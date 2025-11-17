@@ -1,0 +1,24 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /projects/{projectId} {
+      // Para LEER, ACTUALIZAR o BORRAR un proyecto:
+      // El usuario debe estar autenticado Y el campo 'userId' del documento
+      // que YA EXISTE en la base de datos debe ser igual al ID del usuario.
+      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+      
+      // Para CREAR un proyecto:
+      // El usuario debe estar autenticado Y el campo 'userId' del documento
+      // NUEVO que está enviando debe ser igual al ID del usuario.
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+
+      // Reglas para la sub-colección de historial de chat
+      match /chat_history/{messageId} {
+        // Un usuario puede leer y escribir mensajes en el chat de un proyecto
+        // solo si es el propietario de ese proyecto.
+        allow read, write: if request.auth != null && get(/databases/$(database)/documents/projects/$(projectId)).data.userId == request.auth.uid;
+      }
+    }
+  }
+}
