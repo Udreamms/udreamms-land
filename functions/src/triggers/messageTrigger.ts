@@ -1,5 +1,6 @@
 
-import * as functions from 'firebase-functions';
+import { onDocumentCreated } from "firebase-functions/v2/firestore";
+import * as logger from "firebase-functions/logger";
 import { firestore } from 'firebase-admin';
 
 const db = firestore();
@@ -8,16 +9,21 @@ const db = firestore();
  * Se dispara cuando se añade un nuevo mensaje a una conversación.
  * Orquesta la lógica del flujo de trabajo: lee el estado actual, determina el siguiente paso y actualiza el estado.
  */
-export const onMessageCreated = functions.firestore
-  .document('conversations/{conversationId}/messages/{messageId}')
-  .onCreate(async (snap, context) => {
-    const { conversationId } = context.params;
+export const onMessageCreated = onDocumentCreated("conversations/{conversationId}/messages/{messageId}", async (event) => {
+    const { conversationId } = event.params;
+    const snap = event.data;
+
+    if (!snap) {
+        logger.info(`[${conversationId}] No data associated with the event, document may have been deleted.`);
+        return;
+    }
+
     const messageData = snap.data();
 
     // Ignorar mensajes enviados por el bot para evitar bucles infinitos
     if (messageData.sender !== 'customer') {
-      functions.logger.info(`[${conversationId}] Mensaje del bot ignorado.`);
-      return null;
+      logger.info(`[${conversationId}] Mensaje del bot ignorado.`);
+      return;
     }
 
     try {
@@ -27,16 +33,16 @@ export const onMessageCreated = functions.firestore
       const opportunityDoc = await opportunityRef.get();
 
       if (!opportunityDoc.exists) {
-        functions.logger.error(`[${conversationId}] No se encontró la oportunidad correspondiente.`);
-        return null;
+        logger.error(`[${conversationId}] No se encontró la oportunidad correspondiente.`);
+        return;
       }
       
       const userId = opportunityDoc.data()?.userId;
       if (!userId) {
-        functions.logger.error(`[${conversationId}] La oportunidad no tiene un userId asignado. Abortando.`);
-        return null;
+        logger.error(`[${conversationId}] La oportunidad no tiene un userId asignado. Abortando.`);
+        return;
       }
-      functions.logger.info(`[${conversationId}] Procesando para el usuario: ${userId}.`);
+      logger.info(`[${conversationId}] Procesando para el usuario: ${userId}.`);
 
 
       // 2. Leer el estado actual de la conversación del usuario final.
@@ -48,13 +54,13 @@ export const onMessageCreated = functions.firestore
       if (userStateDoc.exists) {
         currentState = userStateDoc.data()?.currentState || 'start';
       }
-      functions.logger.info(`[${conversationId}] Estado actual: ${currentState}.`);
+      logger.info(`[${conversationId}] Estado actual: ${currentState}.`);
 
       // 3. Lógica del flujo de trabajo (SIMULACIÓN)
       // Aquí iría la lógica compleja para determinar el siguiente paso basado en `currentState` y `messageData.content`.
       // Por ahora, simplemente avanzamos a un estado de "processed".
       const nextState = `processed_${new Date().getTime()}`;
-      functions.logger.info(`[${conversationId}] Transición al siguiente estado: ${nextState}.`);
+      logger.info(`[${conversationId}] Transición al siguiente estado: ${nextState}.`);
 
 
       // 4. Escribir el nuevo estado, sellándolo con el `userId`.
@@ -65,14 +71,14 @@ export const onMessageCreated = functions.firestore
         // Aquí se podrían añadir más detalles, como el workflowId activo.
       }, { merge: true });
 
-      functions.logger.info(`[${conversationId}] Estado actualizado correctamente.`);
+      logger.info(`[${conversationId}] Estado actualizado correctamente.`);
 
       // TODO: Aquí se podría disparar la acción de respuesta (p.ej. enviar un mensaje de vuelta).
 
-      return null;
+      return;
 
     } catch (error) {
-      functions.logger.error(`[${conversationId}] Error al procesar el mensaje:`, error);
-      return null;
+      logger.error(`[${conversationId}] Error al procesar el mensaje:`, error);
+      return;
     }
   });

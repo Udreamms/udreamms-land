@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,19 +17,26 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { 
     MessageCircle, Smartphone, Mail, MessageSquare, Send, Phone, Voicemail, Settings2,
-    Rss, Bot, Bell, Globe, Search, Github, User, CheckCircle, AlertTriangle
+    Rss, Bot, Bell, Globe, Search, User, CheckCircle, AlertTriangle
 } from "lucide-react"
+import DiscordIcon from "@/components/icons/DiscordIcon"
+import InstagramIcon from "@/components/icons/InstagramIcon"
+import WhatsappIcon from "@/components/icons/WhatsappIcon"
+import FacebookMessengerIcon from "@/components/icons/FacebookMessengerIcon"
+import TikTokIcon from "@/components/icons/TikTokIcon"
+import GitHubIcon from "@/components/icons/GitHubIcon"
+import { motion } from "framer-motion"
 
 const initialChannels = [
     // Business Messaging
-    { name: "WhatsApp Business API", description: "Connect the WhatsApp Business API via Facebook to engage with your customers.", icon: <MessageCircle className="h-8 w-8 text-green-500" />, badge: "Popular", category: "Business Messaging", path: "/cto/channels/whatsapp", status: "connected" },
-    { name: "TikTok", description: "Connect TikTok Business Messaging to engage with a whole new audience.", icon: <Bot className="h-8 w-8" />, badge: "Beta", category: "Business Messaging", path: "/cto/channels/tiktok", status: "disconnected" },
-    { name: "Facebook Messenger", description: "Connect Facebook Messenger to interact with your customers on the world's largest social media platform.", icon: <MessageSquare className="h-8 w-8 text-blue-600" />, badge: "Popular", category: "Business Messaging", path: "/cto/channels/facebook", status: "disconnected" },
-    { name: "Instagram", description: "Connect Instagram to respond to private messages and build strong brand connections.", icon: <Bot className="h-8 w-8 text-pink-500" />, category: "Business Messaging", path: "/cto/channels/instagram", status: "disconnected" },
+    { name: "WhatsApp Business API", description: "Connect the WhatsApp Business API via Facebook to engage with your customers.", icon: <WhatsappIcon className="h-8 w-8 text-green-500" />, badge: "Popular", category: "Business Messaging", path: "/cto/channels/whatsapp", status: "connected" },
+    { name: "TikTok", description: "Connect TikTok Business Messaging to engage with a whole new audience.", icon: <TikTokIcon className="h-8 w-8" />, badge: "Beta", category: "Business Messaging", path: "/cto/channels/tiktok", status: "disconnected" },
+    { name: "Facebook Messenger", description: "Connect Facebook Messenger to interact with your customers on the world's largest social media platform.", icon: <FacebookMessengerIcon className="h-8 w-8 text-blue-600" />, badge: "Popular", category: "Business Messaging", path: "/cto/channels/facebook", status: "disconnected" },
+    { name: "Instagram", description: "Connect Instagram to respond to private messages and build strong brand connections.", icon: <InstagramIcon className="h-8 w-8 text-pink-500" />, category: "Business Messaging", path: "/cto/channels/instagram", status: "disconnected" },
     { name: "Telegram", description: "Connect your Telegram Bot to provide real-time support when customers reach out.", icon: <Send className="h-8 w-8 text-sky-500" />, category: "Business Messaging", path: "/cto/channels/telegram", status: "error" },
     { name: "Google Business Messages", description: "Allow customers to message you directly from Google Search and Maps.", icon: <MessageCircle className="h-8 w-8 text-blue-500" />, category: "Business Messaging", path: "/cto/channels/google-business", status: "disconnected" },
     { name: "Slack", description: "Receive and respond to messages from your Slack channels directly within the platform.", icon: <MessageSquare className="h-8 w-8 text-purple-500" />, category: "Business Messaging", path: "/cto/channels/slack", status: "disconnected" },
-    { name: "Discord", description: "Connect your Discord server to send notifications and manage channel messages.", icon: <Bot className="h-8 w-8 text-indigo-500" />, category: "Business Messaging", path: "/cto/channels/discord", status: "disconnected" },
+    { name: "Discord", description: "Connect your Discord server to send notifications and manage channel messages.", icon: <DiscordIcon className="h-8 w-8 text-indigo-500" />, category: "Business Messaging", path: "/cto/channels/discord", status: "disconnected" },
 
     // Calling
     { name: "Viber", description: "Connect your Viber Bot to facilitate customer service and interaction on Viber.", icon: <Phone className="h-8 w-8 text-purple-600" />, category: "Calling", path: "/cto/channels/viber", status: "disconnected" },
@@ -47,7 +55,7 @@ const initialChannels = [
 
     // Others
     { name: "Firebase Cloud Messaging (FCM)", description: "Connect FCM to send push notifications to your mobile and web apps directly from your flows.", icon: <Bell className="h-8 w-8 text-yellow-500" />, category: "All", path: "/cto/channels/fcm", status: "disconnected", buttonText: "Configure" },
-    { name: "GitHub", description: "Connect GitHub to receive notifications for issues, pull requests, and commits in your flows.", icon: <Github className="h-8 w-8" />, category: "All", path: "/cto/channels/github", status: "disconnected" },
+    { name: "GitHub", description: "Connect GitHub to receive notifications for issues, pull requests, and commits in your flows.", icon: <GitHubIcon className="h-8 w-8" />, category: "All", path: "/cto/channels/github", status: "disconnected" },
     { name: "Custom Channel", description: "Connect any channel not natively available to extend your messaging capabilities.", icon: <Settings2 className="h-8 w-8 text-orange-500" />, category: "All", path: "/cto/channels/custom", status: "disconnected" },
 ];
 
@@ -77,7 +85,7 @@ export default function ChannelsContent() {
       case 'connected':
         return <Badge variant="outline" className="border-green-500 text-green-500"><CheckCircle className="w-3 h-3 mr-1" /> Active</Badge>;
       case 'error':
-        return <Badge variant="destructive"><AlertTriangle className="w-3 h-3 mr-1"/> Error</Badge>;
+        return <Badge variant="destructive"><AlertTriangle className="w-3 h-3 mr-1" /> Error</Badge>;
       default:
         return null;
     }
@@ -88,11 +96,29 @@ export default function ChannelsContent() {
       case 'connected':
         return <Button variant="outline">Manage Connection</Button>;
       case 'error':
-        return <Button variant="destructive">Reconnect</Button>;
+        return <Button variant="secondary">Reconnect</Button>;
       default:
         return <Button variant="outline">{channel.buttonText || "Connect"}</Button>
     }
   }
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+    },
+  };
 
   return (
     <div className="space-y-8 p-8 flex-1">
@@ -128,37 +154,45 @@ export default function ChannelsContent() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {filteredChannels.map((channel) => (
-          <div
-            key={channel.name}
-            className={`rounded-lg border bg-neutral-900 text-white shadow-sm flex flex-col justify-between p-6 space-y-4 border-neutral-800 hover:border-neutral-700 transition-all`}
-          >
-            <div className="space-y-3">
-              <div className="flex items-start justify-between">
-                {channel.icon}
-                <div className="flex gap-2">
-                    {getStatusComponent(channel.status)}
-                    {channel.badge && (
-                    <Badge
-                        variant={channel.badge === "Popular" ? "default" : "secondary"}
-                        className={channel.badge === 'Popular' ? 'bg-green-900/50 border-green-800/50 text-green-300' : 'bg-blue-900/50 border-blue-800/50 text-blue-300'}
-                    >
-                        {channel.badge}
-                    </Badge>
-                    )}
+          <Link href={channel.path} key={channel.name}>
+            <motion.div
+              className="rounded-lg border bg-neutral-900 text-white shadow-sm flex flex-col justify-between p-6 space-y-4 border-neutral-800 hover:border-neutral-700 transition-all cursor-pointer"
+              variants={itemVariants}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <div className="space-y-3">
+                <div className="flex items-start justify-between">
+                  {channel.icon}
+                  <div className="flex gap-2">
+                      {getStatusComponent(channel.status)}
+                      {channel.badge && (
+                      <Badge
+                          variant={channel.badge === "Popular" ? "default" : "secondary"}
+                          className={channel.badge === 'Popular' ? 'bg-green-900/50 border-green-800/50 text-green-300' : 'bg-blue-900/50 border-blue-800/50 text-blue-300'}
+                      >
+                          {channel.badge}
+                      </Badge>
+                      )}
+                  </div>
                 </div>
+                <h3 className="font-semibold">{channel.name}</h3>
+                <p className="text-sm text-gray-400">
+                  {channel.description}
+                </p>
               </div>
-              <h3 className="font-semibold">{channel.name}</h3>
-              <p className="text-sm text-gray-400">
-                {channel.description}
-              </p>
-            </div>
-            {getButton(channel)}
-          </div>
+              {getButton(channel)}
+            </motion.div>
+          </Link>
         ))}
-      </div>
+      </motion.div>
     </div>
   )
 }
-
