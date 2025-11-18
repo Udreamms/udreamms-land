@@ -32,7 +32,6 @@ export function Sidebar({ isCollapsed, toggleSidebar }: SidebarProps) {
         </div>
         {!isCollapsed && <ChevronDown className="w-5 h-5" />}
       </div>
-
       <nav>
         <ul>
           <li>
@@ -62,7 +61,6 @@ export function Sidebar({ isCollapsed, toggleSidebar }: SidebarProps) {
           </li>
         </ul>
       </nav>
-
       <div className="space-y-2 pt-4">
         {!isCollapsed && <h3 className="text-sm px-2 text-gray-500">Team Spaces</h3>}
         <ul>
@@ -79,12 +77,14 @@ export function Sidebar({ isCollapsed, toggleSidebar }: SidebarProps) {
           <li><Link href="#" className="flex items-center p-2 hover:bg-blue-500/20 rounded-md text-sm"><Users className="w-4 h-4 mr-3" /> {!isCollapsed && 'CHRO (Chief Human...)'}</Link></li>
           <li>
             <DropdownMenu>
-                <Link href="/cto" passHref legacyBehavior>
-                    <DropdownMenuTrigger asChild>
-                        <a className="flex items-center p-2 hover:bg-blue-500/20 rounded-md text-sm w-full">
-                            <Code className="w-4 h-4 mr-3" /> {!isCollapsed && 'CTO (Chief Technology...)'}
-                        </a>
-                    </DropdownMenuTrigger>
+                <Link href="/cto">
+                  {/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */
+                  }
+                  <DropdownMenuTrigger asChild>
+                      <a className="flex items-center p-2 hover:bg-blue-500/20 rounded-md text-sm w-full">
+                          <Code className="w-4 h-4 mr-3" /> {!isCollapsed && 'CTO (Chief Technology...)'}
+                      </a>
+                  </DropdownMenuTrigger>
                 </Link>
                 <DropdownMenuContent side="right" align="start">
                 <DropdownMenuItem asChild>
@@ -96,39 +96,38 @@ export function Sidebar({ isCollapsed, toggleSidebar }: SidebarProps) {
                 <DropdownMenuItem asChild>
                     <Link href="/cto/web-design">
                     <LayoutTemplate />
-                    <span>Web Design</span>
+                    <span>Web Design & Development</span>
                     </Link>
                 </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                        <Link href="/cto/team-management">
-                            <Users />
-                            <span>Gesti&oacute;n de Equipos</span>
-                        </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                        <Link href="/cto/infrastructure">
-                            <Network />
-                            <span>Infraestructura y Redes</span>
-                        </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                        <Link href="/cto/security">
-                            <Shield />
-                            <span>Seguridad Inform&aacute;tica</span>
-                        </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                        <Link href="/cto/support">
-                            <Wrench />
-                            <span>Soporte T&eacute;cnico</span>
-                        </Link>
-                    </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href="/cto/area-administration">
+                        <Users />
+                        <span>Area Administration (Technical Management)</span>
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href="/cto/infrastructure-support">
+                        <Wrench />
+                        <span>Infrastructure and Support</span>
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href="/cto/data-security-management">
+                        <Shield />
+                        <span>Data Security and Management</span>
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href="/cto/innovation-automation">
+                        <Bot />
+                        <span>Innovation and Automation</span>
+                    </Link>
+                </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
           </li>
         </ul>
       </div>
-
       <div className="mt-auto space-y-2">
         <ul>
           <li><Link href="#" className="flex items-center p-2 hover:bg-blue-500/20 rounded-md text-sm"><Settings className="w-4 h-4 mr-3" /> {!isCollapsed && 'Settings'}</Link></li>

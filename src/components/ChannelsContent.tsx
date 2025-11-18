@@ -83,7 +83,7 @@ export default function ChannelsContent() {
   const getStatusComponent = (status: string) => {
     switch (status) {
       case 'connected':
-        return <Badge variant="outline" className="border-green-500 text-green-500"><CheckCircle className="w-3 h-3 mr-1" /> Active</Badge>;
+        return <Badge variant="outline" className="border-green-500 text-green-500 bg-green-500/10"><CheckCircle className="w-3 h-3 mr-1" /> Active</Badge>;
       case 'error':
         return <Badge variant="destructive"><AlertTriangle className="w-3 h-3 mr-1" /> Error</Badge>;
       default:
@@ -94,11 +94,11 @@ export default function ChannelsContent() {
   const getButton = (channel: any) => {
      switch (channel.status) {
       case 'connected':
-        return <Button variant="outline">Manage Connection</Button>;
+        return <Button variant="outline" className="bg-white/10 border-white/20 hover:bg-white/20">Manage Connection</Button>;
       case 'error':
         return <Button variant="secondary">Reconnect</Button>;
       default:
-        return <Button variant="outline">{channel.buttonText || "Connect"}</Button>
+        return <Button variant="outline" className="bg-white/10 border-white/20 hover:bg-white/20">{channel.buttonText || "Connect"}</Button>
     }
   }
 
@@ -161,36 +161,37 @@ export default function ChannelsContent() {
         animate="visible"
       >
         {filteredChannels.map((channel) => (
-          <Link href={channel.path} key={channel.name}>
-            <motion.div
-              className="rounded-lg border bg-neutral-900 text-white shadow-sm flex flex-col justify-between p-6 space-y-4 border-neutral-800 hover:border-neutral-700 transition-all cursor-pointer"
-              variants={itemVariants}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <div className="space-y-3">
-                <div className="flex items-start justify-between">
-                  {channel.icon}
-                  <div className="flex gap-2">
-                      {getStatusComponent(channel.status)}
-                      {channel.badge && (
-                      <Badge
-                          variant={channel.badge === "Popular" ? "default" : "secondary"}
-                          className={channel.badge === 'Popular' ? 'bg-green-900/50 border-green-800/50 text-green-300' : 'bg-blue-900/50 border-blue-800/50 text-blue-300'}
-                      >
-                          {channel.badge}
-                      </Badge>
-                      )}
-                  </div>
+          <motion.div
+            key={channel.name}
+            className="rounded-lg border bg-white/10 backdrop-blur-lg text-white shadow-lg flex flex-col justify-between p-6 space-y-4 border-white/20 hover:border-white/40 transition-all"
+            variants={itemVariants}
+            whileHover={{ scale: 1.05, boxShadow: '0 0 15px rgba(255,255,255,0.1)' }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <div className="space-y-3">
+              <div className="flex items-start justify-between">
+                {channel.icon}
+                <div className="flex gap-2">
+                    {getStatusComponent(channel.status)}
+                    {channel.badge && (
+                    <Badge
+                        variant={channel.badge === "Popular" ? "default" : "secondary"}
+                        className={channel.badge === 'Popular' ? 'bg-green-900/50 border-green-800/50 text-green-300' : 'bg-blue-900/50 border-blue-800/50 text-blue-300'}
+                    >
+                        {channel.badge}
+                    </Badge>
+                    )}
                 </div>
-                <h3 className="font-semibold">{channel.name}</h3>
-                <p className="text-sm text-gray-400">
-                  {channel.description}
-                </p>
               </div>
+              <h3 className="font-semibold">{channel.name}</h3>
+              <p className="text-sm text-gray-400">
+                {channel.description}
+              </p>
+            </div>
+            <Link href={channel.path} passHref>
               {getButton(channel)}
-            </motion.div>
-          </Link>
+            </Link>
+          </motion.div>
         ))}
       </motion.div>
     </div>
