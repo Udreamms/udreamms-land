@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { Sidebar } from '../../../components/Sidebar';
-import ChannelsContent from '../../../components/ChannelsContent';
+import { DataSecurityManagementContent } from '../../../components/DataSecurityManagementContent';
 
-export default function CtoChannelsPage() {
+export default function DataSecurityManagementPage() {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const toggleSidebar = () => {
@@ -14,7 +14,7 @@ export default function CtoChannelsPage() {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
       <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
-      <ChannelsContent />
+      <DataSecurityManagementContent />
     </div>
   );
 }
