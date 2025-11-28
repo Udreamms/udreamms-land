@@ -1,52 +1,92 @@
 
 // functions/src/triggers/sendWhatsappMessage.ts
 
-import { https } from 'firebase-functions';
-import { db } from '../config/firebase'; // Keep db for future Firestore interactions
+import { onCall, HttpsError } from 'firebase-functions/v2/https';
+import { db, admin } from '../config/firebase';
+import axios from 'axios';
 
-/**
- * A callable function to send a WhatsApp message from the CRM.
- * This is a placeholder and will be fully implemented later.
- */
-export const sendWhatsappMessage = https.onCall(async (data, context) => {
-  if (!context.auth) {
-    throw new https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
+export const sendWhatsappMessage = onCall(async (request) => {
+  // New syntax: check auth status from request.auth
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'The function must be called while authenticated.');
   }
 
-  const { conversationId, text } = data;
-  if (!conversationId || !text) {
-    throw new https.HttpsError('invalid-argument', 'Missing conversationId or text.');
+  // New syntax: data is accessed from request.data
+  const { groupId, cardId, text } = request.data;
+  if (!groupId || !cardId || !text) {
+    throw new HttpsError('invalid-argument', 'Missing groupId, cardId, or text.');
   }
 
+  const cardRef = db.collection('kanban-groups').doc(groupId).collection('cards').doc(cardId);
+  
+  const optimisticMessage = {
+    id: `local_${Date.now()}`,
+    text: text,
+    sender: 'cso',
+    timestamp: new Date(),
+    status: 'sending',
+  };
+
+  await cardRef.update({
+    messages: admin.firestore.FieldValue.arrayUnion(optimisticMessage),
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+  
   try {
-    // --- Placeholder Logic ---
-    // In the future, this function will:
-    // 1. Fetch conversation details from Firestore using the conversationId.
-    //    - This will give us the recipient's WhatsApp number.
-    // 2. Use an HTTP client (like axios) to make a POST request to the WhatsApp Business API.
-    //    - This will send the message text to the recipient.
-    // 3. Save the sent message to the Firestore conversation for logging.
+    const cardSnap = await cardRef.get();
+    if (!cardSnap.exists) throw new HttpsError('not-found', 'Card not found.');
+    
+    const cardData = cardSnap.data();
+    const recipientNumber = cardData?.contactNumber?.replace('+', '');
+    if (!recipientNumber) throw new HttpsError('failed-precondition', 'Contact number is missing.');
 
-    console.log(`Attempting to send message: "${text}" to conversation: ${conversationId}`);
-    
-    // For now, we'll just log the action and return a success response.
-    // This allows the rest of the functions to deploy without error.
-    
-    // We'll use the 'db' variable here to satisfy the linter, even if it's a simple read.
-    const placeholderRef = db.collection('conversations').doc(conversationId);
-    const doc = await placeholderRef.get();
-    if (!doc.exists) {
-        console.log('Conversation not found for placeholder logic, but proceeding.');
+    const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+    const accessToken = process.env.WHATSAPP_TOKEN;
+    if (!phoneNumberId || !accessToken) {
+        console.error('WhatsApp API credentials are not set.');
+        throw new Error('Server configuration error.');
     }
+    
+    const url = `https://graph.facebook.com/v18.0/${phoneNumberId}/messages`;
+    const response = await axios.post(url, 
+      {
+        messaging_product: 'whatsapp',
+        to: recipientNumber,
+        type: 'text',
+        text: { body: text },
+      },
+      {
+        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+      }
+    );
 
+    const messageId = response.data.messages[0]?.id;
+    if (!messageId) throw new Error('No message ID returned from WhatsApp.');
 
-    return { success: true, message: 'Message sending logic is a placeholder.', wamid: 'placeholder-wamid' };
+    const finalMessage = { ...optimisticMessage, id: messageId, status: 'sent' };
+    
+    const currentMessages = cardSnap.data()?.messages || [];
+    const updatedMessages = currentMessages.map((msg: any) => 
+      msg.id === optimisticMessage.id ? finalMessage : msg
+    );
 
-  } catch (error) {
-    console.error('Error in placeholder sendWhatsappMessage function:', error);
-    if (error instanceof https.HttpsError) {
+    await cardRef.update({ messages: updatedMessages });
+    
+    return { success: true, wamid: messageId };
+
+  } catch (error: any) {
+    console.error('Error sending WhatsApp message:', error.response ? error.response.data : error.message);
+    
+    const errorMessage = { ...optimisticMessage, status: 'error' };
+    const currentMessages = (await cardRef.get()).data()?.messages || [];
+    const updatedMessages = currentMessages.map((msg: any) => 
+      msg.id === optimisticMessage.id ? errorMessage : msg
+    );
+    await cardRef.update({ messages: updatedMessages });
+    
+    if (error instanceof HttpsError) {
       throw error;
     }
-    throw new https.HttpsError('internal', 'Placeholder function failed.');
+    throw new HttpsError('internal', 'Failed to send message.');
   }
 });

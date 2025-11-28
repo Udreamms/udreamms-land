@@ -3,7 +3,8 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { getStorage } from 'firebase/storage'; // Import getStorage
+import { getStorage } from 'firebase/storage';
+import { getFunctions } from 'firebase/functions'; // <--- 1. Importar getFunctions
 
 // Your web app's Firebase configuration
 export const firebaseConfig = {
@@ -22,7 +23,8 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 // Get Firebase services
 const db = getFirestore(app);
 const auth = getAuth(app);
-const storage = getStorage(app); // Initialize Storage
+const storage = getStorage(app);
+const functions = getFunctions(app); // <--- 2. Inicializar Functions
 
 // Export the services
-export { app, db, auth, storage }; // Export storage
+export { app, db, auth, storage, functions }; // <--- 3. Exportar functions

@@ -1,58 +1,25 @@
 {
-  "indexes": [
+  "indexes": [],
+  "fieldOverrides": [
     {
-      "collectionGroup": "bots",
-      "queryScope": "COLLECTION",
-      "fields": [
+      "collectionGroup": "cards",
+      "fieldPath": "contactName",
+      "indexes": [
         {
-          "fieldPath": "channelId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "status",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "intent",
-          "order": "ASCENDING"
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION_GROUP"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
-      "collectionGroup": "bots",
-      "queryScope": "COLLECTION",
-      "fields": [
+      "collectionGroup": "cards",
+      "fieldPath": "contactNumber",
+      "indexes": [
         {
-          "fieldPath": "isWelcomeBot",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "channelId",
-          "order": "ASCENDING"
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION_GROUP"
         }
-      ],
-      "density": "SPARSE_ALL"
-    },
-    {
-      "collectionGroup": "prospects",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "hasScheduledMeeting",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "remindersActive",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "createdAt",
-          "order": "ASCENDING"
-        }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     }
-  ],
-  "fieldOverrides": []
+  ]
 }
