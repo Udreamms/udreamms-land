@@ -2,8 +2,8 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { firebaseApp } from '../../../firebaseapp';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../lib/firebase'; // <--- CAMBIO IMPORTANTE
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -16,9 +16,9 @@ export default function LoginPage() {
     setError(null);
 
     try {
-        const auth = getAuth(firebaseApp);
+        // Ahora usamos directamente la instancia 'auth' importada
         await signInWithEmailAndPassword(auth, email, password);
-        router.push('/dashboard');
+        router.push('/cso/whatsapp'); // <-- Te envío directo a los chats
     } catch (error: any) {
         setError(error.message);
     }

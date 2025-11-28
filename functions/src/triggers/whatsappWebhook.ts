@@ -1,85 +1,76 @@
 
-import * as functions from "firebase-functions";
-import { firestore } from "firebase-admin";
+// functions/src/triggers/whatsappWebhook.ts
+
+import { https } from 'firebase-functions';
+import { db } from '../config/firebase';
+import { FieldValue } from 'firebase-admin/firestore';
 
 /**
- * Webhook para procesar mensajes entrantes de WhatsApp.
- * Esta función es el punto de entrada para todos los mensajes de los clientes finales.
+ * Creates a new card in the "Bandeja de Entrada" Kanban group for a new WhatsApp message.
+ * @param {string} from The sender's WhatsApp number.
+ * @param {string} text The content of the message.
  */
-export const whatsappWebhook = functions.https.onRequest(async (req, res) => {
-  // 1. Extraer datos y validar la solicitud
-  // En producción, se debe validar la firma de la solicitud para seguridad.
-  const { from, body } = req.body;
-
-  if (!from || !body) {
-    functions.logger.warn("Solicitud inválida: falta 'from' o 'body'.");
-    res.status(400).send("Solicitud inválida.");
-    return;
-  }
-
-  const db = firestore();
-  let userId: string;
-
+async function createKanbanCardInInbox(from: string, text: string) {
   try {
-    // 2. Determinar el propietario del número de teléfono (LA CLAVE MULTI-INQUILINO)
-    // Buscamos en la colección `phoneNumbers` para encontrar a qué usuario de nuestra plataforma
-    // le pertenece el número de WhatsApp que envía el mensaje.
-    const phoneNumbersRef = db.collection("phoneNumbers").doc(from);
-    const phoneDoc = await phoneNumbersRef.get();
+    // 1. Find the "Bandeja de Entrada" group.
+    const groupsQuery = db.collection('kanban-groups').where('name', '==', 'Bandeja de Entrada').limit(1);
+    const snapshot = await groupsQuery.get();
 
-    if (!phoneDoc.exists || !phoneDoc.data()?.userId) {
-      // Si el número no está registrado por ninguno de nuestros usuarios, no podemos procesar el mensaje.
-      functions.logger.error(`Mensaje recibido de un número no registrado: ${from}. No se puede asignar a ningún usuario.`);
-      res.status(403).send("Número de teléfono no registrado en la plataforma.");
+    if (snapshot.empty) {
+      console.error('CRITICAL: Kanban group "Bandeja de Entrada" not found. Please ensure it exists and the name matches exactly.');
       return;
     }
 
-    userId = phoneDoc.data()!.userId;
-    functions.logger.info(`Mensaje de ${from} asignado al usuario: ${userId}`);
+    const inboxGroup = snapshot.docs[0];
+    const groupId = inboxGroup.id;
 
-    // 3. Crear o actualizar la Oportunidad (AHORA CON `userId`)
-    const opportunityId = from; // Seguimos usando el número como ID para fácil acceso
-    const opportunityRef = db.collection("opportunities").doc(opportunityId);
-    const opportunityDoc = await opportunityRef.get();
-
-    const opportunityData = {
-      userId, // <-- Sello de propiedad
-      name: `Oportunidad ${from.slice(-4)}`,
-      phoneNumber: from,
-      source: 'WhatsApp',
-      lastMessageSnippet: body,
-      hasUnreadMessages: true,
-      lastContacted: firestore.FieldValue.serverTimestamp(),
-    };
-
-    if (!opportunityDoc.exists) {
-      await opportunityRef.set({
-        ...opportunityData,
-        currentPipeline: "default",
-        currentStage: "new",
-        createdAt: firestore.FieldValue.serverTimestamp(),
-      });
-    } else {
-      await opportunityRef.update(opportunityData);
-    }
-
-    // 4. Registrar el mensaje en la subcolección de la conversación (AHORA TAMBIÉN CON `userId`)
-    const conversationRef = db.collection("conversations").doc(opportunityId);
-    // El documento principal de la conversación también debe tener el userId para reglas de seguridad.
-    await conversationRef.set({ userId }, { merge: true }); 
-    
-    const messagesSubCollectionRef = conversationRef.collection("messages");
-    await messagesSubCollectionRef.add({
-      content: body,
-      timestamp: firestore.FieldValue.serverTimestamp(),
-      sender: "customer", // Mensaje del cliente final
+    // 2. Create a new card in its "cards" subcollection.
+    await db.collection('kanban-groups').doc(groupId).collection('cards').add({
+      content: `De: ${from} - "${text}"`,
+      createdAt: FieldValue.serverTimestamp(),
     });
-    
-    functions.logger.info(`Mensaje de ${from} procesado y guardado correctamente.`);
-    res.status(200).send("Datos procesados exitosamente.");
+    console.log(`New card created in "Bandeja de Entrada" for message from ${from}.`);
 
   } catch (error) {
-    functions.logger.error("Error grave en el webhook de WhatsApp:", error);
-    res.status(500).send("Error interno del servidor.");
+    console.error('Error creating Kanban card:', error);
+  }
+}
+
+/**
+ * Webhook for receiving messages from WhatsApp.
+ */
+export const whatsappWebhook = https.onRequest(async (req, res) => {
+  if (req.method === 'POST') {
+    const body = req.body;
+    try {
+      if (body.object && body.entry?.[0]?.changes?.[0]?.value.messages?.[0]) {
+        const messageData = body.entry[0].changes[0].value.messages[0];
+        const from = messageData.from;
+        const text = messageData.text?.body;
+
+        if (text) {
+          // --- Corrected Logic ---
+          // Always create the Kanban card in the single inbox group.
+          await createKanbanCardInInbox(from, text);
+          // --- End Corrected Logic ---
+        }
+      }
+      res.sendStatus(200);
+    } catch (error) {
+      console.error('Error processing WhatsApp webhook:', error);
+      res.sendStatus(500);
+    }
+  } else if (req.method === 'GET') {
+    // Verification logic remains the same
+    const mode = req.query['hub.mode'];
+    const token = req.query['hub.verify_token'];
+    const challenge = req.query['hub.challenge'];
+    if (mode === 'subscribe' && token === process.env.WHATSAPP_VERIFY_TOKEN) {
+      res.status(200).send(challenge);
+    } else {
+      res.sendStatus(403);
+    }
+  } else {
+    res.sendStatus(405);
   }
 });
