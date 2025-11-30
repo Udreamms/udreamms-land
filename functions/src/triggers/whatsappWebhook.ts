@@ -4,7 +4,13 @@
 import { onRequest } from 'firebase-functions/v2/https';
 import { db } from '../config/firebase';
 import { FieldValue } from 'firebase-admin/firestore';
+import { handleBotConversation } from '../bot-engine/engine'; // Importamos el motor del bot
 
+// --- Funciones de Ayuda ---
+
+/**
+ * Obtiene el ID del grupo 'Bandeja de Entrada' o lo crea si no existe.
+ */
 async function getInboxGroupId(): Promise<string> {
   const groupsQuery = db.collection('kanban-groups').where('name', '==', 'Bandeja de Entrada');
   const snapshot = await groupsQuery.get();
@@ -21,7 +27,29 @@ async function getInboxGroupId(): Promise<string> {
   }
 }
 
+/**
+ * Comprueba si un bot debe manejar el mensaje entrante.
+ * @param {string} fromNumber El número de teléfono del remitente.
+ * @returns {Promise<boolean>} True si el bot debe manejarlo, false en caso contrario.
+ */
+const shouldBotHandle = async (fromNumber: string): Promise<boolean> => {
+  // Comprobar si el usuario ya tiene una sesión activa
+  const sessionSnap = await db.collection('whatsapp_sessions').doc(fromNumber).get();
+  if (sessionSnap.exists) {
+    return true; // Si ya está en una conversación, el bot debe continuar
+  }
+
+  // Si no hay sesión, comprobar si hay algún bot activo en el sistema
+  const activeBotQuery = db.collection('chatbots').where('isActive', '==', true).limit(1);
+  const activeBotSnap = await activeBotQuery.get();
+  return !activeBotSnap.empty; // Si existe al menos un bot activo, el bot debe empezar
+};
+
+
+// --- Webhook Principal ---
+
 export const whatsappWebhook = onRequest(async (req, res) => {
+  // Verificación del webhook (sin cambios)
   if (req.method === 'GET' && req.query['hub.mode'] === 'subscribe' && req.query['hub.verify_token'] === process.env.WHATSAPP_VERIFY_TOKEN) {
     res.status(200).send(req.query['hub.challenge']);
     return;
@@ -41,6 +69,21 @@ export const whatsappWebhook = onRequest(async (req, res) => {
       return;
     }
 
+    // --- Inicio de la Lógica del Despachador del Bot ---
+    if (change.messages?.[0]) {
+      const messageData = change.messages[0];
+      const fromNumber = messageData.from;
+
+      if (await shouldBotHandle(fromNumber)) {
+        await handleBotConversation(messageData);
+        res.sendStatus(200); // El bot se encargó, terminamos la ejecución.
+        return;
+      }
+    }
+    // --- Fin de la Lógica del Despachador del Bot ---
+
+
+    // Si el bot no manejó el mensaje, la ejecución continúa con tu lógica original...
     if (change.messages?.[0]) {
       const messageData = change.messages[0];
       const contactData = change.contacts?.[0];
@@ -88,6 +131,7 @@ export const whatsappWebhook = onRequest(async (req, res) => {
       }
     } 
     else if (change.statuses?.[0]) {
+      // La lógica de actualización de estado no se ve afectada
       const statusData = change.statuses[0];
       const messageId = statusData.id;
       const newStatus = statusData.status;

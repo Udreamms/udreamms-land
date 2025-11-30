@@ -1,10 +1,14 @@
 
+"use client";
 // src/components/CsoAutomationContent.tsx
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Bot, Zap, Clock, Users, FileText, Settings } from "lucide-react";
+import { useRouter } from 'next/navigation';
 
 export function CsoAutomationContent() {
+  const router = useRouter();
+
   const features = [
     {
       icon: <FileText className="w-6 h-6" />,
@@ -44,6 +48,12 @@ export function CsoAutomationContent() {
     }
   ];
 
+  const handleCardClick = (title: string) => {
+    if (title === "Chatbots") {
+      router.push('/cso/automation/chatbots');
+    }
+  };
+
   return (
     <main className="flex-1 p-10 bg-neutral-900 text-white">
       <div className="mb-8">
@@ -55,7 +65,11 @@ export function CsoAutomationContent() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {features.map((feature, index) => (
-          <Card key={index} className="bg-neutral-800 border-neutral-700 text-white flex flex-col">
+          <Card 
+            key={index} 
+            className="bg-neutral-800 border-neutral-700 text-white flex flex-col hover:bg-neutral-700 transition-colors duration-200 cursor-pointer"
+            onClick={() => handleCardClick(feature.title)}
+          >
             <CardHeader>
               <div className="flex items-center gap-4">
                 {feature.icon}

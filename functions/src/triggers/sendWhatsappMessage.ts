@@ -3,15 +3,13 @@
 
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { db, admin } from '../config/firebase';
-import axios from 'axios';
+import { sendApiMessage } from '../utils/whatsapp'; // Importamos la nueva función
 
 export const sendWhatsappMessage = onCall(async (request) => {
-  // New syntax: check auth status from request.auth
   if (!request.auth) {
     throw new HttpsError('unauthenticated', 'The function must be called while authenticated.');
   }
 
-  // New syntax: data is accessed from request.data
   const { groupId, cardId, text } = request.data;
   if (!groupId || !cardId || !text) {
     throw new HttpsError('invalid-argument', 'Missing groupId, cardId, or text.');
@@ -27,6 +25,7 @@ export const sendWhatsappMessage = onCall(async (request) => {
     status: 'sending',
   };
 
+  // Se añade el mensaje optimista a la base de datos
   await cardRef.update({
     messages: admin.firestore.FieldValue.arrayUnion(optimisticMessage),
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -40,28 +39,10 @@ export const sendWhatsappMessage = onCall(async (request) => {
     const recipientNumber = cardData?.contactNumber?.replace('+', '');
     if (!recipientNumber) throw new HttpsError('failed-precondition', 'Contact number is missing.');
 
-    const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-    const accessToken = process.env.WHATSAPP_TOKEN;
-    if (!phoneNumberId || !accessToken) {
-        console.error('WhatsApp API credentials are not set.');
-        throw new Error('Server configuration error.');
-    }
-    
-    const url = `https://graph.facebook.com/v18.0/${phoneNumberId}/messages`;
-    const response = await axios.post(url, 
-      {
-        messaging_product: 'whatsapp',
-        to: recipientNumber,
-        type: 'text',
-        text: { body: text },
-      },
-      {
-        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-      }
-    );
-
-    const messageId = response.data.messages[0]?.id;
-    if (!messageId) throw new Error('No message ID returned from WhatsApp.');
+    // --- Lógica de envío refactorizada ---
+    // Ahora llamamos a la función centralizada
+    const messageId = await sendApiMessage(recipientNumber, text);
+    // ------------------------------------
 
     const finalMessage = { ...optimisticMessage, id: messageId, status: 'sent' };
     
@@ -75,9 +56,10 @@ export const sendWhatsappMessage = onCall(async (request) => {
     return { success: true, wamid: messageId };
 
   } catch (error: any) {
-    console.error('Error sending WhatsApp message:', error.response ? error.response.data : error.message);
+    console.error('Error in sendWhatsappMessage function:', error);
     
     const errorMessage = { ...optimisticMessage, status: 'error' };
+    // Volvemos a leer los mensajes para asegurar que tenemos la última versión
     const currentMessages = (await cardRef.get()).data()?.messages || [];
     const updatedMessages = currentMessages.map((msg: any) => 
       msg.id === optimisticMessage.id ? errorMessage : msg

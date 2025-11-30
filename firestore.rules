@@ -18,5 +18,11 @@ service cloud.firestore {
     match /{path=**}/cards/{cardId} {
       allow read: if request.auth != null;
     }
+
+    // New rule for chatbots collection
+    // Allows any authenticated user to create, read, update, and delete chatbots.
+    match /chatbots/{botId} {
+      allow read, write: if request.auth != null;
+    }
   }
 }
