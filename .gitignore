@@ -93,3 +93,4 @@ functions/.next/
 *.pid
 *.seed
 *.tgz
+serviceAccountKey.json
