@@ -33,14 +33,14 @@ interface NodeSettingsProps {
 }
 
 // --- Componentes de UI reutilizables ---
-const SettingsSection = ({ title, children }) => (
+const SettingsSection = ({ title, children }: { title: string, children: React.ReactNode }) => (
     <div className="space-y-4 p-4 border border-neutral-800 rounded-lg bg-neutral-900/50">
       <h4 className="font-semibold text-lg text-white">{title}</h4>
       <div className="space-y-4">{children}</div>
     </div>
 );
 
-const Field = ({ label, htmlFor, children, description = null }) => (
+const Field = ({ label, htmlFor, children, description = null }: { label: string, htmlFor: string, children: React.ReactNode, description?: string | null }) => (
     <div>
         <Label htmlFor={htmlFor} className="text-xs font-semibold text-gray-400">{label}</Label>
         {description && <p className="text-xs text-gray-500 mb-2">{description}</p>}
@@ -48,12 +48,12 @@ const Field = ({ label, htmlFor, children, description = null }) => (
     </div>
 );
 
-const FileUploader = ({ onUploadSuccess, initialUrl = null, initialFilename = null }) => {
+const FileUploader = ({ onUploadSuccess, initialUrl = null, initialFilename = null }: { onUploadSuccess: (url: string, filename: string, fileType: string) => void, initialUrl: string | null, initialFilename: string | null }) => {
     const [uploading, setUploading] = useState(false);
     const [progress, setProgress] = useState(0);
-    const [fileUrl, setFileUrl] = useState(initialUrl);
-    const [filename, setFilename] = useState(initialFilename);
-    const [error, setError] = useState(null);
+    const [fileUrl, setFileUrl] = useState<string | null>(initialUrl);
+    const [filename, setFilename] = useState<string | null>(initialFilename);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         setFileUrl(initialUrl);
@@ -140,7 +140,7 @@ const GeneralSettings = ({ node, updateNodeConfig }: NodeSettingsProps) => {
         setNodeName(node.data.label || '');
     }, [node.data.label]);
 
-    const handleNameChange = (e) => {
+    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNodeName(e.target.value);
     };
 
@@ -164,7 +164,7 @@ const TextMessageSettings = ({ node, updateNodeConfig }: NodeSettingsProps) => {
         setContent(node.data.content || '');
     }, [node.data.content]);
 
-    const handleContentChange = (e) => {
+    const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setContent(e.target.value);
     };
 
@@ -200,13 +200,13 @@ const MediaMessageSettings = ({ node, updateNodeConfig }: NodeSettingsProps) => 
         setConfig(prev => ({ ...prev, ...node.data }));
     }, [node.data]);
 
-    const handleUpdate = (data) => {
+    const handleUpdate = (data: any) => {
         const newConfig = { ...config, ...data };
         setConfig(newConfig);
         updateNodeConfig(node.id, newConfig);
     };
     
-    const handleUploadSuccess = (url, filename, fileType) => {
+    const handleUploadSuccess = (url: string, filename: string, fileType: string) => {
         let detectedType = 'document';
         if (fileType.startsWith('image/')) detectedType = 'image';
         else if (fileType.startsWith('video/')) detectedType = 'video';
@@ -250,7 +250,7 @@ const QuickReplySettings = ({ node, updateNodeConfig }: NodeSettingsProps) => {
 
     const handleBlur = () => { updateNodeConfig(node.id, config); };
 
-    const handleButtonChange = (value, index) => {
+    const handleButtonChange = (value: string, index: number) => {
          const newButtons = [...config.buttons];
          newButtons[index] = value;
          setConfig(p => ({...p, buttons: newButtons}));
@@ -264,7 +264,7 @@ const QuickReplySettings = ({ node, updateNodeConfig }: NodeSettingsProps) => {
         }
     };
 
-    const removeButton = (index) => {
+    const removeButton = (index: number) => {
         const newButtons = config.buttons.filter((_, i) => i !== index);
         setConfig(p => ({...p, buttons: newButtons}));
         updateNodeConfig(node.id, { ...config, buttons: newButtons });
@@ -314,7 +314,7 @@ const ListMessageSettings = ({ node, updateNodeConfig }: NodeSettingsProps) => {
         updateNodeConfig(node.id, { ...node.data, listConfig: config });
     };
     
-    const handleFieldChange = (field, value) => {
+    const handleFieldChange = (field: string, value: string) => {
         setConfig(produce(config, draft => {
             draft[field] = value;
         }));
@@ -326,13 +326,13 @@ const ListMessageSettings = ({ node, updateNodeConfig }: NodeSettingsProps) => {
         }));
     };
 
-    const updateSectionTitle = (sectionIndex, title) => {
+    const updateSectionTitle = (sectionIndex: number, title: string) => {
         setConfig(produce(config, draft => {
             draft.sections[sectionIndex].title = title;
         }));
     };
 
-    const deleteSection = (sectionIndex) => {
+    const deleteSection = (sectionIndex: number) => {
         const newConfig = produce(config, draft => {
             draft.sections.splice(sectionIndex, 1);
         });
@@ -340,19 +340,19 @@ const ListMessageSettings = ({ node, updateNodeConfig }: NodeSettingsProps) => {
         updateNodeConfig(node.id, { ...node.data, listConfig: newConfig });
     };
 
-    const addRow = (sectionIndex) => {
+    const addRow = (sectionIndex: number) => {
         setConfig(produce(config, draft => {
              draft.sections[sectionIndex].rows.push({ title: 'Nueva Opción', description: '' });
         }));
     };
     
-    const updateRow = (sectionIndex, rowIndex, field, value) => {
+    const updateRow = (sectionIndex: number, rowIndex: number, field: string, value: string) => {
          setConfig(produce(config, draft => {
             draft.sections[sectionIndex].rows[rowIndex][field] = value;
         }));
     };
 
-    const deleteRow = (sectionIndex, rowIndex) => {
+    const deleteRow = (sectionIndex: number, rowIndex: number) => {
         const newConfig = produce(config, draft => {
             draft.sections[sectionIndex].rows.splice(rowIndex, 1);
         });
@@ -436,7 +436,7 @@ const CaptureInputSettings = ({ node, updateNodeConfig }: NodeSettingsProps) => 
         updateNodeConfig(node.id, config);
     };
 
-    const handleChange = (field, value) => {
+    const handleChange = (field: string, value: string) => {
         setConfig(prev => ({ ...prev, [field]: value }));
     };
 
@@ -502,7 +502,7 @@ const SetVariableSettings = ({ node, updateNodeConfig }: NodeSettingsProps) => {
 const EndSettings = ({ node, updateNodeConfig }: NodeSettingsProps) => {
     const [restart, setRestart] = useState(node.data.restart || false);
 
-    const handleCheckChange = (checked) => {
+    const handleCheckChange = (checked: boolean) => {
         setRestart(checked);
         updateNodeConfig(node.id, {...node.data, restart: checked});
     }
@@ -542,7 +542,7 @@ const SettingsPanel = ({ selectedNode, updateNodeConfig, deleteNode, isOpen, onT
     endNode: EndSettings,
   };
   
-  const NodeSpecificSettings = selectedNode ? nodeSettingsMap[selectedNode.type] : null;
+  const NodeSpecificSettings = selectedNode && selectedNode.type && nodeSettingsMap[selectedNode.type] ? nodeSettingsMap[selectedNode.type] : null;
 
   return (
     <aside className={cn("w-96 bg-neutral-950/80 backdrop-blur-sm p-4 border-l border-neutral-800 text-white flex flex-col transition-all duration-300 ease-in-out", isOpen ? "translate-x-0" : "translate-x-full")}>

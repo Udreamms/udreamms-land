@@ -24,7 +24,6 @@ const ChatbotEditorPage = () => {
   
   const canvasRef = useRef<ChatbotCanvasRef>(null);
 
-  // La función onConnect ahora vive aquí, donde tiene acceso a setEdges
   const onConnect = useCallback(
     (params: Edge | Connection) => setEdges((eds) => addEdge({ ...params, type: 'smoothstep', animated: true, style: { stroke: '#8b5cf6', strokeWidth: 2 } }, eds)),
     [setEdges],
@@ -64,13 +63,16 @@ const ChatbotEditorPage = () => {
         try {
           if (botId === 'new') {
             const docRef = await addDoc(collection(db, 'chatbots'), botData);
-            router.replace(`/cso/automation/chatbots/${docRef.id}`);
+            router.push(`/cso/automation/chatbots/${docRef.id}`);
             setBotId(docRef.id);
             resolve(docRef);
-          } else {
+          } else if (botId) { // Comprobación de seguridad
             const botDocRef = doc(db, 'chatbots', botId);
             await setDoc(botDocRef, botData, { merge: true });
             resolve(botDocRef);
+          } else {
+            // Si botId es undefined por alguna razón, rechazamos la promesa.
+            reject(new Error("No se puede guardar el bot sin una ID válida."));
           }
         } catch (error) {
           console.error("Error saving bot:", error);
@@ -117,7 +119,7 @@ const ChatbotEditorPage = () => {
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             setNodes={setNodes}
-            setEdges={setEdges} // Pasamos setEdges para que el canvas pueda borrar conexiones
+            setEdges={setEdges}
         />
       </div>
     </div>

@@ -6,7 +6,7 @@ import { db } from '@/lib/firebase';
 import {
   collection, onSnapshot, addDoc, serverTimestamp, query,
   doc, deleteDoc, getDoc, setDoc, writeBatch, orderBy, updateDoc,
-  collectionGroup, where, getDocs
+  collectionGroup, where, getDocs, Timestamp
 } from 'firebase/firestore';
 import Group from './Group';
 import Card from './Card';
@@ -20,14 +20,33 @@ import {
 import { SortableContext, arrayMove } from '@dnd-kit/sortable';
 import { createPortal } from 'react-dom';
 
+// --- Interfaces para Tipado ---
+interface GroupData {
+  id: string;
+  name: string;
+  order: number;
+  color: string;
+  createdAt: Timestamp;
+}
+
+interface CardData {
+    id: string;
+    groupId: string;
+    contactName: string;
+    contactNumber?: string;
+    // Añade otras propiedades que esperas en una tarjeta
+    [key: string]: any;
+}
+
+
 const KanbanBoard = () => {
-  const [groups, setGroups] = useState([]);
+  const [groups, setGroups] = useState<GroupData[]>([]);
   const [newGroupName, setNewGroupName] = useState('');
-  const [activeGroup, setActiveGroup] = useState(null);
-  const [activeCard, setActiveCard] = useState(null);
+  const [activeGroup, setActiveGroup] = useState<GroupData | null>(null);
+  const [activeCard, setActiveCard] = useState<CardData | null>(null); // Tipado corregido
   const [selectedCard, setSelectedCard] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<CardData[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
   const groupIds = useMemo(() => groups.map((g) => g.id), [groups]);
@@ -35,7 +54,7 @@ const KanbanBoard = () => {
   useEffect(() => {
     const groupsQuery = query(collection(db, 'kanban-groups'), orderBy("order", "asc"));
     const unsubscribe = onSnapshot(groupsQuery, (snapshot) => {
-      const groupsFromDb = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const groupsFromDb = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as GroupData[];
       setGroups(groupsFromDb);
     });
     return () => unsubscribe();
@@ -55,7 +74,7 @@ const KanbanBoard = () => {
         where('contactName', '<=', searchTerm + '\uf8ff')
       );
       const cardsSnapshot = await getDocs(cardsQuery);
-      const results = cardsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const results = cardsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id, groupId: doc.ref.parent.parent?.id })) as CardData[];
       setSearchResults(results);
     };
 
@@ -175,13 +194,13 @@ const KanbanBoard = () => {
             </form>
           </div>
         </div>
-        {createPortal(
+        {document.body ? createPortal(
           <DragOverlay>
-            {activeGroup && <Group group={activeGroup} onCardClick={() => {}} />}
-            {activeCard && <Card card={activeCard} groupId={activeCard.groupId} />}
+            {activeGroup && <Group group={activeGroup} onCardClick={() => {}} onUpdateColor={() => {}} />}
+            {activeCard && <Card card={activeCard} groupId={activeCard.groupId} onClick={() => {}} />}
           </DragOverlay>,
           document.body
-        )}
+        ) : null}
       </DndContext>
       <ConversationModal isOpen={!!selectedCard} onClose={handleCloseModal} card={selectedCard} />
     </div>

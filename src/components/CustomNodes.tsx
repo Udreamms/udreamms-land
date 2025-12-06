@@ -8,7 +8,8 @@ import {
 } from 'lucide-react';
 
 // --- ESTILOS ---
-const nodeStyle = {
+// Se añade 'as React.CSSProperties' para que TypeScript acepte los estilos
+const nodeStyle: React.CSSProperties = {
   borderRadius: '8px',
   padding: '12px 16px',
   color: 'white',
@@ -19,7 +20,7 @@ const nodeStyle = {
   flexDirection: 'column',
   gap: '8px',
 };
-const nodeHeaderStyle = {
+const nodeHeaderStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: '8px',
@@ -31,14 +32,14 @@ const handleStyle = {
   background: '#8b5cf6',
   border: '1px solid #ede9fe'
 };
-const contentStyle = {
+const contentStyle: React.CSSProperties = {
   paddingTop: '8px',
   borderTop: '1px solid #3f3f46',
   display: 'flex',
   flexDirection: 'column',
   gap: '10px',
 };
-const optionRowStyle = {
+const optionRowStyle: React.CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',

@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, onSnapshot, addDoc, doc, deleteDoc, serverTimestamp, query, writeBatch } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, doc, deleteDoc, serverTimestamp, query, writeBatch, Timestamp } from 'firebase/firestore';
 import Card from './Card';
 import { Plus, Trash2, MoreVertical, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,19 @@ import {
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-// Paleta de colores actualizada con negro puro como predeterminado
+// --- Interface para Tipado de Tarjetas ---
+interface CardData {
+    id: string;
+    groupId: string;
+    contactName: string;
+    lastMessage: string;
+    channel: string;
+    createdAt: Timestamp;
+    updatedAt: Timestamp;
+    messages: any[]; // Se puede mejorar el tipado de 'messages' si es necesario
+}
+
+// ... (resto del componente sin cambios)
 const colors = [
     { name: 'Predeterminado', value: 'bg-black/50', cardColor: 'bg-gray-900' },
     { name: 'Marrón', value: 'bg-stone-950', cardColor: 'bg-stone-900' },
@@ -34,7 +46,7 @@ const colors = [
 ];
 
 const Group = ({ group, onCardClick, onUpdateColor }) => {
-  const [cards, setCards] = useState([]);
+  const [cards, setCards] = useState<CardData[]>([]);
   
   const {
     attributes,
@@ -56,8 +68,8 @@ const Group = ({ group, onCardClick, onUpdateColor }) => {
     const cardsQuery = query(collection(db, `kanban-groups/${group.id}/cards`));
     
     const unsubscribe = onSnapshot(cardsQuery, (snapshot) => {
-      const cardsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), groupId: group.id }));
-      cardsData.sort((a, b) => (b.updatedAt?.toDate() || 0) - (a.updatedAt?.toDate() || 0));
+      const cardsData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id, groupId: group.id })) as CardData[];
+      cardsData.sort((a, b) => (b.updatedAt?.toDate()?.getTime() || 0) - (a.updatedAt?.toDate()?.getTime() || 0));
       setCards(cardsData);
     });
     return () => unsubscribe();
