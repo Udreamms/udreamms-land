@@ -63,7 +63,7 @@ export const whatsappWebhook = https.onRequest(async (req, res) => {
         id: messageData.id,
         text: text,
         sender: 'contact',
-        timestamp: FieldValue.serverTimestamp(),
+        timestamp: new Date(),
       };
 
       if (!cardSnapshot.empty) {
