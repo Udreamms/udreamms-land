@@ -1,12 +1,18 @@
 
-import * as admin from "firebase-admin";
+// src/index.ts
+import * as admin from 'firebase-admin';
 
-admin.initializeApp();
+// This check prevents the app from being initialized multiple times,
+// which is important in a modular structure.
+if (admin.apps.length === 0) {
+  admin.initializeApp();
+}
 
-// Exporta la función de cardActions
-export { moveCard } from "./cardActions";
+// --- Export all functions from their new, organized locations ---
 
-// Aquí puedes añadir y exportar otras funciones en el futuro
-// Por ejemplo:
-// export { anotherFunction } from "./anotherFile";
+// Functions that can be called directly from the web application
+export { sendWhatsappMessage, sendWhatsappMediaMessage } from './callable/whatsapp';
+export { moveCard } from './cardActions'; // Now included!
 
+// Functions that act as webhooks for external services
+export { whatsappWebhook } from './webhooks/whatsapp';

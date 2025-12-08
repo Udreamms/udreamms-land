@@ -1,4 +1,3 @@
-import webpack from 'webpack';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -45,26 +44,6 @@ const nextConfig = {
       },
     ];
   },
-  webpack: (config, { isServer }) => {
-    // Add a rule to handle .mjs files
-    config.module.rules.push({
-      test: /\.mjs$/,
-      include: /node_modules/,
-      type: 'javascript/auto',
-    });
-
-    // Provide Buffer for client-side
-    if (!isServer) {
-      config.plugins.push(
-        new webpack.ProvidePlugin({
-          Buffer: ['buffer', 'Buffer'],
-        })
-      );
-    }
-    
-    return config;
-  },
-  turbopack: {},
 };
 
 export default nextConfig;
