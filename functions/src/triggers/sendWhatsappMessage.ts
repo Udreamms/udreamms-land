@@ -1,74 +1,73 @@
 
 // functions/src/triggers/sendWhatsappMessage.ts
 
-import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import { db, admin } from '../config/firebase';
-import { sendApiMessage } from '../utils/whatsapp'; // Importamos la nueva función
+import * as functions from "firebase-functions";
+import { db } from "../config/firebase";
+import { FieldValue, Timestamp } from "firebase-admin/firestore";
+import { sendWhatsappMessage as sendWhatsappMessageAPI } from "../utils/whatsapp"; // Renamed for clarity
+import { logError } from "../utils/error-logging";
 
-export const sendWhatsappMessage = onCall(async (request) => {
-  if (!request.auth) {
-    throw new HttpsError('unauthenticated', 'The function must be called while authenticated.');
-  }
+interface SendMessageData {
+    cardId: string;
+    groupId: string;
+    message: string;
+    toNumber: string;
+}
 
-  const { groupId, cardId, text } = request.data;
-  if (!groupId || !cardId || !text) {
-    throw new HttpsError('invalid-argument', 'Missing groupId, cardId, or text.');
-  }
-
-  const cardRef = db.collection('kanban-groups').doc(groupId).collection('cards').doc(cardId);
-  
-  const optimisticMessage = {
-    id: `local_${Date.now()}`,
-    text: text,
-    sender: 'cso',
-    timestamp: new Date(),
-    status: 'sending',
-  };
-
-  // Se añade el mensaje optimista a la base de datos
-  await cardRef.update({
-    messages: admin.firestore.FieldValue.arrayUnion(optimisticMessage),
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-  });
-  
-  try {
-    const cardSnap = await cardRef.get();
-    if (!cardSnap.exists) throw new HttpsError('not-found', 'Card not found.');
-    
-    const cardData = cardSnap.data();
-    const recipientNumber = cardData?.contactNumber?.replace('+', '');
-    if (!recipientNumber) throw new HttpsError('failed-precondition', 'Contact number is missing.');
-
-    // --- Lógica de envío refactorizada ---
-    // Ahora llamamos a la función centralizada
-    const messageId = await sendApiMessage(recipientNumber, text);
-    // ------------------------------------
-
-    const finalMessage = { ...optimisticMessage, id: messageId, status: 'sent' };
-    
-    const currentMessages = cardSnap.data()?.messages || [];
-    const updatedMessages = currentMessages.map((msg: any) => 
-      msg.id === optimisticMessage.id ? finalMessage : msg
-    );
-
-    await cardRef.update({ messages: updatedMessages });
-    
-    return { success: true, wamid: messageId };
-
-  } catch (error: any) {
-    console.error('Error in sendWhatsappMessage function:', error);
-    
-    const errorMessage = { ...optimisticMessage, status: 'error' };
-    // Volvemos a leer los mensajes para asegurar que tenemos la última versión
-    const currentMessages = (await cardRef.get()).data()?.messages || [];
-    const updatedMessages = currentMessages.map((msg: any) => 
-      msg.id === optimisticMessage.id ? errorMessage : msg
-    );
-    await cardRef.update({ messages: updatedMessages });
-    
-    if (error instanceof HttpsError) {
-      throw error;
+/**
+ * Cloud Function to send a WhatsApp message from the Kanban interface
+ * and save the message to the conversation history.
+ */
+export const sendWhatsappMessage = functions.https.onCall(async (data: SendMessageData, context) => {
+    // 1. Validate user authentication
+    if (!context.auth) {
+        throw new functions.https.HttpsError(
+            "unauthenticated",
+            "The function must be called while authenticated."
+        );
     }
-    throw new HttpsError('internal', 'Failed to send message.');
-  }
+
+    // 2. Validate incoming data
+    const { cardId, groupId, message, toNumber } = data;
+    if (!cardId || !groupId || !message || !toNumber) {
+        throw new functions.https.HttpsError(
+            "invalid-argument",
+            "Missing required data fields (cardId, groupId, message, toNumber)."
+        );
+    }
+
+    try {
+        // 3. Send the message via the WhatsApp API
+        await sendWhatsappMessageAPI(toNumber, message);
+        functions.logger.info(`Message sent to ${toNumber} successfully via API.`);
+
+        // 4. --- THIS IS THE FIX ---
+        // Save the sent message to the Firestore document (the card)
+        const cardRef = db.collection('kanban-groups').doc(groupId).collection('cards').doc(cardId);
+        
+        const messageData = {
+            sender: 'agent', // Or context.auth.uid to know which agent sent it
+            content: message,
+            timestamp: Timestamp.now(),
+        };
+
+        await cardRef.update({
+            messages: FieldValue.arrayUnion(messageData),
+            lastMessage: message, // Update the last message preview
+            updatedAt: FieldValue.serverTimestamp(), // Update the timestamp to move the card up
+        });
+        
+        functions.logger.info(`Message saved to card ${cardId} in group ${groupId}.`);
+
+        // 5. Return success
+        return { success: true, message: "Message sent and saved successfully." };
+
+    } catch (error) {
+        logError(error, {
+            message: "Error in sendWhatsappMessage Cloud Function",
+            data,
+        });
+        // The error from sendWhatsappMessageAPI is already an HttpsError
+        throw error;
+    }
 });
