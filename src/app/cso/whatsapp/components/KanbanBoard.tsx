@@ -11,7 +11,7 @@ import {
 import Group from './Group';
 import Card from './Card';
 import ConversationModal from './ConversationModal';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -34,20 +34,19 @@ interface CardData {
     groupId: string;
     contactName: string;
     contactNumber?: string;
-    // Añade otras propiedades que esperas en una tarjeta
     [key: string]: any;
 }
-
 
 const KanbanBoard = () => {
   const [groups, setGroups] = useState<GroupData[]>([]);
   const [newGroupName, setNewGroupName] = useState('');
   const [activeGroup, setActiveGroup] = useState<GroupData | null>(null);
-  const [activeCard, setActiveCard] = useState<CardData | null>(null); // Tipado corregido
+  const [activeCard, setActiveCard] = useState<CardData | null>(null);
   const [selectedCard, setSelectedCard] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<CardData[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isInputFocused, setIsInputFocused] = useState(false);
 
   const groupIds = useMemo(() => groups.map((g) => g.id), [groups]);
 
@@ -88,7 +87,7 @@ const KanbanBoard = () => {
       await addDoc(collection(db, 'kanban-groups'), {
         name: newGroupName, 
         order: groups.length,
-        color: 'bg-black/50',
+        color: 'bg-neutral-900/50',
         createdAt: serverTimestamp()
       });
       setNewGroupName('');
@@ -155,53 +154,75 @@ const KanbanBoard = () => {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 10 } }));
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="p-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+    <div className="flex flex-col h-full bg-neutral-950 text-white overflow-hidden">
+      {/* Encabezado con Título y Búsqueda */}
+      <div className="px-6 py-4 border-b border-neutral-800 flex items-center justify-between flex-shrink-0">
+        <div>
+            <h1 className="text-2xl font-bold">Kanban de WhatsApp</h1>
+            <p className="text-neutral-400 text-sm">Gestiona tus conversaciones arrastrando y soltando.</p>
+        </div>
+        <div className="relative w-full max-w-xs">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500" size={18} />
           <Input 
             type="text" 
-            placeholder="Buscar por nombre o número..." 
-            className="w-full bg-black border-gray-700 rounded-lg pl-10 hover:bg-gray-900 transition-colors"
+            placeholder="Buscar contacto..." 
+            className="w-full bg-neutral-800/80 border-neutral-700 rounded-lg pl-10 pr-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          {(isSearching || searchResults.length > 0) && (
-            <div className="absolute top-full mt-2 w-full bg-black rounded-lg border border-gray-700 z-10">
+          {searchTerm && (
+            <Button variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7" onClick={() => setSearchTerm('')}>
+              <X size={16} />
+            </Button>
+          )}
+          {(isSearching || searchResults.length > 0) && searchTerm && (
+            <div className="absolute top-full mt-2 w-full bg-neutral-800 rounded-lg border border-neutral-700 z-20 shadow-lg">
               {searchResults.length > 0 ? (
                 searchResults.map(card => (
-                  <div key={card.id} className="p-2 hover:bg-gray-900 cursor-pointer" onClick={() => handleCardClick(card)}>
-                    <p className="font-bold">{card.contactName}</p>
-                    <p className="text-sm text-gray-400">{card.contactNumber}</p>
+                  <div key={card.id} className="p-3 hover:bg-neutral-700/80 cursor-pointer rounded-md" onClick={() => handleCardClick(card)}>
+                    <p className="font-semibold">{card.contactName}</p>
+                    <p className="text-sm text-neutral-400">{card.contactNumber}</p>
                   </div>
                 ))
               ) : (
-                <p className="p-2 text-gray-400">No se encontraron resultados.</p>
+                <p className="p-3 text-neutral-400">No se encontraron resultados.</p>
               )}
             </div>
           )}
         </div>
       </div>
+      
       <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-        <div className="flex items-start h-full space-x-4 p-4 overflow-x-auto">
+        <div className="flex items-start flex-grow space-x-4 p-6 overflow-x-auto">
           <SortableContext items={groupIds}>
             {groups.map((group) => <Group key={group.id} group={group} onCardClick={handleCardClick} onUpdateColor={handleUpdateGroupColor} />)}
           </SortableContext>
-          <div className="w-72 flex-shrink-0">
-            <form onSubmit={handleAddGroup} className="flex items-center p-2 rounded-lg bg-gray-900/50">
-              <Input type="text" value={newGroupName} onChange={(e) => setNewGroupName(e.target.value)} placeholder="+ Nuevo grupo..." className="bg-transparent text-white placeholder-gray-400 focus:outline-none flex-grow border-none" autoComplete="off" />
-              <Button variant="ghost" size="sm" type="submit"><Plus /></Button>
+          <div className="w-80 flex-shrink-0">
+            <form onSubmit={handleAddGroup} className={`flex items-center p-2 rounded-lg transition-all duration-300 ${isInputFocused ? 'bg-neutral-800' : 'bg-neutral-900/80'}`}>
+              <Input 
+                type="text" 
+                value={newGroupName} 
+                onChange={(e) => setNewGroupName(e.target.value)} 
+                placeholder="+ Añadir otro grupo" 
+                className="bg-transparent text-white placeholder-neutral-400 focus:outline-none flex-grow border-none focus:ring-0" 
+                autoComplete="off"
+                onFocus={() => setIsInputFocused(true)}
+                onBlur={() => setIsInputFocused(false)}
+              />
+              <Button variant="ghost" size="sm" type="submit" className={`${newGroupName.trim() ? 'opacity-100' : 'opacity-0'} transition-opacity`}><Plus /></Button>
             </form>
           </div>
         </div>
-        {document.body ? createPortal(
+        
+        {typeof document !== 'undefined' && createPortal(
           <DragOverlay>
             {activeGroup && <Group group={activeGroup} onCardClick={() => {}} onUpdateColor={() => {}} />}
             {activeCard && <Card card={activeCard} groupId={activeCard.groupId} onClick={() => {}} />}
           </DragOverlay>,
           document.body
-        ) : null}
+        )}
       </DndContext>
+      
       <ConversationModal isOpen={!!selectedCard} onClose={handleCloseModal} card={selectedCard} />
     </div>
   );

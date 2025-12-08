@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { db } from '@/lib/firebase';
 import { doc, deleteDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
+import { Trash2, GripVertical } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import WhatsappIcon from '@/components/icons/WhatsappIcon';
@@ -27,7 +27,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-const Card = ({ card, groupId, onClick, cardColor = 'bg-gray-800' }) => {
+const Card = ({ card, groupId, onClick, cardColor = 'bg-neutral-800' }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
 
@@ -73,17 +73,19 @@ const Card = ({ card, groupId, onClick, cardColor = 'bg-gray-800' }) => {
   const formatTimestamp = (timestamp) => {
     if (!timestamp?.toDate) return '';
     const date = timestamp.toDate();
-    return date.toLocaleString('es-ES', {
-      day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
-    });
+    const now = new Date();
+    const diffInSeconds = (now.getTime() - date.getTime()) / 1000;
+    const diffInDays = diffInSeconds / 86400;
+
+    if (diffInDays < 1) return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    if (diffInDays < 7) return date.toLocaleDateString('es-ES', { weekday: 'short' });
+    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
   };
   
   const getCountryInfo = (phoneNumber) => {
     if (!phoneNumber) return { flag: '🏳️', code: 'N/A' };
     const number = phoneNumber.replace('+', '');
-    
     const codes = Object.keys(countryData).sort((a, b) => b.length - a.length);
-    
     for (const code of codes) {
       if (number.startsWith(code)) {
         const data = countryData[code];
@@ -100,49 +102,50 @@ const Card = ({ card, groupId, onClick, cardColor = 'bg-gray-800' }) => {
       <div
         ref={setNodeRef}
         style={style}
-        {...attributes}
-        {...listeners}
-        onClick={onClick}
-        className={`group relative ${cardColor} p-3 rounded-lg hover:brightness-110 transition-all duration-200 touch-none cursor-grab`}
+        className={`group relative ${cardColor} p-3 rounded-lg shadow-sm hover:shadow-md hover:brightness-110 transition-all duration-200 touch-none flex items-start gap-2`}
       >
-        <div className="flex flex-col gap-2 w-full">
-          <div className="flex justify-between items-start w-full">
-            <div className="flex items-center gap-2">
-              <WhatsappIcon className="h-5 w-5 text-green-400 flex-shrink-0" />
-              <span className="font-bold text-base text-white truncate">{card.contactName || 'Desconocido'}</span>
+        <div {...attributes} {...listeners} className="cursor-grab text-neutral-500 hover:text-white p-1">
+            <GripVertical size={18} />
+        </div>
+        <div onClick={onClick} className="flex-grow cursor-pointer">
+            <div className="flex justify-between items-start w-full">
+                <div className="flex items-center gap-2 mb-1">
+                    <WhatsappIcon className="h-4 w-4 text-green-400 flex-shrink-0" />
+                    <span className="font-semibold text-base text-white truncate">{card.contactName || 'Desconocido'}</span>
+                </div>
+                <span className="text-xs text-neutral-400 whitespace-nowrap pl-2">{formatTimestamp(card.updatedAt || card.createdAt)}</span>
             </div>
-            <span className="text-xs text-gray-400 whitespace-nowrap pl-2">{formatTimestamp(card.updatedAt || card.createdAt)}</span>
-          </div>
-          <div className="flex flex-col text-left gap-2 pl-7">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-300">{card.contactNumber || 'Sin número'}</span>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="text-lg -mt-1 cursor-default">{flag}</span>
-                </TooltipTrigger>
-                <TooltipContent className="bg-gray-900 text-white border-gray-700">
-                  <p>{code}</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            <p className="text-xs text-gray-400 mt-1 break-words pr-5">
-              {card.lastMessage || '...'}
+            
+            <p className="text-sm text-neutral-300 break-words line-clamp-2">
+                {card.lastMessage || '...'}
             </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleOpenDeleteDialog}
-            className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-opacity h-7 w-7"
-            aria-label="Eliminar tarjeta"
-          >
-            <Trash2 size={16} />
-          </Button>
+
+            <div className="flex items-center gap-2 mt-2">
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                    <span className="text-lg -mb-1 cursor-default">{flag}</span>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-neutral-900 text-white border-neutral-700">
+                    <p>{code} {card.contactNumber || ''}</p>
+                    </TooltipContent>
+                </Tooltip>
+                <span className="text-xs text-neutral-400">{card.contactNumber || 'Sin número'}</span>
+            </div>
+            
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleOpenDeleteDialog}
+                className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 text-neutral-400 hover:text-red-500 transition-opacity h-7 w-7"
+                aria-label="Eliminar tarjeta"
+            >
+                <Trash2 size={15} />
+            </Button>
         </div>
       </div>
 
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[425px] bg-gray-900 border-gray-700 text-white">
+        <DialogContent className="sm:max-w-[425px] bg-neutral-900 border-neutral-700 text-white">
           <DialogHeader>
             <DialogTitle>Confirmar Eliminación</DialogTitle>
             <DialogDescription>
@@ -158,7 +161,7 @@ const Card = ({ card, groupId, onClick, cardColor = 'bg-gray-800' }) => {
                 id="delete-confirm"
                 value={deleteConfirmation}
                 onChange={(e) => setDeleteConfirmation(e.target.value)}
-                className="col-span-3 bg-gray-800 border-gray-600 focus:ring-blue-500"
+                className="col-span-3 bg-neutral-800 border-neutral-600 focus:ring-blue-500"
                 autoComplete="off"
               />
             </div>

@@ -29,20 +29,19 @@ interface CardData {
     channel: string;
     createdAt: Timestamp;
     updatedAt: Timestamp;
-    messages: any[]; // Se puede mejorar el tipado de 'messages' si es necesario
+    messages: any[];
 }
 
-// ... (resto del componente sin cambios)
 const colors = [
-    { name: 'Predeterminado', value: 'bg-black/50', cardColor: 'bg-gray-900' },
-    { name: 'Marrón', value: 'bg-stone-950', cardColor: 'bg-stone-900' },
-    { name: 'Naranja', value: 'bg-orange-950', cardColor: 'bg-orange-900' },
-    { name: 'Amarillo', value: 'bg-yellow-950', cardColor: 'bg-yellow-900' },
-    { name: 'Verde', value: 'bg-green-950', cardColor: 'bg-green-900' },
-    { name: 'Azul', value: 'bg-blue-950', cardColor: 'bg-blue-900' },
-    { name: 'Morado', value: 'bg-purple-950', cardColor: 'bg-purple-900' },
-    { name: 'Rosa', value: 'bg-pink-950', cardColor: 'bg-pink-900' },
-    { name: 'Rojo', value: 'bg-red-950', cardColor: 'bg-red-900' },
+    { name: 'Predeterminado', value: 'bg-neutral-900/50', cardColor: 'bg-neutral-800' },
+    { name: 'Piedra', value: 'bg-stone-900/50', cardColor: 'bg-stone-800' },
+    { name: 'Naranja', value: 'bg-orange-900/50', cardColor: 'bg-orange-800' },
+    { name: 'Amarillo', value: 'bg-yellow-900/50', cardColor: 'bg-yellow-800' },
+    { name: 'Verde', value: 'bg-green-900/50', cardColor: 'bg-green-800' },
+    { name: 'Azul', value: 'bg-blue-900/50', cardColor: 'bg-blue-800' },
+    { name: 'Púrpura', value: 'bg-purple-900/50', cardColor: 'bg-purple-800' },
+    { name: 'Rosa', value: 'bg-pink-900/50', cardColor: 'bg-pink-800' },
+    { name: 'Rojo', value: 'bg-red-900/50', cardColor: 'bg-red-800' },
 ];
 
 const Group = ({ group, onCardClick, onUpdateColor }) => {
@@ -77,8 +76,8 @@ const Group = ({ group, onCardClick, onUpdateColor }) => {
 
   const handleAddCard = async () => {
     await addDoc(collection(db, `kanban-groups/${group.id}/cards`), {
-      contactName: "Nueva Tarjeta",
-      lastMessage: 'Creada manualmente',
+      contactName: "Nuevo Contacto",
+      lastMessage: 'Conversación iniciada...',
       channel: 'Manual',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
@@ -87,7 +86,7 @@ const Group = ({ group, onCardClick, onUpdateColor }) => {
   };
 
   const handleDeleteGroup = async () => {
-    if (window.confirm(`¿Estás seguro de que quieres eliminar el grupo "${group.name}"?`)) {
+    if (window.confirm(`¿Estás seguro de que quieres eliminar el grupo "${group.name}"? Esta acción no se puede deshacer.`)) {
       const batch = writeBatch(db);
       cards.forEach((card) => {
         const cardRef = doc(db, `kanban-groups/${group.id}/cards`, card.id);
@@ -105,34 +104,34 @@ const Group = ({ group, onCardClick, onUpdateColor }) => {
     <div
       ref={setNodeRef}
       style={style}
-      className={`${selectedColor.value} backdrop-blur-sm text-white rounded-lg w-96 flex-shrink-0 h-fit`}
+      className="flex flex-col w-96 flex-shrink-0 h-full" // Ancho aumentado a w-96
     >
-      <div className="p-4 flex flex-col">
-        <div {...attributes} {...listeners} className="flex justify-between items-center mb-4 cursor-grab touch-none">
+      <div className={`${selectedColor.value} rounded-t-lg p-3 flex flex-col`}>
+        <div {...attributes} {...listeners} className="flex justify-between items-center cursor-grab touch-none">
           <div className="flex items-center gap-2">
-            <h2 className="font-bold text-gray-200 truncate">{group.name}</h2>
-            <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded-full">
+            <h2 className="font-bold text-white truncate">{group.name}</h2>
+            <span className="text-xs text-neutral-300 bg-black/30 px-2 py-0.5 rounded-full">
               {cards.length}
             </span>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-neutral-400 hover:text-white hover:bg-black/20">
                 <MoreVertical size={16} />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-gray-800 border-gray-700 text-white">
+            <DropdownMenuContent className="bg-neutral-800 border-neutral-700 text-white shadow-lg">
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
+                <DropdownMenuSubTrigger className="hover:bg-neutral-700">
                   <Palette className="mr-2" size={16} />
-                  Colores
+                  Cambiar Color
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
-                  <DropdownMenuSubContent className="bg-gray-800 border-gray-700 text-white">
+                  <DropdownMenuSubContent className="bg-neutral-800 border-neutral-700 text-white">
                     {colors.map(color => (
-                      <DropdownMenuItem key={color.name} onClick={() => onUpdateColor(group.id, color.value)}>
+                      <DropdownMenuItem key={color.name} onClick={() => onUpdateColor(group.id, color.value)} className="hover:bg-neutral-700">
                         <div className="flex items-center gap-2">
-                          <div className={`w-4 h-4 rounded-full ${color.value.replace('/50', '')}`}></div>
+                          <div className={`w-4 h-4 rounded-full ${color.value.replace('/50', '').replace('-900', '-500')}`}></div>
                           {color.name}
                         </div>
                       </DropdownMenuItem>
@@ -140,27 +139,26 @@ const Group = ({ group, onCardClick, onUpdateColor }) => {
                   </DropdownMenuSubContent>
                 </DropdownMenuPortal>
               </DropdownMenuSub>
-              <DropdownMenuItem onClick={handleDeleteGroup} className="cursor-pointer hover:bg-red-500/10 text-red-400">
+              <DropdownMenuItem onClick={handleDeleteGroup} className="cursor-pointer focus:bg-red-500/20 text-red-400 focus:text-red-300">
                 <Trash2 className="mr-2" size={16} />
                 Eliminar Grupo
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-
-        <div className="space-y-2">
-          <SortableContext items={cards.map(c => c.id)}>
-            {cards.map((card) => (
-              <Card key={card.id} card={card} groupId={group.id} onClick={() => onCardClick(card)} cardColor={selectedColor.cardColor} />
-            ))}
-          </SortableContext>
-        </div>
-
-        <div className="mt-4">
-          <Button variant="ghost" onClick={handleAddCard} className="w-full text-sm text-gray-400 hover:text-white">
-            <Plus className="mr-2" size={16} /> Crear Tarjeta
-          </Button>
-        </div>
+      </div>
+      
+      {/* Scrollbar oculto */}
+      <div className="flex-grow overflow-y-auto bg-black/30 p-2 rounded-b-lg space-y-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+        <SortableContext items={cards.map(c => c.id)}>
+          {cards.map((card) => (
+            <Card key={card.id} card={card} groupId={group.id} onClick={() => onCardClick(card)} cardColor={selectedColor.cardColor} />
+          ))}
+        </SortableContext>
+        
+        <Button variant="ghost" onClick={handleAddCard} className="w-full text-sm text-neutral-400 hover:text-white hover:bg-neutral-700/50 mt-2">
+          <Plus className="mr-2" size={16} /> Añadir Tarjeta
+        </Button>
       </div>
     </div>
   );

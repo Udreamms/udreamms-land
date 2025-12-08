@@ -5,11 +5,12 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import ChatbotCanvasWithProvider, { ChatbotCanvasRef } from '@/components/ChatbotCanvas';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Dot } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, setDoc, addDoc, collection } from 'firebase/firestore';
 import { Node, Edge, useNodesState, useEdgesState, OnNodesChange, OnEdgesChange, addEdge, Connection } from 'reactflow';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 const ChatbotEditorPage = () => {
   const params = useParams();
@@ -38,7 +39,7 @@ const ChatbotEditorPage = () => {
 
   const onConnect = useCallback(
     (params: Edge | Connection) => {
-      setEdges((eds) => addEdge({ ...params, type: 'smoothstep', animated: true, style: { stroke: '#8b5cf6', strokeWidth: 2 } }, eds));
+      setEdges((eds) => addEdge({ ...params, type: 'smoothstep', animated: true, style: { stroke: '#3b82f6', strokeWidth: 2.5 } }, eds));
       setHasUnsavedChanges(true);
     },
     [setEdges],
@@ -54,7 +55,7 @@ const ChatbotEditorPage = () => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       if (hasUnsavedChanges) {
         event.preventDefault();
-        event.returnValue = ''; // Required for modern browsers
+        event.returnValue = '';
       }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -85,12 +86,16 @@ const ChatbotEditorPage = () => {
         setEdges([]);
         setIsLoading(false);
       }
-      setHasUnsavedChanges(false); // Reset on initial load
+      setHasUnsavedChanges(false);
     };
     loadBotData();
   }, [botId, router, setNodes, setEdges]);
 
   const handleSave = async () => {
+    if (!botName.trim()) {
+        toast.error("El nombre del bot no puede estar vacío.");
+        return;
+    }
     setIsSaving(true);
     const promise = () => new Promise(async (resolve, reject) => {
         const flowData = { nodes, edges };
@@ -98,14 +103,13 @@ const ChatbotEditorPage = () => {
         try {
           if (botId === 'new') {
             const docRef = await addDoc(collection(db, 'chatbots'), botData);
-            setHasUnsavedChanges(false); // Reset before navigation
+            setHasUnsavedChanges(false);
             router.push(`/cso/automation/chatbots/${docRef.id}`);
-            // No need to setBotId here, the page will reload with the new ID
             resolve(docRef);
           } else if (botId) {
             const botDocRef = doc(db, 'chatbots', botId);
             await setDoc(botDocRef, botData, { merge: true });
-            setHasUnsavedChanges(false); // Reset on successful save
+            setHasUnsavedChanges(false);
             resolve(botDocRef);
           } else {
             reject(new Error("No se puede guardar el bot sin una ID válida."));
@@ -137,23 +141,36 @@ const ChatbotEditorPage = () => {
 
   if (isLoading) {
     return (
-        <div className="flex items-center justify-center h-screen bg-neutral-900 text-white">
-            <Loader2 className="h-8 w-8 animate-spin" /> <p className="ml-4">Cargando bot...</p>
+        <div className="flex items-center justify-center h-screen bg-neutral-950 text-white">
+            <Loader2 className="h-8 w-8 animate-spin" /> <p className="ml-4">Cargando editor...</p>
         </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen bg-neutral-900 text-white">
-      <header className="flex items-center justify-between p-3 border-b border-neutral-800 bg-neutral-950/50">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={handleGoBack}><ArrowLeft className="h-5 w-5" /></Button>
-          <input type="text" value={botName} onChange={handleNameChange} className="text-lg font-bold bg-transparent focus:outline-none focus:bg-neutral-800 rounded px-2" />
+    <div className="flex flex-col h-screen bg-neutral-950 text-white overflow-hidden">
+      <header className="flex items-center justify-between p-3 border-b border-neutral-800 flex-shrink-0 z-10">
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="icon" onClick={handleGoBack} className="h-9 w-9"><ArrowLeft className="h-4 w-4" /></Button>
+          <div className="w-px h-6 bg-neutral-700" />
+          <div className="relative">
+            <input 
+                type="text" 
+                value={botName} 
+                onChange={handleNameChange} 
+                className="text-lg font-bold bg-transparent focus:outline-none hover:bg-neutral-800/80 rounded px-2 py-1 transition-colors" 
+                placeholder="Nombre del Chatbot"
+            />
+            <Dot className={cn("absolute -right-1 top-1 text-blue-500 transition-opacity duration-300", hasUnsavedChanges ? "opacity-100 animate-pulse" : "opacity-0")} size={24} />
+          </div>
         </div>
         <div className="flex items-center space-x-2">
-            <Button onClick={handleSave} disabled={isSaving} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2">
+            <span className={cn("text-xs text-neutral-400 transition-opacity duration-300", hasUnsavedChanges ? "opacity-100" : "opacity-0")}>
+                Cambios sin guardar
+            </span>
+            <Button onClick={handleSave} disabled={isSaving || !hasUnsavedChanges} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2">
               {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save size={16} />}
-              {isSaving ? 'Guardando...' : 'Guardar'}
+              {isSaving ? 'Guardando...' : 'Guardar Cambios'}
             </Button>
         </div>
       </header>

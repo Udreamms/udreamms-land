@@ -2,46 +2,51 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus, Loader2, MessageCircle, Power } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { collection, onSnapshot, doc, updateDoc } from 'firebase/firestore'; // Import onSnapshot
+import { collection, onSnapshot, doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { toast } from 'sonner'; // Import toast for notifications
+import { toast } from 'sonner';
 
 interface Bot {
   id: string;
   name: string;
-  isActive: boolean; // Propiedad para rastrear el estado del bot
+  isActive: boolean;
 }
 
 const ChatbotsPage = () => {
   const router = useRouter();
   const [bots, setBots] = useState<Bot[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [updatingBots, setUpdatingBots] = useState<string[]>([]); // Para mostrar feedback de carga por bot
+  const [updatingBots, setUpdatingBots] = useState<string[]>([]);
 
   useEffect(() => {
     const botsCollection = collection(db, 'chatbots');
 
-    // Set up the real-time listener
-    const unsubscribe = onSnapshot(botsCollection, (querySnapshot) => {
-      const botsData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        name: doc.data().name || 'Bot sin nombre',
-        isActive: doc.data().isActive || false,
-        ...doc.data(),
-      } as Bot));
-      setBots(botsData);
-      setIsLoading(false); // Set loading to false after the first data load
-    }, (error) => {
-      console.error("Error fetching bots with snapshot: ", error);
-      toast.error("No se pudieron cargar los bots.");
-      setIsLoading(false);
-    });
+    const unsubscribe = onSnapshot(
+      botsCollection,
+      (querySnapshot) => {
+        const botsData = querySnapshot.docs.map(
+          (doc) =>
+            ({
+              id: doc.id,
+              name: doc.data().name || 'Bot sin nombre',
+              isActive: doc.data().isActive || false,
+              ...doc.data(),
+            } as Bot)
+        );
+        setBots(botsData);
+        setIsLoading(false);
+      },
+      (error) => {
+        console.error('Error fetching bots with snapshot: ', error);
+        toast.error('No se pudieron cargar los bots.');
+        setIsLoading(false);
+      }
+    );
 
-    // Cleanup: unsubscribe from the listener when the component unmounts
     return () => unsubscribe();
-  }, []); // The empty dependency array ensures this effect runs only once
+  }, []);
 
   const handleCreateNewBot = () => {
     router.push('/cso/automation/chatbots/new');
@@ -51,80 +56,109 @@ const ChatbotsPage = () => {
     router.push(`/cso/automation/chatbots/${botId}`);
   };
 
-  // Función para manejar el cambio de estado del bot (actualizada con toasts)
   const handleToggleBotStatus = async (bot: Bot) => {
-    setUpdatingBots(prev => [...prev, bot.id]);
+    setUpdatingBots((prev) => [...prev, bot.id]);
     try {
       const botRef = doc(db, 'chatbots', bot.id);
       const newStatus = !bot.isActive;
       await updateDoc(botRef, { isActive: newStatus });
-      
-      // The optimistic update below is technically not needed due to the real-time listener,
-      // but it makes the UI feel even more instantaneous.
-      setBots(prevBots =>
-        prevBots.map(b => (b.id === bot.id ? { ...b, isActive: newStatus } : b))
-      );
-      toast.success(`Bot "${bot.name}" ${newStatus ? 'activado' : 'desactivado'}.`);
 
+      setBots((prevBots) =>
+        prevBots.map((b) => (b.id === bot.id ? { ...b, isActive: newStatus } : b))
+      );
+      toast.success(
+        `Bot "${bot.name}" ${newStatus ? 'activado' : 'desactivado'}.`
+      );
     } catch (error) {
-      console.error("Error updating bot status:", error);
-      toast.error("No se pudo actualizar el estado del bot.");
+      console.error('Error updating bot status:', error);
+      toast.error('No se pudo actualizar el estado del bot.');
     } finally {
-      setUpdatingBots(prev => prev.filter(id => id !== bot.id));
+      setUpdatingBots((prev) => prev.filter((id) => id !== bot.id));
     }
   };
 
   return (
     <div className="p-6 bg-neutral-900 text-white min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Chatbots</h1>
-        <Button onClick={handleCreateNewBot} className="bg-blue-600 hover:bg-blue-700">
-          <Plus className="mr-2 h-4 w-4" /> Crear Nuevo Bot
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold">Mis Chatbots</h1>
+        <Button
+          onClick={handleCreateNewBot}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transform transition-transform duration-200 hover:scale-105"
+        >
+          <Plus className="mr-2 h-5 w-5" /> Crear Nuevo Bot
         </Button>
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center items-center mt-10">
-          <Loader2 className="h-8 w-8 animate-spin" />
+        <div className="flex justify-center items-center mt-20">
+          <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {bots.length > 0 ? (
-            bots.map(bot => (
+            bots.map((bot) => (
               <div
                 key={bot.id}
-                className="border border-neutral-700 rounded-lg p-4 flex flex-col justify-between transition-colors duration-200"
+                className="bg-neutral-800 border border-neutral-700 rounded-xl shadow-lg hover:shadow-blue-500/20 transition-all duration-300 flex flex-col group"
               >
-                <div 
+                <div
                   onClick={() => handleBotClick(bot.id)}
-                  className="cursor-pointer"
+                  className="p-6 cursor-pointer flex-grow"
                 >
-                  <h2 className="text-lg font-semibold">{bot.name}</h2>
-                  <p className="text-sm text-neutral-400 mt-2">
-                    ID: {bot.id}
+                  <div className="flex items-center justify-between mb-4">
+                    <MessageCircle className="w-8 h-8 text-blue-400 group-hover:text-blue-300 transition-colors" />
+                    <span
+                      className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                        bot.isActive
+                          ? 'bg-green-500/20 text-green-300'
+                          : 'bg-neutral-600/50 text-neutral-300'
+                      }`}
+                    >
+                      {bot.isActive ? 'Activo' : 'Inactivo'}
+                    </span>
+                  </div>
+                  <h2 className="text-lg font-bold text-white truncate">
+                    {bot.name}
+                  </h2>
+                  <p className="text-sm text-neutral-400 mt-2 font-mono break-all">
+                    {bot.id}
                   </p>
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-neutral-700">
+                <div className="px-6 py-4 bg-neutral-800/50 rounded-b-xl border-t border-neutral-700">
                   <Button
                     onClick={(e) => {
-                      e.stopPropagation(); // Evita que al hacer clic se navegue a la página del bot
+                      e.stopPropagation();
                       handleToggleBotStatus(bot);
                     }}
-                    className={`w-full ${bot.isActive ? 'bg-green-600 hover:bg-green-700' : 'bg-neutral-600 hover:bg-neutral-700'}`}
-                    disabled={updatingBots.includes(bot.id)} // Deshabilita el botón mientras se actualiza
+                    className={`w-full font-semibold transition-colors duration-200 flex items-center justify-center ${
+                      bot.isActive
+                        ? 'bg-red-600 hover:bg-red-700 text-white'
+                        : 'bg-green-600 hover:bg-green-700 text-white'
+                    }`}
+                    disabled={updatingBots.includes(bot.id)}
                   >
                     {updatingBots.includes(bot.id) ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
-                      bot.isActive ? 'Activado' : 'Desactivado'
+                      <>
+                        <Power className="mr-2 h-4 w-4" />
+                        {bot.isActive ? 'Desactivar' : 'Activar'}
+                      </>
                     )}
                   </Button>
                 </div>
               </div>
             ))
           ) : (
-            <p className="text-neutral-400 col-span-full">No se encontraron bots. ¡Crea uno nuevo para empezar!</p>
+            <div className="col-span-full text-center py-20 bg-neutral-800 rounded-xl border border-dashed border-neutral-700">
+              <p className="text-neutral-400 text-lg">
+                No se encontraron bots.
+              </p>
+              <p className="text-neutral-500 mt-2">
+                ¡Crea uno nuevo para empezar a automatizar!
+              </p>
+            </div>
           )}
         </div>
       )}
