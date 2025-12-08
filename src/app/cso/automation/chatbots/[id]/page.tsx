@@ -18,16 +18,50 @@ const ChatbotEditorPage = () => {
   const [botName, setBotName] = useState('Nuevo Chatbot');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChangeOriginal] = useNodesState([]);
+  const [edges, setEdges, onEdgesChangeOriginal] = useEdgesState([]);
   
   const canvasRef = useRef<ChatbotCanvasRef>(null);
 
+  // --- Wrappers to detect changes ---
+  const onNodesChange: OnNodesChange = (changes) => {
+    onNodesChangeOriginal(changes);
+    setHasUnsavedChanges(true);
+  };
+
+  const onEdgesChange: OnEdgesChange = (changes) => {
+    onEdgesChangeOriginal(changes);
+    setHasUnsavedChanges(true);
+  };
+
   const onConnect = useCallback(
-    (params: Edge | Connection) => setEdges((eds) => addEdge({ ...params, type: 'smoothstep', animated: true, style: { stroke: '#8b5cf6', strokeWidth: 2 } }, eds)),
+    (params: Edge | Connection) => {
+      setEdges((eds) => addEdge({ ...params, type: 'smoothstep', animated: true, style: { stroke: '#8b5cf6', strokeWidth: 2 } }, eds));
+      setHasUnsavedChanges(true);
+    },
     [setEdges],
   );
+  
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBotName(e.target.value);
+    setHasUnsavedChanges(true);
+  }
+
+  // --- Effect to handle unsaved changes before leaving ---
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        event.preventDefault();
+        event.returnValue = ''; // Required for modern browsers
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [hasUnsavedChanges]);
 
   useEffect(() => {
     const loadBotData = async () => {
@@ -51,6 +85,7 @@ const ChatbotEditorPage = () => {
         setEdges([]);
         setIsLoading(false);
       }
+      setHasUnsavedChanges(false); // Reset on initial load
     };
     loadBotData();
   }, [botId, router, setNodes, setEdges]);
@@ -63,15 +98,16 @@ const ChatbotEditorPage = () => {
         try {
           if (botId === 'new') {
             const docRef = await addDoc(collection(db, 'chatbots'), botData);
+            setHasUnsavedChanges(false); // Reset before navigation
             router.push(`/cso/automation/chatbots/${docRef.id}`);
-            setBotId(docRef.id);
+            // No need to setBotId here, the page will reload with the new ID
             resolve(docRef);
-          } else if (botId) { // Comprobación de seguridad
+          } else if (botId) {
             const botDocRef = doc(db, 'chatbots', botId);
             await setDoc(botDocRef, botData, { merge: true });
+            setHasUnsavedChanges(false); // Reset on successful save
             resolve(botDocRef);
           } else {
-            // Si botId es undefined por alguna razón, rechazamos la promesa.
             reject(new Error("No se puede guardar el bot sin una ID válida."));
           }
         } catch (error) {
@@ -88,6 +124,17 @@ const ChatbotEditorPage = () => {
     });
   };
 
+  const handleGoBack = () => {
+    if (hasUnsavedChanges) {
+      if (window.confirm('Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?')) {
+        router.push('/cso/automation/chatbots');
+      }
+    } else {
+      router.push('/cso/automation/chatbots');
+    }
+  };
+
+
   if (isLoading) {
     return (
         <div className="flex items-center justify-center h-screen bg-neutral-900 text-white">
@@ -100,8 +147,8 @@ const ChatbotEditorPage = () => {
     <div className="flex flex-col h-screen bg-neutral-900 text-white">
       <header className="flex items-center justify-between p-3 border-b border-neutral-800 bg-neutral-950/50">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.push('/cso/automation/chatbots')}><ArrowLeft className="h-5 w-5" /></Button>
-          <input type="text" value={botName} onChange={(e) => setBotName(e.target.value)} className="text-lg font-bold bg-transparent focus:outline-none focus:bg-neutral-800 rounded px-2" />
+          <Button variant="ghost" size="icon" onClick={handleGoBack}><ArrowLeft className="h-5 w-5" /></Button>
+          <input type="text" value={botName} onChange={handleNameChange} className="text-lg font-bold bg-transparent focus:outline-none focus:bg-neutral-800 rounded px-2" />
         </div>
         <div className="flex items-center space-x-2">
             <Button onClick={handleSave} disabled={isSaving} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2">

@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc } from 'firebase/firestore'; // Import onSnapshot
 import { db } from '@/lib/firebase';
+import { toast } from 'sonner'; // Import toast for notifications
 
 interface Bot {
   id: string;
@@ -20,28 +21,27 @@ const ChatbotsPage = () => {
   const [updatingBots, setUpdatingBots] = useState<string[]>([]); // Para mostrar feedback de carga por bot
 
   useEffect(() => {
-    const fetchBots = async () => {
-      setIsLoading(true);
-      try {
-        const botsCollection = collection(db, 'chatbots');
-        const querySnapshot = await getDocs(botsCollection);
-        const botsData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          name: doc.data().name || 'Bot sin nombre',
-          isActive: doc.data().isActive || false, // Asume 'false' si no está definido
-          ...doc.data(),
-        } as Bot));
-        setBots(botsData);
-      } catch (error) {
-        console.error("Error fetching bots:", error);
-        alert("No se pudieron cargar los bots.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    const botsCollection = collection(db, 'chatbots');
 
-    fetchBots();
-  }, []);
+    // Set up the real-time listener
+    const unsubscribe = onSnapshot(botsCollection, (querySnapshot) => {
+      const botsData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        name: doc.data().name || 'Bot sin nombre',
+        isActive: doc.data().isActive || false,
+        ...doc.data(),
+      } as Bot));
+      setBots(botsData);
+      setIsLoading(false); // Set loading to false after the first data load
+    }, (error) => {
+      console.error("Error fetching bots with snapshot: ", error);
+      toast.error("No se pudieron cargar los bots.");
+      setIsLoading(false);
+    });
+
+    // Cleanup: unsubscribe from the listener when the component unmounts
+    return () => unsubscribe();
+  }, []); // The empty dependency array ensures this effect runs only once
 
   const handleCreateNewBot = () => {
     router.push('/cso/automation/chatbots/new');
@@ -51,20 +51,24 @@ const ChatbotsPage = () => {
     router.push(`/cso/automation/chatbots/${botId}`);
   };
 
-  // Función para manejar el cambio de estado del bot
+  // Función para manejar el cambio de estado del bot (actualizada con toasts)
   const handleToggleBotStatus = async (bot: Bot) => {
     setUpdatingBots(prev => [...prev, bot.id]);
     try {
       const botRef = doc(db, 'chatbots', bot.id);
       const newStatus = !bot.isActive;
       await updateDoc(botRef, { isActive: newStatus });
-      // Actualiza el estado local para reflejar el cambio instantáneamente
+      
+      // The optimistic update below is technically not needed due to the real-time listener,
+      // but it makes the UI feel even more instantaneous.
       setBots(prevBots =>
         prevBots.map(b => (b.id === bot.id ? { ...b, isActive: newStatus } : b))
       );
+      toast.success(`Bot "${bot.name}" ${newStatus ? 'activado' : 'desactivado'}.`);
+
     } catch (error) {
       console.error("Error updating bot status:", error);
-      alert("No se pudo actualizar el estado del bot.");
+      toast.error("No se pudo actualizar el estado del bot.");
     } finally {
       setUpdatingBots(prev => prev.filter(id => id !== bot.id));
     }
