@@ -2,7 +2,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Loader2, MessageCircle, Power } from 'lucide-react';
+import { Plus, Loader2, MessageCircle, Power, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { collection, onSnapshot, doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -48,6 +48,10 @@ const ChatbotsPage = () => {
     return () => unsubscribe();
   }, []);
 
+  const handleGoBack = () => {
+    router.push('/cso/automation');
+  };
+
   const handleCreateNewBot = () => {
     router.push('/cso/automation/chatbots/new');
   };
@@ -80,7 +84,12 @@ const ChatbotsPage = () => {
   return (
     <div className="p-6 bg-neutral-900 text-white min-h-screen">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold">Mis Chatbots</h1>
+        <div className="flex items-center gap-4">
+            <Button variant="outline" size="icon" onClick={handleGoBack} className="h-9 w-9">
+                <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <h1 className="text-2xl font-bold">Mis Chatbots</h1>
+        </div>
         <Button
           onClick={handleCreateNewBot}
           className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transform transition-transform duration-200 hover:scale-105"
