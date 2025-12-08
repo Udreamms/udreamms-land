@@ -1,8 +1,9 @@
 
 // src/components/ChatbotCanvas.tsx
 'use client';
-import React from 'react';
-import ReactFlow, {
+import React, { useState, useCallback, forwardRef, useImperativeHandle } from 'react';
+import {
+  ReactFlow,
   MiniMap,
   Controls,
   Background,
@@ -13,6 +14,7 @@ import ReactFlow, {
   OnEdgesChange,
   ReactFlowInstance,
   OnConnect,
+  ReactFlowProvider // Movido al inicio
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Button } from './ui/button';
@@ -25,20 +27,11 @@ import {
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from "@/components/ui/tooltip";
 
-export interface ChatbotCanvasRef {}
-
-interface ChatbotCanvasProps {
-  nodes: Node[];
-  edges: Edge[];
-  onNodesChange: OnNodesChange;
-  onEdgesChange: OnEdgesChange;
-  onConnect: OnConnect;
-  setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
-  setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
-}
-
+// --- DEFINICIONES FUERA DEL COMPONENTE (SOLUCIÓN AL ERROR #002) ---
+// Se define `nodeTypes` aquí, fuera de cualquier componente.
+// Esto asegura que el objeto no se vuelva a crear en cada renderizado.
 const nodeTypes = {
     startNode: nodeComponents.StartNode,
     endNode: nodeComponents.EndNode,
@@ -63,6 +56,19 @@ const sidebarNodes = [
     { type: 'setVariableNode', label: 'Asignar Variable', icon: <Variable className="text-lime-400" /> },
     { type: 'endNode', label: 'Fin', icon: <StopCircle className="text-red-400" /> },
 ];
+
+// --- Interfaces ---
+export interface ChatbotCanvasRef {}
+interface ChatbotCanvasProps {
+  nodes: Node[];
+  edges: Edge[];
+  onNodesChange: OnNodesChange;
+  onEdgesChange: OnEdgesChange;
+  onConnect: OnConnect;
+  setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
+  setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
+}
+
 
 const SidebarNode = ({ icon, label, type: nodeType, onDragStart, isCollapsed }) => {
     const nodeContent = (
@@ -89,17 +95,17 @@ const SidebarNode = ({ icon, label, type: nodeType, onDragStart, isCollapsed }) 
 };
 
 
-const ChatbotCanvas = React.forwardRef<ChatbotCanvasRef, ChatbotCanvasProps>(
+const ChatbotCanvas = forwardRef<ChatbotCanvasRef, ChatbotCanvasProps>(
   ({ nodes, edges, onNodesChange, onEdgesChange, onConnect, setNodes, setEdges }, ref) => {
     
-    const [selectedNode, setSelectedNode] = React.useState<Node | null>(null);
-    const [reactFlowInstance, setReactFlowInstance] = React.useState<ReactFlowInstance | null>(null);
-    const [isLeftSidebarOpen, setLeftSidebarOpen] = React.useState(true);
-    const [isRightSidebarOpen, setRightSidebarOpen] = React.useState(false);
+    const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+    const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
+    const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(true);
+    const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
     
-    const onDragOver = React.useCallback((event) => { event.preventDefault(); event.dataTransfer.dropEffect = 'move'; }, []);
+    const onDragOver = useCallback((event) => { event.preventDefault(); event.dataTransfer.dropEffect = 'move'; }, []);
     
-    const onDrop = React.useCallback(
+    const onDrop = useCallback(
       (event) => {
         event.preventDefault();
         const type = event.dataTransfer.getData('application/reactflow');
@@ -123,7 +129,7 @@ const ChatbotCanvas = React.forwardRef<ChatbotCanvasRef, ChatbotCanvasProps>(
         setRightSidebarOpen(false);
     };
 
-    const updateNodeConfig = React.useCallback((nodeId: string, data: object) => {
+    const updateNodeConfig = useCallback((nodeId: string, data: object) => {
         setNodes((nds) =>
             nds.map((node) => (node.id === nodeId ? { ...node, data: { ...node.data, ...data } } : node))
         );
@@ -132,14 +138,14 @@ const ChatbotCanvas = React.forwardRef<ChatbotCanvasRef, ChatbotCanvasProps>(
         }
     }, [selectedNode, setNodes]);
     
-    const deleteNode = React.useCallback((nodeId: string) => {
+    const deleteNode = useCallback((nodeId: string) => {
         setNodes((nds) => nds.filter((node) => node.id !== nodeId));
         setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
         setSelectedNode(null);
         setRightSidebarOpen(false);
     }, [setNodes, setEdges]);
     
-    React.useImperativeHandle(ref, () => ({}));
+    useImperativeHandle(ref, () => ({}));
 
     return (
       <div className="flex h-full bg-neutral-950">
@@ -166,7 +172,7 @@ const ChatbotCanvas = React.forwardRef<ChatbotCanvasRef, ChatbotCanvasProps>(
             onConnect={onConnect}
             onNodeClick={onNodeClick}
             onPaneClick={onPaneClick}
-            nodeTypes={nodeTypes}
+            nodeTypes={nodeTypes} // Se pasa la constante definida fuera
             onInit={setReactFlowInstance}
             fitView
             className="bg-neutral-950"
@@ -189,9 +195,8 @@ const ChatbotCanvas = React.forwardRef<ChatbotCanvasRef, ChatbotCanvasProps>(
 });
 ChatbotCanvas.displayName = 'ChatbotCanvas';
 
-import { ReactFlowProvider } from 'reactflow';
 
-const ChatbotCanvasWithProvider = React.forwardRef<ChatbotCanvasRef, ChatbotCanvasProps>((props, ref) => (
+const ChatbotCanvasWithProvider = forwardRef<ChatbotCanvasRef, ChatbotCanvasProps>((props, ref) => (
   <TooltipProvider delayDuration={0}>
     <ReactFlowProvider>
       <ChatbotCanvas {...props} ref={ref} />
