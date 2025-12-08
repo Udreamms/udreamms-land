@@ -19,11 +19,6 @@ interface NodeWrapperProps {
 }
 
 const NodeWrapper = ({ children, header, icon, label, color }: NodeWrapperProps) => (
-  // SOLUCIÓN:
-  // 1. Se eliminó la clase 'react-flow__node-default' para evitar heredar estilos no deseados.
-  // 2. Se aumentó el ancho a 'w-80' (320px).
-  // 3. Se aseguró un fondo sólido con 'bg-neutral-800'.
-  // 4. Se aumentó el redondeo con 'rounded-xl'.
   <div className={cn("rounded-xl shadow-lg border-2 bg-neutral-800 w-80", color)}>
     {/* HEADER */}
     <div className={cn("p-3 rounded-t-lg flex items-center gap-3", color.replace('border-', 'bg-').replace('-500', '-900/60'))}>
@@ -41,7 +36,10 @@ const NodeWrapper = ({ children, header, icon, label, color }: NodeWrapperProps)
   </div>
 );
 
-const HandleStyled = ({ type, position, id, ...props }) => (
+// --- CORRECCIÓN DEL ERROR DE BUILD ---
+// Se añade 'id = undefined' para que el prop 'id' sea opcional.
+// React Flow internamente asignará un id 'null' si no se provee uno, lo cual es válido.
+const HandleStyled = ({ type, position, id = undefined, ...props }) => (
     <Handle 
         type={type} 
         position={position} 

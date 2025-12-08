@@ -1,138 +1,234 @@
 
 'use client';
-
 import React, { useState, useEffect, useRef } from 'react';
-import { Dialog, DialogContent, DialogClose, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { db, functions } from '@/lib/firebase';
+import { doc, onSnapshot, Timestamp, updateDoc } from 'firebase/firestore';
+import { httpsCallable } from 'firebase/functions';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Mic, Smile, Check, CheckCheck, Clock, AlertCircle, Maximize, Minimize, X, Pencil, ImageIcon } from 'lucide-react';
-import { db, functions } from '@/lib/firebase';
-import { doc, onSnapshot, Timestamp } from 'firebase/firestore';
-import { httpsCallable } from 'firebase/functions';
-import EmojiPicker from 'emoji-picker-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Send, Loader2, User, Building, Phone, Hash, Pencil, Save } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from 'sonner';
 
-// --- Interface para Tipado de Mensajes ---
+// --- Interfaces ---
 interface Message {
-  text: string;
-  sender: 'contact' | 'user';
+  content: string;
+  sender: 'contact' | 'agent';
   timestamp: Timestamp;
-  status: 'sent' | 'delivered' | 'read' | 'sending' | 'error';
 }
+
+interface CardData {
+  contactName?: string;
+  contactNumber?: string;
+  company?: string;
+  notes?: string;
+  tags?: string[];
+  messages?: Message[];
+}
+
+// --- Componente Auxiliar (LA SOLUCIÓN AL ERROR) ---
+const Field = ({ label, htmlFor, children, description = null }: { label: string, htmlFor: string, children: React.ReactNode, description?: string | null }) => (
+    <div className="space-y-2">
+        <Label htmlFor={htmlFor} className="text-xs font-semibold text-neutral-400">{label}</Label>
+        {description && <p className="text-xs text-neutral-500 -mt-1">{description}</p>}
+        {children}
+    </div>
+);
+
 
 const sendWhatsappMessage = httpsCallable(functions, 'sendWhatsappMessage');
 
-const MessageStatus = ({ status }) => {
-  // ... (sin cambios)
-};
-
 const groupMessagesByDate = (messages: Message[] = []) => {
-  if (!Array.isArray(messages)) {
-    return [];
-  }
-  const grouped = messages.reduce((acc, msg) => {
+  if (!Array.isArray(messages)) return [];
+  return messages.reduce((acc, msg) => {
     if (!msg.timestamp?.toDate) return acc;
     const date = msg.timestamp.toDate().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
     if (!acc[date]) acc[date] = [];
     acc[date].push(msg);
     return acc;
   }, {} as { [key: string]: Message[] });
-  return Object.entries(grouped);
 };
 
 const ConversationModal = ({ isOpen, onClose, card }) => {
-  const [liveCardData, setLiveCardData] = useState(card);
-  const [messageText, setMessageText] = useState('');
-  const [error, setError] = useState(null);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [isMaximized, setIsMaximized] = useState(false);
-  
-  // --- CORRECCIÓN: Tipado del Ref ---
-  const chatEndRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [liveCardData, setLiveCardData] = useState<CardData | null>(null);
+  const [newMessage, setNewMessage] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [contactInfo, setContactInfo] = useState({ name: '', company: '', tags: '' });
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isOpen && card?.groupId && card?.id) {
-      const cardRef = doc(db, 'kanban-groups', card.groupId, 'cards', card.id);
-      const unsubscribe = onSnapshot(cardRef, (doc) => {
-        if (doc.exists()) {
-          setLiveCardData({ ...doc.data(), id: doc.id, groupId: card.groupId });
-        }
-      });
-      return () => unsubscribe();
+    if (!card?.id || !card?.groupId) {
+      setLiveCardData(null);
+      return;
     }
-  }, [isOpen, card]);
+    const cardRef = doc(db, 'kanban-groups', card.groupId, 'cards', card.id);
+    const unsubscribe = onSnapshot(cardRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data() as CardData;
+        setLiveCardData(data);
+        setContactInfo({
+          name: data.contactName || '',
+          company: data.company || '',
+          tags: (data.tags || []).join(', '),
+        });
+      } else {
+        setLiveCardData(null);
+      }
+    });
+    return () => unsubscribe();
+  }, [card?.id, card?.groupId]);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [liveCardData?.messages]);
 
   const handleSendMessage = async () => {
-    // ... (sin cambios)
+    if (!newMessage.trim() || !card || isSending) return;
+    setIsSending(true);
+    try {
+      await sendWhatsappMessage({
+        cardId: card.id,
+        groupId: card.groupId,
+        message: newMessage,
+        toNumber: liveCardData?.contactNumber,
+      });
+      setNewMessage('');
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast.error('Error al enviar el mensaje.');
+    } finally {
+      setIsSending(false);
+    }
   };
 
-  const onEmojiClick = (emojiObject) => {
-    setMessageText(prev => prev + emojiObject.emoji);
-  };
-  
-  const formatMessageTimestamp = (timestamp) => {
-    if (!timestamp?.toDate) return '';
-    return timestamp.toDate().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-  };
-  
-  const groupedMessages = groupMessagesByDate(liveCardData?.messages as Message[]);
-  
-  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const textarea = e.target;
-    textarea.style.height = 'auto';
-    const maxHeight = 96;
-    if (textarea.scrollHeight <= maxHeight) {
-        textarea.style.height = `${textarea.scrollHeight}px`;
-    } else {
-        textarea.style.height = `${maxHeight}px`;
+  const handleInfoSave = async () => {
+    if (!card) return;
+    const cardRef = doc(db, 'kanban-groups', card.groupId, 'cards', card.id);
+    const updatedData = {
+      contactName: contactInfo.name,
+      company: contactInfo.company,
+      tags: contactInfo.tags.split(',').map(tag => tag.trim()).filter(Boolean),
+    };
+    try {
+      await updateDoc(cardRef, updatedData);
+      toast.success('Información del contacto actualizada.');
+    } catch (error) {
+      console.error("Error updating contact info:", error);
+      toast.error('No se pudo actualizar la información.');
     }
   };
   
-  const getInitials = (name) => {
-    if (!name) return '?';
-    const names = name.split(' ');
-    return names.length > 1
-        ? `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase()
-        : name.substring(0, 2).toUpperCase();
+  const handleInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setContactInfo(prev => ({ ...prev, [name]: value }));
   };
 
+  const groupedMessages = groupMessagesByDate(liveCardData?.messages);
   const contactName = liveCardData?.contactName || 'Desconocido';
   const contactNumber = liveCardData?.contactNumber || '';
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent 
-            className={cn(
-              "bg-black border-gray-800 text-white flex flex-col p-0 gap-0 transition-all duration-300",
-              isMaximized 
-                ? "w-screen h-screen max-w-full inset-0 translate-0 rounded-none" 
-                : "max-w-7xl h-[80vh]"
-            )}
-        >
-            {/* ... (sin cambios en la estructura JSX) */}
-             <div className="flex-grow grid grid-cols-2 overflow-hidden">
-              <div className="col-span-1 flex flex-col h-full bg-black">
-                <div className="flex-grow p-4 overflow-y-auto flex flex-col gap-1 no-scrollbar">
-                  {/* ... (código de mapeo de mensajes) */}
-                  <div ref={chatEndRef} />
-                </div>
-                
-                <div className="p-2 bg-black">
-                  {/* ... (código del área de texto) */}
-                </div>
-              </div>
-
-              {/* ... (resto del JSX) */}
+      <DialogContent className="max-w-5xl h-[90vh] flex flex-col p-0">
+        <DialogHeader className="p-4 border-b border-neutral-800">
+          <DialogTitle className="text-white">Conversación con {contactName}</DialogTitle>
+        </DialogHeader>
+        <div className="grid grid-cols-1 md:grid-cols-3 flex-1 overflow-hidden">
+          {/* Columna de Chat (ocupa 2/3) */}
+          <div className="col-span-2 flex flex-col bg-neutral-900/50 h-full">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {Object.entries(groupedMessages).map(([date, messages]) => (
+                <React.Fragment key={date}>
+                  <div className="text-center my-2">
+                    <span className="text-xs text-neutral-400 bg-neutral-800 px-2 py-1 rounded-full">{date}</span>
+                  </div>
+                  {messages.map((msg, index) => (
+                    <div key={index} className={cn("flex", msg.sender === 'agent' ? 'justify-end' : 'justify-start')}>
+                      <div className={cn(
+                        "p-3 rounded-lg max-w-sm",
+                        msg.sender === 'agent' ? 'bg-blue-600 text-white rounded-br-none' : 'bg-neutral-700 text-white rounded-bl-none'
+                      )}>
+                        <p className="text-sm">{msg.content}</p>
+                        <p className="text-xs text-neutral-300/70 text-right mt-1">
+                          {msg.timestamp?.toDate().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </React.Fragment>
+              ))}
+              <div ref={messagesEndRef} />
             </div>
-        </DialogContent>
+            <div className="p-4 border-t border-neutral-800 bg-neutral-900">
+              <div className="relative">
+                <Textarea
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
+                  placeholder="Escribe un mensaje... (Shift+Enter para nueva línea)"
+                  className="bg-neutral-800 border-neutral-700 pr-20"
+                  rows={2}
+                />
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={isSending || !newMessage.trim()}
+                  size="icon"
+                  className="absolute right-3 bottom-2.5 h-9 w-12"
+                >
+                  {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Columna de Información del Contacto (ocupa 1/3) */}
+          <div className="col-span-1 flex flex-col bg-neutral-950 p-4 overflow-y-auto">
+            <h3 className="text-lg font-bold mb-4">Detalles del Contacto</h3>
+            <Tabs defaultValue="details" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="details">Detalles</TabsTrigger>
+                <TabsTrigger value="notes">Notas</TabsTrigger>
+              </TabsList>
+              <TabsContent value="details" className="mt-4 space-y-4">
+                <Field label="Nombre" htmlFor="contact-name">
+                    <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" size={16}/>
+                        <Input id="contact-name" name="name" value={contactInfo.name} onChange={handleInfoChange} className="pl-9"/>
+                    </div>
+                </Field>
+                <Field label="Número de WhatsApp" htmlFor="contact-number">
+                    <div className="relative">
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" size={16}/>
+                        <Input id="contact-number" value={contactNumber} disabled className="pl-9"/>
+                    </div>
+                </Field>
+                <Field label="Empresa" htmlFor="contact-company">
+                    <div className="relative">
+                        <Building className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" size={16}/>
+                        <Input id="contact-company" name="company" value={contactInfo.company} onChange={handleInfoChange} className="pl-9"/>
+                    </div>
+                </Field>
+                <Field label="Etiquetas" htmlFor="contact-tags" description="Separadas por comas. Ej: VIP, Lead, Soporte">
+                     <div className="relative">
+                        <Hash className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" size={16}/>
+                        <Input id="contact-tags" name="tags" value={contactInfo.tags} onChange={handleInfoChange} className="pl-9"/>
+                    </div>
+                </Field>
+                <Button onClick={handleInfoSave} className="w-full"><Save size={16} className="mr-2"/>Guardar Cambios</Button>
+              </TabsContent>
+              <TabsContent value="notes" className="mt-4">
+                 <Field label="Notas Internas" htmlFor="contact-notes" description="Estas notas no son visibles para el cliente.">
+                    <Textarea id="contact-notes" className="min-h-[200px]" placeholder="Añade información relevante sobre el cliente..."/>
+                </Field>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
+      </DialogContent>
     </Dialog>
   );
 };
