@@ -1,12 +1,12 @@
 
-// src/index.ts
-import * as admin from 'firebase-admin';
+import * as admin from "firebase-admin";
 
-// Initialize Firebase Admin SDK
 admin.initializeApp();
 
-// Export all callable functions from the whatsapp callable file
-export { sendWhatsappMessage, sendWhatsappMediaMessage } from './callable/whatsapp';
+// Exporta la función de cardActions
+export { moveCard } from "./cardActions";
 
-// Export all webhook functions from the whatsapp webhook file
-export { whatsappWebhook } from './webhooks/whatsapp';
+// Aquí puedes añadir y exportar otras funciones en el futuro
+// Por ejemplo:
+// export { anotherFunction } from "./anotherFile";
+

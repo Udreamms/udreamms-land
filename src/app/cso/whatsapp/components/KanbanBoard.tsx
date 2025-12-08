@@ -2,7 +2,8 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { db } from '@/lib/firebase';
+import { db, functions } from '@/lib/firebase'; // Import functions
+import { httpsCallable } from 'firebase/functions'; // Import httpsCallable
 import {
   collection, onSnapshot, addDoc, serverTimestamp, query,
   doc, deleteDoc, getDoc, setDoc, writeBatch, orderBy, updateDoc,
@@ -19,6 +20,7 @@ import {
 } from '@dnd-kit/core';
 import { SortableContext, arrayMove } from '@dnd-kit/sortable';
 import { createPortal } from 'react-dom';
+import { toast } from 'sonner';
 
 // --- Interfaces para Tipado ---
 interface GroupData {
@@ -36,6 +38,8 @@ interface CardData {
     contactNumber?: string;
     [key: string]: any;
 }
+
+const moveCard = httpsCallable(functions, 'moveCard');
 
 const KanbanBoard = () => {
   const [groups, setGroups] = useState<GroupData[]>([]);
@@ -120,6 +124,7 @@ const KanbanBoard = () => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
+    // --- Mover un Grupo ---
     if (active.data.current?.type === "GROUP") {
       const oldIndex = groups.findIndex((g) => g.id === active.id);
       const newIndex = groups.findIndex((g) => g.id === over.id);
@@ -134,20 +139,30 @@ const KanbanBoard = () => {
       await batch.commit();
     }
 
+    // --- Mover una Tarjeta ---
     if (active.data.current?.type === "CARD") {
       const sourceGroupId = active.data.current?.card?.groupId;
       let destGroupId = over.id;
+
+      // Si se suelta sobre otra tarjeta, usar el groupId de esa tarjeta
       if (over.data.current?.type === 'CARD') {
         destGroupId = over.data.current.card.groupId;
       }
-      if (!sourceGroupId || !destGroupId || sourceGroupId === destGroupId) return;
-      const cardRef = doc(db, 'kanban-groups', sourceGroupId, 'cards', active.id);
-      const cardSnap = await getDoc(cardRef);
-      if (cardSnap.exists()) {
-        const newCardRef = doc(db, 'kanban-groups', destGroupId, 'cards', active.id);
-        await setDoc(newCardRef, { ...cardSnap.data(), updatedAt: serverTimestamp() });
-        await deleteDoc(cardRef);
+
+      if (!sourceGroupId || !destGroupId || sourceGroupId === destGroupId) {
+        return;
       }
+      
+      const cardId = active.id;
+
+      // Llamada a la Cloud Function
+      const promise = moveCard({ sourceGroupId, destGroupId, cardId });
+
+      toast.promise(promise, {
+        loading: 'Moviendo conversación...',
+        success: 'Conversación movida con éxito.',
+        error: (err) => `Error al mover: ${err.message}`,
+      });
     }
   }
 

@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
+import EmojiPicker, { EmojiClickData, Theme } from 'emoji-picker-react';
 import { useDropzone } from 'react-dropzone';
 import { useFileUpload } from '@/lib/hooks/useFileUpload';
 
@@ -159,7 +159,14 @@ const ConversationModal = ({ isOpen, onClose, card }) => {
   
   const handleInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => setContactInfo(prev => ({ ...prev, [e.target.name]: e.target.value }));
   const handleCustomFieldChange = (key: string, value: string) => setCustomFields(prev => ({ ...prev, [key]: value }));
-  const addCustomField = () => newFieldName && !customFields.hasOwnProperty(newFieldName) ? setCustomFields(prev => ({ ...prev, [newFieldName]: '' })) || setNewFieldName('') : toast.warning('El nombre del campo no puede estar vacío o ya existe.');
+  const addCustomField = () => {
+    if (newFieldName && !customFields.hasOwnProperty(newFieldName)) {
+      setCustomFields(prev => ({ ...prev, [newFieldName]: '' }));
+      setNewFieldName('');
+    } else {
+      toast.warning('El nombre del campo no puede estar vacío o ya existe.');
+    }
+  };
   const deleteCustomField = (key: string) => { const { [key]: _, ...rest } = customFields; setCustomFields(rest); };
   const groupedMessages = groupMessagesByDate(liveCardData?.messages);
 
@@ -213,7 +220,7 @@ const ConversationModal = ({ isOpen, onClose, card }) => {
                         <Button variant="ghost" size="icon" className="text-neutral-400 hover:text-white"><Smile size={20}/></Button>
                     </PopoverTrigger>
                     <PopoverContent side="top" className="p-0 border-none bg-transparent w-auto">
-                        <EmojiPicker onEmojiClick={onEmojiClick} theme="dark" />
+                        <EmojiPicker onEmojiClick={onEmojiClick} theme={Theme.DARK} />
                     </PopoverContent>
                 </Popover>
                 <Textarea ref={textareaRef} value={newMessage} onChange={(e) => setNewMessage(e.target.value)}
