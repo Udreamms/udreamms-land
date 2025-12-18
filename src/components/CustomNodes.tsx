@@ -4,7 +4,8 @@ import React from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { 
     MessageSquare, Edit2, Zap, AlertTriangle, CheckCircle, Code, Variable, 
-    StopCircle, Rows, ImageIcon 
+    StopCircle, Rows, ImageIcon, CheckSquare, Contact, MapPin, BrainCircuit, 
+    Database, Clock, ShoppingCart, CreditCard, Rocket, Mic, Smile, Users, ThumbsUp, Send, Bot
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -136,7 +137,7 @@ export const MediaMessageNode = ({ data = {} }: NodeProps) => (
 );
 
 export const ConditionNode = ({ data = {} }: NodeProps) => (
-  <NodeWrapper header="Condición" icon={<AlertTriangle size={20} className="text-orange-400" />} label={data.label} color="border-orange-500">
+  <NodeWrapper header="Condición" icon={<BrainCircuit size={20} className="text-amber-400" />} label={data.label} color="border-amber-500">
     <p className="text-xs text-neutral-400">Bifurca el flujo basado en una condición.</p>
     <div className="space-y-1.5 pt-1">
         <OptionRow handleId="true">Verdadero</OptionRow>
@@ -160,6 +161,120 @@ export const WebhookNode = ({ data = {} }: NodeProps) => (
 export const SetVariableNode = ({ data = {} }: NodeProps) => (
     <NodeWrapper header="Asignar Variable" icon={<Variable size={20} className="text-lime-400" />} label={data.label} color="border-lime-500">
         <p className="text-xs text-neutral-400">Define o modifica una variable.</p>
+        <HandleStyled type="target" position={Position.Left} />
+        <HandleStyled type="source" position={Position.Right} />
+    </NodeWrapper>
+);
+
+// --- NUEVOS NODOS (PLACEHOLDERS) ---
+
+export const PollNode = ({ data = {} }: NodeProps) => (
+    <NodeWrapper header="Encuesta Nativa" icon={<CheckSquare size={20} className="text-teal-400" />} label={data.label} color="border-teal-500">
+        <p className="text-xs text-neutral-400">Crea una pregunta con opciones para votar.</p>
+        <HandleStyled type="target" position={Position.Left} />
+        <HandleStyled type="source" position={Position.Right} />
+    </NodeWrapper>
+);
+
+export const ContactNode = ({ data = {} }: NodeProps) => (
+    <NodeWrapper header="Contacto (VCard)" icon={<Contact size={20} className="text-orange-400" />} label={data.label} color="border-orange-500">
+        <p className="text-xs text-neutral-400">Envía una ficha de contacto.</p>
+        <HandleStyled type="target" position={Position.Left} />
+        <HandleStyled type="source" position={Position.Right} />
+    </NodeWrapper>
+);
+
+export const LocationNode = ({ data = {} }: NodeProps) => (
+    <NodeWrapper header="Ubicación" icon={<MapPin size={20} className="text-red-400" />} label={data.label} color="border-red-500">
+        <p className="text-xs text-neutral-400">Envía coordenadas geográficas.</p>
+        <HandleStyled type="target" position={Position.Left} />
+        <HandleStyled type="source" position={Position.Right} />
+    </NodeWrapper>
+);
+
+export const FirestoreReadWriteNode = ({ data = {} }: NodeProps) => (
+    <NodeWrapper header="Consulta Firestore" icon={<Database size={20} className="text-gray-400" />} label={data.label} color="border-gray-500">
+        <p className="text-xs text-neutral-400">Lee o escribe en la base de datos.</p>
+        <HandleStyled type="target" position={Position.Left} />
+        <HandleStyled type="source" position={Position.Right} />
+    </NodeWrapper>
+);
+
+export const DelayNode = ({ data = {} }: NodeProps) => (
+    <NodeWrapper header="Espera / Delay" icon={<Clock size={20} className="text-gray-400" />} label={data.label} color="border-gray-500">
+        <p className="text-xs text-neutral-400">Introduce una pausa en el flujo.</p>
+        <HandleStyled type="target" position={Position.Left} />
+        <HandleStyled type="source" position={Position.Right} />
+    </NodeWrapper>
+);
+
+export const CatalogNode = ({ data = {} }: NodeProps) => (
+    <NodeWrapper header="Catálogo de Productos" icon={<ShoppingCart size={20} className="text-green-400" />} label={data.label} color="border-green-500">
+        <p className="text-xs text-neutral-400">Muestra un catálogo de productos.</p>
+        <HandleStyled type="target" position={Position.Left} />
+        <HandleStyled type="source" position={Position.Right} />
+    </NodeWrapper>
+);
+
+export const ProductNode = ({ data = {} }: NodeProps) => (
+    <NodeWrapper header="Producto Único/Múltiple" icon={<CreditCard size={20} className="text-green-400" />} label={data.label} color="border-green-500">
+        <p className="text-xs text-neutral-400">Envía uno o varios productos.</p>
+        <HandleStyled type="target" position={Position.Left} />
+        <HandleStyled type="source" position={Position.Right} />
+    </NodeWrapper>
+);
+
+export const WhatsappFlowsNode = ({ data = {} }: NodeProps) => (
+    <NodeWrapper header="WhatsApp Flows" icon={<Rocket size={20} className="text-green-400" />} label={data.label} color="border-green-500">
+        <p className="text-xs text-neutral-400">Inicia un formulario interactivo.</p>
+        <HandleStyled type="target" position={Position.Left} />
+        <HandleStyled type="source" position={Position.Right} />
+    </NodeWrapper>
+);
+
+export const CheckoutNode = ({ data = {} }: NodeProps) => (
+    <NodeWrapper header="Nodo de Pago" icon={<ThumbsUp size={20} className="text-green-400" />} label={data.label} color="border-green-500">
+        <p className="text-xs text-neutral-400">Integra una pasarela de pago.</p>
+        <HandleStyled type="target" position={Position.Left} />
+        <HandleStyled type="source" position={Position.Right} />
+    </NodeWrapper>
+);
+
+export const GenerativeAINode = ({ data = {} }: NodeProps) => (
+    <NodeWrapper header="IA Generativa (LLM)" icon={<Bot size={20} className="text-sky-400" />} label={data.label} color="border-sky-500">
+        <p className="text-xs text-neutral-400">Conecta con un modelo de lenguaje.</p>
+        <HandleStyled type="target" position={Position.Left} />
+        <HandleStyled type="source" position={Position.Right} />
+    </NodeWrapper>
+);
+
+export const TranscriptionNode = ({ data = {} }: NodeProps) => (
+    <NodeWrapper header="Transcripción (Audio)" icon={<Mic size={20} className="text-sky-400" />} label={data.label} color="border-sky-500">
+        <p className="text-xs text-neutral-400">Convierte audio a texto.</p>
+        <HandleStyled type="target" position={Position.Left} />
+        <HandleStyled type="source" position={Position.Right} />
+    </NodeWrapper>
+);
+
+export const SentimentAnalysisNode = ({ data = {} }: NodeProps) => (
+    <NodeWrapper header="Análisis de Sentimiento" icon={<Smile size={20} className="text-sky-400" />} label={data.label} color="border-sky-500">
+        <p className="text-xs text-neutral-400">Clasifica la emoción del usuario.</p>
+        <HandleStyled type="target" position={Position.Left} />
+        <HandleStyled type="source" position={Position.Right} />
+    </NodeWrapper>
+);
+
+export const TemplateNode = ({ data = {} }: NodeProps) => (
+    <NodeWrapper header="Plantillas (Templates)" icon={<Send size={20} className="text-fuchsia-400" />} label={data.label} color="border-fuchsia-500">
+        <p className="text-xs text-neutral-400">Envía notificaciones aprobadas por Meta.</p>
+        <HandleStyled type="target" position={Position.Left} />
+        <HandleStyled type="source" position={Position.Right} />
+    </NodeWrapper>
+);
+
+export const HumanHandoffNode = ({ data = {} }: NodeProps) => (
+    <NodeWrapper header="Transferencia a Humano" icon={<Users size={20} className="text-fuchsia-400" />} label={data.label} color="border-fuchsia-500">
+        <p className="text-xs text-neutral-400">Transfiere la conversación a un agente.</p>
         <HandleStyled type="target" position={Position.Left} />
         <HandleStyled type="source" position={Position.Right} />
     </NodeWrapper>

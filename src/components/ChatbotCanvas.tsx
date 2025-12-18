@@ -1,7 +1,6 @@
-
 // src/components/ChatbotCanvas.tsx
 'use client';
-import React, { useState, useCallback, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useCallback, forwardRef, useImperativeHandle, useMemo } from 'react';
 import {
   ReactFlow,
   MiniMap,
@@ -14,13 +13,19 @@ import {
   OnEdgesChange,
   ReactFlowInstance,
   OnConnect,
-  ReactFlowProvider // Movido al inicio
+  ReactFlowProvider,
+  updateEdge,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Button } from './ui/button';
 import * as nodeComponents from './CustomNodes';
+import CustomEdge from './CustomEdge';
 import SettingsPanel from './SettingsPanel';
-import { Menu, MessageSquare, Image as ImageIcon, Zap, Rows, Edit2, AlertTriangle, Code, Variable, StopCircle, ChevronLeft } from 'lucide-react';
+import { 
+    Menu, MessageSquare, Image as ImageIcon, Zap, Rows, Edit2, AlertTriangle, Code, Variable, StopCircle, ChevronLeft,
+    CheckSquare, Contact, MapPin, BrainCircuit, Bot, Database, Clock, ShoppingCart, CreditCard,
+    Rocket, Mic, Smile, Users, ThumbsUp, Send
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
     Tooltip,
@@ -29,35 +34,59 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-// --- DEFINICIONES FUERA DEL COMPONENTE (SOLUCIÓN AL ERROR #002) ---
-// Se define `nodeTypes` aquí, fuera de cualquier componente.
-// Esto asegura que el objeto no se vuelva a crear en cada renderizado.
-const nodeTypes = {
-    startNode: nodeComponents.StartNode,
-    endNode: nodeComponents.EndNode,
-    textMessageNode: nodeComponents.TextMessageNode,
-    mediaMessageNode: nodeComponents.MediaMessageNode,
-    quickReplyNode: nodeComponents.QuickReplyNode,
-    listMessageNode: nodeComponents.ListMessageNode,
-    conditionNode: nodeComponents.ConditionNode,
-    captureInputNode: nodeComponents.CaptureInputNode,
-    webhookNode: nodeComponents.WebhookNode,
-    setVariableNode: nodeComponents.SetVariableNode,
-};
-
-const sidebarNodes = [
-    { type: 'textMessageNode', label: 'Mensaje de Texto', icon: <MessageSquare className="text-blue-400" /> },
-    { type: 'mediaMessageNode', label: 'Mensaje Multimedia', icon: <ImageIcon className="text-yellow-400" /> },
-    { type: 'quickReplyNode', label: 'Respuesta Rápida', icon: <Zap className="text-purple-400" /> },
-    { type: 'listMessageNode', label: 'Mensaje de Lista', icon: <Rows className="text-indigo-400" /> },
-    { type: 'captureInputNode', label: 'Capturar Entrada', icon: <Edit2 className="text-cyan-400" /> },
-    { type: 'conditionNode', label: 'Condición', icon: <AlertTriangle className="text-orange-400" /> },
-    { type: 'webhookNode', label: 'Webhook', icon: <Code className="text-pink-400" /> },
-    { type: 'setVariableNode', label: 'Asignar Variable', icon: <Variable className="text-lime-400" /> },
-    { type: 'endNode', label: 'Fin', icon: <StopCircle className="text-red-400" /> },
+const sidebarNodeGroups = [
+    {
+        title: 'Mensajería y UI',
+        nodes: [
+            { type: 'textMessageNode', label: 'Mensaje de Texto', icon: <MessageSquare className="text-blue-400" /> },
+            { type: 'mediaMessageNode', label: 'Mensaje Multimedia', icon: <ImageIcon className="text-yellow-400" /> },
+            { type: 'quickReplyNode', label: 'Respuesta Rápida', icon: <Zap className="text-purple-400" /> },
+            { type: 'listMessageNode', label: 'Mensaje de Lista', icon: <Rows className="text-indigo-400" /> },
+            { type: 'pollNode', label: 'Encuesta Nativa', icon: <CheckSquare className="text-teal-400" /> },
+            { type: 'contactNode', label: 'Contacto (VCard)', icon: <Contact className="text-orange-400" /> },
+            { type: 'locationNode', label: 'Ubicación', icon: <MapPin className="text-red-400" /> },
+        ]
+    },
+    {
+        title: 'Lógica y Procesamiento',
+        nodes: [
+            { type: 'captureInputNode', label: 'Capturar Entrada', icon: <Edit2 className="text-cyan-400" /> },
+            { type: 'conditionNode', label: 'Condición (If/Else)', icon: <BrainCircuit className="text-amber-400" /> },
+            { type: 'setVariableNode', label: 'Asignar Variable', icon: <Variable className="text-lime-400" /> },
+            { type: 'webhookNode', label: 'Webhook', icon: <Code className="text-pink-400" /> },
+            { type: 'firestoreReadWriteNode', label: 'Consulta Firestore', icon: <Database className="text-gray-400" /> },
+            { type: 'delayNode', label: 'Espera / Delay', icon: <Clock className="text-gray-400" /> },
+            { type: 'endNode', label: 'Fin de Flujo', icon: <StopCircle className="text-red-500" /> },
+        ]
+    },
+    {
+        title: 'Comercio y Ventas',
+        nodes: [
+            { type: 'catalogNode', label: 'Catálogo de Productos', icon: <ShoppingCart className="text-green-400" /> },
+            { type: 'productNode', label: 'Producto Único/Múltiple', icon: <CreditCard className="text-green-400" /> },
+            { type: 'whatsappFlowsNode', label: 'WhatsApp Flows', icon: <Rocket className="text-green-400" /> },
+            { type: 'checkoutNode', label: 'Nodo de Pago', icon: <ThumbsUp className="text-green-400" /> },
+        ]
+    },
+    {
+        title: 'Inteligencia Artificial',
+        nodes: [
+            { type: 'generativeAINode', label: 'IA Generativa (LLM)', icon: <Bot className="text-sky-400" /> },
+            { type: 'transcriptionNode', label: 'Transcripción (Audio)', icon: <Mic className="text-sky-400" /> },
+            { type: 'sentimentAnalysisNode', label: 'Análisis de Sentimiento', icon: <Smile className="text-sky-400" /> },
+        ]
+    },
+    {
+        title: 'Gestión y Soporte',
+        nodes: [
+            { type: 'templateNode', label: 'Plantillas (Templates)', icon: <Send className="text-fuchsia-400" /> },
+            { type: 'humanHandoffNode', label: 'Transferencia a Humano', icon: <Users className="text-fuchsia-400" /> },
+        ]
+    }
 ];
+const sidebarNodes = sidebarNodeGroups.flatMap(group => group.nodes);
 
-// --- Interfaces ---
+
 export interface ChatbotCanvasRef {}
 interface ChatbotCanvasProps {
   nodes: Node[];
@@ -68,7 +97,6 @@ interface ChatbotCanvasProps {
   setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
   setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
 }
-
 
 const SidebarNode = ({ icon, label, type: nodeType, onDragStart, isCollapsed }) => {
     const nodeContent = (
@@ -94,10 +122,42 @@ const SidebarNode = ({ icon, label, type: nodeType, onDragStart, isCollapsed }) 
     );
 };
 
-
 const ChatbotCanvas = forwardRef<ChatbotCanvasRef, ChatbotCanvasProps>(
   ({ nodes, edges, onNodesChange, onEdgesChange, onConnect, setNodes, setEdges }, ref) => {
     
+    // MEMOIZE nodeTypes and edgeTypes to prevent unnecessary re-renders and warnings
+    // Defining the object INSIDE useMemo to strictly follow "Alternative implementation" from React Flow docs
+    const nodeTypes = useMemo(() => ({
+        startNode: nodeComponents.StartNode,
+        endNode: nodeComponents.EndNode,
+        textMessageNode: nodeComponents.TextMessageNode,
+        mediaMessageNode: nodeComponents.MediaMessageNode,
+        quickReplyNode: nodeComponents.QuickReplyNode,
+        listMessageNode: nodeComponents.ListMessageNode,
+        pollNode: nodeComponents.PollNode,
+        contactNode: nodeComponents.ContactNode,
+        locationNode: nodeComponents.LocationNode,
+        captureInputNode: nodeComponents.CaptureInputNode,
+        conditionNode: nodeComponents.ConditionNode,
+        setVariableNode: nodeComponents.SetVariableNode,
+        webhookNode: nodeComponents.WebhookNode,
+        firestoreReadWriteNode: nodeComponents.FirestoreReadWriteNode,
+        delayNode: nodeComponents.DelayNode,
+        catalogNode: nodeComponents.CatalogNode,
+        productNode: nodeComponents.ProductNode,
+        whatsappFlowsNode: nodeComponents.WhatsappFlowsNode,
+        checkoutNode: nodeComponents.CheckoutNode,
+        generativeAINode: nodeComponents.GenerativeAINode,
+        transcriptionNode: nodeComponents.TranscriptionNode,
+        sentimentAnalysisNode: nodeComponents.SentimentAnalysisNode,
+        templateNode: nodeComponents.TemplateNode,
+        humanHandoffNode: nodeComponents.HumanHandoffNode,
+    }), []);
+
+    const edgeTypes = useMemo(() => ({
+        custom: CustomEdge,
+    }), []);
+
     const [selectedNode, setSelectedNode] = useState<Node | null>(null);
     const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
     const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(true);
@@ -113,10 +173,15 @@ const ChatbotCanvas = forwardRef<ChatbotCanvasRef, ChatbotCanvasProps>(
 
         const position = reactFlowInstance.screenToFlowPosition({ x: event.clientX, y: event.clientY });
         const newNodeData = sidebarNodes.find(n => n.type === type);
-        const newNode: Node = { id: `node_${+new Date()}`, type, position, data: { label: newNodeData?.label || 'Nuevo Nodo' } };
+        const newNode: Node = { id: `dndnode_${+new Date()}`, type, position, data: { label: newNodeData?.label || 'Nuevo Nodo' } };
         setNodes((nds) => nds.concat(newNode));
       },
       [reactFlowInstance, setNodes],
+    );
+
+    const onEdgeUpdate = useCallback(
+      (oldEdge, newConnection) => setEdges((els) => updateEdge(oldEdge, newConnection, els)),
+      [setEdges]
     );
 
     const onNodeClick = (_: React.MouseEvent, node: Node) => {
@@ -149,7 +214,7 @@ const ChatbotCanvas = forwardRef<ChatbotCanvasRef, ChatbotCanvasProps>(
 
     return (
       <div className="flex h-full bg-neutral-950">
-        <aside className={cn("bg-neutral-950/50 p-3 border-r border-neutral-800 transition-all duration-300 ease-in-out", isLeftSidebarOpen ? "w-72" : "w-20")}>
+        <aside className={cn("bg-neutral-950/50 p-3 border-r border-neutral-800 transition-all duration-300 ease-in-out", isLeftSidebarOpen ? "w-96" : "w-20")}>
             <div className="flex items-center justify-between mb-4 h-10">
                 <h2 className={cn("text-lg font-bold text-white", !isLeftSidebarOpen && "hidden")}>Nodos Disponibles</h2>
                 <Button variant="ghost" size="icon" onClick={() => setLeftSidebarOpen(!isLeftSidebarOpen)} className="hover:bg-neutral-800 text-neutral-400 hover:text-white">
@@ -157,8 +222,15 @@ const ChatbotCanvas = forwardRef<ChatbotCanvasRef, ChatbotCanvasProps>(
                 </Button>
             </div>
             <div className="overflow-y-auto h-[calc(100%-3rem)] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
-                {sidebarNodes.map(nodeInfo => (
-                    <SidebarNode key={nodeInfo.type} {...nodeInfo} onDragStart={(e, type) => e.dataTransfer.setData('application/reactflow', type)} isCollapsed={!isLeftSidebarOpen} />
+                {sidebarNodeGroups.map((group, index) => (
+                    <div key={index}>
+                        <h3 className={cn("text-xs font-bold text-neutral-400 uppercase tracking-wider mb-2 mt-4", isLeftSidebarOpen ? "px-2" : "text-center")}>
+                            {isLeftSidebarOpen ? group.title : "•"}
+                        </h3>
+                        {group.nodes.map(nodeInfo => (
+                            <SidebarNode key={nodeInfo.type} {...nodeInfo} onDragStart={(e, type) => e.dataTransfer.setData('application/reactflow', type)} isCollapsed={!isLeftSidebarOpen} />
+                        ))}
+                    </div>
                 ))}
             </div>
         </aside>
@@ -170,9 +242,11 @@ const ChatbotCanvas = forwardRef<ChatbotCanvasRef, ChatbotCanvasProps>(
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            onEdgeUpdate={onEdgeUpdate}
             onNodeClick={onNodeClick}
             onPaneClick={onPaneClick}
-            nodeTypes={nodeTypes} // Se pasa la constante definida fuera
+            nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
             onInit={setReactFlowInstance}
             fitView
             className="bg-neutral-950"
@@ -194,7 +268,6 @@ const ChatbotCanvas = forwardRef<ChatbotCanvasRef, ChatbotCanvasProps>(
     );
 });
 ChatbotCanvas.displayName = 'ChatbotCanvas';
-
 
 const ChatbotCanvasWithProvider = forwardRef<ChatbotCanvasRef, ChatbotCanvasProps>((props, ref) => (
   <TooltipProvider delayDuration={0}>
