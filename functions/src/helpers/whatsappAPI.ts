@@ -9,79 +9,88 @@ const phoneNumberId = whatsappConfig?.phone_number_id;
 
 const WHATSAPP_API_URL = `https://graph.facebook.com/v19.0/${phoneNumberId}/messages`;
 
-// Helper general para realizar la llamada a la API
 async function makeWhatsAppRequest(data: object) {
     if (!accessToken || !phoneNumberId) {
-        functions.logger.error('Missing WhatsApp API credentials in config.');
-        throw new functions.https.HttpsError('internal', 'Missing WhatsApp API credentials.');
+        functions.logger.error('Missing WhatsApp API credentials.');
+        throw new functions.https.HttpsError('internal', 'Missing credentials.');
     }
-
     try {
         await axios.post(WHATSAPP_API_URL, data, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
         });
-    } catch (error: any) { // Catch as 'any' to inspect its properties
-        if (error.isAxiosError) {
-            functions.logger.error('Error sending WhatsApp message via API:', error.response?.data || error.message);
-        } else {
-            functions.logger.error('An unexpected error occurred:', error);
-        }
-        // Re-throw a consistent error to the calling function
-        throw new functions.https.HttpsError('internal', 'Error occurred while sending message via WhatsApp API.');
+    } catch (error: any) {
+        functions.logger.error('WhatsApp API Error:', error.response?.data || error.message);
+        throw new functions.https.HttpsError('internal', 'Error sending WhatsApp message.');
     }
 }
 
-// Función específica para mensajes de texto
 export async function sendMessage(to: string, message: string): Promise<void> {
-    const data = {
-        messaging_product: 'whatsapp',
-        to,
-        text: { body: message },
-    };
-    await makeWhatsAppRequest(data);
-    functions.logger.info(`Text message sent to ${to}.`);
+    await makeWhatsAppRequest({ messaging_product: 'whatsapp', to, text: { body: message } });
 }
 
-// Función específica para mensajes multimedia
-export async function sendMediaMessage(to: string, fileUrl: string, fileName: string): Promise<void> {
-    const mediaType = getMediaType(fileName);
+export async function sendMediaMessage(to: string, fileUrl: string, caption: string = '', fileName: string = 'file'): Promise<void> {
+    const mediaType = getMediaType(fileUrl, fileName);
     if (mediaType === 'unsupported') {
-        throw new functions.https.HttpsError('invalid-argument', 'Unsupported file type.');
+        functions.logger.warn(`Unsupported media: ${fileName}`);
+        return;
     }
-
-    const data = {
-        messaging_product: 'whatsapp',
-        to,
-        type: mediaType,
-        [mediaType]: {
-            link: fileUrl,
-            caption: fileName // Opcional: puedes usar el nombre del archivo como caption
-        }
-    };
-
-    await makeWhatsAppRequest(data);
-    functions.logger.info(`Media message (${mediaType}) sent to ${to}.`);
+    await makeWhatsAppRequest({
+        messaging_product: 'whatsapp', to, type: mediaType,
+        [mediaType]: { link: fileUrl, caption: caption }
+    });
 }
 
-function getMediaType(fileName: string): 'image' | 'document' | 'video' | 'audio' | 'unsupported' {
-    const extension = fileName.split('.').pop()?.toLowerCase();
-    if (!extension) return 'unsupported';
+// NUEVO: Enviar Botones (Quick Replies)
+export async function sendButtonMessage(to: string, bodyText: string, buttons: any[]): Promise<void> {
+    const validButtons = buttons.slice(0, 3).map((btn, i) => ({
+        type: "reply",
+        reply: { id: btn.id || `btn_${i}`, title: btn.title?.substring(0, 20) || "Opción" }
+    }));
 
-    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension)) {
-        return 'image';
-    }
-    if (['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(extension)) {
-        return 'document';
-    }
-    if (['mp4', '3gp', 'mov'].includes(extension)) {
-        return 'video';
-    }
-    if (['mp3', 'aac', 'ogg', 'amr'].includes(extension)) {
-        return 'audio';
-    }
-    
-    return 'unsupported';
+    await makeWhatsAppRequest({
+        messaging_product: 'whatsapp', to, type: 'interactive',
+        interactive: {
+            type: 'button',
+            body: { text: bodyText },
+            action: { buttons: validButtons }
+        }
+    });
+}
+
+// NUEVO: Enviar Lista
+export async function sendListMessage(to: string, bodyText: string, buttonText: string, sections: any[]): Promise<void> {
+    const formattedSections = sections.map(sec => ({
+        title: sec.title,
+        rows: (sec.rows || []).map((row: any) => ({
+            id: row.id || row.title,
+            title: row.title?.substring(0, 23),
+            description: row.description?.substring(0, 70) || ''
+        }))
+    }));
+
+    await makeWhatsAppRequest({
+        messaging_product: 'whatsapp', to, type: 'interactive',
+        interactive: {
+            type: 'list',
+            body: { text: bodyText },
+            action: { button: buttonText || "Ver Opciones", sections: formattedSections }
+        }
+    });
+}
+
+// NUEVO: Enviar Ubicación
+export async function sendLocationMessage(to: string, lat: number, long: number, name: string, address: string): Promise<void> {
+    await makeWhatsAppRequest({
+        messaging_product: 'whatsapp', to, type: 'location',
+        location: { latitude: lat, longitude: long, name: name, address: address }
+    });
+}
+
+function getMediaType(url: string, fileName: string): 'image' | 'document' | 'video' | 'audio' | 'unsupported' {
+    const ext = (fileName.includes('.') ? fileName.split('.').pop() : url.split('.').pop())?.toLowerCase();
+    if (['jpg', 'jpeg', 'png', 'webp'].includes(ext || '')) return 'image';
+    if (['pdf', 'doc', 'docx', 'xls', 'xlsx'].includes(ext || '')) return 'document';
+    if (['mp4', '3gp'].includes(ext || '')) return 'video';
+    if (['mp3', 'aac', 'ogg'].includes(ext || '')) return 'audio';
+    return 'image'; 
 }
