@@ -20,8 +20,9 @@ import { PollSettings } from './settings/nodes/PollSettings';
 import { ContactSettings } from './settings/nodes/ContactSettings';
 import { LocationSettings } from './settings/nodes/LocationSettings';
 import { PlaceholderSettings } from './settings/nodes/PlaceholderSettings';
-import { WhatsappFlowsSettings } from './settings/nodes/WhatsappFlowsSettings'; // Nuevo
-import { CheckoutSettings } from './settings/nodes/CheckoutSettings'; // Nuevo
+import { WhatsappFlowsSettings } from './settings/nodes/WhatsappFlowsSettings';
+import { CheckoutSettings } from './settings/nodes/CheckoutSettings';
+import { StartSettings } from './settings/nodes/StartSettings'; // Importado
 
 // Nuevos Nodos AI & Management
 import { GenerativeAISettings } from './settings/nodes/GenerativeAISettings';
@@ -53,6 +54,7 @@ const SettingsPanel = ({ selectedNode, updateNodeConfig, deleteNode, isOpen, onT
   }
 
   const nodeSettingsMap: { [key: string]: React.FC<NodeSettingsProps> } = {
+    startNode: StartSettings, // Registrado
     textMessageNode: TextMessageSettings,
     mediaMessageNode: MediaMessageSettings,
     quickReplyNode: QuickReplySettings,
@@ -104,6 +106,7 @@ const SettingsPanel = ({ selectedNode, updateNodeConfig, deleteNode, isOpen, onT
             </div>
           </Tabs>
           <div className="mt-auto pt-3 border-t border-neutral-800">
+            {/* El nodo de inicio usualmente no se debería borrar, pero lo dejo por consistencia si el usuario quiere */}
             <Button variant="destructive" onClick={() => deleteNode(selectedNode.id)} className="w-full">
               <Trash2 className="mr-2 h-4 w-4" /> Eliminar Nodo
             </Button>

@@ -98,12 +98,17 @@ export const QuickReplyNode = ({ data = {} }: NodeProps) => (
   <NodeWrapper header="Respuesta Rápida" icon={<Zap size={20} className="text-purple-400" />} label={data.label} color="border-purple-500">
     <p className="text-xs text-neutral-400">Texto:</p>
     <p className="whitespace-pre-wrap bg-neutral-900/70 p-2 rounded-md text-white max-h-20 overflow-y-auto text-xs">
-        {data.text || 'Haz clic para editar.'}
+        {data.text || data.bodyText || 'Haz clic para editar.'}
     </p>
     <div className="space-y-1.5 pt-1">
-        { (data.buttons || []).filter(b => b).map((btn, i) => (
-            <OptionRow key={i} handleId={btn}>{btn}</OptionRow>
-        ))}
+        { (data.buttons || []).filter(b => b).map((btn, i) => {
+            const isObject = typeof btn === 'object' && btn !== null;
+            const label = isObject ? btn.title : btn;
+            const id = isObject ? (btn.id || btn.payload || btn.title) : btn;
+            return (
+                <OptionRow key={i} handleId={id}>{label}</OptionRow>
+            )
+        })}
     </div>
     <HandleStyled type="target" position={Position.Left} />
   </NodeWrapper>
@@ -118,9 +123,14 @@ export const ListMessageNode = ({ data = {} }: NodeProps) => (
       { (data.sections || []).map((section, sectionIndex) => (
           <div key={sectionIndex} className="space-y-1.5 pt-1">
               <p className="text-xs text-indigo-300 font-semibold">{section.title || `Sección ${sectionIndex + 1}`}</p>
-              { (section.options || []).map((opt, optIndex) => (
-                  <OptionRow key={optIndex} handleId={opt}>{opt || `Opción ${optIndex + 1}`}</OptionRow>
-              ))}
+              { (section.rows || section.options || []).map((opt, optIndex) => {
+                  const isObject = typeof opt === 'object' && opt !== null;
+                  const label = isObject ? opt.title : opt;
+                  const id = isObject ? opt.id : opt;
+                  return (
+                    <OptionRow key={optIndex} handleId={id}>{label || `Opción ${optIndex + 1}`}</OptionRow>
+                  );
+              })}
           </div>
       ))}
       <HandleStyled type="target" position={Position.Left} />
