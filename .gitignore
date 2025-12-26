@@ -1,4 +1,6 @@
-.next
 node_modules
+.next
 .firebase
 public/assets
+functions/node_modules
+package-lock.json
