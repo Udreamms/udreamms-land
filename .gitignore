@@ -1,7 +1,8 @@
-node_modules
-.next
-.firebase
-public/assets
-functions/node_modules
-package-lock.json
+node_modules/
+.firebase/
+.env
 .env.local
+build/
+dist/
+.next/
+*.mp4
