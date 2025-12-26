@@ -1,12 +1,19 @@
 
 import type { Metadata } from 'next';
-import { Poppins } from 'next/font/google';
+import { Inter, Open_Sans } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'sonner';
 
-const poppins = Poppins({
+const inter = Inter({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+const openSans = Open_Sans({
+  subsets: ['latin'],
+  variable: '--font-open-sans',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -21,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={poppins.className}>
+      <body className={`${inter.variable} ${openSans.variable} font-sans`}>
         {children}
         <Toaster richColors position="top-right" />
       </body>
