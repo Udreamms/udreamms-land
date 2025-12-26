@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Hero from "@/components/landing/Hero";
+import QuickAccess from "@/components/landing/QuickAccess"; // IMPORTADO
 import Stats from "@/components/landing/Stats";
 import Services from "@/components/landing/Services";
 import YouTubeSubscription from "@/components/landing/YouTubeSubscription";
@@ -23,7 +24,6 @@ function HomeContent() {
   const [showUpsell, setShowUpsell] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
 
-  // Check if calculator should be shown from URL parameter
   useEffect(() => {
     if (searchParams.get('calculator') === 'true') {
       setShowCalculator(true);
@@ -50,11 +50,15 @@ function HomeContent() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50"> {/* Fondo general gris muy suave */}
       <TopBar onGetQuote={handleStartQuote} />
       <Header />
       
       <Hero onStartQuote={handleStartQuote} />
+      
+      {/* NUEVA SECCIÓN DE ACCESO RÁPIDO */}
+      <QuickAccess />
+      
       <Stats />
       <Services onStartQuote={handleStartQuote} onAppClick={handleAppClick} />
       <YouTubeSubscription />

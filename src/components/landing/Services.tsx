@@ -1,6 +1,6 @@
 "use client";
 
-import { Shield, GraduationCap, Globe, Users, Smartphone } from "lucide-react";
+import { Shield, GraduationCap, Globe, Users, Smartphone, ArrowRight } from "lucide-react";
 
 interface ServicesProps {
   onStartQuote: () => void;
@@ -9,99 +9,123 @@ interface ServicesProps {
 
 export default function Services({ onStartQuote, onAppClick }: ServicesProps) {
   return (
-    <section className="py-20 bg-gradient-to-r from-primary to-primary-glow">
-      <div className="container px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
-            Nuestros Servicios
+    <section className="py-24 bg-white">
+      <div className="container px-6 md:px-12 mx-auto">
+        <div className="mb-16 max-w-3xl">
+          <h2 className="text-3xl md:text-5xl font-bold mb-6 text-gray-900 tracking-tight text-left">
+            Todo lo que necesitas para estudiar en <span className="text-primary">USA</span>
           </h2>
-          <p className="text-lg text-white/90 max-w-2xl mx-auto">
-            Todo lo que necesitas para estudiar en Estados Unidos
+          <p className="text-xl text-gray-600 leading-relaxed text-left">
+            Diseñamos cada servicio pensando en simplificar tu vida, desde el primer trámite hasta que aterrizas en tu nuevo hogar.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
-          <div className="bg-white/10 backdrop-blur-sm p-8 rounded-lg shadow-lg hover:shadow-xl transition-all border border-white/20 hover:border-white/40 group">
-            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center mb-4">
-              <Shield className="w-7 h-7 text-white" />
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Tarjeta 1: Migratorio */}
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group flex flex-col justify-between h-full">
+            <div>
+              <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <Shield className="w-7 h-7 text-primary" />
+              </div>
+              <h3 className="text-2xl font-bold mb-4 text-gray-900 text-left">
+                Servicio Migratorio
+              </h3>
+              <ul className="space-y-3 mb-6">
+                {['Aplicación a escuela', 'Trámite SEVIS', 'Documentación', 'Preparación Consular'].map((item, i) => (
+                  <li key={i} className="flex items-start text-gray-600 text-left">
+                    <span className="mr-2 text-primary mt-1">•</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-white transition-colors">
-              Servicio Migratorio
-            </h3>
-            <ul className="space-y-2 text-white/90 mt-4">
-              <li>✓ Aplicación a escuela</li>
-              <li>✓ SEVIS</li>
-              <li>✓ Documentación y preparación</li>
-              <li>✓ Cita Consular</li>
-            </ul>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-sm p-8 rounded-lg shadow-lg hover:shadow-xl transition-all border border-white/20 hover:border-white/40 group">
-            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center mb-4">
-              <GraduationCap className="w-7 h-7 text-white" />
+          {/* Tarjeta 2: Programas */}
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group flex flex-col justify-between h-full">
+            <div>
+              <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <GraduationCap className="w-7 h-7 text-primary" />
+              </div>
+              <h3 className="text-2xl font-bold mb-4 text-gray-900 text-left">
+                Programas de Inglés
+              </h3>
+              <ul className="space-y-3 mb-6">
+                {['Inglés Intensivo', 'Clases Online', 'TOEFL & IELTS', 'Inglés de Negocios'].map((item, i) => (
+                  <li key={i} className="flex items-start text-gray-600 text-left">
+                    <span className="mr-2 text-primary mt-1">•</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-white transition-colors">
-              Programas de Inglés
-            </h3>
-            <ul className="space-y-2 text-white/90 mt-4">
-              <li>✓ Inglés Intensivo</li>
-              <li>✓ Inglés Online</li>
-              <li>✓ TOEFL & IELTS</li>
-              <li>✓ Inglés de Negocios</li>
-            </ul>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-sm p-8 rounded-lg shadow-lg hover:shadow-xl transition-all border border-white/20 hover:border-white/40 group">
-            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center mb-4">
-              <Globe className="w-7 h-7 text-white" />
+          {/* Tarjeta 3: Aeropuerto */}
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group flex flex-col justify-between h-full">
+            <div>
+              <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <Globe className="w-7 h-7 text-primary" />
+              </div>
+              <h3 className="text-2xl font-bold mb-4 text-gray-900 text-left">
+                Servicio Aeropuerto
+              </h3>
+              <ul className="space-y-3 mb-6">
+                {['Recogida privada', 'Traslado seguro', 'Bienvenida cálida', 'Sim card local'].map((item, i) => (
+                  <li key={i} className="flex items-start text-gray-600 text-left">
+                    <span className="mr-2 text-primary mt-1">•</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-white transition-colors">
-              Servicio Aeropuerto
-            </h3>
-            <ul className="space-y-2 text-white/90 mt-4">
-              <li>✓ Recogida en aeropuerto</li>
-              <li>✓ Traslado a domicilio</li>
-            </ul>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-sm p-8 rounded-lg shadow-lg hover:shadow-xl transition-all border border-white/20 hover:border-white/40 group">
-            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center mb-4">
-              <Users className="w-7 h-7 text-white" />
+          {/* Tarjeta 4: Vivienda */}
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group flex flex-col justify-between h-full">
+            <div>
+              <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <Users className="w-7 h-7 text-primary" />
+              </div>
+              <h3 className="text-2xl font-bold mb-4 text-gray-900 text-left">
+                Servicio Vivienda
+              </h3>
+              <ul className="space-y-3 mb-6">
+                {['Búsqueda personalizada', 'Homestays verificados', 'Residencias estudiantiles', 'Contratos seguros'].map((item, i) => (
+                  <li key={i} className="flex items-start text-gray-600 text-left">
+                    <span className="mr-2 text-primary mt-1">•</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-white transition-colors">
-              Servicio Vivienda
-            </h3>
-            <ul className="space-y-2 text-white/90 mt-4">
-              <li>✓ Búsqueda de vivienda</li>
-              <li>✓ Aplicación y documentación</li>
-              <li>✓ Soporte durante el proceso</li>
-            </ul>
           </div>
 
+          {/* Tarjeta 5: App (Destacada) - Ocupa 2 columnas en pantallas grandes */}
           <div 
             onClick={onAppClick}
-            className="bg-white/10 backdrop-blur-sm p-8 rounded-lg shadow-lg hover:shadow-xl transition-all border border-white/20 hover:border-white/40 group cursor-pointer"
+            className="md:col-span-2 bg-gradient-to-br from-gray-900 to-black p-8 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-800 group cursor-pointer relative overflow-hidden flex flex-col justify-center"
           >
-            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center mb-4">
-              <Smartphone className="w-7 h-7 text-white" />
+            <div className="absolute top-0 right-0 p-32 bg-primary/20 blur-[100px] rounded-full pointer-events-none"></div>
+            
+            <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-8">
+              <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shrink-0">
+                <Smartphone className="w-8 h-8 text-white" />
+              </div>
+              
+              <div className="flex-1 text-left">
+                <h3 className="text-2xl font-bold mb-2 text-white">
+                  Descarga la App Udreamms
+                </h3>
+                <p className="text-gray-400 mb-6 max-w-md">
+                  Gestiona todo tu proceso desde tu celular. Accede a recursos exclusivos, conecta con otros estudiantes y mantente al día.
+                </p>
+                <div className="flex items-center text-primary font-semibold group-hover:text-white transition-colors">
+                  Descargar ahora <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
             </div>
-            <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-white transition-colors">
-              Descarga la App
-            </h3>
-            <div className="text-3xl font-bold text-white mb-4">Udreamms</div>
-            <p className="text-white/90">
-              Para estudiantes que ya están en USA
-            </p>
           </div>
-        </div>
-
-        <div className="text-center">
-          <button
-            onClick={onStartQuote}
-            className="inline-flex items-center justify-center px-10 py-5 text-lg font-semibold bg-white text-primary rounded-lg shadow-lg hover:scale-105 transition-all hover:bg-white/95"
-          >
-            Ver mi Cotización Personalizada
-          </button>
         </div>
       </div>
     </section>
