@@ -1,0 +1,11 @@
+
+// tsconfig.scripts.json
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "outDir": "dist/scripts",
+    "noEmit": false
+  },
+  "include": ["scripts"]
+}
