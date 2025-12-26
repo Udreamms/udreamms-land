@@ -4,3 +4,4 @@ node_modules
 public/assets
 functions/node_modules
 package-lock.json
+.env.local
