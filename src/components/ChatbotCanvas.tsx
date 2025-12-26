@@ -1,6 +1,6 @@
 // src/components/ChatbotCanvas.tsx
 'use client';
-import React, { useState, useCallback, forwardRef, useImperativeHandle, useMemo } from 'react';
+import React, { useState, useCallback, forwardRef, useImperativeHandle } from 'react';
 import {
   ReactFlow,
   MiniMap,
@@ -33,6 +33,40 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+
+// --- STATIC CONFIGURATION (DEFINED OUTSIDE COMPONENT) ---
+// This prevents React Flow warning #002 about unnecessary re-renders.
+
+const nodeTypes = {
+    startNode: nodeComponents.StartNode,
+    endNode: nodeComponents.EndNode,
+    textMessageNode: nodeComponents.TextMessageNode,
+    mediaMessageNode: nodeComponents.MediaMessageNode,
+    quickReplyNode: nodeComponents.QuickReplyNode,
+    listMessageNode: nodeComponents.ListMessageNode,
+    pollNode: nodeComponents.PollNode,
+    contactNode: nodeComponents.ContactNode,
+    locationNode: nodeComponents.LocationNode,
+    captureInputNode: nodeComponents.CaptureInputNode,
+    conditionNode: nodeComponents.ConditionNode,
+    setVariableNode: nodeComponents.SetVariableNode,
+    webhookNode: nodeComponents.WebhookNode,
+    firestoreReadWriteNode: nodeComponents.FirestoreReadWriteNode,
+    delayNode: nodeComponents.DelayNode,
+    catalogNode: nodeComponents.CatalogNode,
+    productNode: nodeComponents.ProductNode,
+    whatsappFlowsNode: nodeComponents.WhatsappFlowsNode,
+    checkoutNode: nodeComponents.CheckoutNode,
+    generativeAINode: nodeComponents.GenerativeAINode,
+    transcriptionNode: nodeComponents.TranscriptionNode,
+    sentimentAnalysisNode: nodeComponents.SentimentAnalysisNode,
+    templateNode: nodeComponents.TemplateNode,
+    humanHandoffNode: nodeComponents.HumanHandoffNode,
+};
+
+const edgeTypes = {
+    custom: CustomEdge,
+};
 
 const sidebarNodeGroups = [
     {
@@ -125,38 +159,8 @@ const SidebarNode = ({ icon, label, type: nodeType, onDragStart, isCollapsed }) 
 const ChatbotCanvas = forwardRef<ChatbotCanvasRef, ChatbotCanvasProps>(
   ({ nodes, edges, onNodesChange, onEdgesChange, onConnect, setNodes, setEdges }, ref) => {
     
-    // MEMOIZE nodeTypes and edgeTypes to prevent unnecessary re-renders and warnings
-    // Defining the object INSIDE useMemo to strictly follow "Alternative implementation" from React Flow docs
-    const nodeTypes = useMemo(() => ({
-        startNode: nodeComponents.StartNode,
-        endNode: nodeComponents.EndNode,
-        textMessageNode: nodeComponents.TextMessageNode,
-        mediaMessageNode: nodeComponents.MediaMessageNode,
-        quickReplyNode: nodeComponents.QuickReplyNode,
-        listMessageNode: nodeComponents.ListMessageNode,
-        pollNode: nodeComponents.PollNode,
-        contactNode: nodeComponents.ContactNode,
-        locationNode: nodeComponents.LocationNode,
-        captureInputNode: nodeComponents.CaptureInputNode,
-        conditionNode: nodeComponents.ConditionNode,
-        setVariableNode: nodeComponents.SetVariableNode,
-        webhookNode: nodeComponents.WebhookNode,
-        firestoreReadWriteNode: nodeComponents.FirestoreReadWriteNode,
-        delayNode: nodeComponents.DelayNode,
-        catalogNode: nodeComponents.CatalogNode,
-        productNode: nodeComponents.ProductNode,
-        whatsappFlowsNode: nodeComponents.WhatsappFlowsNode,
-        checkoutNode: nodeComponents.CheckoutNode,
-        generativeAINode: nodeComponents.GenerativeAINode,
-        transcriptionNode: nodeComponents.TranscriptionNode,
-        sentimentAnalysisNode: nodeComponents.SentimentAnalysisNode,
-        templateNode: nodeComponents.TemplateNode,
-        humanHandoffNode: nodeComponents.HumanHandoffNode,
-    }), []);
-
-    const edgeTypes = useMemo(() => ({
-        custom: CustomEdge,
-    }), []);
+    // nodeTypes and edgeTypes are now defined OUTSIDE the component
+    // No useMemo needed inside here anymore.
 
     const [selectedNode, setSelectedNode] = useState<Node | null>(null);
     const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);

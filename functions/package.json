@@ -26,6 +26,7 @@
     "eslint": "^9.39.1",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-import": "^2.32.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
   "private": true

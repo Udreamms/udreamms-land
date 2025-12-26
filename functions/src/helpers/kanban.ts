@@ -90,3 +90,17 @@ export async function handleKanbanUpdate(from: string, contactName: string, body
         }
     });
 }
+
+// NUEVA FUNCIÓN PARA ACTUALIZAR ESTADO DE LECTURA
+export async function updateReadStatus(recipientId: string): Promise<void> {
+    const cardsRef = db.collectionGroup('cards').where('contactNumber', '==', recipientId);
+    const snapshot = await cardsRef.get();
+    
+    if (!snapshot.empty) {
+        // Marcamos la hora exacta en la que el usuario leyó el último mensaje
+        await snapshot.docs[0].ref.update({
+            lastReadAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+        functions.logger.info(`[Read Receipt] Updated lastReadAt for ${recipientId}`);
+    }
+}

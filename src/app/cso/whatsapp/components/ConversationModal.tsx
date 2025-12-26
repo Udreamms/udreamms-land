@@ -8,12 +8,13 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Progress } from "@/components/ui/progress";
 import { 
     Send, Loader2, User, Building, Phone, Hash, Save, Mail, Globe, MapPin, 
-    PlusCircle, Trash2, GripVertical, Paperclip, Smile, FileText, Image as ImageIcon
+    PlusCircle, Trash2, GripVertical, Paperclip, Smile, FileText, Image as ImageIcon,
+    CheckCheck // <--- Importado
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -38,6 +39,7 @@ interface CardData extends DocumentData {
   tags?: string[];
   messages?: Message[];
   customFields?: CustomField;
+  lastReadAt?: Timestamp; // <--- Añadido soporte para lectura
 }
 
 const sendWhatsappMessage = httpsCallable(functions, 'sendWhatsappMessage');
@@ -170,10 +172,19 @@ const ConversationModal = ({ isOpen, onClose, card }) => {
   const deleteCustomField = (key: string) => { const { [key]: _, ...rest } = customFields; setCustomFields(rest); };
   const groupedMessages = groupMessagesByDate(liveCardData?.messages);
 
+  // Helper para verificar si un mensaje ha sido leído
+  const isMessageRead = (msg: Message) => {
+    if (!liveCardData?.lastReadAt || !msg.timestamp) return false;
+    return msg.timestamp.seconds <= liveCardData.lastReadAt.seconds;
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-6xl w-[95vw] h-[90vh] flex flex-col p-0 bg-neutral-900 border-neutral-800">
         <DialogTitle className="sr-only">Conversation with {liveCardData?.contactName || 'contact'}</DialogTitle>
+        <DialogDescription className="sr-only">
+            Conversation interface for chatting with {liveCardData?.contactName || 'the contact'} and managing their details.
+        </DialogDescription>
         <div className="grid grid-cols-12 flex-1 h-full">
           <div className="col-span-8 flex flex-col border-r border-neutral-800 h-full" {...getRootProps()}>
             <input {...getInputProps()} />
@@ -195,7 +206,19 @@ const ConversationModal = ({ isOpen, onClose, card }) => {
                         <div key={index} className={cn("flex items-end gap-2", msg.sender === 'agent' ? 'justify-end' : 'justify-start')}>
                           <div className={cn( "px-3 py-2 rounded-xl max-w-lg shadow-md", msg.sender === 'agent' ? 'bg-[#005c4b] text-white rounded-br-none' : 'bg-neutral-700 text-white rounded-bl-none' )}>
                             <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
-                            <p className="text-xs text-neutral-300/60 text-right mt-1">{msg.timestamp?.toDate().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</p>
+                            <div className="flex items-center justify-end gap-1 mt-1">
+                                <p className="text-[10px] text-neutral-300/80">
+                                    {msg.timestamp?.toDate().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                                {msg.sender === 'agent' && (
+                                    <CheckCheck 
+                                        size={14} 
+                                        className={cn(
+                                            isMessageRead(msg) ? "text-blue-400" : "text-neutral-400"
+                                        )} 
+                                    />
+                                )}
+                            </div>
                           </div>
                         </div>
                       ))}

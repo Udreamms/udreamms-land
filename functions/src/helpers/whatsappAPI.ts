@@ -9,23 +9,34 @@ const phoneNumberId = whatsappConfig?.phone_number_id;
 
 const WHATSAPP_API_URL = `https://graph.facebook.com/v19.0/${phoneNumberId}/messages`;
 
-async function makeWhatsAppRequest(data: object) {
+async function makeWhatsAppRequest(data: object, type: string) {
     if (!accessToken || !phoneNumberId) {
         functions.logger.error('Missing WhatsApp API credentials.');
-        throw new functions.https.HttpsError('internal', 'Missing credentials.');
+        // No lanzamos error para no detener el flujo si faltan credenciales en dev
+        return;
     }
     try {
         await axios.post(WHATSAPP_API_URL, data, {
             headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
         });
+        // functions.logger.info(`WhatsApp API Response (${type}): OK`);
     } catch (error: any) {
-        functions.logger.error('WhatsApp API Error:', error.response?.data || error.message);
-        throw new functions.https.HttpsError('internal', 'Error sending WhatsApp message.');
+        functions.logger.error(`WhatsApp API Error (${type}):`, error.response?.data || error.message);
     }
 }
 
+export async function markAsRead(messageId: string): Promise<void> {
+    if (!messageId) return;
+    await makeWhatsAppRequest({
+        messaging_product: 'whatsapp',
+        status: 'read',
+        message_id: messageId
+    }, 'MarkAsRead');
+}
+
 export async function sendMessage(to: string, message: string): Promise<void> {
-    await makeWhatsAppRequest({ messaging_product: 'whatsapp', to, text: { body: message } });
+    if (!message) return;
+    await makeWhatsAppRequest({ messaging_product: 'whatsapp', to, text: { body: message } }, 'Text');
 }
 
 export async function sendMediaMessage(to: string, fileUrl: string, caption: string = '', fileName: string = 'file'): Promise<void> {
@@ -37,53 +48,82 @@ export async function sendMediaMessage(to: string, fileUrl: string, caption: str
     await makeWhatsAppRequest({
         messaging_product: 'whatsapp', to, type: mediaType,
         [mediaType]: { link: fileUrl, caption: caption }
-    });
+    }, 'Media');
 }
 
-// NUEVO: Enviar Botones (Quick Replies)
 export async function sendButtonMessage(to: string, bodyText: string, buttons: any[]): Promise<void> {
-    const validButtons = buttons.slice(0, 3).map((btn, i) => ({
-        type: "reply",
-        reply: { id: btn.id || `btn_${i}`, title: btn.title?.substring(0, 20) || "Opción" }
-    }));
+    const validButtons = buttons.slice(0, 3).map((btn, i) => {
+        const id = (btn.id || `btn_${i}`).substring(0, 256);
+        const title = (btn.title || "Opción").substring(0, 20); 
+        return {
+            type: "reply",
+            reply: { id, title }
+        };
+    });
 
-    await makeWhatsAppRequest({
-        messaging_product: 'whatsapp', to, type: 'interactive',
+    if (validButtons.length === 0) return;
+
+    const payload = {
+        messaging_product: 'whatsapp', 
+        to, 
+        type: 'interactive',
         interactive: {
             type: 'button',
-            body: { text: bodyText },
+            body: { text: bodyText.substring(0, 1024) }, 
             action: { buttons: validButtons }
         }
-    });
+    };
+    
+    await makeWhatsAppRequest(payload, 'Buttons');
 }
 
-// NUEVO: Enviar Lista
 export async function sendListMessage(to: string, bodyText: string, buttonText: string, sections: any[]): Promise<void> {
-    const formattedSections = sections.map(sec => ({
-        title: sec.title,
-        rows: (sec.rows || []).map((row: any) => ({
-            id: row.id || row.title,
-            title: row.title?.substring(0, 23),
-            description: row.description?.substring(0, 70) || ''
-        }))
-    }));
+    if (!sections || sections.length === 0) return;
 
-    await makeWhatsAppRequest({
-        messaging_product: 'whatsapp', to, type: 'interactive',
+    const formattedSections: any[] = [];
+    let totalRows = 0;
+
+    for (const sec of sections) {
+        const rows = (sec.rows || []).map((row: any) => {
+            const rowId = (row.id || row.title || `row_${Math.random()}`).substring(0, 200);
+            let rowTitle = (row.title || "Opción").trim();
+            if (rowTitle.length > 24) rowTitle = rowTitle.substring(0, 21) + "...";
+            let rowDesc = row.description ? row.description.substring(0, 72) : undefined;
+            return { id: rowId, title: rowTitle, description: rowDesc };
+        });
+
+        if (rows.length > 0) {
+            formattedSections.push({
+                title: (sec.title || "Opciones").substring(0, 50),
+                rows: rows
+            });
+            totalRows += rows.length;
+        }
+    }
+
+    if (totalRows === 0) return;
+
+    let validBtnText = (buttonText || "Ver Opciones").substring(0, 20);
+
+    const payload = {
+        messaging_product: 'whatsapp', 
+        to, 
+        type: 'interactive',
         interactive: {
             type: 'list',
-            body: { text: bodyText },
-            action: { button: buttonText || "Ver Opciones", sections: formattedSections }
+            body: { text: (bodyText || "Selecciona una opción").substring(0, 1024) },
+            action: { button: validBtnText, sections: formattedSections }
         }
-    });
+    };
+
+    await makeWhatsAppRequest(payload, 'List');
 }
 
-// NUEVO: Enviar Ubicación
 export async function sendLocationMessage(to: string, lat: number, long: number, name: string, address: string): Promise<void> {
     await makeWhatsAppRequest({
         messaging_product: 'whatsapp', to, type: 'location',
         location: { latitude: lat, longitude: long, name: name, address: address }
-    });
+    }, 'Location');
 }
 
 function getMediaType(url: string, fileName: string): 'image' | 'document' | 'video' | 'audio' | 'unsupported' {

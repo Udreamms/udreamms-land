@@ -7,21 +7,20 @@ import {
     sendMediaMessage, 
     sendButtonMessage, 
     sendListMessage, 
-    sendLocationMessage 
+    sendLocationMessage,
+    markAsRead
 } from './whatsappAPI';
 
 const db = admin.firestore();
 
+// Delay helper
 const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
 export async function getActiveBot(): Promise<any | null> {
     const botsSnapshot = await db.collection('chatbots').where('isActive', '==', true).limit(1).get();
     if (botsSnapshot.empty) return null;
-    
     const botData = botsSnapshot.docs[0].data();
-    if (!botData.flow || !botData.flow.nodes || !botData.flow.edges) {
-        return null;
-    }
+    if (!botData.flow || !botData.flow.nodes || !botData.flow.edges) return null;
     return { id: botsSnapshot.docs[0].id, ...botData };
 }
 
@@ -29,157 +28,181 @@ function replaceVariables(text: string, cardData: any): string {
     if (!text) return '';
     let processedText = text;
     const variables = {
-        name: cardData.contactName || '',
+        name: cardData.contactName || 'Amigo',
+        nombre: cardData.contactName || 'Amigo',
         phone: cardData.contactNumber || '',
         ...cardData.customFields
     };
     for (const [key, value] of Object.entries(variables)) {
-        const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'gi');
+        const regex = new RegExp(`\\{?\\{\\s*${key}\\s*\\}\\}?`, 'gi');
         processedText = processedText.replace(regex, String(value || ''));
     }
     return processedText;
 }
 
+// Calcula el tiempo de "escritura humana" en MS
+function calculateTypingDelay(text: string): number {
+    const charsPerSecond = 25; 
+    const baseDelay = 1000; 
+    let typingTime = (text.length / charsPerSecond) * 1000;
+    
+    if (typingTime < 1500) typingTime = 1500;
+    if (typingTime > 6000) typingTime = 6000; 
+
+    return baseDelay + typingTime;
+}
+
+function sanitizeListData(data: any): any[] {
+    const cleanSections: any[] = [];
+    if (Array.isArray(data.sections) && data.sections.length > 0) {
+        for (const sec of data.sections) {
+            const rows = sec.rows || [];
+            const options = sec.options || []; 
+            const validRows: any[] = [];
+            if (Array.isArray(rows)) {
+                rows.forEach((r: any) => { if (r && r.title && r.title.trim() !== '') validRows.push(r); });
+            }
+            if (Array.isArray(options)) {
+                options.forEach((opt: any, idx: number) => {
+                    if (typeof opt === 'string' && opt.trim() !== '') {
+                        validRows.push({ id: `opt_${Date.now()}_${idx}`, title: opt, description: '' });
+                    }
+                });
+            }
+            if (validRows.length > 0) cleanSections.push({ title: sec.title || 'Opciones', rows: validRows });
+        }
+    }
+    if (cleanSections.length === 0 && Array.isArray(data.options)) {
+        const validRows = data.options.filter((opt: any) => typeof opt === 'string' && opt.trim() !== '')
+            .map((opt: string, idx: number) => ({ id: `legacy_${idx}`, title: opt }));
+        if (validRows.length > 0) cleanSections.push({ title: 'Opciones', rows: validRows });
+    }
+    return cleanSections;
+}
+
+function sanitizeButtonsData(buttons: any[]): any[] {
+    if (!Array.isArray(buttons)) return [];
+    return buttons.filter(b => b && b.title && b.title !== 'undefined' && b.title.trim() !== '');
+}
+
+// --- MAIN ENGINE ---
+
 export async function executeBotFlow(bot: any, to: string, cardData: any, userMessage: string): Promise<void> {
     functions.logger.info(`>>> EXECUTING FLOW: ${bot.name} for ${to} <<<`);
-    functions.logger.info(`User Message: "${userMessage}"`);
 
     let currentNodeId = cardData.botState?.currentNodeId;
-    let nextNodeId = null;
+    let nextNodeId: string | null = null;
     let shouldContinue = true;
     let executionCount = 0;
     const MAX_STEPS = 15;
 
-    // --- PASO 0: PROCESAR RESPUESTA DEL NODO ANTERIOR ---
+    // --- PROCESAR INPUT USUARIO ---
     if (currentNodeId) {
-        functions.logger.info(`Resuming from Node ID: ${currentNodeId}`);
         const currentNode = bot.flow.nodes.find((n: any) => String(n.id) === String(currentNodeId));
-        
-        if (!currentNode) {
-             functions.logger.error(`Node ${currentNodeId} not found in flow definition!`);
-             return;
-        }
+        if (!currentNode) return;
 
-        // 1. VALIDACIÓN PARA CAPTURA DE DATOS
+        await markAsRead(userMessage); 
+        await delay(500); 
+
         if (currentNode.type === 'captureInputNode') {
             const validation = validateInput(userMessage, currentNode.data);
             if (!validation.isValid) {
                 await sendMessage(to, validation.errorMessage || "Respuesta inválida.");
                 return; 
             }
-            if (currentNode.data.variableName) {
-                await saveVariable(to, currentNode.data.variableName, userMessage);
+            let varName = currentNode.data.variableName;
+            if (!varName || varName === 'undefined') {
+                const text = (currentNode.data.text || '').toLowerCase();
+                if (text.includes('nombre') || text.includes('name')) varName = 'nombre';
+                else varName = `captured_${currentNode.id}`;
+            }
+            if (varName) {
+                await saveVariable(to, varName, userMessage);
                 if (!cardData.customFields) cardData.customFields = {};
-                cardData.customFields[currentNode.data.variableName] = userMessage;
+                cardData.customFields[varName] = userMessage;
+                if (['nombre', 'name'].includes(varName)) cardData.contactName = userMessage;
             }
         }
         
-        // 2. ENRUTAMIENTO INTELIGENTE (Smart Routing)
-        // Buscamos todos los caminos posibles desde este nodo
         const outgoingEdges = bot.flow.edges.filter((e: any) => String(e.source) === String(currentNodeId));
         let selectedEdge = null;
 
-        if (outgoingEdges.length === 0) {
-            functions.logger.info("End of flow reached (no edges).");
+        if (outgoingEdges.length > 0) {
+            if (outgoingEdges.length === 1) {
+                selectedEdge = outgoingEdges[0];
+            } else {
+                if (currentNode.type === 'quickReplyNode') {
+                    const buttons = sanitizeButtonsData(currentNode.data.buttons || []);
+                    const matchedBtn = buttons.find((btn: any) => 
+                        (btn.title || '').toLowerCase().trim() === userMessage.toLowerCase().trim() ||
+                        (btn.id || '') === userMessage
+                    );
+                    if (matchedBtn) {
+                        const handleId = matchedBtn.id || matchedBtn.title;
+                        selectedEdge = outgoingEdges.find((e: any) => e.sourceHandle === handleId);
+                    }
+                } else if (currentNode.type === 'listMessageNode') {
+                    const sections = sanitizeListData(currentNode.data);
+                    let matchedRowId = null;
+                    for (const sec of sections) {
+                        const row = sec.rows.find((r: any) => 
+                            (r.title || '').toLowerCase().trim() === userMessage.toLowerCase().trim() ||
+                            (r.id || '') === userMessage
+                        );
+                        if (row) {
+                            matchedRowId = row.id || row.title;
+                            break;
+                        }
+                    }
+                    if (matchedRowId) {
+                        selectedEdge = outgoingEdges.find((e: any) => e.sourceHandle === matchedRowId);
+                    }
+                }
+                if (!selectedEdge) selectedEdge = outgoingEdges[0];
+            }
+            if (selectedEdge) nextNodeId = selectedEdge.target;
+        } else {
             await updateBotState(to, { status: 'completed', currentNodeId: null });
             return;
-        } else if (outgoingEdges.length === 1) {
-            // Si solo hay un camino, lo tomamos sin preguntar (ej. Texto -> Texto)
-            selectedEdge = outgoingEdges[0];
-        } else {
-            // HAY MÚLTIPLES CAMINOS: Debemos decidir cuál tomar según la respuesta del usuario
-            functions.logger.info(`Multiple paths detected from ${currentNode.type}. Routing based on user input: "${userMessage}"`);
-            
-            if (currentNode.type === 'quickReplyNode') {
-                // Buscamos qué botón coincide con el texto del usuario
-                const buttons = currentNode.data.buttons || [];
-                const matchedBtn = buttons.find((btn: any) => 
-                    (btn.title || '').toLowerCase().trim() === userMessage.toLowerCase().trim() ||
-                    (btn.id || '') === userMessage // Por si acaso llega el ID
-                );
-
-                if (matchedBtn) {
-                    const handleId = matchedBtn.id || matchedBtn.title;
-                    // Buscamos el edge que sale del handle específico de ese botón
-                    selectedEdge = outgoingEdges.find((e: any) => e.sourceHandle === handleId);
-                    if (!selectedEdge) {
-                        functions.logger.warn(`Button "${handleId}" matched, but no edge connected to it. Using fallback.`);
-                    }
-                }
-            } else if (currentNode.type === 'listMessageNode') {
-                // Similar para listas
-                let matchedRowId = null;
-                const sections = currentNode.data.sections || [];
-                for (const sec of sections) {
-                    const row = (sec.rows || []).find((r: any) => 
-                        (r.title || '').toLowerCase().trim() === userMessage.toLowerCase().trim()
-                    );
-                    if (row) {
-                        matchedRowId = row.id || row.title;
-                        break;
-                    }
-                }
-                
-                if (matchedRowId) {
-                    selectedEdge = outgoingEdges.find((e: any) => e.sourceHandle === matchedRowId);
-                }
-            }
-
-            // FALLBACK: Si no encontramos coincidencia específica (o no hay handles nombrados),
-            // tomamos el primer edge disponible para no romper el flujo.
-            if (!selectedEdge) {
-                functions.logger.info("No specific route matched. Taking default path.");
-                selectedEdge = outgoingEdges[0];
-            }
         }
-
-        if (selectedEdge) {
-            nextNodeId = selectedEdge.target;
-            functions.logger.info(`Routing to next node: ${nextNodeId}`);
-        } else {
-             functions.logger.warn("Could not determine next step.");
-             return;
-        }
-
     } else {
-        // INICIO DEL FLUJO (StartNode)
         const startNode = bot.flow.nodes.find((n: any) => n.type === 'startNode');
         if (!startNode) return;
         const firstEdge = bot.flow.edges.find((e: any) => String(e.source) === String(startNode.id));
         if (firstEdge) nextNodeId = firstEdge.target;
     }
 
-    // --- BUCLE DE EJECUCIÓN (Ejecuta nodos secuenciales hasta que necesita parar) ---
+    // --- EJECUCIÓN DE NODOS ---
     while (shouldContinue && nextNodeId && executionCount < MAX_STEPS) {
         executionCount++;
         const nextNode = bot.flow.nodes.find((n: any) => String(n.id) === String(nextNodeId));
-        
-        if (!nextNode) {
-            shouldContinue = false;
-            break;
-        }
+        if (!nextNode) { shouldContinue = false; break; }
 
-        functions.logger.info(`[Step ${executionCount}] Executing Node: ${nextNode.type}`);
-        
-        // Guardamos estado ANTES de ejecutar (por si falla o para esperar input)
-        await updateBotState(to, { 
-            status: 'active', 
-            currentNodeId: nextNodeId,
-            lastInteraction: new Date() 
-        });
+        await updateBotState(to, { status: 'active', currentNodeId: nextNodeId, lastInteraction: new Date() });
+
+        // Simulación Humana (Typing Delay) - CONTROLADO POR UI
+        if (['textMessageNode', 'mediaMessageNode', 'quickReplyNode', 'listMessageNode'].includes(nextNode.type)) {
+            // Por defecto es TRUE (Humano) a menos que se desactive explícitamente en el editor
+            const simulateTyping = nextNode.data.typingSimulation !== false;
+            
+            if (simulateTyping) {
+                const content = nextNode.data.content || nextNode.data.text || nextNode.data.caption || '';
+                const humanDelay = calculateTypingDelay(content);
+                await delay(humanDelay);
+            }
+        }
 
         switch (nextNode.type) {
             case 'textMessageNode':
-                const txt = replaceVariables(nextNode.data.content, cardData);
-                await sendMessage(to, txt);
-                await logBotMessage(to, txt);
+                const txt = replaceVariables(nextNode.data.content || nextNode.data.text || '', cardData);
+                if (txt) {
+                    await sendMessage(to, txt);
+                    await logBotMessage(to, txt);
+                }
                 nextNodeId = getNextNodeId(bot, nextNodeId);
-                await delay(800);
-                if (!nextNodeId) shouldContinue = false;
                 break;
 
             case 'captureInputNode':
-                // NODO DE PARADA: El bot se detiene aquí y espera al webhook (Paso 0)
                 shouldContinue = false; 
                 break;
 
@@ -190,32 +213,31 @@ export async function executeBotFlow(bot: any, to: string, cardData: any, userMe
                     await logBotMessage(to, `[Archivo] ${caption}`);
                 }
                 nextNodeId = getNextNodeId(bot, nextNodeId);
-                await delay(1000);
-                if (!nextNodeId) shouldContinue = false;
                 break;
 
             case 'quickReplyNode':
-                const btnText = replaceVariables(nextNode.data.text || nextNode.data.bodyText, cardData);
-                const buttons = nextNode.data.buttons || [];
+                const qrText = replaceVariables(nextNode.data.text || nextNode.data.bodyText || 'Selecciona:', cardData);
+                const buttons = sanitizeButtonsData(nextNode.data.buttons || []);
                 if (buttons.length > 0) {
-                    await sendButtonMessage(to, btnText, buttons);
-                    await logBotMessage(to, `[Botones] ${btnText}`);
-                    shouldContinue = false; // NODO DE PARADA (Espera selección)
+                    await sendButtonMessage(to, qrText, buttons);
+                    await logBotMessage(to, `[Botones] ${qrText}`);
+                    shouldContinue = false; 
                 } else {
-                    await sendMessage(to, btnText); // Fallback texto
+                    await sendMessage(to, qrText);
                     nextNodeId = getNextNodeId(bot, nextNodeId);
                 }
                 break;
 
             case 'listMessageNode':
-                const listText = replaceVariables(nextNode.data.text, cardData);
-                const btnLabel = nextNode.data.buttonText || "Ver Opciones";
-                const sections = nextNode.data.sections || [];
-                if (sections.length > 0) {
-                    await sendListMessage(to, listText, btnLabel, sections);
-                    await logBotMessage(to, `[Lista] ${listText}`);
-                    shouldContinue = false; // NODO DE PARADA (Espera selección)
+                const listBody = replaceVariables(nextNode.data.body || nextNode.data.text || 'Selecciona:', cardData);
+                const btnLabel = nextNode.data.buttonText || "Opciones";
+                const cleanSections = sanitizeListData(nextNode.data);
+                if (cleanSections.length > 0) {
+                    await sendListMessage(to, listBody, btnLabel, cleanSections);
+                    await logBotMessage(to, `[Lista] ${listBody}`);
+                    shouldContinue = false;
                 } else {
+                    await sendMessage(to, listBody);
                     nextNodeId = getNextNodeId(bot, nextNodeId);
                 }
                 break;
@@ -225,47 +247,33 @@ export async function executeBotFlow(bot: any, to: string, cardData: any, userMe
                     await sendLocationMessage(to, parseFloat(nextNode.data.latitude), parseFloat(nextNode.data.longitude), nextNode.data.name, nextNode.data.address);
                 }
                 nextNodeId = getNextNodeId(bot, nextNodeId);
-                if (!nextNodeId) shouldContinue = false;
                 break;
 
             case 'delayNode':
                 const ms = (nextNode.data.duration || 2) * 1000;
                 await delay(ms);
                 nextNodeId = getNextNodeId(bot, nextNodeId);
-                if (!nextNodeId) shouldContinue = false;
                 break;
             
             case 'conditionNode':
-                // Lógica simple: Buscar edge 'true' o 'false' (placeholder)
                 const trueEdge = bot.flow.edges.find((e: any) => String(e.source) === String(nextNodeId) && e.sourceHandle === 'true');
                 if (trueEdge) nextNodeId = trueEdge.target;
                 else nextNodeId = getNextNodeId(bot, nextNodeId);
-                
-                if (!nextNodeId) shouldContinue = false;
                 break;
 
             default:
-                // Paso a través para nodos desconocidos o puramente lógicos
                 nextNodeId = getNextNodeId(bot, nextNodeId);
-                if (!nextNodeId) shouldContinue = false;
                 break;
         }
     }
-    
-    // Si terminamos el bucle y no hay más nodos, marcamos como completado
-    if (!shouldContinue && !nextNodeId && currentNodeId !== nextNodeId) {
-         // Ojo: Si shouldContinue es false porque estamos en un nodo de parada (Capture/Buttons), NO completamos.
-         // Solo completamos si no hay nextNodeId.
-    }
 }
 
-// Helper para obtener el siguiente nodo por defecto (primer edge)
-function getNextNodeId(bot: any, currentId: string): string | null {
+function getNextNodeId(bot: any, currentId: string | null): string | null {
+    if (!currentId) return null;
     const edge = bot.flow.edges.find((e: any) => String(e.source) === String(currentId));
     return edge ? edge.target : null;
 }
 
-// HELPERS DE VALIDACIÓN Y DB (Sin cambios significativos, solo incluidos por completitud)
 function validateInput(input: string, config: any): { isValid: boolean, errorMessage?: string } {
     if (!input || input.trim() === '') return { isValid: false, errorMessage: "Respuesta vacía." };
     if (config.inputType === 'email') {
@@ -274,21 +282,29 @@ function validateInput(input: string, config: any): { isValid: boolean, errorMes
     }
     return { isValid: true };
 }
+
 async function saveVariable(contactNumber: string, variable: string, value: string) {
+    if (!variable) return;
     const cardsRef = db.collectionGroup('cards').where('contactNumber', '==', contactNumber);
     const snapshot = await cardsRef.get();
+    
+    const updateData: any = {};
+    updateData[`customFields.${variable}`] = value;
+    if (['nombre', 'name', 'fullname'].includes(variable.toLowerCase())) {
+        updateData['contactName'] = value;
+    }
+
     if (!snapshot.empty) {
-        const updateData: any = {};
-        updateData[`customFields.${variable}`] = value;
-        if (variable === 'nombre' || variable === 'name') updateData['contactName'] = value;
         await snapshot.docs[0].ref.update(updateData);
     }
 }
+
 async function updateBotState(contactNumber: string, state: any) {
     const cardsRef = db.collectionGroup('cards').where('contactNumber', '==', contactNumber);
     const snapshot = await cardsRef.get();
     if (!snapshot.empty) await snapshot.docs[0].ref.update({ botState: state, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
 }
+
 async function logBotMessage(contactNumber: string, message: string) {
     const cardsRef = db.collectionGroup('cards').where('contactNumber', '==', contactNumber);
     const snapshot = await cardsRef.get();
