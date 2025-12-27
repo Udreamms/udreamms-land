@@ -1,66 +1,165 @@
-import { Heart } from "lucide-react";
-import Link from "next/link";
+import Link from 'next/link';
+import Image from 'next/image'
 
 const Footer = () => {
   return (
-    <footer className="bg-black border-t border-gray-800">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid md:grid-cols-4 gap-8">
-          {/* Logo and description */}
-          <div className="md:col-span-2 space-y-4">
-            <div className="flex items-center space-x-3">
-              <div className="text-2xl font-bold text-white">
-                <span className="text-primary">Udreamms</span>
-              </div>
-            </div>
-            <p className="text-gray-400 leading-relaxed max-w-md">
-              Tu aliado estratégico para estudiar inglés en USA. Te acompañamos en cada etapa de tu aventura americana, desde la preparación hasta tu éxito en Estados Unidos.
-            </p>
+    <footer className="bg-black text-white pt-24 pb-8">
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
+          {/* Left Section */}
+          <div className="md:col-span-1">
+            <p className="text-white text-2xl"><strong>Haciendo que Udreamms sea útil para todos</strong></p>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4 className="text-white font-semibold mb-4">Enlaces Rápidos</h4>
-            <ul className="space-y-2 text-gray-400">
+          {/* Products and Responsibility */}
+          <div className="mb-24">
+            <h4 className="font-semibold mb-3 text-sm">Productos</h4>
+            <ul className="text-gray-400 space-y-2 text-sm mb-4">
               <li>
-                <Link href="/" className="hover:text-primary transition-colors">Inicio</Link>
+                <Link href="#" className="hover:text-primary transition-colors">Descubre cómo la IA puede ser útil, desde el trabajo hasta la vida cotidiana</Link>
               </li>
               <li>
-                <Link href="/destinos" className="hover:text-primary transition-colors">Destinos</Link>
+                <Link href="#" className="hover:text-primary transition-colors">Para el conocimiento</Link>
               </li>
               <li>
-                <Link href="/brochures" className="hover:text-primary transition-colors">Brochures</Link>
+                <Link href="#" className="hover:text-primary transition-colors">Para la creatividad</Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-primary transition-colors">Contacto</Link>
+                <Link href="#" className="hover:text-primary transition-colors">Para la productividad</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Para estudiantes</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Para experimentar</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Explorar productos</Link>
+              </li>
+            </ul>
+
+            <h4 className="font-semibold mt-16 mb-3 text-sm">Responsabilidad</h4>
+            <ul className="text-gray-400 space-y-2 text-sm">
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Estamos construyendo e implementando la IA de manera responsable</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Responsabilidad y seguridad</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Política</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Construyendo para todos</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors mb-20">Impacto social</Link>
               </li>
             </ul>
           </div>
 
-          {/* Get in Touch */}
+          {/* Build */}
+          <div className="mb-24">
+            <h4 className="font-semibold mb-3 text-sm">Construir</h4>
+            <ul className="text-gray-400 space-y-2 text-sm">
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Comience a construir con modelos y herramientas de IA de vanguardia</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Empezar a construir</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Codifica con asistencia de IA</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Aproveche los marcos y las herramientas</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Construye con la IA de Google</Link>
+              </li>
+            </ul>
+
+            {/* About */}
+            <h4 className="font-semibold mt-16 mb-3 text-sm">Acerca de</h4>
+            <ul className="text-gray-400 space-y-2 text-sm mt-auto">
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Estamos comprometidos a mejorar la vida de tantas personas como sea posible</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Por qué la IA</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Nuestro viaje de IA</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Principios de la IA</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Para organizaciones</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Aprenda habilidades de IA</Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Research */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Contáctanos</h4>
-            <div className="space-y-3 text-gray-400 text-sm">
-              <div>
-                <a href="mailto:info@udreamms.com" className="text-primary hover:underline">
-                  info@udreamms.com
-                </a>
-              </div>
-              <div className="pt-2">
-                <div>Teléfono: +1 650 784 0581</div>
-              </div>
-            </div>
+            <h4 className="font-semibold mb-3 text-sm">Investigación</h4>
+            <ul className="text-gray-400 space-y-2 text-sm">
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Abordar los problemas más desafiantes de la informática</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Salud</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Ciencia</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Sostenibilidad</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors">Explorar más investigación</Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Síganos */}
+          <div>
+            <h4 className="font-semibold mb-3 text-sm">Síganos</h4>
+            <ul className="text-gray-400 space-y-2 text-sm">
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors"><Image src="/assets/f.jpg" alt="Facebook" width={32} height={32} /></Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors"><Image src="/assets/i.jpg" alt="Instagram" width={32} height={32} /></Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors"><Image src="/assets/w.jpg"  alt="Whatsapp" width={32} height={32} /></Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors"><Image src="/assets/x.jpg" alt="X" width={32} height={32} /></Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors"><Image src="/assets/y.jpg" alt="YouTube" width={32} height={32} /></Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary transition-colors"><Image src="/assets/t.jpg" alt="TikTok" width={32} height={32} /></Link>
+              </li>
+            </ul>
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-12 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="text-gray-600 text-sm">
-              © 2025 Udreamms. Todos los derechos reservados.
-            </div>
-            <div className="text-gray-600 text-sm">
-              udreamms.com
-            </div>
+        {/* Footer Bottom */}
+        <div className=" items-center flex mt-20">
+          <span className="text-white text-lg">Udreamms</span>
+          {/* Centered About Links */}
+          <div className="flex justify-center space-x-3 w-full">
+            <Link href="#" className="text-gray-400 hover:text-primary transition-colors text-xs">Acerca de Udreamms</Link>
+            <Link href="#" className="text-gray-400 hover:text-primary transition-colors text-xs">Productos de Udreamms</Link>
+            <Link href="#" className="text-gray-400 hover:text-primary transition-colors text-xs">Privacidad</Link>
+            <Link href="#" className="text-gray-400 hover:text-primary transition-colors text-xs">Términos</Link>
           </div>
         </div>
       </div>
