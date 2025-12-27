@@ -8,7 +8,7 @@ interface TopBarProps {
 const TopBar = ({ onGetQuote }: TopBarProps) => {
   return (
     // CAMBIO: bg-primary -> bg-black
-    <div className="bg-black text-white py-3 border-b border-white/10">
+    <div className="bg-black text-white py-3 border-b border-white/10 hidden">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-center gap-8 flex-wrap">
           <Link 
