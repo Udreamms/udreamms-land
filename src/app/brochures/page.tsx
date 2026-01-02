@@ -6,68 +6,76 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Download } from "lucide-react";
+import { Download, Sparkles, FileText, CheckCircle2, AlertCircle } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
-const Brochures = () => {
+const brochures = [
+  {
+    id: 1,
+    title: "Estudia Inglés en Utah",
+    description: "Orem, Salt Lake City",
+    image: "/assets/brochure-utah.jpg",
+    tag: "Aventura"
+  },
+  {
+    id: 2,
+    title: "Estudia Inglés en Florida",
+    description: "Miami, Orlando, Boca Ratón, Jacksonville, Aventura",
+    image: "/assets/brochure-florida.jpg",
+    tag: "Sol & Playa"
+  },
+  {
+    id: 3,
+    title: "Estudia Inglés en New York",
+    description: "New York, New Jersey",
+    image: "/assets/brochure-newyork.jpg",
+    tag: "Metrópolis"
+  },
+  {
+    id: 4,
+    title: "Estudia Inglés en California",
+    description: "California",
+    image: "/assets/brochure-california.jpg",
+    tag: "Tech"
+  },
+  {
+    id: 5,
+    title: "Estudia Inglés en Washington D.C.",
+    description: "Washington D.C. - La capital de Estados Unidos",
+    image: "/assets/brochure-washington.jpg",
+    tag: "Capital"
+  },
+  {
+    id: 6,
+    title: "Estudia Inglés en Virginia",
+    description: "Virginia - Historia y belleza natural",
+    image: "/assets/brochure-virginia.jpg",
+    tag: "Naturaleza"
+  },
+  {
+    id: 7,
+    title: "Estudia Inglés en Boston",
+    description: "Boston - Cuna de la educación en Estados Unidos",
+    image: "/assets/brochure-boston.jpg",
+    tag: "Académico"
+  },
+  {
+    id: 8,
+    title: "Estudia Inglés en Georgia",
+    description: "Atlanta",
+    image: "/assets/brochure-georgia.jpg",
+    tag: "Dinámico"
+  }
+];
+
+export default function BrochuresPage() {
   const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
     email: "",
     telefono: "",
   });
-
-  const brochures = [
-    {
-      id: 1,
-      title: "Estudia Inglés en Utah",
-      description: "Orem, Salt Lake City",
-      image: "/assets/brochure-utah.jpg"
-    },
-    {
-      id: 2,
-      title: "Estudia Inglés en Florida",
-      description: "Miami, Orlando, Boca Ratón, Jacksonville, Aventura",
-      image: "/assets/brochure-florida.jpg"
-    },
-    {
-      id: 3,
-      title: "Estudia Inglés en New York",
-      description: "New York, New Jersey",
-      image: "/assets/brochure-newyork.jpg"
-    },
-    {
-      id: 4,
-      title: "Estudia Inglés en California",
-      description: "California",
-      image: "/assets/brochure-california.jpg"
-    },
-    {
-      id: 5,
-      title: "Estudia Inglés en Washington D.C.",
-      description: "Washington D.C. - La capital de Estados Unidos",
-      image: "/assets/brochure-washington.jpg"
-    },
-    {
-      id: 6,
-      title: "Estudia Inglés en Virginia",
-      description: "Virginia - Historia y belleza natural",
-      image: "/assets/brochure-virginia.jpg"
-    },
-    {
-      id: 7,
-      title: "Estudia Inglés en Boston",
-      description: "Boston - Cuna de la educación en Estados Unidos",
-      image: "/assets/brochure-boston.jpg"
-    },
-    {
-      id: 8,
-      title: "Estudia Inglés en Georgia",
-      description: "Atlanta",
-      image: "/assets/brochure-georgia.jpg"
-    }
-  ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -76,150 +84,186 @@ const Brochures = () => {
     });
   };
 
-  const handleDownload = (brochureTitle: string) => {
-    if (!formData.nombre || !formData.apellido || !formData.email || !formData.telefono) {
-      toast.error("Por favor completa todos los campos antes de descargar");
-      return;
-    }
+  const isFormValid = formData.nombre && formData.apellido && formData.email && formData.telefono;
 
-    toast.success(`Descargando: ${brochureTitle}`);
-    
-    // Aquí se implementaría la lógica real de descarga
-    console.log("Descargando brochure:", brochureTitle, "Usuario:", formData);
+  const handleDownload = (brochureTitle: string) => {
+    if (!isFormValid) return;
+    alert(`Descargando: ${brochureTitle}`);
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-white font-sans selection:bg-primary/10">
       <Header />
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="bg-gradient-to-r from-primary via-primary-glow to-secondary py-20">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Descarga Nuestros Brochures
-            </h1>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              Obtén información detallada sobre nuestros programas en diferentes destinos
-            </p>
+      
+      <main>
+        {/* Hero Section - Apple Style */}
+        <section className="relative pt-40 pb-20 overflow-hidden bg-white">
+          <div className="container px-6 md:px-12 relative z-10">
+            <div className="max-w-4xl text-left">
+              <motion.span 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-primary font-bold tracking-tight text-xl mb-4 block"
+              >
+                Documentación
+              </motion.span>
+              
+              <motion.h1 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="text-6xl md:text-8xl font-bold text-[#1d1d1f] tracking-tighter leading-[0.9] mb-8"
+              >
+                Todo lo que necesitas <br />
+                saber por escrito.
+              </motion.h1>
+              
+              <motion.p 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-xl md:text-2xl text-[#86868b] font-medium leading-relaxed max-w-2xl"
+              >
+                Descarga guías detalladas sobre programas, costos y vida estudiantil en Estados Unidos. Información clara para decisiones importantes.
+              </motion.p>
+            </div>
           </div>
         </section>
 
-        {/* Form Section */}
-        <section className="py-16 bg-muted/30">
-          <div className="container mx-auto px-4 max-w-2xl">
-            <Card className="shadow-elevated border-2 border-primary/20">
-              <CardHeader>
-                <CardTitle className="text-2xl">
-                  Información de Contacto
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="nombre">Nombre *</Label>
-                    <Input
-                      id="nombre"
-                      name="nombre"
-                      value={formData.nombre}
-                      onChange={handleInputChange}
-                      placeholder="Tu nombre"
-                      required
-                    />
+        {/* Form Section - Modernized */}
+        <section className="py-12 bg-white">
+          <div className="container px-6 md:px-12 max-w-7xl mx-auto">
+            <div className="relative p-8 md:p-12 rounded-[2.5rem] bg-slate-50 border border-slate-100 shadow-sm overflow-hidden">
+               <div className="relative z-10 grid md:grid-cols-12 gap-12 items-center">
+                  <div className="md:col-span-5">
+                    <h2 className="text-3xl font-black text-[#1d1d1f] mb-4 tracking-tight">Acceso Instantáneo</h2>
+                    <p className="text-[#86868b] mb-6 leading-relaxed font-medium">
+                      Completa tus datos una sola vez para habilitar la descarga de todos nuestros materiales informativos.
+                    </p>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3 text-slate-600 font-medium">
+                        <CheckCircle2 className="w-5 h-5 text-green-500" />
+                        <span>Precios actualizados 2026</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-slate-600 font-medium">
+                        <CheckCircle2 className="w-5 h-5 text-green-500" />
+                        <span>Guía de alojamiento</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="apellido">Apellido *</Label>
-                    <Input
-                      id="apellido"
-                      name="apellido"
-                      value={formData.apellido}
-                      onChange={handleInputChange}
-                      placeholder="Tu apellido"
-                      required
-                    />
+
+                  <div className="md:col-span-7 space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="nombre" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 pl-1">Nombre</Label>
+                        <Input id="nombre" name="nombre" value={formData.nombre} onChange={handleInputChange} placeholder="Ej: Juan" className="h-12 rounded-xl border-slate-200 focus:border-primary focus:ring-primary/20 bg-white" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="apellido" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 pl-1">Apellido</Label>
+                        <Input id="apellido" name="apellido" value={formData.apellido} onChange={handleInputChange} placeholder="Ej: Pérez" className="h-12 rounded-xl border-slate-200 focus:border-primary focus:ring-primary/20 bg-white" />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="email" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 pl-1">Correo Electrónico</Label>
+                      <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="tu@email.com" className="h-12 rounded-xl border-slate-200 focus:border-primary focus:ring-primary/20 bg-white" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="telefono" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 pl-1">WhatsApp</Label>
+                      <Input id="telefono" name="telefono" type="tel" value={formData.telefono} onChange={handleInputChange} placeholder="+1 234 567 8900" className="h-12 rounded-xl border-slate-200 focus:border-primary focus:ring-primary/20 bg-white" />
+                    </div>
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email *</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder="tu@email.com"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="telefono">Teléfono *</Label>
-                  <Input
-                    id="telefono"
-                    name="telefono"
-                    type="tel"
-                    value={formData.telefono}
-                    onChange={handleInputChange}
-                    placeholder="+1 234 567 8900"
-                    required
-                  />
-                </div>
-              </CardContent>
-            </Card>
+               </div>
+            </div>
           </div>
         </section>
 
         {/* Brochures Grid */}
-        <section className="py-16 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold mb-4">Selecciona y Descarga</h2>
-              <p className="text-lg text-muted-foreground">
-                {!formData.nombre || !formData.apellido || !formData.email || !formData.telefono ? (
-                  <span className="text-destructive font-semibold">
-                    ⚠️ Completa el formulario arriba para habilitar las descargas
-                  </span>
-                ) : (
-                  <span className="text-primary font-semibold">
-                    ✓ Formulario completo - Ya puedes descargar los brochures
-                  </span>
-                )}
-              </p>
+        <section className="py-20 bg-white">
+          <div className="container px-6 md:px-12 max-w-7xl mx-auto">
+            <div className="text-left mb-12">
+              {!isFormValid ? (
+                <div className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-amber-50 text-amber-600 font-bold text-sm border border-amber-100">
+                  <AlertCircle className="w-4 h-4" />
+                  Completa el formulario arriba para habilitar las descargas
+                </div>
+              ) : (
+                <div className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-green-50 text-green-600 font-bold text-sm border border-green-100">
+                  <CheckCircle2 className="w-4 h-4" />
+                  ¡Todo listo! Ya puedes descargar tus brochures
+                </div>
+              )}
             </div>
-            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              {brochures.map((brochure) => (
-                <Card key={brochure.id} className="overflow-hidden hover:shadow-elevated transition-shadow">
-                  <div className="aspect-video relative overflow-hidden">
-                    <img
-                      src={brochure.image}
-                      alt={brochure.title}
-                      className="w-full h-full object-cover"
-                    />
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+              {brochures.map((brochure, index) => (
+                <motion.div 
+                  key={brochure.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index % 3 * 0.1 }}
+                  className="group relative"
+                >
+                  <div className="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] transition-all duration-500">
+                    <div className="relative aspect-video overflow-hidden">
+                      <img
+                        src={brochure.image}
+                        alt={brochure.title}
+                        className="w-full h-full object-cover grayscale-[0.1] group-hover:grayscale-0 group-hover:scale-105 transition-transform duration-700"
+                      />
+                      <div className="absolute top-4 left-4">
+                         <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-bold uppercase tracking-widest">
+                           {brochure.tag}
+                         </span>
+                      </div>
+                    </div>
+                    
+                    <div className="p-8">
+                      <h3 className="text-2xl font-black text-[#1d1d1f] mb-2 tracking-tight group-hover:text-primary transition-colors">
+                        {brochure.title}
+                      </h3>
+                      <p className="text-[#86868b] text-sm mb-8 leading-relaxed line-clamp-2 h-10 font-medium">
+                        {brochure.description}
+                      </p>
+                      
+                      <Button
+                        onClick={() => handleDownload(brochure.title)}
+                        className={`w-full h-14 rounded-2xl font-bold text-base transition-all ${isFormValid ? 'bg-primary text-white shadow-lg hover:shadow-primary/30' : 'bg-slate-100 text-slate-400'}`}
+                        disabled={!isFormValid}
+                      >
+                        <Download className="mr-2 h-5 w-5" />
+                        {isFormValid ? "Descargar PDF" : "Habilitar Descarga"}
+                      </Button>
+                    </div>
                   </div>
-                  <CardHeader>
-                    <CardTitle>{brochure.title}</CardTitle>
-                    <CardDescription>{brochure.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button
-                      onClick={() => handleDownload(brochure.title)}
-                      className="w-full"
-                      size="lg"
-                      disabled={!formData.nombre || !formData.apellido || !formData.email || !formData.telefono}
-                    >
-                      <Download className="mr-2 h-4 w-4" />
-                      {!formData.nombre || !formData.apellido || !formData.email || !formData.telefono 
-                        ? "Completa el formulario primero" 
-                        : "Descargar Brochure"}
-                    </Button>
-                  </CardContent>
-                </Card>
+                </motion.div>
               ))}
             </div>
           </div>
         </section>
+
+        {/* Support Section */}
+        <section className="py-24 bg-white">
+           <div className="container px-6 md:px-12 text-center">
+              <div className="max-w-2xl mx-auto">
+                 <h2 className="text-4xl font-black text-[#1d1d1f] mb-6 tracking-tight">¿Prefieres ayuda personalizada?</h2>
+                 <p className="text-[#86868b] text-lg mb-10 leading-relaxed font-medium">
+                   Si tienes dudas específicas sobre alguno de nuestros destinos, nuestros asesores están listos para escucharte.
+                 </p>
+                 <motion.button
+                   whileHover={{ scale: 1.05 }}
+                   whileTap={{ scale: 0.95 }}
+                   className="inline-flex items-center gap-3 px-12 py-6 rounded-full bg-[#1d1d1f] text-white font-black text-xl transition-all"
+                 >
+                   Hablar con un experto
+                   <Sparkles className="w-6 h-6 text-primary" />
+                 </motion.button>
+              </div>
+           </div>
+        </section>
       </main>
+
       <Footer />
     </div>
   );
-};
-
-export default Brochures;
+}

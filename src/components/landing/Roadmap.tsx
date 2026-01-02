@@ -55,20 +55,36 @@ const steps = [
   }
 ];
 
-// Componente de Confeti CSS Simple
+// Componente de Confeti CSS Simple - Corregido para evitar errores de hidratación
 const Confetti = () => {
+  const [pieces, setPieces] = useState<any[]>([]);
+
+  useEffect(() => {
+    const colors = ['#ff0', '#f00', '#0f0', '#00f'];
+    const newPieces = [...Array(20)].map((_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      backgroundColor: colors[Math.floor(Math.random() * colors.length)],
+      animationDelay: `${Math.random() * 2}s`,
+      animationDuration: `${2 + Math.random() * 3}s`
+    }));
+    setPieces(newPieces);
+  }, []);
+
+  if (pieces.length === 0) return null;
+
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(20)].map((_, i) => (
+      {pieces.map((piece) => (
         <div
-          key={i}
-          className="absolute w-2 h-2 bg-yellow-400 rounded-full animate-confetti"
+          key={piece.id}
+          className="absolute w-2 h-2 rounded-full animate-confetti"
           style={{
-            left: `${Math.random() * 100}%`,
+            left: piece.left,
             top: `-10%`,
-            backgroundColor: ['#ff0', '#f00', '#0f0', '#00f'][Math.floor(Math.random() * 4)],
-            animationDelay: `${Math.random() * 2}s`,
-            animationDuration: `${2 + Math.random() * 3}s`
+            backgroundColor: piece.backgroundColor,
+            animationDelay: piece.animationDelay,
+            animationDuration: piece.animationDuration
           }}
         />
       ))}
