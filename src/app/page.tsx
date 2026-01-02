@@ -3,7 +3,6 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Hero from "@/components/landing/Hero";
-import QuickAccess from "@/components/landing/QuickAccess"; // IMPORTADO
 import Stats from "@/components/landing/Stats";
 import Services from "@/components/landing/Services";
 import YouTubeSubscription from "@/components/landing/YouTubeSubscription";
@@ -13,7 +12,6 @@ import AppSection from "@/components/landing/AppSection";
 import WhyChooseUs from "@/components/landing/WhyChooseUs";
 import CalculatorSection from "@/components/landing/CalculatorSection";
 import CtaSection from "@/components/landing/CtaSection";
-import TopBar from "@/components/landing/TopBar";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import { UpsellModal } from "@/components/landing/UpsellModal";
@@ -50,28 +48,34 @@ function HomeContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50"> {/* Fondo general gris muy suave */}
-      <TopBar onGetQuote={handleStartQuote} />
+    <div className="min-h-screen bg-white">
+      {/* TopBar eliminado */}
       <Header />
       
       <Hero onStartQuote={handleStartQuote} />
       
-      {/* NUEVA SECCIÓN DE ACCESO RÁPIDO */}
-      <QuickAccess />
-      
       <Stats />
+
+      {/* Flujo Principal: Qué hacemos -> Cómo lo hacemos */}
       <Services onStartQuote={handleStartQuote} onAppClick={handleAppClick} />
-      <YouTubeSubscription />
       <Roadmap />
+
+      {/* Auto-identificación del usuario */}
       <StageDetails />
+
+      {/* Herramientas y Valor Diferencial */}
       <AppSection />
       <WhyChooseUs />
 
+      {/* Cierre / Conversión */}
       {showCalculator ? (
         <CalculatorSection onComplete={handleQuoteComplete} />
       ) : (
         <CtaSection onStartQuote={handleStartQuote} />
       )}
+
+      {/* Prueba Social / Comunidad (Empujón final de confianza) */}
+      <YouTubeSubscription />
 
       <Footer />
       <UpsellModal 

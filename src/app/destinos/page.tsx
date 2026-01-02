@@ -1,6 +1,5 @@
 "use client";
 
-import TopBar from "@/components/landing/TopBar";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import { MapPin } from "lucide-react";
@@ -86,7 +85,6 @@ const Destinos = () => {
 
   return (
     <div className="min-h-screen">
-      <TopBar onGetQuote={() => window.location.href = '/?calculator=true'} />
       <Header />
       
       {/* Hero Section */}

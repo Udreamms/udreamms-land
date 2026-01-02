@@ -1,6 +1,6 @@
 "use client";
 
-import { Shield, Users, Globe, CheckCircle } from "lucide-react";
+import { Shield, Users, Globe, CheckCircle2 } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 
 // Componente para animar el conteo
@@ -59,46 +59,63 @@ export default function Stats() {
       number: 15,
       suffix: "+",
       title: "Años de Trayectoria",
-      description: "Liderando el mercado educativo.",
+      description: "Liderando el mercado educativo",
     },
     {
       icon: Users,
       number: 1250,
       suffix: "+",
       title: "Estudiantes Felices",
-      description: "Sueños cumplidos en USA.",
+      description: "Sueños cumplidos en USA",
     },
     {
       icon: Globe,
       number: 25,
       suffix: "+",
       title: "Estados Disponibles",
-      description: "Cobertura en todo el país.",
+      description: "Cobertura en todo el país",
     },
     {
-      icon: CheckCircle,
-      number: 99,
+      icon: CheckCircle2,
+      number: 95,
       suffix: "%",
       title: "Tasa de Aprobación",
-      description: "Garantía en tus trámites.",
+      description: "Garantía en tus trámites",
     },
   ];
 
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-white relative overflow-hidden">
+      {/* Elementos decorativos de fondo muy sutiles */}
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+      
       <div className="container px-6 md:px-12 mx-auto">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-12 gap-x-8 relative">
+          
           {stats.map((stat, index) => {
             return (
-              <div key={index} className="flex flex-col items-center text-center group cursor-default">
-                <div className="text-5xl md:text-6xl font-extrabold text-black mb-2 tracking-tighter group-hover:text-primary transition-colors duration-300">
+              <div key={index} className="relative group flex flex-col items-center text-center">
+                
+                {/* Separador Vertical (Solo visible en Desktop entre columnas) */}
+                {index !== 0 && (
+                   <div className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 h-24 w-px bg-gray-100"></div>
+                )}
+
+                {/* Icono con fondo suave */}
+                <div className="mb-6 p-4 rounded-2xl bg-primary/5 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 shadow-sm group-hover:shadow-lg group-hover:shadow-primary/30 group-hover:-translate-y-1">
+                  <stat.icon className="w-8 h-8" strokeWidth={2} />
+                </div>
+
+                {/* Número Grande con Gradiente */}
+                <div className="text-5xl md:text-6xl font-black mb-3 tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-gray-900 to-gray-600 group-hover:from-primary group-hover:to-secondary transition-all duration-300">
                   <CountUp end={stat.number} suffix={stat.suffix} />
                 </div>
-                <div className="h-1 w-12 bg-gray-200 rounded-full mb-4 group-hover:bg-primary transition-colors duration-300"></div>
-                <h3 className="text-lg font-bold text-gray-900 mb-1">
+
+                {/* Título y Descripción */}
+                <h3 className="text-lg font-bold text-gray-900 mb-2">
                   {stat.title}
                 </h3>
-                <p className="text-sm text-gray-500 font-medium">
+                <p className="text-sm text-gray-500 font-medium max-w-[200px] leading-relaxed">
                   {stat.description}
                 </p>
               </div>
@@ -106,6 +123,9 @@ export default function Stats() {
           })}
         </div>
       </div>
+      
+      {/* Borde inferior suave */}
+      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
     </section>
   );
 }

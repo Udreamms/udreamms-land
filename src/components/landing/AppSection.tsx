@@ -1,173 +1,184 @@
 "use client";
 
-import { Smartphone } from "lucide-react";
-import Image from 'next/image';
+import { AlertTriangle } from "lucide-react";
 import Link from 'next/link';
-import { AlertTriangle } from 'lucide-react';
 
+// Datos con descripciones para todos
 const servicesData = [
   {
-    title: "Oportunidades",
-    desc: "Encuentra ofertas de trabajo, becas y oportunidades de networking para estudiantes internacionales",
-    cta: "Ver más",
-    imageKeyword: "credit card banking",
-    videoUrl: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2Ftrabajo.mp4?alt=media&token=8c361ac9-8767-486e-bcb8-a951598571a5",
-  },
-  {
-    title: "Vivienda",
-    desc: "Te ayudamos a encontrar el lugar perfecto para vivir durante tu estadía en Estados Unidos.",
-    cta: "Buscar vivienda",
-    imageKeyword: "apartment interior",
-    videoUrl: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2Fhome.mp4?alt=media&token=8fe8f2cf-e608-47be-b2ff-b8d0212dd7c1",
-  },
-  {
-    title: "Viajes y Aventuras",
-    desc: "Descubre lugares increíbles, eventos y actividades para aprovechar tu estadía al máximo",
-    cta: "Ver más",
-    imageKeyword: "airplane window view",
-    videoUrl: null,
-  },
-  {
-    title: "Conocimiento Clave en USA",
-    desc: "Guías prácticas sobre cultura, leyes, tips de vida diaria y todo lo que necesitas saber",
-    cta: "Ver más",
-    imageKeyword: "driving car usa",
-    videoUrl: null,
-  },
-  {
     title: "Cuenta Bancaria",
-    desc: "Te ayudamos con los trámites para crear una cuenta bancaria al llegar a Estados Unidos y recibir una tarjeta débito.",
+    desc: "Abre tu cuenta en dólares desde el primer día. Sin comisiones ocultas y con tarjeta de débito internacional.",
     cta: "Abrir cuenta",
-    imageKeyword: "credit card banking 2",
-    videoUrl: null,
+    videoUrl: null, // Sin video (Negro + Texto)
   },
   {
     title: "Compra/Renta de Auto",
-    desc: "Te ayudamos para que puedas comprar/rentar un auto para movilizarte más fácilmente.",
+    desc: "Encuentra el vehículo ideal para tu presupuesto. Opciones de leasing flexibles para estudiantes internacionales.",
     cta: "Ver autos",
-    imageKeyword: "car rental 2",
-    videoUrl: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2Fcoche.mp4?alt=media&token=c0645f1b-3570-4bd9-b52e-739299cfb4ac",
+    videoUrl: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2Fcoche.mp4?alt=media&token=c0645f1b-3570-4bd9-b52e-739299cfb4ac", // Con Video
   },
   {
     title: "Pase de Autobús",
-    desc: "Te ayudamos a adquirir un pase de bus estudiantil económico.",
+    desc: "Muévete por la ciudad sin límites. Descuentos exclusivos del 50% en transporte público para miembros Udreamms.",
     cta: "Solicitar pase",
-    imageKeyword: "bus public transport 2",
-    videoUrl: null,
+    videoUrl: null, // Sin video
   },
   {
     title: "Scooter",
-    desc: "Obtén información para comprar o rentar un scooter y moverte fácilmente por la ciudad",
-    cta: "Ver opciones",
-    imageKeyword: "scooter city",
-    videoUrl: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2Fscooter.mp4?alt=media&token=400bd256-8057-44f4-ab01-87765207a564",
+    desc: "La forma más divertida y rápida de ir al campus. Alquiler por minutos o planes mensuales económicos.",
+    cta: "Rentar",
+    videoUrl: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2Fscooter.mp4?alt=media&token=400bd256-8057-44f4-ab01-87765207a564", // Con Video
   },
   {
     title: "Plan de Celular",
-    desc: "Te ayudamos a sacar una línea de celular de USA ya sea en un plan individual o grupal.",
+    desc: "Mantente conectado con datos ilimitados 5G. Planes sin contrato forzoso y llamadas internacionales incluidas.",
     cta: "Ver planes",
-    imageKeyword: "smartphone using 2",
-    videoUrl: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2Flicencia.mp4?alt=media&token=f18b3fd9-abbe-4530-ba59-2ed99567b14c",
+    videoUrl: null, // Sin video
   },
   {
     title: "Licencia de Conducir",
-    desc: "Te guiamos al seguir los pasos para tramitar una licencia de conducir del estado donde estudies.",
+    desc: "Guía paso a paso para obtener tu licencia americana. Te ayudamos con el examen teórico y práctico.",
     cta: "Ver guía",
-    imageKeyword: "driving car usa 2",
-    videoUrl: null,
+    videoUrl: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2Flicencia.mp4?alt=media&token=f18b3fd9-abbe-4530-ba59-2ed99567b14c", // Con Video (Asumimos que hay uno, o reusamos para el ejemplo)
   },
   {
     title: "Seguro Médico",
-    desc: "Te ayudamos a conseguir un seguro médico en caso que necesites uno.",
+    desc: "Cobertura completa ante cualquier emergencia. Cumple con todos los requisitos de tu visa F-1.",
     cta: "Cotizar seguro",
-    imageKeyword: "health insurance doctor 2",
-    videoUrl: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2Ftrabajo.mp4?alt=media&token=8c361ac9-8767-486e-bcb8-a951598571a5",
+    videoUrl: null, // Sin video
   },
   {
     title: "Vuelos Económicos",
-    desc: "Te ayudamos a cotizar vuelos económicos hacia Estados Unidos.",
+    desc: "Alertas de precios bajos para visitar a tu familia. Descuentos especiales en aerolíneas partner.",
     cta: "Buscar vuelos",
-    imageKeyword: "airplane window view 2",
-    videoUrl: null
+    videoUrl: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2Ftrabajo.mp4?alt=media&token=8c361ac9-8767-486e-bcb8-a951598571a5", // Con Video (Reusado placeholder)
   }
 ];
 
+// Duplicamos la data para el efecto de scroll infinito sin cortes
+const infiniteData = [...servicesData, ...servicesData];
+
 export default function AppSection() {
-  const reorderedServicesData = [...servicesData];
-  // Swap elements at indices 1 and 2
-  [reorderedServicesData[1], reorderedServicesData[2]] = [reorderedServicesData[2], reorderedServicesData[1]];
-
   return (
-    <section id="app-section" className="bg-[#111111] py-20">
-      <div className="container px-4 max-w-5xl">
-        <div className="text-center mb-16 gap-6">
-          <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-6">
-            <div className="absolute inset-0 bg-red-600 blur-2xl opacity-20"></div>
-            <Smartphone className="w-10 h-10 text-primary-foreground relative" />
-          </div>
-          <h2 className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-br from-white to-gray-400 bg-clip-text text-transparent">
-            Udreamms App
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-2">
-            Tu compañera perfecta una vez que llegues a Estados Unidos
-          </p>
-          <div className="rounded-full border border-red-500/20 bg-red-500/10 px-4 py-1.5 inline-flex items-center">
-            <AlertTriangle className="w-4 h-4 mr-2 text-red-400" />
-            <p className="text-sm font-medium text-red-400">
-              Esta aplicación es exclusiva para estudiantes que ya están en USA
-            </p>
-          </div>
+    <section id="app-section" className="bg-black py-32 overflow-hidden relative">
+      
+      {/* Header */}
+      <div className="container px-4 mx-auto mb-12 text-center relative z-10">
+        <h2 className="text-5xl md:text-7xl font-bold tracking-tighter text-white mb-4">
+          Udreamms App
+        </h2>
+        <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-8 font-light">
+          Tu compañera perfecta una vez que llegues a Estados Unidos
+        </p>
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-red-900/50 bg-red-950/20">
+          <AlertTriangle className="w-4 h-4 text-red-500" />
+          <span className="text-sm font-medium text-red-400">
+            Exclusivo para estudiantes en USA
+          </span>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {reorderedServicesData.map((service, index) => {
+      {/* Marquee Container */}
+      <div className="relative w-full flex overflow-hidden py-16"> {/* AÑADIDO PY-16 AQUÍ */}
+        
+        {/* Gradients laterales para suavizar la entrada/salida */}
+        <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none"></div>
+        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none"></div>
+
+        {/* Track Animado */}
+        <div className="flex gap-8 animate-scroll hover:pause px-4">
+          {infiniteData.map((service, index) => {
+            
+            const hasVideo = index % 2 !== 0; // Alternamos
+            const isZigZagDown = index % 2 !== 0; // Bajamos las que tienen video
+
             return (
-              <div key={index}
-                className={`group relative overflow-hidden rounded-3xl h-[400px] w-full transition-all duration-300 ${index % 4 === 0 || index % 4 === 2 ? 'translate-y-12' : ''}`}>
-                {service.videoUrl ? (
-                  <video
-                    src={service.videoUrl}
-                    className="object-cover w-full h-full absolute inset-0 hover:scale-110 duration-500"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    controls
-                  />
-                ) : (
-                  <div className="object-cover w-full h-full absolute inset-0 bg-black"></div>
+              <div 
+                key={index}
+                className={`
+                   relative shrink-0
+                   w-[340px] h-[520px]
+                   group overflow-hidden rounded-[2.5rem] border transition-all duration-500
+                   ${hasVideo 
+                      ? 'border-white/10 bg-black' 
+                      : 'border-white/20 bg-[#080808] hover:bg-[#111]'
+                   }
+                   ${isZigZagDown ? 'translate-y-12' : '-translate-y-4'} /* Ajuste Zig-Zag más pronunciado y seguro */
+                `}
+              >
+                
+                {/* 1. CASO CON VIDEO */}
+                {hasVideo && (
+                  <>
+                    <div className="absolute inset-0 h-full w-full">
+                        <video
+                          src={service.videoUrl || ""}
+                          className="object-cover w-full h-full opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                        />
+                      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 pointer-events-none"></div>
+                    </div>
+                    
+                    <div className="relative h-full w-full p-8 flex flex-col justify-between z-10">
+                      <h3 className="text-3xl font-black text-white leading-none drop-shadow-xl tracking-tight">
+                        {service.title}
+                      </h3>
+                      <Link
+                        href="#"
+                        className="inline-flex items-center justify-center bg-white/20 backdrop-blur-xl border border-white/30 text-white rounded-full px-6 py-3 font-bold text-sm hover:bg-white hover:text-black transition-all duration-300 w-fit self-start group-hover:translate-x-1"
+                      >
+                        {service.cta}
+                      </Link>
+                    </div>
+                  </>
                 )}
-                <div className="absolute inset-0 bg-black/50"></div>
-                <div className="relative flex flex-col h-full p-4">
-                  <h3 className="text-lg font-semibold text-white mb-2">
-                    {service.title}
-                  </h3>
-                  <p className="text-sm text-gray-300 mb-4 flex-grow">
-                    {service.desc}
-                  </p>
-                   <Link
-                    href="#"
-                    className="inline-flex items-center justify-center text-black bg-white rounded-full px-4 py-2 font-medium hover:bg-gray-100 transition-colors w-fit self-start text-sm"
-                  >
-                    {service.cta}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      className="w-4 h-4 ml-2"
+
+                {/* 2. CASO SIN VIDEO (SOLO TEXTO) */}
+                {!hasVideo && (
+                  <div className="relative h-full w-full p-8 flex flex-col justify-between z-10">
+                    <div>
+                      <h3 className="text-3xl font-bold text-white mb-6 leading-tight">
+                        {service.title}
+                      </h3>
+                      <p className="text-gray-400 text-lg leading-relaxed font-light">
+                        {service.desc}
+                      </p>
+                    </div>
+                    
+                    <Link
+                      href="#"
+                      className="inline-flex items-center justify-center bg-white text-black rounded-full px-8 py-4 font-bold text-sm hover:bg-gray-200 transition-all duration-300 w-full group-hover:-translate-y-1 shadow-lg"
                     >
-                      <path
-                        fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L6.22 12h10.56a.75.75 0 010 1.5H6.22l.99 1.77a.75 0 01-1.04.02z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </Link>
-                </div>
+                      {service.cta}
+                    </Link>
+
+                    {/* Decoración sutil */}
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+                  </div>
+                )}
+
               </div>
             );
           })}
         </div>
       </div>
+
+      {/* Definición de la Animación en CSS (Inline para Next.js App Router) */}
+      <style jsx global>{`
+        @keyframes scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); } /* -50% porque duplicamos la data */
+        }
+        .animate-scroll {
+          animation: scroll 60s linear infinite; /* Más lento para que sea elegante */
+        }
+        .hover\:pause:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
     </section>
   );
 }
