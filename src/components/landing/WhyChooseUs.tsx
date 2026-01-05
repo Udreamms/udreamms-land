@@ -1,140 +1,199 @@
 "use client";
 
-import { Heart, Target, Lightbulb, Zap } from "lucide-react";
-import { motion, Variants } from "framer-motion";
+import { 
+  Heart, 
+  Target, 
+  Lightbulb, 
+  Zap,
+  Plus,
+  GraduationCap,
+  Shield,
+  Globe,
+  ChevronLeft,
+  ChevronRight
+} from "lucide-react";
+import { useRef } from "react";
 
 export default function WhyChooseUs() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const scrollAmount = 350;
+      scrollRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
   
-  // Variantes para el contenedor (controla el orden de aparición)
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2 // Retraso entre cada tarjeta
-      }
+  const reasons = [
+    {
+      id: 1,
+      category: "Soporte",
+      title: "Acompañamiento Humano",
+      description: "Sabemos que irte a otro país da miedo. Por eso nuestro equipo está contigo no solo en los papeles, sino cuando necesitas a alguien con quien hablar.",
+      icon: Heart,
+      color: "text-red-500",
+    },
+    {
+      id: 2,
+      category: "Eficacia",
+      title: "Enfoque en Resultados",
+      description: "Optimizamos cada aplicación para maximizar tus chances de aceptación. Tu éxito es nuestra única métrica importante.",
+      icon: Target,
+      color: "text-orange-500",
+    },
+    {
+      id: 3,
+      category: "Tecnología",
+      title: "Innovación Constante",
+      description: "Usamos tecnología propia para hacer tu proceso más rápido y transparente. Olvídate del papeleo innecesario.",
+      icon: Lightbulb,
+      color: "text-yellow-500",
+    },
+    {
+      id: 4,
+      category: "Velocidad",
+      title: "Rapidez y Eficiencia",
+      description: "Sin burocracia. Nuestro sistema digital agiliza la recolección de documentos y evita errores comunes.",
+      icon: Zap,
+      color: "text-purple-500",
+    },
+    {
+      id: 5,
+      category: "Calidad",
+      title: "Escuelas Certificadas",
+      description: "Trabajamos solo con instituciones acreditadas.",
+      icon: GraduationCap,
+      color: "text-pink-500",
+    },
+    {
+      id: 6,
+      category: "Confianza",
+      title: "Proceso Seguro",
+      description: "Te guiamos en cada paso del proceso migratorio.",
+      icon: Shield,
+      color: "text-rose-500",
+    },
+    {
+      id: 7,
+      category: "Comodidad",
+      title: "Todo Incluido",
+      description: "Aeropuerto, vivienda y servicios adicionales.",
+      icon: Globe,
+      color: "text-red-400",
     }
-  };
-
-  // Variantes para las tarjetas (la animación individual)
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, x: -100 }, // Empieza invisible y desplazado a la izquierda
-    visible: { 
-      opacity: 1, 
-      x: 0, // Llega a su posición original
-      transition: { 
-        type: "spring", // Efecto rebote suave
-        stiffness: 50,
-        damping: 20
-      }
-    }
-  };
-
-  // Variante alternativa para venir desde la derecha (opcional para alternar)
-  const itemVariantsRight: Variants = {
-    hidden: { opacity: 0, x: 100 },
-    visible: { 
-      opacity: 1, 
-      x: 0,
-      transition: { 
-        type: "spring",
-        stiffness: 50,
-        damping: 20
-      }
-    }
-  };
+  ];
 
   return (
     <section className="py-24 bg-white overflow-hidden">
       <div className="container px-6 md:px-12 mx-auto">
-        <div className="text-center mb-16 max-w-3xl mx-auto">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-3xl md:text-4xl font-bold mb-6 text-gray-900 tracking-tight"
-          >
-            ¿Por qué Udreamms?
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-xl text-gray-600"
-          >
-            No somos solo una agencia, somos tu partner en esta aventura.
-          </motion.p>
+        
+        {/* Header */}
+        <div className="mb-12 flex flex-col md:flex-row justify-between items-end gap-6">
+          <div className="max-w-4xl">
+            <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 text-black">
+              Por qué Udreamms es <br />
+              <span className="text-gray-400">la mejor decisión.</span>
+            </h2>
+            <p className="text-xl text-gray-500 font-medium leading-relaxed max-w-2xl">
+              Beneficios exclusivos diseñados para garantizar tu éxito en USA.
+            </p>
+          </div>
+
+          {/* Desktop Navigation Arrows */}
+          <div className="hidden md:flex gap-3">
+            <button 
+              onClick={() => scroll('left')}
+              className="w-12 h-12 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition-colors"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button 
+              onClick={() => scroll('right')}
+              className="w-12 h-12 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition-colors"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          </div>
         </div>
 
-        <motion.div 
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }} // Se activa cuando el elemento entra 100px en pantalla
+        {/* Horizontal Scroll Container - Scrollbar Hidden */}
+        <div 
+          ref={scrollRef}
+          className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-12 -mx-6 px-6 md:mx-0 md:px-0"
+          style={{ 
+            scrollbarWidth: 'none',  /* Firefox */
+            msOverflowStyle: 'none',  /* IE and Edge */
+          }}
         >
-          {/* Tarjeta Grande Destacada (Izquierda) */}
-          <motion.div 
-            variants={itemVariants}
-            className="lg:col-span-2 bg-white p-10 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-8 hover:shadow-xl transition-shadow duration-300"
-          >
-             <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center shrink-0 text-primary">
-                <Heart className="w-10 h-10" />
-             </div>
-             <div className="text-center md:text-left">
-                <h3 className="text-2xl font-bold mb-3 text-gray-900">Acompañamiento Humano</h3>
-                <p className="text-gray-500 text-lg leading-relaxed">
-                  Sabemos que irte a otro país da miedo. Por eso nuestro equipo está contigo no solo en los papeles, sino cuando necesitas a alguien con quien hablar.
-                </p>
-             </div>
-          </motion.div>
+          {/* Hide Scrollbar for Webkit */}
+          <style jsx>{`
+            div::-webkit-scrollbar {
+              display: none;
+            }
+          `}</style>
+          
+          {reasons.map((card) => (
+            <div 
+              key={card.id}
+              className="relative shrink-0 snap-center w-[300px] md:w-[340px] h-[500px] bg-white rounded-[2.5rem] p-8 shadow-xl shadow-gray-100 border border-gray-100 flex flex-col justify-between transition-transform hover:scale-[1.02] duration-300"
+            >
+               {/* Top Content */}
+               <div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3 block">
+                    {card.category}
+                  </span>
+                  <h3 className="text-3xl font-bold text-gray-900 mb-4 leading-tight">
+                    {card.title}.
+                  </h3>
+                  <p className="text-gray-500 font-medium text-sm leading-relaxed">
+                    {card.description}
+                  </p>
+               </div>
 
-          {/* Tarjeta Pequeña 1 (Derecha) */}
-          <motion.div 
-            variants={itemVariantsRight}
-            className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 hover:shadow-xl transition-shadow duration-300"
-          >
-             <div className="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center mb-6 text-orange-600">
-                <Target className="w-7 h-7" />
-             </div>
-             <h3 className="text-xl font-bold mb-3 text-gray-900">Enfoque en Resultados</h3>
-             <p className="text-gray-500">
-               Optimizamos cada aplicación para maximizar tus chances de aceptación.
-             </p>
-          </motion.div>
+               {/* Bottom Content (Icon + Plus Button) */}
+               <div className="relative h-32 flex items-center justify-center mt-6">
+                  {/* Large Icon replacing the image */}
+                  <card.icon 
+                    className={`w-32 h-32 opacity-20 ${card.color}`} 
+                    strokeWidth={1}
+                  />
+                  
+                  {/* Floating real icon on top for better visibility */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                     <card.icon 
+                        className={`w-16 h-16 ${card.color} drop-shadow-md`} 
+                        strokeWidth={1.5} 
+                     />
+                  </div>
 
-          {/* Tarjeta Pequeña 2 (Izquierda en grid flow) */}
-          <motion.div 
-            variants={itemVariants}
-            className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 hover:shadow-xl transition-shadow duration-300"
-          >
-             <div className="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 text-blue-600">
-                <Lightbulb className="w-7 h-7" />
-             </div>
-             <h3 className="text-xl font-bold mb-3 text-gray-900">Innovación Constante</h3>
-             <p className="text-gray-500">
-               Usamos tecnología propia para hacer tu proceso más rápido y transparente.
-             </p>
-          </motion.div>
+                  {/* Plus Button in bottom right corner */}
+                  <button className="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 transition-colors shadow-lg">
+                    <Plus className="w-5 h-5" />
+                  </button>
+               </div>
+            </div>
+          ))}
+        </div>
 
-          {/* Tarjeta Grande Destacada 2 (Derecha en grid flow) */}
-          <motion.div 
-            variants={itemVariantsRight}
-            className="lg:col-span-2 bg-white p-10 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-8 hover:shadow-xl transition-shadow duration-300"
-          >
-             <div className="w-20 h-20 bg-purple-100 rounded-3xl flex items-center justify-center shrink-0 text-purple-600">
-                <Zap className="w-10 h-10" />
-             </div>
-             <div className="text-center md:text-left">
-                <h3 className="text-2xl font-bold mb-3 text-gray-900">Rapidez y Eficiencia</h3>
-                <p className="text-gray-500 text-lg leading-relaxed">
-                  Sin burocracia innecesaria. Nuestro sistema digital agiliza la recolección de documentos y evita errores comunes.
-                </p>
-             </div>
-          </motion.div>
+        {/* Mobile Navigation Arrows */}
+        <div className="md:hidden flex justify-center gap-4 mt-4">
+            <button 
+              onClick={() => scroll('left')}
+              className="w-12 h-12 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition-colors"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button 
+              onClick={() => scroll('right')}
+              className="w-12 h-12 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition-colors"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+        </div>
 
-        </motion.div>
       </div>
     </section>
   );

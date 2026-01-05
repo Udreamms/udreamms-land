@@ -10,155 +10,142 @@ import {
 
 export default function StageDetails() {
   
-  // Datos estructurados
   const stages = [
     {
       id: 1,
-      tag: "Etapa 1",
-      title: "Aún no califico",
+      tag: "Fase 1",
+      title: "Preparación Inicial",
       description: "No tienes pasaporte ni fondos suficientes. Te ayudamos con clases de inglés y programas para generar ingresos.",
-      linkText: "Ver cómo prepararme",
       icon: FileCheck,
-      color: "text-blue-600",
-      bgIcon: "bg-blue-50",
-      border: "border-blue-100",
-      hoverBorder: "group-hover:border-blue-200"
+      color: "text-blue-500", 
     },
     {
       id: 2,
-      tag: "Etapa 2",
-      title: "Tengo todo para comenzar",
+      tag: "Fase 2",
+      title: "Aplicación y Obtención de Visa",
       description: "Tienes documentos listos. Es hora de aplicar a la escuela, gestionar el I-20 y prepararte para la embajada.",
-      linkText: "Iniciar aplicación",
       icon: GraduationCap,
-      color: "text-purple-600",
-      bgIcon: "bg-purple-50",
-      border: "border-purple-100",
-      hoverBorder: "group-hover:border-purple-200"
+      color: "text-purple-500", 
     },
     {
       id: 3,
-      tag: "Etapa 3",
-      title: "Visa Aprobada",
+      tag: "Fase 3",
+      title: "Planificación de Viaje",
       description: "¿Y ahora qué sigue? Búsqueda de vivienda, compra de vuelos y el checklist final antes de partir.",
-      linkText: "Organizar mi viaje",
       icon: Plane,
-      color: "text-orange-600",
-      bgIcon: "bg-orange-50",
-      border: "border-orange-100",
-      hoverBorder: "group-hover:border-orange-200"
+      color: "text-orange-500", 
     },
     {
       id: 4,
-      tag: "Etapa 4",
-      title: "Llegamos a USA",
+      tag: "Fase 4",
+      title: "Llegada y Primeros Días",
       description: "Adaptación inicial: Recogida en aeropuerto, cuenta bancaria, SSN y acceso a la comunidad Udreamms.",
-      linkText: "Guía de llegada",
       icon: MapPin,
-      color: "text-emerald-600",
-      bgIcon: "bg-emerald-50",
-      border: "border-emerald-100",
-      hoverBorder: "group-hover:border-emerald-200"
+      color: "text-emerald-500", 
     }
   ];
 
   return (
-    <section className="py-24 bg-gray-50 relative overflow-hidden">
-      {/* Decoración de fondo sutil */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-white skew-x-12 translate-x-1/4 pointer-events-none opacity-50"></div>
-
-      <div className="container max-w-6xl mx-auto px-6 relative z-10">
+    <section className="py-24 bg-white relative overflow-hidden">
+      
+      <div className="container max-w-[1400px] mx-auto px-6 relative z-10">
         
         {/* Header */}
-        <div className="mb-16 pb-8 border-b border-gray-200">
-          <span className="text-primary font-bold tracking-widest uppercase text-xs mb-3 block">
-            Tu Estatus Actual
-          </span>
-          <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4">
-            ¿En qué etapa te encuentras?
+        <div className="mb-12 pb-6 max-w-4xl">
+          <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 text-black">
+            ¿En qué fase <br />
+            <span className="text-gray-400">te encuentras?</span>
           </h2>
-           <p className="text-xl text-gray-600 max-w-2xl leading-relaxed">
-            Identifica dónde estás en tu viaje y descubre cómo te podemos ayudar hoy mismo con soluciones a tu medida.
+           <p className="text-xl text-gray-500 font-medium leading-relaxed">
+            Identifica dónde estás en tu viaje y descubre cómo te podemos ayudar hoy mismo.
           </p>
         </div>
 
-        {/* Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Grid Superior: 2 Filas de 2 Tarjetas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           
           {stages.map((stage) => (
-            <div key={stage.id} className={`group bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border ${stage.border} ${stage.hoverBorder}`}>
-              <div className="flex flex-col sm:flex-row gap-6 items-start">
-                
-                {/* Icono */}
-                <div className={`w-16 h-16 rounded-2xl ${stage.bgIcon} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300`}>
-                   <stage.icon className={`w-8 h-8 ${stage.color}`} />
-                </div>
-                
-                {/* Contenido */}
-                <div className="flex-1 space-y-3">
-                  <div className="flex items-center gap-2">
-                     <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-500`}>
-                        {stage.tag}
-                     </span>
-                  </div>
-                  
-                  <h3 className="text-2xl font-bold text-gray-900 group-hover:text-primary transition-colors duration-300">
-                    {stage.title}
-                  </h3>
-                  
-                  <p className="text-gray-500 leading-relaxed text-sm md:text-base font-medium">
-                    {stage.description}
-                  </p>
+            <div key={stage.id} className="group bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100 relative flex flex-col justify-between h-[380px] hover:shadow-xl hover:shadow-gray-200 transition-all duration-300">
+                <div>
+                    {/* Icon */}
+                    <div className="mb-4">
+                        <stage.icon className={`w-12 h-12 ${stage.color}`} strokeWidth={1.5} />
+                    </div>
+                    
+                    {/* Title Part 1 (Tag) */}
+                    <div className="mb-2">
+                        <span className={`text-xl font-bold ${stage.color}`}>
+                            {stage.tag}
+                        </span>
+                    </div>
 
-                  <div className="pt-2">
-                    <span className={`inline-flex items-center text-sm font-bold ${stage.color} hover:opacity-80 transition-opacity mt-2 cursor-pointer`}>
-                      {stage.linkText}
-                      <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-                    </span>
-                  </div>
+                    {/* Title Part 2 (Main Title) */}
+                    <h3 className={`text-3xl md:text-4xl font-bold ${stage.color} mb-4 leading-tight`}>
+                        {stage.title}
+                    </h3>
+                    
+                    {/* Description */}
+                    <p className="text-gray-600 text-lg md:text-xl font-medium leading-relaxed">
+                        {stage.description}
+                    </p>
                 </div>
-
-              </div>
             </div>
           ))}
 
-          {/* Tarjeta Especial: Meta Final (Full Width) */}
-           <div className="group cursor-pointer md:col-span-2 mt-4 relative overflow-hidden rounded-3xl bg-gradient-to-r from-gray-900 to-black p-1 shadow-2xl hover:shadow-primary/20 transition-all duration-500">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
-              
-              <div className="relative h-full bg-[#0a0a0a] rounded-[22px] p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 overflow-hidden">
-                 
-                 {/* Fondo decorativo interno */}
-                 <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-primary/10 rounded-full blur-[80px] pointer-events-none"></div>
-
-                 <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shrink-0 group-hover:scale-110 transition-transform duration-300">
-                    <span className="text-4xl md:text-5xl">🎯</span>
-                 </div>
-                 
-                 <div className="flex-1 space-y-4 text-center md:text-left relative z-10">
-                    <div>
-                       <span className="text-xs font-bold uppercase tracking-widest text-primary mb-2 block">
-                          El Destino
-                       </span>
-                       <h3 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                         ¿Ya vives en USA?
-                       </h3>
-                    </div>
-                    <p className="text-gray-400 text-lg max-w-2xl leading-relaxed">
-                      Si ya lograste tu sueño, únete a nuestra red de Alumni. Te ayudamos a encontrar trabajo part-time, hacer networking y viajar por todo el país.
-                    </p>
-                 </div>
-
-                 <div className="relative z-10 shrink-0">
-                    <button className="inline-flex items-center px-8 py-4 rounded-full bg-white text-black font-bold hover:bg-gray-100 transition-colors">
-                      Unirme a la Comunidad
-                      <ArrowRight className="w-5 h-5 ml-2" />
-                    </button>
-                 </div>
-              </div>
-           </div>
-
         </div>
+
+        {/* Tarjeta Inferior Grande: Fase 5 */}
+        <div className="group bg-white rounded-[2.5rem] p-0 shadow-sm border border-gray-100 relative overflow-hidden hover:shadow-2xl hover:shadow-gray-200 transition-all duration-300">
+            <div className="flex flex-col lg:flex-row items-center h-full min-h-[250px]">
+                
+                {/* Imagen (Izquierda) - Fondo Blanco */}
+                <div className="w-full lg:w-[25%] h-[200px] lg:h-full relative bg-white flex items-center justify-center p-6">
+                    <img 
+                        src="/assets/Udreamms App.jpeg" 
+                        alt="Udreamms App" 
+                        className="w-auto h-full max-h-[150px] object-contain transition-transform duration-700 group-hover:scale-105" 
+                    />
+                </div>
+
+                {/* Contenido (Derecha) */}
+                <div className="w-full lg:w-[75%] p-8 lg:p-10 flex flex-col lg:flex-row items-center justify-between gap-8 bg-white">
+                     
+                     {/* Textos */}
+                     <div className="flex-1 space-y-4">
+                        <span className="text-xl font-bold text-[#D31245] mb-1 block">
+                            Fase 5
+                        </span>
+
+                        <h3 className="text-3xl md:text-4xl font-black text-[#D31245] mb-3 leading-tight">
+                            ¿Ya vives en USA?
+                        </h3>
+                        
+                        <div className="text-lg md:text-xl font-medium leading-relaxed">
+                            <p className="text-gray-500 mb-4">
+                                Si ya lograste tu sueño, únete a nuestra red de Alumnos. Te ayudamos a encontrar trabajo part-time, hacer networking y viajar por todo el país.
+                            </p>
+                            
+                            {/* Mensaje Llamativo */}
+                            <p className="text-gray-500 font-bold">
+                                Todo lo podrás hacer desde nuestra App. <br />
+                                <span className="text-[#D31245]">Descárgala ya en App Store o Google Play.</span> <br />
+                                ¡Te esperamos!
+                            </p>
+                        </div>
+                     </div>
+                     
+                     {/* Botón a la derecha */}
+                     <div className="shrink-0 self-start lg:self-center">
+                        <button className="inline-flex items-center px-8 py-4 rounded-full bg-[#D31245] text-white font-bold hover:bg-red-700 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95 text-base whitespace-nowrap">
+                          Unirme a la comunidad
+                          <ArrowRight className="w-5 h-5 ml-3" />
+                        </button>
+                     </div>
+                </div>
+
+            </div>
+        </div>
+
       </div>
     </section>
   );

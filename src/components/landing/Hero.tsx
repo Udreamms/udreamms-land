@@ -66,14 +66,14 @@ export default function Hero({ onStartQuote }: HeroProps) {
           
           <div className="max-w-[70%] text-left space-y-2"> 
             {/* Texto superior (Eyebrow) */}
-            <p className="text-white text-lg md:text-xl font-semibold tracking-tight">
+            <p className="text-gray-300 text-lg md:text-xl font-semibold tracking-tight">
               Asesoría integral para la obtención de tu visa americana
             </p>
             
-            {/* Título Principal - REDUCIDO LEVEMENTE */}
+            {/* Título Principal */}
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] text-white tracking-tighter">
               ¿Listo para <br />
-              <span className="text-gray-400">cambiar tu futuro?</span>
+              cambiar tu futuro?
             </h1>
             
             <div className="pt-4 text-xl md:text-2xl text-gray-300 font-medium tracking-tight max-w-none">

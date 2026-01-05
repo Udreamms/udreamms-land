@@ -56,14 +56,14 @@ export default function Stats() {
   const stats = [
     {
       icon: Shield,
-      number: 15,
+      number: 30,
       suffix: "+",
-      title: "Años de Trayectoria",
-      description: "Liderando el mercado educativo",
+      title: "Experiencia Educativa",
+      description: "Escuelas aliadas con más de 30 años en el mercado",
     },
     {
       icon: Users,
-      number: 1250,
+      number: 783,
       suffix: "+",
       title: "Estudiantes Felices",
       description: "Sueños cumplidos en USA",
@@ -123,9 +123,6 @@ export default function Stats() {
           })}
         </div>
       </div>
-      
-      {/* Borde inferior suave */}
-      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
     </section>
   );
 }

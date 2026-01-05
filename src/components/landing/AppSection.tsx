@@ -39,7 +39,7 @@ const servicesData = [
     title: "Licencia de Conducir",
     desc: "Guía paso a paso para obtener tu licencia americana. Te ayudamos con el examen teórico y práctico.",
     cta: "Ver guía",
-    videoUrl: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2Flicencia.mp4?alt=media&token=f18b3fd9-abbe-4530-ba59-2ed99567b14c", // Con Video (Asumimos que hay uno, o reusamos para el ejemplo)
+    videoUrl: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2Flicencia.mp4?alt=media&token=f18b3fd9-abbe-4530-ba59-2ed99567b14c", // Con Video
   },
   {
     title: "Seguro Médico",
@@ -51,7 +51,7 @@ const servicesData = [
     title: "Vuelos Económicos",
     desc: "Alertas de precios bajos para visitar a tu familia. Descuentos especiales en aerolíneas partner.",
     cta: "Buscar vuelos",
-    videoUrl: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2Ftrabajo.mp4?alt=media&token=8c361ac9-8767-486e-bcb8-a951598571a5", // Con Video (Reusado placeholder)
+    videoUrl: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2Ftrabajo.mp4?alt=media&token=8c361ac9-8767-486e-bcb8-a951598571a5", // Con Video
   }
 ];
 
@@ -63,7 +63,7 @@ export default function AppSection() {
     <section id="app-section" className="bg-black py-32 overflow-hidden relative">
       
       {/* Header */}
-      <div className="container px-4 mx-auto mb-12 text-center relative z-10">
+      <div className="container px-4 mx-auto mb-16 text-center relative z-10">
         <h2 className="text-5xl md:text-7xl font-bold tracking-tighter text-white mb-4">
           Udreamms App
         </h2>
@@ -79,31 +79,29 @@ export default function AppSection() {
       </div>
 
       {/* Marquee Container */}
-      <div className="relative w-full flex overflow-hidden py-16"> {/* AÑADIDO PY-16 AQUÍ */}
+      <div className="relative w-full flex overflow-hidden py-10"> 
         
-        {/* Gradients laterales para suavizar la entrada/salida */}
+        {/* Gradients laterales */}
         <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none"></div>
         <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none"></div>
 
         {/* Track Animado */}
-        <div className="flex gap-8 animate-scroll hover:pause px-4">
+        <div className="flex gap-6 animate-scroll hover:pause px-4 items-center">
           {infiniteData.map((service, index) => {
             
-            const hasVideo = index % 2 !== 0; // Alternamos
-            const isZigZagDown = index % 2 !== 0; // Bajamos las que tienen video
+            const hasVideo = index % 2 !== 0; 
 
             return (
               <div 
                 key={index}
                 className={`
                    relative shrink-0
-                   w-[340px] h-[520px]
-                   group overflow-hidden rounded-[2.5rem] border transition-all duration-500
+                   w-[300px] h-[450px]
+                   group overflow-hidden rounded-[2rem] border transition-all duration-500
                    ${hasVideo 
                       ? 'border-white/10 bg-black' 
                       : 'border-white/20 bg-[#080808] hover:bg-[#111]'
                    }
-                   ${isZigZagDown ? 'translate-y-12' : '-translate-y-4'} /* Ajuste Zig-Zag más pronunciado y seguro */
                 `}
               >
                 
@@ -122,13 +120,13 @@ export default function AppSection() {
                       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 pointer-events-none"></div>
                     </div>
                     
-                    <div className="relative h-full w-full p-8 flex flex-col justify-between z-10">
-                      <h3 className="text-3xl font-black text-white leading-none drop-shadow-xl tracking-tight">
+                    <div className="relative h-full w-full p-6 flex flex-col justify-between z-10">
+                      <h3 className="text-2xl font-black text-white leading-none drop-shadow-xl tracking-tight">
                         {service.title}
                       </h3>
                       <Link
                         href="#"
-                        className="inline-flex items-center justify-center bg-white/20 backdrop-blur-xl border border-white/30 text-white rounded-full px-6 py-3 font-bold text-sm hover:bg-white hover:text-black transition-all duration-300 w-fit self-start group-hover:translate-x-1"
+                        className="inline-flex items-center justify-center bg-white/20 backdrop-blur-xl border border-white/30 text-white rounded-full px-5 py-2.5 font-bold text-xs hover:bg-white hover:text-black transition-all duration-300 w-fit self-start group-hover:translate-x-1"
                       >
                         {service.cta}
                       </Link>
@@ -138,25 +136,25 @@ export default function AppSection() {
 
                 {/* 2. CASO SIN VIDEO (SOLO TEXTO) */}
                 {!hasVideo && (
-                  <div className="relative h-full w-full p-8 flex flex-col justify-between z-10">
+                  <div className="relative h-full w-full p-6 flex flex-col justify-between z-10">
                     <div>
-                      <h3 className="text-3xl font-bold text-white mb-6 leading-tight">
+                      <h3 className="text-2xl font-bold text-white mb-4 leading-tight">
                         {service.title}
                       </h3>
-                      <p className="text-gray-400 text-lg leading-relaxed font-light">
+                      <p className="text-gray-400 text-base leading-relaxed font-light">
                         {service.desc}
                       </p>
                     </div>
                     
                     <Link
                       href="#"
-                      className="inline-flex items-center justify-center bg-white text-black rounded-full px-8 py-4 font-bold text-sm hover:bg-gray-200 transition-all duration-300 w-full group-hover:-translate-y-1 shadow-lg"
+                      className="inline-flex items-center justify-center bg-white text-black rounded-full px-6 py-3 font-bold text-xs hover:bg-gray-200 transition-all duration-300 w-full group-hover:-translate-y-1 shadow-lg"
                     >
                       {service.cta}
                     </Link>
 
                     {/* Decoración sutil */}
-                    <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
                   </div>
                 )}
 
@@ -170,10 +168,10 @@ export default function AppSection() {
       <style jsx global>{`
         @keyframes scroll {
           0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); } /* -50% porque duplicamos la data */
+          100% { transform: translateX(-50%); } 
         }
         .animate-scroll {
-          animation: scroll 60s linear infinite; /* Más lento para que sea elegante */
+          animation: scroll 60s linear infinite; 
         }
         .hover\:pause:hover {
           animation-play-state: paused;
