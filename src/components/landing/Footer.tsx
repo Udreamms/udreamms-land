@@ -61,7 +61,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Tu Vida en USA */}
+          {/* Tu Vida en USA - CONECTADO A SERVICIOS */}
           <div className="mb-24">
             <h4 className="font-semibold mb-3 text-sm">Tu Vida en USA</h4>
             <ul className="text-gray-400 space-y-2 text-sm">
@@ -81,7 +81,7 @@ const Footer = () => {
                 <Link href="/services" className="hover:text-primary transition-colors">Movilidad (Autos, Scooters, Bus)</Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-primary transition-colors">Empieza tu viaje hoy</Link>
+                <Link href="/services" className="hover:text-primary transition-colors">Empieza tu viaje hoy</Link>
               </li>
             </ul>
 
