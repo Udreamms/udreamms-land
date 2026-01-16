@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { 
   Menu, X, ChevronDown, Lock, GraduationCap, Plane, Home as HomeIcon, 
   Briefcase, Globe, CreditCard, Car, Smartphone, FileText, Heart, 
-  ArrowRight, Star, Gift, Building2, Book, ShieldCheck, Map, LayoutGrid, Users
+  ArrowRight, Star, Gift, Building2, Book, ShieldCheck, Map, LayoutGrid, Users, Trophy
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -42,24 +43,20 @@ type MenuItemData = {
 // --- DATA DEL MENÚ ---
 const menuData: MenuItemData[] = [
   {
-    label: "Programas",
-    href: "/courses", 
+    label: "Visas",
     megaMenu: {
-      title: "Programas Educativos",
-      description: "Descubre el camino académico perfecto para tus metas en Estados Unidos.",
-      actionText: "Ver todos los cursos",
-      actionHref: "/courses",
+      title: "Tu camino a USA",
+      description: "Asesoría experta para cada tipo de viajero.",
+      actionText: "Evaluar mi perfil",
+      actionHref: "/#quiz", // Placeholder for smart quiz link
       items: [
-        { title: "Inglés Intensivo", desc: "Clases presenciales", href: "/courses", icon: Book, colorClass: "text-blue-400 bg-blue-500/10" },
-        { title: "Inglés Online", desc: "Aprende desde casa", href: "/courses", icon: Globe, colorClass: "text-purple-400 bg-purple-500/10" },
-        { title: "TOEFL & IELTS", desc: "Prep. exámenes", href: "/courses", icon: FileText, colorClass: "text-orange-400 bg-orange-500/10" },
-        { title: "Inglés de Negocios", desc: "Para profesionales", href: "/courses", icon: Briefcase, colorClass: "text-emerald-400 bg-emerald-500/10" },
-        { title: "Intercambio Cultural", desc: "Vive y aprende", href: "/courses", icon: Heart, colorClass: "text-rose-400 bg-rose-500/10" },
-        { title: "Viajes por Turismo", desc: "Explora USA", href: "/services", icon: Map, colorClass: "text-sky-400 bg-sky-500/10" },
+        { title: "Visa de Estudiante", desc: "F-1: Estudia y vive en USA", href: "/visas/student", icon: GraduationCap, colorClass: "text-blue-400 bg-blue-500/10" },
+        { title: "Visa de Turismo", desc: "B1/B2: Viaja sin preocupaciones", href: "/visas/tourist", icon: Plane, colorClass: "text-sky-400 bg-sky-500/10" },
+        { title: "FIFA World Cup 2026", desc: "Paquete Fan Exclusivo", href: "/visas/fifa", icon: Trophy, colorClass: "text-yellow-400 bg-yellow-500/10" },
       ]
     }
   },
-  { label: "Destinos", href: "/destinos" },
+  { label: "Testimonios", href: "/#reviews" }, // Placeholder anchor
   {
     label: "Comunidad",
     megaMenu: {
@@ -83,15 +80,23 @@ const menuData: MenuItemData[] = [
       ]
     }
   },
-  { label: "Brochures", href: "/brochures" },
   { label: "FAQs", href: "/faqs" },
+  { label: "Contáctanos", href: "/contact" },
 ];
 
 export default function Header() {
+  const pathname = usePathname();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showPreApplication, setShowPreApplication] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  // Determinar si es una página de "landing de visa"
+  const isVisaLandingPage = [
+    "/visas/student",
+    "/visas/tourist",
+    "/visas/fifa"
+  ].includes(pathname);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -102,6 +107,7 @@ export default function Header() {
   }, []);
 
   const handleMouseEnter = (label: string) => {
+    if (isVisaLandingPage) return; // No mostrar mega menu en landings de visa
     setActiveMenu(label);
   };
 
@@ -134,40 +140,45 @@ export default function Header() {
                <span className="text-xl font-bold tracking-tight text-white group-hover:text-primary transition-colors">Udreamms</span>
             </Link>
 
-            {/* DESKTOP NAV */}
-            <nav className="hidden lg:flex items-center h-full">
-              {menuData.map((item) => (
-                <div 
-                  key={item.label}
-                  className="relative h-full flex items-center"
-                  onMouseEnter={() => item.megaMenu && handleMouseEnter(item.label)}
-                >
-                  <Link 
-                    href={item.href || "#"}
-                    className={`
-                      px-4 py-2 text-[13px] xl:text-[14px] font-medium tracking-wide transition-all duration-300 flex items-center gap-1.5 rounded-full hover:bg-white/5
-                      ${activeMenu === item.label ? "text-white bg-white/5" : "text-white hover:text-gray-200"}
-                    `}
+            {/* DESKTOP NAV - Ocultar en landings de visa */}
+            {!isVisaLandingPage && (
+              <nav className="hidden lg:flex items-center h-full">
+                {menuData.map((item) => (
+                  <div 
+                    key={item.label}
+                    className="relative h-full flex items-center"
+                    onMouseEnter={() => item.megaMenu && handleMouseEnter(item.label)}
                   >
-                    {item.label}
-                    {item.megaMenu && (
-                      <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 opacity-60 ${activeMenu === item.label ? "rotate-180 opacity-100" : ""}`} />
-                    )}
-                  </Link>
-                </div>
-              ))}
-            </nav>
+                    <Link 
+                      href={item.href || "#"}
+                      className={`
+                        px-4 py-2 text-[13px] xl:text-[14px] font-medium tracking-wide transition-all duration-300 flex items-center gap-1.5 rounded-full hover:bg-white/5
+                        ${activeMenu === item.label ? "text-white bg-white/5" : "text-white hover:text-gray-200"}
+                      `}
+                    >
+                      {item.label}
+                      {item.megaMenu && (
+                        <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 opacity-60 ${activeMenu === item.label ? "rotate-180 opacity-100" : ""}`} />
+                      )}
+                    </Link>
+                  </div>
+                ))}
+              </nav>
+            )}
           </div>
 
           {/* GRUPO DERECHA: ACCIONES */}
           <div className="hidden lg:flex items-center gap-4 z-50">
-            <Link href="/login" className="text-[10px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1.5 opacity-60 hover:opacity-100">
-               <Lock className="w-3 h-3" /> Staff
-            </Link>
+            {/* Solo mostrar Staff si NO es landing de visa, o podrías dejarlo oculto si quieres algo más limpio */}
+            {!isVisaLandingPage && (
+              <Link href="/login" className="text-[10px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1.5 opacity-60 hover:opacity-100">
+                 <Lock className="w-3 h-3" /> Staff
+              </Link>
+            )}
 
             <Link href="/portal">
                <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10 rounded-full h-9 px-4 text-sm font-medium border border-transparent hover:border-white/10 transition-all">
-                  Portal Alumnos
+                  Portal de Cliente
                </Button>
             </Link>
 
@@ -179,17 +190,37 @@ export default function Header() {
             </Button>
           </div>
 
-          {/* MOBILE TOGGLE */}
-          <button 
-            className="lg:hidden text-white p-2"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X /> : <Menu />}
-          </button>
+          {/* MOBILE TOGGLE - Ocultar en landings de visa si quieres evitar menu movil completo */}
+          {!isVisaLandingPage && (
+            <button 
+              className="lg:hidden text-white p-2"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X /> : <Menu />}
+            </button>
+          )}
+
+          {/* En móvil si es landing de visa, igual mostramos portal y aplica ahora si no hay menu de hamburguesa? O simplemente dejamos el logo y botones? */}
+          {isVisaLandingPage && (
+            <div className="lg:hidden flex items-center gap-2">
+                <Link href="/portal">
+                  <Button variant="ghost" size="sm" className="text-white hover:bg-white/10 rounded-full text-xs px-3">
+                    Portal
+                  </Button>
+                </Link>
+                <Button 
+                  onClick={handleApplyClick}
+                  size="sm"
+                  className="bg-primary text-white rounded-full text-xs px-4"
+                >
+                  Aplica
+                </Button>
+            </div>
+          )}
 
           {/* --- MEGA MENU DESKTOP --- */}
           <AnimatePresence>
-            {activeMenu && (
+            {!isVisaLandingPage && activeMenu && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -227,21 +258,21 @@ export default function Header() {
 
                             {/* COL 2: ITEMS (Width depends on socials presence) */}
                             <div className={`${item.megaMenu.socials ? 'col-span-7 border-r border-white/5 pr-8' : 'col-span-9'}`}>
-                                <div className={`${item.label === 'Programas' ? 'grid grid-cols-3 gap-6' : 'grid grid-cols-2 gap-8'}`}>
+                                <div className={`${item.label === 'Visas' ? 'grid grid-cols-3 gap-6' : 'grid grid-cols-2 gap-8'}`}>
                                   {item.megaMenu.items.map((subItem, idx) => (
                                       <Link 
                                         key={idx} 
                                         href={subItem.href}
-                                        className={`group flex items-start ${item.label === 'Programas' ? 'gap-4 p-4 rounded-2xl' : 'gap-5 p-5 rounded-[1.5rem]'} transition-all duration-300 hover:bg-white/[0.03] border border-transparent hover:border-white/5 bg-white/[0.01]`}
+                                        className={`group flex items-start ${item.label === 'Visas' ? 'gap-4 p-4 rounded-2xl' : 'gap-5 p-5 rounded-[1.5rem]'} transition-all duration-300 hover:bg-white/[0.03] border border-transparent hover:border-white/5 bg-white/[0.01]`}
                                       >
-                                        <div className={`${item.label === 'Programas' ? 'w-10 h-10 rounded-xl' : 'w-12 h-12 rounded-2xl'} flex items-center justify-center shrink-0 border border-white/5 transition-transform group-hover:scale-110 duration-300 ${subItem.colorClass}`}>
-                                            <subItem.icon className={`${item.label === 'Programas' ? 'w-5 h-5' : 'w-6 h-6'}`} strokeWidth={2} />
+                                        <div className={`${item.label === 'Visas' ? 'w-10 h-10 rounded-xl' : 'w-12 h-12 rounded-2xl'} flex items-center justify-center shrink-0 border border-white/5 transition-transform group-hover:scale-110 duration-300 ${subItem.colorClass}`}>
+                                            <subItem.icon className={`${item.label === 'Visas' ? 'w-5 h-5' : 'w-6 h-6'}`} strokeWidth={2} />
                                         </div>
                                         <div className="flex flex-col">
-                                            <div className={`text-white font-bold ${item.label === 'Programas' ? 'text-sm mb-0.5' : 'text-lg mb-1'} group-hover:text-primary transition-colors flex items-center gap-2`}>
+                                            <div className={`text-white font-bold ${item.label === 'Visas' ? 'text-sm mb-0.5' : 'text-lg mb-1'} group-hover:text-primary transition-colors flex items-center gap-2`}>
                                               {subItem.title}
                                             </div>
-                                            <p className={`text-gray-500 font-medium leading-tight group-hover:text-gray-400 ${item.label === 'Programas' ? 'text-xs' : 'text-sm leading-normal'}`}>
+                                            <p className={`text-gray-500 font-medium leading-tight group-hover:text-gray-400 ${item.label === 'Visas' ? 'text-xs' : 'text-sm leading-normal'}`}>
                                               {subItem.desc}
                                             </p>
                                         </div>
@@ -290,7 +321,7 @@ export default function Header() {
 
       {/* --- MOBILE MENU OVERLAY --- */}
       <AnimatePresence>
-        {isMobileMenuOpen && (
+        {!isVisaLandingPage && isMobileMenuOpen && (
           <motion.div 
             initial={{ opacity: 0, x: "100%" }}
             animate={{ opacity: 1, x: 0 }}
@@ -348,7 +379,7 @@ export default function Header() {
                      <Link href="/portal" onClick={() => setIsMobileMenuOpen(false)}>
                         <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/10 h-16 text-lg font-medium border border-white/10 rounded-2xl">
                            <GraduationCap className="w-6 h-6 mr-4" />
-                           Portal Alumnos
+                           Portal de Cliente
                         </Button>
                      </Link>
                      <Button 

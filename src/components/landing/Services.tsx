@@ -74,8 +74,11 @@ export default function Services({ onStartQuote, onAppClick }: ServicesProps) {
 
   return (
     <section className="py-24 bg-white text-gray-900 relative overflow-hidden">
-      
-      <div className="container px-6 md:px-12 mx-auto">
+      {/* Difuminado superior e inferior para armonizar */}
+      <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-gray-50 to-white" />
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-50 to-white" />
+
+      <div className="container px-6 md:px-12 mx-auto relative z-10">
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
@@ -151,19 +154,6 @@ export default function Services({ onStartQuote, onAppClick }: ServicesProps) {
 
             </div>
           ))}
-        </div>
-
-        {/* Bottom CTA Button */}
-        <div className="mt-16 flex justify-center">
-          <button 
-            onClick={onStartQuote}
-            className="group inline-flex items-center gap-6 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-full pl-10 pr-2 py-2 transition-all duration-300 active:scale-95 shadow-sm"
-          >
-            <span className="text-lg font-bold">Ver mi Cotización Personalizada</span>
-            <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white transition-transform group-hover:translate-x-1 shadow-md">
-              <ChevronRight className="w-6 h-6" strokeWidth={3} />
-            </div>
-          </button>
         </div>
 
       </div>

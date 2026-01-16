@@ -56,8 +56,8 @@ export default function Hero({ onStartQuote }: HeroProps) {
           </video>
         )}
         
-        {/* Overlays para legibilidad */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        {/* Overlays para legibilidad y transición suave a negro */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#050507] via-transparent to-transparent" />
       </div>
       
       {/* Contenido con márgenes de 5cm */}
@@ -72,13 +72,14 @@ export default function Hero({ onStartQuote }: HeroProps) {
             
             {/* Título Principal */}
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] text-white tracking-tighter">
-              ¿Listo para <br />
-              cambiar tu futuro?
+              Transforma tu futuro <br />
+              y cumple tu sueño <br />
+              en América
             </h1>
             
-            <div className="pt-4 text-xl md:text-2xl text-gray-300 font-medium tracking-tight max-w-none">
-              <p className="whitespace-nowrap">
-                Simplificamos el proceso de estudiar y vivir en Estados Unidos.
+            <div className="pt-4 text-lg md:text-xl text-gray-300 font-medium tracking-tight max-w-none">
+              <p>
+                Te guiamos desde la solicitud de la visa hasta que tienes vivienda en USA
               </p>
             </div>
           </div>
@@ -88,7 +89,7 @@ export default function Hero({ onStartQuote }: HeroProps) {
               onClick={onStartQuote}
               className="group relative inline-flex items-center justify-center px-10 py-4 text-lg font-semibold text-white overflow-hidden rounded-full bg-primary hover:bg-primary/90 transition-all duration-300 shadow-lg shadow-primary/20"
             >
-              Obtén tu Cotización
+              Evalúa tu perfil Gratis
             </button>
             
             <button
