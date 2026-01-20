@@ -78,10 +78,31 @@ export default function StudentVisaPage() {
 
       {/* Automated Guide Trigger (Conceptual) */}
       <section className="py-20 bg-white border-t">
-        <div className="container mx-auto px-6 text-center">
+        <div className="container mx-auto px-6 flex flex-col items-center text-center">
+           {/* Nueva imagen añadida */}
+           <div className="w-48 h-48 mb-6 rounded-2xl overflow-hidden shadow-xl border-4 border-gray-50">
+             <img 
+               src="/assets/c.jpg" 
+               alt="Guía Udreamms" 
+               className="w-full h-full object-cover" 
+             />
+           </div>
+
+           {/* Nuevo video añadido debajo de la imagen */}
+           <div className="w-full max-w-[450px] aspect-[9/16] mb-8 rounded-3xl overflow-hidden shadow-2xl border-2 border-gray-100 bg-black">
+              <video 
+                src="https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2Fcaminando.mp4?alt=media&token=23aa3c50-49ff-4689-9246-3bb06ec26437"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+              />
+           </div>
+           
            <h2 className="text-2xl font-bold mb-8">¿Aún no estás listo?</h2>
-           <p className="text-gray-600 mb-8">Descarga nuestra guía de universidades aliadas y comienza a planear.</p>
-           <Button variant="outline" className="border-black text-black hover:bg-black hover:text-white">
+           <p className="text-gray-600 mb-8 max-w-md">Descarga nuestra guía de universidades aliadas y comienza a planear.</p>
+           <Button variant="outline" className="border-black text-black hover:bg-black hover:text-white px-10 h-14 rounded-full font-bold">
              Descargar Guía PDF
            </Button>
         </div>

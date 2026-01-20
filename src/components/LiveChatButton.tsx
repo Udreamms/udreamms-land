@@ -3,8 +3,8 @@
 import { MessageCircle } from "lucide-react";
 
 export const LiveChatButton = () => {
-  // Número de teléfono
-  const phoneNumber = "13858882799";
+  // Número de teléfono actualizado
+  const phoneNumber = "16507840581";
   // Mensaje predeterminado corregido y mejorado
   const message = "Buen día, ¿cómo están? Me gustaría recibir asesoría personalizada.";
   
