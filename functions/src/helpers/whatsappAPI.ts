@@ -4,49 +4,57 @@ import * as functions from 'firebase-functions';
 import axios from 'axios';
 
 const whatsappConfig = functions.config().whatsapp;
-const accessToken = whatsappConfig?.access_token;
-const phoneNumberId = whatsappConfig?.phone_number_id;
+// Updated with user provided keys as primary or fallback
+const accessToken = whatsappConfig?.access_token || 'EAARnTi3ZAPNYBQFC70F28fb9MispCQZAVtfnHhmPsdZBNqyWQZBcA3bE7pU4430ZBzDJxEoHZAbmUD2EWOxZBS9aRirmHvM5luC6U03sIz752oracncCSZCb9WPOtaLaIcAiXkytFuFPF5AuJrmoLvB6leQ09wyOWNfS217JjNZAvjYYxjfEZCtvfxyZChGBkWzZBQZDZD';
+const phoneNumberId = whatsappConfig?.phone_number_id || '676837795516836';
 
 const WHATSAPP_API_URL = `https://graph.facebook.com/v19.0/${phoneNumberId}/messages`;
+
+function cleanNumber(phone: string): string {
+    return phone.replace(/\D/g, ''); // Solo números, quita el '+'
+}
 
 async function makeWhatsAppRequest(data: object, type: string) {
     if (!accessToken || !phoneNumberId) {
         functions.logger.error('Missing WhatsApp API credentials.');
-        // No lanzamos error para no detener el flujo si faltan credenciales en dev
-        return;
+        throw new Error('WhatsApp API credentials are not configured.');
     }
     try {
-        await axios.post(WHATSAPP_API_URL, data, {
+        const response = await axios.post(WHATSAPP_API_URL, data, {
             headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
         });
-        // functions.logger.info(`WhatsApp API Response (${type}): OK`);
+        return response.data;
     } catch (error: any) {
-        functions.logger.error(`WhatsApp API Error (${type}):`, error.response?.data || error.message);
+        const errorData = error.response?.data || error.message;
+        functions.logger.error(`WhatsApp API Error (${type}):`, errorData);
+        throw new Error(`WhatsApp API Error: ${JSON.stringify(errorData)}`);
     }
 }
 
-export async function markAsRead(messageId: string): Promise<void> {
+export async function markAsRead(messageId: string): Promise<any> {
     if (!messageId) return;
-    await makeWhatsAppRequest({
+    return await makeWhatsAppRequest({
         messaging_product: 'whatsapp',
         status: 'read',
         message_id: messageId
     }, 'MarkAsRead');
 }
 
-export async function sendMessage(to: string, message: string): Promise<void> {
+export async function sendMessage(to: string, message: string): Promise<any> {
     if (!message) return;
-    await makeWhatsAppRequest({ messaging_product: 'whatsapp', to, text: { body: message } }, 'Text');
+    const cleanTo = cleanNumber(to);
+    return await makeWhatsAppRequest({ messaging_product: 'whatsapp', to: cleanTo, text: { body: message } }, 'Text');
 }
 
-export async function sendMediaMessage(to: string, fileUrl: string, caption: string = '', fileName: string = 'file'): Promise<void> {
+export async function sendMediaMessage(to: string, fileUrl: string, caption: string = '', fileName: string = 'file'): Promise<any> {
     const mediaType = getMediaType(fileUrl, fileName);
     if (mediaType === 'unsupported') {
         functions.logger.warn(`Unsupported media: ${fileName}`);
         return;
     }
-    await makeWhatsAppRequest({
-        messaging_product: 'whatsapp', to, type: mediaType,
+    const cleanTo = cleanNumber(to);
+    return await makeWhatsAppRequest({
+        messaging_product: 'whatsapp', to: cleanTo, type: mediaType,
         [mediaType]: { link: fileUrl, caption: caption }
     }, 'Media');
 }
@@ -54,7 +62,7 @@ export async function sendMediaMessage(to: string, fileUrl: string, caption: str
 export async function sendButtonMessage(to: string, bodyText: string, buttons: any[]): Promise<void> {
     const validButtons = buttons.slice(0, 3).map((btn, i) => {
         const id = (btn.id || `btn_${i}`).substring(0, 256);
-        const title = (btn.title || "Opción").substring(0, 20); 
+        const title = (btn.title || "Opción").substring(0, 20);
         return {
             type: "reply",
             reply: { id, title }
@@ -64,16 +72,16 @@ export async function sendButtonMessage(to: string, bodyText: string, buttons: a
     if (validButtons.length === 0) return;
 
     const payload = {
-        messaging_product: 'whatsapp', 
-        to, 
+        messaging_product: 'whatsapp',
+        to: cleanNumber(to),
         type: 'interactive',
         interactive: {
             type: 'button',
-            body: { text: bodyText.substring(0, 1024) }, 
+            body: { text: bodyText.substring(0, 1024) },
             action: { buttons: validButtons }
         }
     };
-    
+
     await makeWhatsAppRequest(payload, 'Buttons');
 }
 
@@ -106,8 +114,8 @@ export async function sendListMessage(to: string, bodyText: string, buttonText: 
     let validBtnText = (buttonText || "Ver Opciones").substring(0, 20);
 
     const payload = {
-        messaging_product: 'whatsapp', 
-        to, 
+        messaging_product: 'whatsapp',
+        to: cleanNumber(to),
         type: 'interactive',
         interactive: {
             type: 'list',
@@ -121,7 +129,7 @@ export async function sendListMessage(to: string, bodyText: string, buttonText: 
 
 export async function sendLocationMessage(to: string, lat: number, long: number, name: string, address: string): Promise<void> {
     await makeWhatsAppRequest({
-        messaging_product: 'whatsapp', to, type: 'location',
+        messaging_product: 'whatsapp', to: cleanNumber(to), type: 'location',
         location: { latitude: lat, longitude: long, name: name, address: address }
     }, 'Location');
 }
@@ -132,5 +140,5 @@ function getMediaType(url: string, fileName: string): 'image' | 'document' | 'vi
     if (['pdf', 'doc', 'docx', 'xls', 'xlsx'].includes(ext || '')) return 'document';
     if (['mp4', '3gp'].includes(ext || '')) return 'video';
     if (['mp3', 'aac', 'ogg'].includes(ext || '')) return 'audio';
-    return 'image'; 
+    return 'image';
 }

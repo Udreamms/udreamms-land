@@ -10,4 +10,5 @@ if (admin.apps.length === 0) {
 export { sendWhatsappMessage, sendWhatsappMediaMessage } from './callable/whatsapp';
 export { moveCard } from './cardActions';
 export { whatsappWebhook } from './webhooks/whatsapp';
+export { googleFormsWebhook } from './webhooks/googleForms';
 // fixCors eliminado porque ya cumplió su función

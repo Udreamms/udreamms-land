@@ -46,7 +46,7 @@ function FlowPage() {
           edges: edgesToSave,
         }
       }, { merge: true });
-      
+
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
@@ -62,7 +62,7 @@ function FlowPage() {
         setChatbotName('ID de chatbot no encontrado');
         return;
       }
-      
+
       setIsLoading(true);
       const docRef = doc(db, 'chatbots', chatbotId);
       const docSnap = await getDoc(docRef);
@@ -70,17 +70,17 @@ function FlowPage() {
       if (docSnap.exists()) {
         const data = docSnap.data();
         setChatbotName(data.name || 'Mi Chatbot');
-        
+
         const flowData = data.flow || {};
         const savedNodes = flowData.nodes || [];
         const savedEdges = (flowData.edges || []).map(({ animated, style, ...edge }: any) => ({
-            ...edge,
-            type: 'custom', 
+          ...edge,
+          type: 'custom',
         }));
 
         setNodes(Array.isArray(savedNodes) ? savedNodes : []);
         setEdges(Array.isArray(savedEdges) ? savedEdges : []);
-        
+
       } else {
         console.log('No se encontró el documento, creando un chatbot de inicio.');
         setChatbotName('Nuevo Chatbot');
@@ -91,22 +91,22 @@ function FlowPage() {
       }
       setIsLoading(false);
     };
-    
+
     fetchChatbotData();
   }, [chatbotId, saveData]);
-  
+
   // Efecto de Auto-guardado (Triggered by nodes/edges/name changes)
   useEffect(() => {
-    if (isLoading) return; 
+    if (isLoading) return;
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-    
+
     debounceTimeout.current = setTimeout(() => {
       // Solo guardar si hay contenido
       if (nodes.length > 0 || edges.length > 0) {
         saveData(nodes, edges, chatbotName);
       }
     }, 1500);
-    
+
     return () => {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     };
@@ -129,12 +129,12 @@ function FlowPage() {
     <div className="flex flex-col h-screen bg-neutral-900 text-white overflow-hidden">
       {/* HEADER BAR */}
       <div className="h-14 bg-neutral-950 border-b border-neutral-800 flex items-center justify-between px-4 z-20 shrink-0">
-        
+
         {/* Izquierda: Volver y Nombre */}
         <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => router.push('/cso/automation/chatbots')}
             className="text-neutral-400 hover:text-white hover:bg-neutral-800"
             title="Volver a mis bots"
@@ -143,7 +143,7 @@ function FlowPage() {
           </Button>
 
           <div className="flex items-center group">
-            <Input 
+            <Input
               value={chatbotName}
               onChange={(e) => setChatbotName(e.target.value)}
               className="bg-transparent border-transparent hover:border-neutral-700 focus:border-neutral-600 focus:bg-neutral-900 text-lg font-semibold text-white w-[300px] h-9 px-2 transition-all"
@@ -169,23 +169,23 @@ function FlowPage() {
               <span>Guardado</span>
             </div>
           )}
-           {saveStatus === 'error' && (
+          {saveStatus === 'error' && (
             <div className="flex items-center gap-2 text-red-500 text-sm">
               <Save className="w-4 h-4" />
               <span>Error al guardar</span>
             </div>
           )}
           {saveStatus === 'idle' && (
-             <div className="flex items-center gap-2 text-neutral-600 text-sm">
-                <Cloud className="w-4 h-4" />
-                <span>Al día</span>
+            <div className="flex items-center gap-2 text-neutral-600 text-sm">
+              <Cloud className="w-4 h-4" />
+              <span>Al día</span>
             </div>
           )}
         </div>
       </div>
 
       {/* CANVAS AREA */}
-      <div className="flex-grow relative w-full h-full">
+      <div className="flex-1 min-h-0 relative w-full">
         <ChatbotCanvas
           nodes={nodes}
           edges={edges}
