@@ -6,7 +6,8 @@ import { storage } from '@/lib/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/lib/firebase';
 import { httpsCallable } from 'firebase/functions';
-import { functions } from '@/lib/firebase';
+import { functions, db } from '@/lib/firebase';
+import { doc, updateDoc, arrayUnion, Timestamp } from 'firebase/firestore';
 import { toast } from 'sonner';
 
 const sendWhatsappMediaMessage = httpsCallable(functions, 'sendWhatsappMediaMessage');
@@ -41,7 +42,7 @@ export const useFileUpload = () => {
 
         setUploading(true);
         setProgress(0);
-        
+
         const promise = new Promise<void>((resolve, reject) => {
             uploadTask.on('state_changed',
                 (snapshot) => {
@@ -56,13 +57,27 @@ export const useFileUpload = () => {
                 async () => {
                     try {
                         const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                        
+
                         await sendWhatsappMediaMessage({
                             cardId,
                             groupId,
                             fileUrl: downloadURL,
                             toNumber,
                             fileName: file.name
+                        });
+
+                        // Save document metadata to Firestore
+                        const fileData = {
+                            id: `doc_${Date.now()}`,
+                            name: file.name,
+                            url: downloadURL,
+                            type: file.type,
+                            size: file.size,
+                            uploadedAt: Timestamp.now()
+                        };
+
+                        await updateDoc(doc(db, 'kanban-groups', groupId, 'cards', cardId), {
+                            documents: arrayUnion(fileData)
                         });
 
                         setUploading(false);

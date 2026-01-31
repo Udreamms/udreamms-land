@@ -9,39 +9,38 @@ const Footer = () => {
           {/* Left Section */}
           <div className="md:col-span-1">
             <p className="text-white text-2xl"><strong>Haciendo que Udreamms sea útil para todos</strong></p>
+            <div className="mt-8">
+              <img src="/assets/Logo Udreamms.png" alt="Udreamms Logo" className="w-16 h-auto opacity-80 mb-4" />
+              <p className="text-gray-500 text-sm">
+                Tu puente seguro a los Estados Unidos.
+                <br />
+                Visa, Estudios, Vida.
+              </p>
+            </div>
           </div>
 
-          {/* Programas Educativos */}
+          {/* Programas Educativos / Visas */}
           <div className="mb-24">
-            <h4 className="font-semibold mb-3 text-sm">Programas Educativos</h4>
+            <h4 className="font-semibold mb-3 text-sm">Visas y Programas</h4>
             <ul className="text-gray-400 space-y-2 text-sm mb-4">
               <li>
-                <Link href="/courses" className="hover:text-primary transition-colors">Inglés Intensivo (Presencial)</Link>
+                <Link href="/visas/student" className="hover:text-primary transition-colors">Visa de Estudiante (F-1)</Link>
               </li>
               <li>
-                <Link href="/courses" className="hover:text-primary transition-colors">Inglés Online (Desde casa)</Link>
+                <Link href="/visas/tourist" className="hover:text-primary transition-colors">Visa de Turismo (B1/B2)</Link>
               </li>
               <li>
-                <Link href="/courses" className="hover:text-primary transition-colors">Preparación TOEFL & IELTS</Link>
+                <Link href="/visas/fifa" className="hover:text-primary transition-colors">Experiencia FIFA 2026</Link>
               </li>
               <li>
-                <Link href="/courses" className="hover:text-primary transition-colors">Inglés de Negocios</Link>
-              </li>
-              <li>
-                <Link href="/services" className="hover:text-primary transition-colors">Simulación de Entrevista Consular</Link>
-              </li>
-              <li>
-                <Link href="/services" className="hover:text-primary transition-colors">Asesoría para Visa F1 y B1/B2</Link>
-              </li>
-              <li>
-                <Link href="/courses" className="hover:text-primary transition-colors">Explorar todos los cursos</Link>
+                <Link href="/courses" className="hover:text-primary transition-colors">Cursos de Inglés</Link>
               </li>
             </ul>
 
             <h4 className="font-semibold mt-16 mb-3 text-sm">Confianza y Legal</h4>
             <ul className="text-gray-400 space-y-2 text-sm">
               <li>
-                <Link href="/about" className="hover:text-primary transition-colors">Transparencia en Visas (No somos Gobierno)</Link>
+                <Link href="/about" className="hover:text-primary transition-colors">Transparencia en Visas</Link>
               </li>
               <li>
                 <Link href="/privacidad" className="hover:text-primary transition-colors">Política de Privacidad</Link>
@@ -50,38 +49,26 @@ const Footer = () => {
                 <Link href="/terminos" className="hover:text-primary transition-colors">Términos y Condiciones</Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-primary transition-colors">Nuestro Compromiso Ético</Link>
-              </li>
-              <li>
-                <Link href="/faqs" className="hover:text-primary transition-colors">Soporte al Estudiante Internacional</Link>
-              </li>
-              <li>
-                <Link href="/about" className="hover:text-primary transition-colors">Aviso Legal Importante</Link>
+                <Link href="/faqs" className="hover:text-primary transition-colors">Soporte al Estudiante</Link>
               </li>
             </ul>
           </div>
 
           {/* Tu Vida en USA - CONECTADO A SERVICIOS */}
           <div className="mb-24">
-            <h4 className="font-semibold mb-3 text-sm">Tu Vida en USA</h4>
+            <h4 className="font-semibold mb-3 text-sm">Ecosistema de Llegada</h4>
             <ul className="text-gray-400 space-y-2 text-sm">
               <li>
-                <Link href="/services" className="hover:text-primary transition-colors">Encuentra tu Vivienda / Homestay</Link>
+                <Link href="/services" className="hover:text-primary transition-colors">Vivienda Segura</Link>
               </li>
               <li>
-                <Link href="/services" className="hover:text-primary transition-colors">Seguro Médico Estudiantil</Link>
+                <Link href="/services" className="hover:text-primary transition-colors">Apertura de Cuenta Bancaria</Link>
               </li>
               <li>
-                <Link href="/services" className="hover:text-primary transition-colors">Cuenta Bancaria en EE. UU.</Link>
+                <Link href="/services" className="hover:text-primary transition-colors">Sim Card y Móvil</Link>
               </li>
               <li>
-                <Link href="/services" className="hover:text-primary transition-colors">Planes de Celular y Conectividad</Link>
-              </li>
-              <li>
-                <Link href="/services" className="hover:text-primary transition-colors">Movilidad (Autos, Scooters, Bus)</Link>
-              </li>
-              <li>
-                <Link href="/services" className="hover:text-primary transition-colors">Empieza tu viaje hoy</Link>
+                <Link href="/services" className="hover:text-primary transition-colors">Transporte y Aeropuerto</Link>
               </li>
             </ul>
 
@@ -89,47 +76,37 @@ const Footer = () => {
             <h4 className="font-semibold mt-16 mb-3 text-sm">Sobre Udreamms</h4>
             <ul className="text-gray-400 space-y-2 text-sm mt-auto">
               <li>
-                <Link href="/about" className="hover:text-primary transition-colors">Nuestra Historia y Misión</Link>
+                <Link href="/about" className="hover:text-primary transition-colors">Nuestra Historia</Link>
               </li>
               <li>
-                <Link href="/referrals" className="hover:text-primary transition-colors">Programa de Afiliados (Gana con nosotros)</Link>
+                <Link href="/referrals" className="hover:text-primary transition-colors">Programa de Afiliados</Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-primary transition-colors">Trabaja con el equipo</Link>
+                <Link href="/contact" className="hover:text-primary transition-colors">Contáctanos</Link>
               </li>
-              <li>
-                <span className="text-gray-400">📞 +1 385 888 2799</span>
-              </li>
-              <li>
-                <span className="text-gray-400">✉️ udreamms@gmail.com</span>
-              </li>
-              <li>
-                <span className="text-gray-400">📍 Salt Lake City, Utah</span>
+              <li className="pt-4">
+                <span className="text-gray-400 block">📞 +1 650 784 0581</span>
+                <span className="text-gray-400 block">✉️ udreamms@gmail.com</span>
+                <span className="text-gray-400 block">📍 Salt Lake City, Utah</span>
               </li>
             </ul>
           </div>
 
           {/* Oportunidades y Destinos */}
           <div>
-            <h4 className="font-semibold mb-3 text-sm">Oportunidades y Destinos</h4>
+            <h4 className="font-semibold mb-3 text-sm">Comunidad</h4>
             <ul className="text-gray-400 space-y-2 text-sm">
               <li>
-                <Link href="/destinos" className="hover:text-primary transition-colors">Destinos en Estados Unidos (Utah, etc.)</Link>
-              </li>
-              <li>
-                <Link href="/services" className="hover:text-primary transition-colors">Becas y Oportunidades Laborales</Link>
-              </li>
-              <li>
-                <Link href="/services" className="hover:text-primary transition-colors">Viajes y Aventuras (Turismo)</Link>
+                <Link href="/destinos" className="hover:text-primary transition-colors">Destinos Top en USA</Link>
               </li>
               <li>
                 <Link href="/partnerships" className="hover:text-primary transition-colors">Universidades Aliadas</Link>
               </li>
               <li>
-                <Link href="/faqs" className="hover:text-primary transition-colors">Testimonios de Estudiantes</Link>
+                <Link href="/#reviews" className="hover:text-primary transition-colors">Testimonios Reales</Link>
               </li>
               <li>
-                <Link href="/destinos" className="hover:text-primary transition-colors">Ver mapa de destinos</Link>
+                <Link href="/portal" className="hover:text-primary transition-colors font-bold text-white">Portal de Cliente</Link>
               </li>
             </ul>
           </div>
@@ -145,7 +122,7 @@ const Footer = () => {
                 <a href="https://www.instagram.com/udreamms/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><Image src="/assets/i.jpg" alt="Instagram" width={32} height={32} style={{ height: 'auto' }} className="rounded-md" /></a>
               </li>
               <li>
-                <a href="https://chat.whatsapp.com/JTQ2ZVfqv3J9CRm5ydG8t3?mode=r_t" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><Image src="/assets/w.jpg"  alt="Whatsapp" width={32} height={32} style={{ height: 'auto' }} className="rounded-md" /></a>
+                <a href="https://wa.me/16507840581" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><Image src="/assets/w.jpg"  alt="Whatsapp" width={32} height={32} style={{ height: 'auto' }} className="rounded-md" /></a>
               </li>
               <li>
                 <a href="https://x.com/udreamms" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><Image src="/assets/x.jpg" alt="X" width={32} height={32} style={{ height: 'auto' }} className="rounded-md" /></a>
@@ -161,13 +138,17 @@ const Footer = () => {
         </div>
 
         {/* Footer Bottom */}
-        <div className=" items-center flex mt-20">
+        <div className="items-center flex mt-20 flex-col md:flex-row gap-4">
           <Link href="/" className="text-white text-lg font-bold hover:text-primary transition-colors">Udreamms</Link>
-          <div className="flex justify-center space-x-3 w-full">
+          <div className="flex justify-center space-x-6 w-full flex-wrap">
             <Link href="/about" className="text-gray-400 hover:text-primary transition-colors text-xs">Acerca de Udreamms</Link>
-            <Link href="/courses" className="text-gray-400 hover:text-primary transition-colors text-xs">Programas</Link>
+            <Link href="/visas/student" className="text-gray-400 hover:text-primary transition-colors text-xs">Visa Estudiante</Link>
+            <Link href="/visas/tourist" className="text-gray-400 hover:text-primary transition-colors text-xs">Visa Turismo</Link>
             <Link href="/privacidad" className="text-gray-400 hover:text-primary transition-colors text-xs">Privacidad</Link>
             <Link href="/terminos" className="text-gray-400 hover:text-primary transition-colors text-xs">Términos</Link>
+          </div>
+          <div className="text-gray-600 text-[10px] w-full text-center md:text-right">
+             © {new Date().getFullYear()} Udreamms LLC. All rights reserved.
           </div>
         </div>
       </div>

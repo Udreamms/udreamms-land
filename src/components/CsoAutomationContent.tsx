@@ -1,6 +1,7 @@
 
 "use client";
 // src/components/CsoAutomationContent.tsx
+import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Bot, Zap, Clock, Users, FileText, Settings, ArrowRight } from "lucide-react";
@@ -62,32 +63,32 @@ export function CsoAutomationContent() {
   };
 
   return (
-    <main className="flex-1 p-8 md:p-12 bg-neutral-950 text-white">
-      <div className="mb-10">
-        <h1 className="text-4xl font-bold tracking-tight">Centro de Automatización</h1>
-        <p className="text-neutral-400 mt-3 text-lg">
+    <main className="flex-1 p-6 bg-neutral-950 text-white">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold tracking-tight">Centro de Automatización</h1>
+        <p className="text-neutral-400 mt-1 text-sm">
           Configura herramientas para agilizar tu comunicación y ahorrar tiempo.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {features.map((feature, index) => (
-          <div 
+          <div
             key={index}
-            className="group relative flex flex-col bg-neutral-900 border border-neutral-800 rounded-xl shadow-lg hover:border-blue-500/50 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+            className="group relative flex flex-col bg-neutral-900 border border-neutral-800 rounded-lg shadow-sm hover:border-blue-500/50 transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer"
             onClick={() => handleCardClick(feature.href)}
           >
-            <div className="p-6 flex-grow">
-              <div className="mb-4">
-                {feature.icon}
+            <div className="p-4 flex-grow">
+              <div className="mb-3">
+                {React.cloneElement(feature.icon as React.ReactElement, { className: "w-6 h-6 " + (feature.icon as React.ReactElement).props.className.split(' ').filter((c: string) => !c.startsWith('w-') && !c.startsWith('h-')).join(' ') })}
               </div>
-              <h2 className="text-xl font-semibold text-white">{feature.title}</h2>
-              <p className="text-neutral-400 mt-2 text-sm">{feature.description}</p>
+              <h2 className="text-sm font-bold text-white uppercase tracking-wide">{feature.title}</h2>
+              <p className="text-neutral-400 mt-1.5 text-xs leading-relaxed">{feature.description}</p>
             </div>
-            <div className="p-6 pt-0 mt-auto">
-              <div className="flex items-center text-blue-500 font-semibold text-sm">
+            <div className="p-4 pt-0 mt-auto">
+              <div className="flex items-center text-blue-500 font-bold text-[10px] uppercase tracking-wider">
                 <span>{feature.action}</span>
-                <ArrowRight className="w-4 h-4 ml-2 transform transition-transform duration-300 group-hover:translate-x-1" />
+                <ArrowRight className="w-3 h-3 ml-1.5 transform transition-transform duration-300 group-hover:translate-x-1" />
               </div>
             </div>
           </div>

@@ -105,7 +105,6 @@ export default function Roadmap() {
 
   return (
     <section id="roadmap" className="py-32 bg-black relative overflow-hidden w-full min-h-[1000px]">
-      
       {/* Fondo estelar sutil */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-900/20 via-black to-black opacity-50"></div>
       

@@ -86,17 +86,14 @@ export default function Stats() {
 
   return (
     <section className="py-24 bg-white relative overflow-hidden">
-      {/* Elementos decorativos de fondo muy sutiles */}
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
-      
-      <div className="container px-6 md:px-12 mx-auto">
+      <div className="container px-6 md:px-12 mx-auto relative z-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-12 gap-x-8 relative">
           
           {stats.map((stat, index) => {
             return (
               <div key={index} className="relative group flex flex-col items-center text-center">
                 
-                {/* Separador Vertical (Solo visible en Desktop entre columnas) */}
+                {/* Separador Vertical */}
                 {index !== 0 && (
                    <div className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 h-24 w-px bg-gray-100"></div>
                 )}

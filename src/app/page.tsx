@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Hero from "@/components/landing/Hero";
+import ChooseYourPath from "@/components/landing/ChooseYourPath";
 import Stats from "@/components/landing/Stats";
 import Services from "@/components/landing/Services";
 import YouTubeSubscription from "@/components/landing/YouTubeSubscription";
@@ -15,6 +16,10 @@ import CtaSection from "@/components/landing/CtaSection";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import { UpsellModal } from "@/components/landing/UpsellModal";
+import Testimonial from "@/components/landing/Testimonial";
+import JoinOurStudents from "@/components/landing/JoinOurStudents";
+import CityPartnerships from "@/components/landing/CityPartnerships";
+import PlanButtons from "@/components/landing/PlanButtons";
 
 function HomeContent() {
   const searchParams = useSearchParams();
@@ -54,6 +59,8 @@ function HomeContent() {
       
       <Hero onStartQuote={handleStartQuote} />
       
+      <ChooseYourPath />
+      
       <Stats />
 
       {/* Flujo Principal: Qué hacemos -> Cómo lo hacemos */}
@@ -66,6 +73,12 @@ function HomeContent() {
       {/* Herramientas y Valor Diferencial */}
       <AppSection />
       <WhyChooseUs />
+
+      {/* NUEVAS SECCIONES BAJO "POR QUÉ UDREAMMS" */}
+      <JoinOurStudents />
+      <Testimonial />
+      <CityPartnerships />
+      <PlanButtons />
 
       {/* Cierre / Conversión */}
       {showCalculator ? (
