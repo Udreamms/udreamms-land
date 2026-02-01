@@ -3,7 +3,9 @@ import { Montserrat } from "next/font/google"; // Font updated to Montserrat
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import LiveChatButton from "@/components/LiveChatButton";
+import { SidebarProvider } from "@/components/SidebarContext";
+import { Toaster } from "sonner";
+
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -34,8 +36,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <LiveChatButton />
+          <SidebarProvider>
+            {children}
+            <Toaster />
+          </SidebarProvider>
         </ThemeProvider>
       </body>
     </html>

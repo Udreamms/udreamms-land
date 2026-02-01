@@ -8,6 +8,17 @@ import { Button } from '@/components/ui/button';
 import { Trash2, GripVertical } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import {
+  MessageCircle,
+  Instagram,
+  Facebook,
+  Linkedin,
+  Youtube,
+  Twitter,
+  Globe2,
+  FileSpreadsheet
+} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import WhatsappIcon from '@/components/icons/WhatsappIcon';
 import { countryData } from '@/lib/utils';
 import {
@@ -69,19 +80,17 @@ const Card = ({ card, groupId, onClick, cardColor = 'bg-neutral-800' }) => {
       }
     }
   };
-  
+
   const formatTimestamp = (timestamp) => {
     if (!timestamp?.toDate) return '';
     const date = timestamp.toDate();
-    const now = new Date();
-    const diffInSeconds = (now.getTime() - date.getTime()) / 1000;
-    const diffInDays = diffInSeconds / 86400;
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = date.toLocaleString('es-ES', { month: 'short' }).toUpperCase();
+    const time = date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
 
-    if (diffInDays < 1) return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-    if (diffInDays < 7) return date.toLocaleDateString('es-ES', { weekday: 'short' });
-    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+    return `${day} ${month} ${time}`;
   };
-  
+
   const getCountryInfo = (phoneNumber) => {
     if (!phoneNumber) return { flag: '🏳️', code: 'N/A' };
     const number = phoneNumber.replace('+', '');
@@ -102,45 +111,72 @@ const Card = ({ card, groupId, onClick, cardColor = 'bg-neutral-800' }) => {
       <div
         ref={setNodeRef}
         style={style}
-        className={`group relative ${cardColor} p-3 rounded-lg shadow-sm hover:shadow-md hover:brightness-110 transition-all duration-200 touch-none flex items-start gap-2`}
+        data-card-id={card.id}
+        className={`group relative ${cardColor} p-0 rounded-xl border border-neutral-700/20 shadow-sm hover:border-neutral-700 transition-all duration-200 touch-none flex items-stretch select-none overflow-hidden max-h-[90px]`}
       >
-        <div {...attributes} {...listeners} className="cursor-grab text-neutral-500 hover:text-white p-1">
-            <GripVertical size={18} />
+        {/* Full-height Drag Handle Side */}
+        <div
+          {...attributes}
+          {...listeners}
+          className="flex-shrink-0 w-4 flex flex-col items-center justify-center gap-1 cursor-grab text-neutral-600 hover:text-neutral-400 hover:bg-neutral-800/30 transition-all active:cursor-grabbing border-r border-neutral-800/10"
+        >
+          <GripVertical size={12} />
         </div>
-        <div onClick={onClick} className="flex-grow cursor-pointer">
-            <div className="flex justify-between items-start w-full">
-                <div className="flex items-center gap-2 mb-1">
-                    <WhatsappIcon className="h-4 w-4 text-green-400 flex-shrink-0" />
-                    <span className="font-semibold text-base text-white truncate">{card.contactName || 'Desconocido'}</span>
-                </div>
-                <span className="text-xs text-neutral-400 whitespace-nowrap pl-2">{formatTimestamp(card.updatedAt || card.createdAt)}</span>
+
+        {/* Card Content Area */}
+        <div className="flex-grow p-2 flex flex-col gap-0.5 min-w-0">
+          <div className="flex items-center justify-between relative z-10">
+            <div className="flex items-center gap-1.5 min-w-0">
+              {(() => {
+                const channel = (card.channel || '').toLowerCase();
+                const hasNumber = !!card.contactNumber;
+                if (channel.includes('instagram')) {
+                  return <Instagram className="w-3.5 h-3.5 text-pink-500 flex-shrink-0" />;
+                }
+                return <WhatsappIcon className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />;
+              })()}
+              <h3 className="font-bold text-[11px] text-white truncate leading-none">
+                {card.contactName || 'Desconocido'}
+              </h3>
             </div>
-            
-            <p className="text-sm text-neutral-300 break-words line-clamp-2">
-                {card.lastMessage || '...'}
+
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <span className="text-[8px] font-bold text-neutral-500 uppercase tracking-tight tabular-nums leading-none">
+                {formatTimestamp(card.updatedAt || card.createdAt)}
+              </span>
+              {card.unreadCount > 0 && (
+                <Badge className="bg-blue-600 text-white border-transparent h-3.5 min-w-[14px] flex items-center justify-center p-0 text-[9px] font-bold rounded-sm">
+                  {card.unreadCount}
+                </Badge>
+              )}
+            </div>
+          </div>
+
+          <div onClick={onClick} className="flex-grow cursor-pointer relative z-10 space-y-0.5 min-h-0">
+            <p className="text-[9px] text-neutral-400 font-medium break-words line-clamp-1 leading-tight mb-1">
+              {card.lastMessage || '...'}
             </p>
 
-            <div className="flex items-center gap-2 mt-2">
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                    <span className="text-lg -mb-1 cursor-default">{flag}</span>
-                    </TooltipTrigger>
-                    <TooltipContent className="bg-neutral-900 text-white border-neutral-700">
-                    <p>{code} {card.contactNumber || ''}</p>
-                    </TooltipContent>
-                </Tooltip>
-                <span className="text-xs text-neutral-400">{card.contactNumber || 'Sin número'}</span>
+            <div className="flex items-center justify-between mt-auto">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[9px] text-neutral-500 font-medium tracking-wide">
+                  {flag} {card.contactNumber || ''}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleOpenDeleteDialog}
+                  className="h-5 w-5 text-neutral-500 hover:text-red-400 hover:bg-red-500/10 rounded-full transition-colors"
+                  aria-label="Eliminar tarjeta"
+                >
+                  <Trash2 size={10} />
+                </Button>
+              </div>
             </div>
-            
-            <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleOpenDeleteDialog}
-                className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 text-neutral-400 hover:text-red-500 transition-opacity h-7 w-7"
-                aria-label="Eliminar tarjeta"
-            >
-                <Trash2 size={15} />
-            </Button>
+          </div>
         </div>
       </div>
 

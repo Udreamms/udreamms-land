@@ -28,12 +28,12 @@ const ChatbotsPage = () => {
       (querySnapshot) => {
         const botsData = querySnapshot.docs.map(
           (doc) =>
-            ({
-              id: doc.id,
-              name: doc.data().name || 'Bot sin nombre',
-              isActive: doc.data().isActive || false,
-              ...doc.data(),
-            } as Bot)
+          ({
+            id: doc.id,
+            name: doc.data().name || 'Bot sin nombre',
+            isActive: doc.data().isActive || false,
+            ...doc.data(),
+          } as Bot)
         );
         setBots(botsData);
         setIsLoading(false);
@@ -63,13 +63,20 @@ const ChatbotsPage = () => {
   const handleToggleBotStatus = async (bot: Bot) => {
     setUpdatingBots((prev) => [...prev, bot.id]);
     try {
-      const botRef = doc(db, 'chatbots', bot.id);
       const newStatus = !bot.isActive;
+
+      // Si vamos a ACTIVAR este bot, primero desactivamos todos los demás
+      if (newStatus) {
+        const otherActiveBots = bots.filter(b => b.isActive && b.id !== bot.id);
+        for (const otherBot of otherActiveBots) {
+          const otherBotRef = doc(db, 'chatbots', otherBot.id);
+          await updateDoc(otherBotRef, { isActive: false });
+        }
+      }
+
+      const botRef = doc(db, 'chatbots', bot.id);
       await updateDoc(botRef, { isActive: newStatus });
 
-      setBots((prevBots) =>
-        prevBots.map((b) => (b.id === bot.id ? { ...b, isActive: newStatus } : b))
-      );
       toast.success(
         `Bot "${bot.name}" ${newStatus ? 'activado' : 'desactivado'}.`
       );
@@ -83,53 +90,52 @@ const ChatbotsPage = () => {
 
   return (
     <div className="p-6 bg-neutral-900 text-white min-h-screen">
-      <div className="flex justify-between items-center mb-8">
-        <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" onClick={handleGoBack} className="h-9 w-9">
-                <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <h1 className="text-2xl font-bold">Mis Chatbots</h1>
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="icon" onClick={handleGoBack} className="h-8 w-8">
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-xl font-bold tracking-tight">Mis Chatbots</h1>
         </div>
         <Button
           onClick={handleCreateNewBot}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transform transition-transform duration-200 hover:scale-105"
+          className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-1.5 px-3 rounded-lg shadow-md transform transition-transform duration-200 hover:scale-105 h-8"
         >
-          <Plus className="mr-2 h-5 w-5" /> Crear Nuevo Bot
+          <Plus className="mr-1.5 h-4 w-4" /> Crear Nuevo Bot
         </Button>
       </div>
 
       {isLoading ? (
         <div className="flex justify-center items-center mt-20">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+          <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {bots.length > 0 ? (
             bots.map((bot) => (
               <div
                 key={bot.id}
-                className="bg-neutral-800 border border-neutral-700 rounded-xl shadow-lg hover:shadow-blue-500/20 transition-all duration-300 flex flex-col group"
+                className="bg-neutral-800 border border-neutral-700 rounded-lg shadow-sm hover:shadow-blue-500/10 transition-all duration-300 flex flex-col group"
               >
                 <div
                   onClick={() => handleBotClick(bot.id)}
-                  className="p-6 cursor-pointer flex-grow"
+                  className="p-4 cursor-pointer flex-grow"
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <MessageCircle className="w-8 h-8 text-blue-400 group-hover:text-blue-300 transition-colors" />
+                  <div className="flex items-center justify-between mb-3">
+                    <MessageCircle className="w-6 h-6 text-blue-400 group-hover:text-blue-300 transition-colors" />
                     <span
-                      className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                        bot.isActive
-                          ? 'bg-green-500/20 text-green-300'
-                          : 'bg-neutral-600/50 text-neutral-300'
-                      }`}
+                      className={`px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded-full ${bot.isActive
+                        ? 'bg-green-500/20 text-green-300'
+                        : 'bg-neutral-600/50 text-neutral-400'
+                        }`}
                     >
                       {bot.isActive ? 'Activo' : 'Inactivo'}
                     </span>
                   </div>
-                  <h2 className="text-lg font-bold text-white truncate">
+                  <h2 className="text-sm font-bold text-white truncate mb-1">
                     {bot.name}
                   </h2>
-                  <p className="text-sm text-neutral-400 mt-2 font-mono break-all">
+                  <p className="text-[10px] text-neutral-500 font-mono break-all leading-tight">
                     {bot.id}
                   </p>
                 </div>
@@ -140,11 +146,10 @@ const ChatbotsPage = () => {
                       e.stopPropagation();
                       handleToggleBotStatus(bot);
                     }}
-                    className={`w-full font-semibold transition-colors duration-200 flex items-center justify-center ${
-                      bot.isActive
-                        ? 'bg-red-600 hover:bg-red-700 text-white'
-                        : 'bg-green-600 hover:bg-green-700 text-white'
-                    }`}
+                    className={`w-full font-semibold transition-colors duration-200 flex items-center justify-center ${bot.isActive
+                      ? 'bg-red-600 hover:bg-red-700 text-white'
+                      : 'bg-green-600 hover:bg-green-700 text-white'
+                      }`}
                     disabled={updatingBots.includes(bot.id)}
                   >
                     {updatingBots.includes(bot.id) ? (

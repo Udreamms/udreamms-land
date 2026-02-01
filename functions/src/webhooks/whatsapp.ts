@@ -10,7 +10,7 @@ export const whatsappWebhook = functions.https.onRequest(async (req, res) => {
     res.status(200).send('EVENT_RECEIVED');
 
     const { entry } = req.body;
-    
+
     // Validar POST
     if (req.method !== 'POST') return;
 
@@ -36,10 +36,10 @@ export const whatsappWebhook = functions.https.onRequest(async (req, res) => {
     const contact = change.contacts?.[0];
     const from = message.from;
     const contactName = contact?.profile?.name || 'Usuario';
-    
+
     // EXTRACCIÓN ROBUSTA DEL MENSAJE (Texto, Botón, Lista)
     let body = '';
-    
+
     if (message.type === 'text') {
         body = message.text.body;
     } else if (message.type === 'interactive') {
@@ -58,7 +58,7 @@ export const whatsappWebhook = functions.https.onRequest(async (req, res) => {
 
     try {
         // 1. Gestionar Tarjeta en Kanban
-        const cardData = await handleKanbanUpdate(from, contactName, body);
+        const cardData = await handleKanbanUpdate(from, contactName, body, 'whatsapp');
         if (!cardData) return;
 
         // 2. Ejecutar Bot
@@ -66,22 +66,22 @@ export const whatsappWebhook = functions.https.onRequest(async (req, res) => {
         if (activeBot) {
             const now = new Date();
             let shouldRestart = false;
-            
+
             if (cardData.isNew) {
                 shouldRestart = true;
             } else if (cardData.botState?.lastInteraction) {
-                 const lastInteraction = cardData.botState.lastInteraction.toDate ? cardData.botState.lastInteraction.toDate() : new Date(0);
-                 const timeDiff = now.getTime() - lastInteraction.getTime();
-                 if (timeDiff > TWENTY_FOUR_HOURS_IN_MS) {
-                     shouldRestart = true;
-                 }
+                const lastInteraction = cardData.botState.lastInteraction.toDate ? cardData.botState.lastInteraction.toDate() : new Date(0);
+                const timeDiff = now.getTime() - lastInteraction.getTime();
+                if (timeDiff > TWENTY_FOUR_HOURS_IN_MS) {
+                    shouldRestart = true;
+                }
             } else {
-                 if (!cardData.botState) shouldRestart = true;
+                if (!cardData.botState) shouldRestart = true;
             }
 
             if (shouldRestart) {
                 functions.logger.info(`Starting/Restarting bot flow for ${from}.`);
-                delete cardData.botState; 
+                delete cardData.botState;
                 await executeBotFlow(activeBot, from, cardData, body);
             } else if (cardData.botState?.status === 'active') {
                 await executeBotFlow(activeBot, from, cardData, body);

@@ -5,11 +5,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Node } from 'reactflow';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { 
-    Bold, 
-    Italic, 
-    Code, 
-    Smile, 
+import {
+    Bold,
+    Italic,
+    Code,
+    Smile,
     Link as LinkIcon,
     Clock // Icono nuevo
 } from 'lucide-react';
@@ -17,12 +17,13 @@ import { SettingsSection } from '../SharedComponents';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import EmojiPicker, { EmojiClickData, Theme } from 'emoji-picker-react';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 interface NodeSettingsProps {
@@ -42,7 +43,7 @@ export const TextMessageSettings = ({ node, updateNodeConfig }: NodeSettingsProp
     const [content, setContent] = useState(node.data.content || '');
     const [previewUrl, setPreviewUrl] = useState(node.data.previewUrl !== false);
     // Nuevo estado: por defecto true (humano), false = máquina rápida
-    const [typingSimulation, setTypingSimulation] = useState(node.data.typingSimulation !== false); 
+    const [typingSimulation, setTypingSimulation] = useState(node.data.typingSimulation !== false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
@@ -67,7 +68,7 @@ export const TextMessageSettings = ({ node, updateNodeConfig }: NodeSettingsProp
             const selectedText = text.substring(start, end);
             const wrapper = textToInsert;
             newText = text.substring(0, start) + wrapper + selectedText + wrapper + text.substring(end);
-            newCursorPos = end + (wrapper.length * 2); 
+            newCursorPos = end + (wrapper.length * 2);
             if (selectedText.length === 0) newCursorPos = start + wrapper.length;
         } else {
             newText = text.substring(0, start) + textToInsert + text.substring(end);
@@ -86,30 +87,30 @@ export const TextMessageSettings = ({ node, updateNodeConfig }: NodeSettingsProp
     return (
         <SettingsSection title="💬 Mensaje de Texto">
             <div className="space-y-4">
-                
+
                 {/* Toolbar */}
-                <div className="flex items-center justify-between bg-neutral-800 p-1.5 rounded-t-md border border-neutral-700 border-b-0">
+                <div className="flex items-center justify-between bg-neutral-900/50 px-2 py-1 border border-neutral-800/50 rounded-t-lg">
                     <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-neutral-400 hover:text-white" onClick={() => insertText('*', true)}><Bold size={14} /></Button>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-neutral-400 hover:text-white" onClick={() => insertText('_', true)}><Italic size={14} /></Button>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-neutral-400 hover:text-white" onClick={() => insertText('```', true)}><Code size={14} /></Button>
-                        <div className="w-px h-4 bg-neutral-700 mx-1 self-center" />
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-neutral-500 hover:text-white" onClick={() => insertText('*', true)}><Bold size={12} /></Button>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-neutral-500 hover:text-white" onClick={() => insertText('_', true)}><Italic size={12} /></Button>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-neutral-500 hover:text-white" onClick={() => insertText('```', true)}><Code size={12} /></Button>
+                        <div className="w-px h-3 bg-neutral-800 mx-1 self-center" />
                         <Popover>
                             <PopoverTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-7 w-7 text-yellow-500 hover:text-yellow-400"><Smile size={14} /></Button>
+                                <Button variant="ghost" size="icon" className="h-6 w-6 text-yellow-600 hover:text-yellow-500"><Smile size={12} /></Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0 border-none" side="right" align="start">
-                                <EmojiPicker onEmojiClick={(e) => insertText(e.emoji)} theme={Theme.DARK} lazyLoadEmojis={true} height={350} width={300} />
+                                <EmojiPicker onEmojiClick={(e) => insertText(e.emoji)} theme={Theme.DARK} lazyLoadEmojis={true} height={300} width={280} />
                             </PopoverContent>
                         </Popover>
-                         <DropdownMenu>
+                        <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-purple-400 hover:text-purple-300 gap-1 font-medium"><span className="font-mono">{`{}`}</span> Vars</Button>
+                                <Button variant="ghost" size="sm" className="h-6 px-1.5 text-[10px] text-purple-500 hover:text-purple-400 gap-1 font-bold uppercase tracking-wider"><span className="font-mono text-[11px]">{`{}`}</span> Vars</Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="bg-neutral-900 border-neutral-700 text-white">
+                            <DropdownMenuContent className="bg-neutral-900 border-neutral-800 text-white">
                                 {COMMON_VARIABLES.map((v) => (
-                                    <DropdownMenuItem key={v.value} onClick={() => insertText(v.value)} className="hover:bg-neutral-800 cursor-pointer flex justify-between gap-4">
-                                        <span>{v.label}</span><span className="font-mono text-neutral-500 text-xs">{v.value}</span>
+                                    <DropdownMenuItem key={v.value} onClick={() => insertText(v.value)} className="hover:bg-neutral-800 cursor-pointer flex justify-between gap-4 py-1.5">
+                                        <span className="text-[10px] font-bold uppercase">{v.label}</span><span className="font-mono text-neutral-500 text-[9px]">{v.value}</span>
                                     </DropdownMenuItem>
                                 ))}
                             </DropdownMenuContent>
@@ -118,7 +119,7 @@ export const TextMessageSettings = ({ node, updateNodeConfig }: NodeSettingsProp
                 </div>
 
                 {/* Text Area */}
-                <div className="relative -mt-4">
+                <div className="relative">
                     <Textarea
                         ref={textareaRef}
                         value={content}
@@ -126,23 +127,26 @@ export const TextMessageSettings = ({ node, updateNodeConfig }: NodeSettingsProp
                             setContent(e.target.value);
                             handleUpdate({ content: e.target.value });
                         }}
-                        placeholder="Hola {{first_name}}..."
-                        className="min-h-[180px] rounded-t-none border-t-0 font-normal text-base resize-none p-3 pr-2 pb-8 bg-neutral-900 focus-visible:ring-0"
+                        placeholder="Escribe el mensaje aquí..."
+                        className="min-h-[140px] rounded-t-none border-neutral-800/50 font-medium text-xs resize-none p-3 pr-2 pb-8 bg-neutral-900/20 focus-visible:ring-0 leading-relaxed"
                     />
-                    <div className="absolute bottom-2 right-3 text-xs text-neutral-500 bg-neutral-900/90 pl-2">
+                    <div className="absolute bottom-2 right-3 text-[9px] font-black text-neutral-600 bg-transparent pl-2 uppercase tracking-tight">
                         {content.length} caracteres
                     </div>
                 </div>
 
                 {/* Configuration Toggles */}
-                <div className="space-y-3 pt-2">
+                <div className="flex flex-col pt-2">
                     {/* Link Preview */}
-                    <div className="flex items-center justify-between p-3 bg-neutral-900 rounded-lg border border-neutral-800">
-                        <div className="flex items-center gap-2">
-                            <LinkIcon size={14} className="text-neutral-500"/>
-                            <Label className="text-xs font-medium text-neutral-400">Previsualizar enlaces</Label>
+                    <div className="flex items-center justify-between px-2 py-3 hover:bg-white/[0.02] transition-colors group rounded-md">
+                        <div className="flex items-center gap-3">
+                            <LinkIcon size={14} className="text-neutral-500 group-hover:text-neutral-300" />
+                            <div className="flex flex-col">
+                                <Label className="text-[11px] font-bold text-neutral-300 uppercase tracking-tight">PREVISUALIZAR ENLACES</Label>
+                                <span className="text-[9px] text-neutral-600 font-bold uppercase tracking-widest mt-0.5">Muestra miniatura del link</span>
+                            </div>
                         </div>
-                        <Switch 
+                        <Switch
                             checked={previewUrl}
                             onCheckedChange={(checked) => {
                                 setPreviewUrl(checked);
@@ -153,25 +157,23 @@ export const TextMessageSettings = ({ node, updateNodeConfig }: NodeSettingsProp
                     </div>
 
                     {/* Human Typing Simulation */}
-                    <div className="flex items-center justify-between p-3 bg-neutral-900 rounded-lg border border-neutral-800">
-                        <div className="space-y-0.5">
-                            <div className="flex items-center gap-2">
-                                <Clock size={14} className={typingSimulation ? "text-green-400" : "text-neutral-500"}/>
-                                <Label className="text-xs font-medium text-neutral-300">Modo Humano (Delay)</Label>
+                    <div className="flex items-center justify-between px-2 py-3 hover:bg-white/[0.02] transition-colors group rounded-md">
+                        <div className="flex items-center gap-3">
+                            <Clock size={14} className={cn("text-neutral-500 group-hover:text-neutral-300", typingSimulation && "text-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]")} />
+                            <div className="flex flex-col">
+                                <Label className="text-[11px] font-bold text-neutral-300 uppercase tracking-tight">MODO HUMANO (DELAY)</Label>
+                                <span className="text-[9px] text-neutral-600 font-bold uppercase tracking-widest mt-0.5">
+                                    {typingSimulation ? "SIMULA ESCRITURA MANUAL" : "ENVÍO INSTANTÁNEO"}
+                                </span>
                             </div>
-                            <p className="text-[10px] text-neutral-500 pl-6 max-w-[200px]">
-                                {typingSimulation 
-                                    ? "Espera unos segundos antes de enviar (simula escribir)." 
-                                    : "Envío instantáneo (modo robot/OTP)."}
-                            </p>
                         </div>
-                        <Switch 
+                        <Switch
                             checked={typingSimulation}
                             onCheckedChange={(checked) => {
                                 setTypingSimulation(checked);
                                 handleUpdate({ typingSimulation: checked });
                             }}
-                            className="scale-75 data-[state=checked]:bg-green-600"
+                            className="scale-75 data-[state=checked]:bg-emerald-600"
                         />
                     </div>
                 </div>
