@@ -21,9 +21,9 @@ const config = {
     },
     extend: {
       fontFamily: {
-        playfair: ['Playfair Display', 'serif'],
-        sans: ['var(--font-inter)', ...fontFamily.sans],
-        'open-sans': ['var(--font-open-sans)', ...fontFamily.sans],
+        playfair: ['var(--font-montserrat)', 'sans-serif'], // Replaced with Montserrat for global consistency
+        sans: ['var(--font-montserrat)', ...fontFamily.sans],
+        'open-sans': ['var(--font-montserrat)', ...fontFamily.sans],
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -69,7 +69,10 @@ const config = {
           'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))'
-        }
+        },
+        abyss: '#0F2027',
+        cloud: '#FAFAF9',
+        gold: '#C5A572',
       },
       backgroundImage: {
         'gradient-hero': 'var(--gradient-hero)',
@@ -99,12 +102,24 @@ const config = {
           '0%': { opacity: '0', transform: 'translateY(10px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        'float': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        'shimmer': {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        }
+
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in': 'fade-in 0.5s ease-out',
         'bounce': 'bounce 1s infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'shimmer': 'shimmer 3s linear infinite',
+
       },
     },
   },

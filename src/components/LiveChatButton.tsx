@@ -1,16 +1,24 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { MessageCircle } from "lucide-react";
 
 export const LiveChatButton = () => {
+  const pathname = usePathname();
+
+  // Ocultar en la landing de turista si se solicita
+  if (pathname === "/visas/tourist") {
+    return null;
+  }
+
   // Número de teléfono actualizado
   const phoneNumber = "16507840581";
   // Mensaje predeterminado corregido y mejorado
   const message = "Buen día, ¿cómo están? Me gustaría recibir asesoría personalizada.";
-  
+
   // Codificamos el mensaje para URL
   const encodedMessage = encodeURIComponent(message);
-  
+
   // Construimos el enlace completo
   const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
 
