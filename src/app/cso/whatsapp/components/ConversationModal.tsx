@@ -1,295 +1,438 @@
-
-'use client';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { db, functions } from '@/lib/firebase';
-import { doc, onSnapshot, Timestamp, updateDoc, DocumentData } from 'firebase/firestore';
-import { httpsCallable } from 'firebase/functions';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Progress } from "@/components/ui/progress";
-import { 
-    Send, Loader2, User, Building, Phone, Hash, Save, Mail, Globe, MapPin, 
-    PlusCircle, Trash2, GripVertical, Paperclip, Smile, FileText, Image as ImageIcon,
-    CheckCheck // <--- Importado
-} from 'lucide-react';
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useSidebar } from '@/components/SidebarContext';
+import { useConversationLogic } from './ConversationModal/hooks/useConversationLogic';
+import { ChatSection } from './ConversationModal/components/ChatSection';
+import { Sidebar } from './ConversationModal/components/Sidebar';
+import { ConversationModalProps } from './ConversationModal/types';
+import { socialPlatforms } from './ConversationModal/constants';
+import { User, CreditCard, FileText, Clock, Phone, ChevronDown, X, CheckCheck, Search, MoreVertical, Filter, BellOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
-import EmojiPicker, { EmojiClickData, Theme } from 'emoji-picker-react';
-import { useDropzone } from 'react-dropzone';
-import { useFileUpload } from '@/lib/hooks/useFileUpload';
+import FilePreviewModal from './ConversationModal/FilePreviewModal';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { CsoSidebar } from '../../../../components/CsoSidebar';
+import { WhatsappIcon } from './ConversationModal/components/SharedComponents';
 
-// --- Interfaces ---
-interface Message {
-  text: string;
-  sender: 'user' | 'agent';
-  timestamp: Timestamp;
-}
-interface CustomField { [key: string]: string; }
-interface CardData extends DocumentData {
-  contactName?: string;
-  contactNumber?: string;
-  company?: string;
-  email?: string;
-  website?: string;
-  address?: string;
-  tags?: string[];
-  messages?: Message[];
-  customFields?: CustomField;
-  lastReadAt?: Timestamp; // <--- Añadido soporte para lectura
-}
+export default function ConversationModal(props: ConversationModalProps) {
+  const logic = useConversationLogic(props);
+  const [isInboxCollapsed, setIsInboxCollapsed] = React.useState(false);
+  const { isCollapsed } = useSidebar();
+  const [searchTerm, setSearchTerm] = React.useState(''); // Inbox search
 
-const sendWhatsappMessage = httpsCallable(functions, 'sendWhatsappMessage');
+  // Header Feature States
+  const [chatSearchTerm, setChatSearchTerm] = React.useState('');
+  const [isChatSearchOpen, setIsChatSearchOpen] = React.useState(false);
+  const [muteDuration, setMuteDuration] = React.useState<string | null>(null);
 
-const groupMessagesByDate = (messages: Message[] = []) => {
-  if (!Array.isArray(messages)) return [];
-  return messages.reduce((acc, msg) => {
-    if (!msg.timestamp?.toDate) return acc;
-    const date = msg.timestamp.toDate().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
-    if (!acc[date]) acc[date] = [];
-    acc[date].push(msg);
-    return acc;
-  }, {} as { [key: string]: Message[] });
-};
-
-const EditableField = ({ icon, name, value, onChange, placeholder }) => (
-    <div className="relative flex items-center">
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500">{icon}</div>
-        <Input 
-            id={`contact-${name}`} name={name} value={value} onChange={onChange}
-            placeholder={placeholder} className="pl-9 bg-neutral-800/60 border-neutral-700 focus:bg-neutral-800"
-        />
-    </div>
-);
-
-const ConversationModal = ({ isOpen, onClose, card }) => {
-  const [liveCardData, setLiveCardData] = useState<CardData | null>(null);
-  const [newMessage, setNewMessage] = useState('');
-  const [isSending, setIsSending] = useState(false);
-  const [contactInfo, setContactInfo] = useState<Partial<CardData>>({});
-  const [customFields, setCustomFields] = useState<CustomField>({});
-  const [newFieldName, setNewFieldName] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const { uploading, progress, uploadFile } = useFileUpload();
-
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-      if (!liveCardData || !card) {
-          toast.error("No se puede subir un archivo sin una conversación activa.");
-          return;
-      }
-      const file = acceptedFiles[0];
-      if (file) {
-          uploadFile(file, {
-              cardId: card.id,
-              groupId: card.groupId,
-              toNumber: liveCardData.contactNumber!,
-          });
-      }
-  }, [liveCardData, card, uploadFile]);
-
-  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
-      onDrop,
-      noClick: true,
-      noKeyboard: true,
-  });
-
-  useEffect(() => {
-    if (!card?.id || !card?.groupId) {
-      setLiveCardData(null);
-      return;
+  // Keep it open by default
+  React.useEffect(() => {
+    if (props.isOpen) {
+      setIsInboxCollapsed(false);
     }
-    const cardRef = doc(db, 'kanban-groups', card.groupId, 'cards', card.id);
-    const unsubscribe = onSnapshot(cardRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data() as CardData;
-        setLiveCardData(data);
-        setContactInfo({
-          contactName: data.contactName || '', company: data.company || '', email: data.email || '',
-          website: data.website || '', address: data.address || '', tags: data.tags || [],
-        });
-        setCustomFields(data.customFields || {});
-      } else {
-        setLiveCardData(null);
-      }
-    });
-    return () => unsubscribe();
-  }, [card?.id, card?.groupId]);
+  }, [props.isOpen]);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
-  }, [liveCardData?.messages]);
+  if (!props.isOpen) return null;
 
-  const handleSendMessage = async () => {
-    if (!newMessage.trim() || !card || isSending) return;
-    setIsSending(true);
-    const promise = sendWhatsappMessage({
-        cardId: card.id, groupId: card.groupId, message: newMessage, toNumber: liveCardData?.contactNumber,
-    });
-    toast.promise(promise, {
-        loading: 'Enviando mensaje...',
-        success: () => { setNewMessage(''); return 'Mensaje enviado.'; },
-        error: 'Error al enviar el mensaje.',
-        finally: () => setIsSending(false)
-    });
-  };
+  const filteredConversations = props.allConversations?.filter(conv => {
+    const matchesSearch = conv.contactName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      conv.contactNumber?.includes(searchTerm) ||
+      conv.name?.toLowerCase().includes(searchTerm.toLowerCase());
 
-  const handleInfoSave = async () => {
-    if (!card) return;
-    const cardRef = doc(db, 'kanban-groups', card.groupId, 'cards', card.id);
-    const updatedData = { ...contactInfo, customFields };
-    toast.promise(updateDoc(cardRef, updatedData), {
-        loading: 'Guardando información...',
-        success: 'Información del contacto actualizada.',
-        error: 'No se pudo actualizar la información.',
-    });
-  };
+    // Filter by Active Platform (normalize to lowercase, default to whatsapp)
+    const convSource = (conv.source || 'whatsapp').toLowerCase();
+    const activeSource = (logic.activePlatform || 'whatsapp').toLowerCase();
+    const matchesPlatform = convSource === activeSource;
 
-  const onEmojiClick = (emojiObject: EmojiClickData) => {
-    const textArea = textareaRef.current;
-    if (textArea) {
-        const start = textArea.selectionStart;
-        const end = textArea.selectionEnd;
-        setNewMessage(prev => prev.substring(0, start) + emojiObject.emoji + prev.substring(end));
-        setTimeout(() => { textArea.focus(); textArea.selectionStart = textArea.selectionEnd = start + emojiObject.emoji.length; }, 0);
-    }
-  };
-  
-  const handleInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => setContactInfo(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  const handleCustomFieldChange = (key: string, value: string) => setCustomFields(prev => ({ ...prev, [key]: value }));
-  const addCustomField = () => {
-    if (newFieldName && !customFields.hasOwnProperty(newFieldName)) {
-      setCustomFields(prev => ({ ...prev, [newFieldName]: '' }));
-      setNewFieldName('');
-    } else {
-      toast.warning('El nombre del campo no puede estar vacío o ya existe.');
-    }
-  };
-  const deleteCustomField = (key: string) => { const { [key]: _, ...rest } = customFields; setCustomFields(rest); };
-  const groupedMessages = groupMessagesByDate(liveCardData?.messages);
+    return matchesSearch && matchesPlatform;
+  }) || [];
 
-  // Helper para verificar si un mensaje ha sido leído
-  const isMessageRead = (msg: Message) => {
-    if (!liveCardData?.lastReadAt || !msg.timestamp) return false;
-    return msg.timestamp.seconds <= liveCardData.lastReadAt.seconds;
+  const activePlatformData = socialPlatforms.find(p => p.name === logic.activePlatform) || socialPlatforms[0];
+
+  const floatingStyle: React.CSSProperties = {
+    position: 'fixed',
+    left: isCollapsed ? '80px' : '176px',
+    right: '0px',
+    top: '84px',
+    bottom: '0px',
+    zIndex: 100,
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl w-[95vw] h-[90vh] flex flex-col p-0 bg-neutral-900 border-neutral-800">
-        <DialogTitle className="sr-only">Conversation with {liveCardData?.contactName || 'contact'}</DialogTitle>
-        <DialogDescription className="sr-only">
-            Conversation interface for chatting with {liveCardData?.contactName || 'the contact'} and managing their details.
-        </DialogDescription>
-        <div className="grid grid-cols-12 flex-1 h-full">
-          <div className="col-span-8 flex flex-col border-r border-neutral-800 h-full" {...getRootProps()}>
-            <input {...getInputProps()} />
-            <header className="flex items-center p-3 border-b border-neutral-800 bg-neutral-800/80 backdrop-blur-sm flex-shrink-0">
-                <img src={`https://ui-avatars.com/api/?name=${liveCardData?.contactName || 'C'}&background=2563eb&color=fff&bold=true`} alt="avatar" className="w-10 h-10 rounded-full mr-4"/>
-                <div>
-                    <h2 className="text-lg font-bold text-white">{liveCardData?.contactName || 'Desconocido'}</h2>
-                    <p className="text-sm text-neutral-400">{liveCardData?.contactNumber || ''}</p>
-                </div>
-            </header>
-            <div className="relative flex-1">
-                {uploading && <Progress value={progress} className="absolute top-0 left-0 w-full h-1 z-20" />}
-                {isDragActive && <div className="absolute inset-0 bg-blue-500/30 flex items-center justify-center text-white font-bold z-10 backdrop-blur-sm"><p>Suelta el archivo para enviarlo</p></div>}
-                <div className="absolute inset-0 overflow-y-auto p-6 space-y-2 bg-black/30 bg-blend-multiply bg-[url('/whatsapp-bg.png')]">
-                  {Object.entries(groupedMessages).map(([date, messages]) => (
-                    <React.Fragment key={date}>
-                      <div className="flex justify-center my-3"><span className="text-xs text-neutral-300 bg-neutral-800/90 px-3 py-1 rounded-full shadow-lg">{date}</span></div>
-                      {messages.map((msg, index) => (
-                        <div key={index} className={cn("flex items-end gap-2", msg.sender === 'agent' ? 'justify-end' : 'justify-start')}>
-                          <div className={cn( "px-3 py-2 rounded-xl max-w-lg shadow-md", msg.sender === 'agent' ? 'bg-[#005c4b] text-white rounded-br-none' : 'bg-neutral-700 text-white rounded-bl-none' )}>
-                            <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
-                            <div className="flex items-center justify-end gap-1 mt-1">
-                                <p className="text-[10px] text-neutral-300/80">
-                                    {msg.timestamp?.toDate().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
-                                </p>
-                                {msg.sender === 'agent' && (
-                                    <CheckCheck 
-                                        size={14} 
-                                        className={cn(
-                                            isMessageRead(msg) ? "text-blue-400" : "text-neutral-400"
-                                        )} 
-                                    />
-                                )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </React.Fragment>
-                  ))}
-                  <div ref={messagesEndRef} />
-                </div>
-            </div>
-            <footer className="p-3 border-t border-neutral-800 bg-neutral-800/50 flex-shrink-0">
-              <div className="flex items-center bg-neutral-700/80 rounded-lg p-2">
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button variant="ghost" size="icon" className="text-neutral-400 hover:text-white"><Paperclip size={20}/></Button>
-                    </PopoverTrigger>
-                    <PopoverContent side="top" className="w-auto bg-neutral-800 border-neutral-700 text-white p-1 space-y-1">
-                        <Button variant="ghost" className="w-full justify-start text-sm" onClick={open}><ImageIcon className="mr-2 h-4 w-4 text-yellow-400"/> Foto o Video</Button>
-                        <Button variant="ghost" className="w-full justify-start text-sm" onClick={open}><FileText className="mr-2 h-4 w-4 text-blue-400"/> Documento</Button>
-                    </PopoverContent>
-                </Popover>
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button variant="ghost" size="icon" className="text-neutral-400 hover:text-white"><Smile size={20}/></Button>
-                    </PopoverTrigger>
-                    <PopoverContent side="top" className="p-0 border-none bg-transparent w-auto">
-                        <EmojiPicker onEmojiClick={onEmojiClick} theme={Theme.DARK} />
-                    </PopoverContent>
-                </Popover>
-                <Textarea ref={textareaRef} value={newMessage} onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
-                  placeholder="Escribe un mensaje aquí..." className="bg-transparent border-none focus:ring-0 focus-visible:ring-0 resize-none text-base h-auto" rows={1} />
-                <Button onClick={handleSendMessage} disabled={isSending || !newMessage.trim()} size="icon" className="h-9 w-12 bg-blue-600 hover:bg-blue-700 rounded-lg">
-                  {isSending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-                </Button>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95, y: 10 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95, y: 10 }}
+      transition={{ duration: 0.2 }}
+      className={cn("bg-black/40 backdrop-blur-sm text-white flex font-sans overflow-hidden fixed inset-0")}
+      style={floatingStyle}
+    >
+      {!props.position && !props.hideSidebar && <CsoSidebar />}
+
+      <div className="flex-1 flex min-w-0 p-2 gap-2">
+        <div className="flex-1 flex overflow-hidden relative">
+
+          {/* Left Pane: Bandeja */}
+          <aside className={cn(
+            "flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out relative z-10",
+            "bg-neutral-900/95 backdrop-blur-2xl border-r border-white/5 shadow-2xl overflow-hidden",
+            isInboxCollapsed || props.hideInternalTray ? "w-0 border-none" : "w-[220px]"
+          )}>
+            <div className="px-4 pt-4 pb-2 space-y-3">
+              <div className="flex items-center gap-2">
+                <h2 className="text-[10px] font-black text-white uppercase tracking-widest">
+                  {props.currentGroupName || 'Bandeja'}
+                </h2>
+                <span className="text-neutral-500 text-[9px] font-mono">
+                  ({filteredConversations.length})
+                </span>
               </div>
-            </footer>
-          </div>
-          <div className="col-span-4 flex flex-col bg-neutral-950 p-4 overflow-y-auto">
-            <h3 className="text-xl font-bold mb-6 text-white">Información del Contacto</h3>
-            <div className="space-y-4">
-                <EditableField icon={<User size={16}/>} name="contactName" value={contactInfo.contactName || ''} onChange={handleInfoChange} placeholder="Nombre completo" />
-                <EditableField icon={<Phone size={16}/>} name="contactNumber" value={liveCardData?.contactNumber || ''} onChange={()=>{}} placeholder="" />
-                <EditableField icon={<Building size={16}/>} name="company" value={contactInfo.company || ''} onChange={handleInfoChange} placeholder="Nombre de la empresa" />
-                <EditableField icon={<Mail size={16}/>} name="email" value={contactInfo.email || ''} onChange={handleInfoChange} placeholder="correo@ejemplo.com" />
-                <EditableField icon={<Globe size={16}/>} name="website" value={contactInfo.website || ''} onChange={handleInfoChange} placeholder="https://ejemplo.com" />
-                <EditableField icon={<MapPin size={16}/>} name="address" value={contactInfo.address || ''} onChange={handleInfoChange} placeholder="Ciudad, País" />
-                <EditableField icon={<Hash size={16}/>} name="tags" value={(contactInfo.tags || []).join(', ')} onChange={(e) => setContactInfo(prev => ({ ...prev, tags: e.target.value.split(',').map(t => t.trim())}))} placeholder="VIP, Lead, Soporte" />
+
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
+                  <Search className="h-3 w-3 text-neutral-600 transition-colors" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Buscar..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-transparent border-b border-white/5 hover:border-white/10 text-neutral-300 text-[10px] pl-5 pr-8 py-1.5 outline-none focus:border-blue-500/50 transition-all placeholder:text-neutral-700 font-mono tracking-tight"
+                />
+                {!searchTerm && (
+                  <div className="absolute inset-y-0 right-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button variant="ghost" size="icon" className="h-4 w-4 text-neutral-600 hover:text-white">
+                      <Filter size={8} />
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
-            <hr className="my-6 border-neutral-700" />
-            <h4 className="text-lg font-bold mb-4 text-white">Campos Personalizados</h4>
-            <div className="space-y-3">
-                {Object.entries(customFields).map(([key, value]) => (
-                    <div key={key} className="flex items-center gap-2">
-                        <GripVertical size={16} className="text-neutral-500 cursor-move"/>
-                        <Input value={key} disabled className="w-1/3 bg-neutral-800 border-neutral-700 font-semibold text-xs"/>
-                        <Input value={value} onChange={(e) => handleCustomFieldChange(key, e.target.value)} placeholder="Valor..." className="flex-grow bg-neutral-800/60 border-neutral-700 focus:bg-neutral-800"/>
-                        <Button variant="ghost" size="icon" onClick={() => deleteCustomField(key)} className="text-neutral-500 hover:text-red-500"><Trash2 size={16}/></Button>
+
+            <div className="flex-1 overflow-y-auto custom-scrollbar pt-2 pb-6">
+              {filteredConversations.map((conv) => (
+                <button
+                  key={conv.id}
+                  onClick={() => props.onSelectConversation?.(conv)}
+                  className={cn(
+                    "w-full px-4 py-3 flex flex-col gap-1 text-left group transition-all duration-200 relative",
+                    "border-b border-transparent hover:border-white/5",
+                    props.card?.id === conv.id ? "bg-auto" : "bg-transparent"
+                  )}
+                >
+                  <div className="flex items-center justify-between min-w-0 w-full">
+                    <div className="flex items-center gap-2 min-w-0">
+                      {/* Minimal indicator instead of avatar */}
+                      <div className={cn(
+                        "w-1 h-1 rounded-full flex-shrink-0",
+                        props.card?.id === conv.id ? "bg-blue-500" : "bg-neutral-600 group-hover:bg-neutral-400"
+                      )} />
+
+                      <h3 className={cn(
+                        "text-[11px] font-bold truncate tracking-tight transition-colors",
+                        props.card?.id === conv.id ? "text-blue-400" : "text-neutral-300 group-hover:text-neutral-200"
+                      )}>
+                        {conv.contactName || conv.name}
+                      </h3>
                     </div>
-                ))}
+
+                    <span className="text-[9px] font-mono text-neutral-600 whitespace-nowrap">
+                      {conv.timestamp?.toDate ? conv.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '...'}
+                    </span>
+                  </div>
+
+                  <div className="pl-3 min-w-0 w-full opacity-60 group-hover:opacity-100 transition-opacity">
+                    <p className={cn(
+                      "text-[10px] truncate leading-tight font-medium font-mono",
+                      props.card?.id === conv.id ? "text-blue-500/70" : "text-neutral-500"
+                    )}>
+                      {conv.contactNumber || conv.lastMessage || '...'}
+                    </p>
+                  </div>
+
+                  {props.card?.id === conv.id && (
+                    <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                  )}
+                </button>
+              ))}
             </div>
-            <div className="flex items-center gap-2 mt-4">
-                <Input value={newFieldName} onChange={(e) => setNewFieldName(e.target.value)} placeholder="Nombre del nuevo campo..."/>
-                <Button onClick={addCustomField} size="sm" variant="outline"><PlusCircle size={16} className="mr-2"/>Añadir</Button>
+          </aside>
+
+          {/* Right Column: Chat Window */}
+          <div className="flex-1 flex bg-black rounded-[32px] shadow-2xl overflow-hidden relative mr-4 my-4 border border-white/5">
+            <div className="flex-1 flex flex-col min-w-0 h-full">
+              {/* Header */}
+              <header className="h-[42px] border-b border-white/5 flex items-center justify-between px-4 bg-transparent flex-shrink-0 drag-handle cursor-move relative z-50">
+                <div className="flex items-center gap-2.5">
+                  <div className="relative group">
+                    <div className="w-7 h-7 rounded-[10px] flex items-center justify-center text-white font-black text-[10px] shadow-lg transition-transform duration-300 bg-neutral-700">
+                      {props.card?.contactName?.charAt(0) || props.card?.name?.charAt(0) || '?'}
+                    </div>
+                    <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-neutral-900 border border-black flex items-center justify-center">
+                      <div className={cn("w-1.5 h-1.5 rounded-full", activePlatformData.name === 'Instagram' ? 'bg-pink-500' : 'bg-green-500')} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      {/* Name */}
+                      <h3 className="font-black text-white text-xs leading-none uppercase tracking-wide">{props.card?.contactName || props.card?.name || 'Skyler'}</h3>
+                    </div>
+                    <p className="text-neutral-500 text-[8px] font-bold mt-0.5 uppercase tracking-widest">{props.card?.contactNumber || 'NO ID'}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-6">
+                  {/* Action Pill Container */}
+                  <div className="flex items-center bg-neutral-900/50 border border-white/5 rounded-full p-0.5 gap-0.5 shadow-inner">
+                    <div className={cn("flex items-center overflow-hidden transition-all duration-300", isChatSearchOpen ? "w-[100px]" : "w-7")}>
+                      {isChatSearchOpen ? (
+                        <div className="flex items-center px-1.5">
+                          <Search size={12} className="text-neutral-500 mr-1" />
+                          <input
+                            autoFocus
+                            className="bg-transparent border-none text-[9px] text-white w-full outline-none placeholder:text-neutral-600"
+                            placeholder="Buscar..."
+                            value={chatSearchTerm}
+                            onChange={(e) => setChatSearchTerm(e.target.value)}
+                            onBlur={() => !chatSearchTerm && setIsChatSearchOpen(false)}
+                          />
+                          <button onMouseDown={() => { setChatSearchTerm(''); setIsChatSearchOpen(false) }}><X size={10} className="text-neutral-500 hover:text-white" /></button>
+                        </div>
+                      ) : (
+                        <Button variant="ghost" size="icon" onClick={() => setIsChatSearchOpen(true)} className="h-7 w-7 text-neutral-400 hover:text-white hover:bg-white/5 rounded-full">
+                          <Search size={14} />
+                        </Button>
+                      )}
+                    </div>
+
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className={cn("h-7 w-7 hover:text-white hover:bg-white/5 rounded-full transition-colors", muteDuration ? "text-red-400" : "text-neutral-400")}>
+                          {muteDuration ? <BellOff size={14} /> : <Clock size={14} />}
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="center" className="bg-neutral-900 border-neutral-800 text-neutral-200 text-xs">
+                        <DropdownMenuLabel className="text-[10px] uppercase font-black tracking-widest text-neutral-500">Silenciar</DropdownMenuLabel>
+                        <DropdownMenuSeparator className="bg-neutral-800" />
+                        {[
+                          { label: '8 Horas', val: '8h' },
+                          { label: '1 Semana', val: '1w' },
+                          { label: 'Siempre', val: 'always' }
+                        ].map((opt) => (
+                          <DropdownMenuItem key={opt.val} onClick={() => { setMuteDuration(opt.val); logic.handleSaveMute(opt.val); }} className="flex justify-between cursor-pointer focus:bg-neutral-800 text-[10px] font-bold">
+                            <span>{opt.label}</span>
+                            {muteDuration === opt.val && <CheckCheck size={12} className="text-blue-500" />}
+                          </DropdownMenuItem>
+                        ))}
+                        <DropdownMenuSeparator className="bg-neutral-800" />
+                        <DropdownMenuItem onClick={() => { setMuteDuration(null); logic.handleSaveMute(null); }} className="cursor-pointer text-red-400 focus:bg-neutral-800 focus:text-red-300 text-[10px] font-bold">
+                          Desactivar silencio
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+
+                    <div className="flex items-center bg-neutral-800/50 rounded-full ml-0.5">
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-neutral-400 hover:text-white hover:bg-white/5 rounded-l-full">
+                        <Phone size={14} />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-5 text-neutral-400 hover:text-white hover:bg-white/5 rounded-r-full">
+                        <ChevronDown size={10} />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 p-0.5 gap-1 hover:bg-white/10 rounded-full pl-1 pr-2 border border-white/5 bg-neutral-900/50 shadow-inner">
+                          <div className={cn("w-6 h-6 rounded-[8px] flex items-center justify-center transition-all", activePlatformData.bgColor)}>
+                            <activePlatformData.icon className="w-3.5 h-3.5 text-white" />
+                          </div>
+                          <ChevronDown size={12} className="text-neutral-500" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40 bg-neutral-900 border-neutral-800 p-1 z-[200] rounded-xl">
+                        {socialPlatforms.map((platform) => (
+                          <DropdownMenuItem
+                            key={platform.name}
+                            onClick={() => logic.setActivePlatform(platform.name)}
+                            className={cn(
+                              "flex items-center gap-2 p-1.5 rounded-lg cursor-pointer",
+                              logic.activePlatform === platform.name ? "bg-blue-600/10 text-blue-400" : "text-neutral-400 hover:bg-neutral-800"
+                            )}
+                          >
+                            <div className={cn("w-6 h-6 rounded-md flex items-center justify-center", platform.bgColor, platform.color)}>
+                              <platform.icon className={platform.name === 'TikTok' ? 'w-3 h-3 fill-current' : 'w-3.5 h-3.5'} />
+                            </div>
+                            <span className="font-bold text-[10px] uppercase tracking-wide">{platform.name}</span>
+                            {logic.activePlatform === platform.name && <CheckCheck size={12} className="ml-auto" />}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <div className="h-4 w-px bg-white/10 mx-0.5" />
+
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={props.onClose}
+                      className="h-8 w-8 text-neutral-500 hover:text-white hover:bg-white/5 rounded-full transition-all duration-200"
+                    >
+                      <X size={16} />
+                    </Button>
+                  </div>
+                </div>
+              </header>
+
+              <ChatSection
+                liveCardData={logic.liveCardData}
+                activePlatform={logic.activePlatform}
+                setActivePlatform={logic.setActivePlatform}
+                socialPlatforms={socialPlatforms}
+                currentPlatform={logic.currentPlatform}
+                uploading={logic.uploading}
+                progress={logic.progress}
+                selectedFile={logic.selectedFile}
+                filePreviewUrl={logic.filePreviewUrl}
+                handleCancelPreview={logic.handleCancelPreview}
+                handleDisplayFileSend={logic.handleDisplayFileSend}
+                isDragActive={logic.isDragActive}
+                getRootProps={logic.getRootProps}
+                getInputProps={logic.getInputProps}
+                groupedMessages={logic.groupedMessages}
+                isMessageRead={logic.isMessageRead}
+                setPreviewFile={logic.setPreviewFile}
+                messagesEndRef={logic.messagesEndRef}
+                newMessage={logic.newMessage}
+                setNewMessage={logic.setNewMessage}
+                handleSendMessage={logic.handleSendMessage}
+                isSending={logic.isSending}
+                open={logic.open}
+                onEmojiClick={logic.onEmojiClick}
+                onClose={props.onClose}
+                chatSearchTerm={chatSearchTerm}
+              />
             </div>
-            <div className="mt-auto pt-6">
-                <Button onClick={handleInfoSave} className="w-full bg-blue-600 hover:bg-blue-700"><Save size={16} className="mr-2"/>Guardar Toda la Información</Button>
+
+            <AnimatePresence>
+              {logic.activeTab && (
+                <motion.div
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={{ width: 280, opacity: 1 }}
+                  exit={{ width: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="border-l border-white/5 bg-neutral-900/50 flex flex-col overflow-hidden h-full"
+                >
+                  <div className="flex-1 min-h-0 flex flex-col">
+                    <Sidebar
+                      activeTab={logic.activeTab}
+                      setActiveTab={logic.setActiveTab}
+                      isEditing={logic.isEditing}
+                      setIsEditing={logic.setIsEditing}
+                      liveCardData={logic.liveCardData}
+                      contactInfo={logic.contactInfo}
+                      handleInfoChange={logic.handleInfoChange}
+                      handleInfoSave={logic.handleInfoSave}
+                      setContactInfo={logic.setContactInfo}
+                      currentGroupName={logic.currentGroupName}
+                      toggleChecklistItem={logic.toggleChecklistItem}
+                      handleToggleCheckIn={logic.handleToggleCheckIn}
+                      checklistProgress={logic.checklistProgress}
+                      isAddingPayment={logic.isAddingPayment}
+                      setIsAddingPayment={logic.setIsAddingPayment}
+                      newPayment={logic.newPayment}
+                      setNewPayment={logic.setNewPayment}
+                      handleSavePaymentMethod={logic.handleSavePaymentMethod}
+                      isAddingCheckIn={logic.isAddingCheckIn}
+                      setIsAddingCheckIn={logic.setIsAddingCheckIn}
+                      newCheckIn={logic.newCheckIn}
+                      setNewCheckIn={logic.setNewCheckIn}
+                      handleSaveCheckIn={logic.handleSaveCheckIn}
+                      editingCheckInId={logic.editingCheckInId}
+                      setEditingCheckInId={logic.setEditingCheckInId}
+                      editText={logic.editText}
+                      setEditText={logic.setEditText}
+                      handleSaveEditedCheckIn={logic.handleSaveEditedCheckIn}
+                      handleEditCheckIn={logic.handleEditCheckIn}
+                      handleDeleteCheckIn={logic.handleDeleteCheckIn}
+                      isAddingNote={logic.isAddingNote}
+                      setIsAddingNote={logic.setIsAddingNote}
+                      newNote={logic.newNote}
+                      setNewNote={logic.setNewNote}
+                      handleSaveNote={logic.handleSaveNote}
+                      editingNoteId={logic.editingNoteId}
+                      setEditingNoteId={logic.setEditingNoteId}
+                      handleEditNote={logic.handleEditNote}
+                      handleDeleteNote={logic.handleDeleteNote}
+                      handleSaveEditedNote={logic.handleSaveEditedNote}
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Right Icon Bar */}
+            <div className="w-[60px] flex-shrink-0 border-l border-white/5 bg-black/80 backdrop-blur-md flex flex-col items-center py-6 gap-6 z-10">
+              {[
+                { id: 'perfil', icon: User, label: 'Perfil' },
+                { id: 'notas', icon: FileText, label: 'Notas' },
+                { id: 'pagos', icon: CreditCard, label: 'Pagos' },
+                { id: 'historial', icon: Clock, label: 'Historial' },
+              ].map((item: any) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    if (logic.activeTab === item.id) {
+                      logic.setActiveTab(null);
+                    } else {
+                      logic.setActiveTab(item.id as any);
+                      logic.setIsEditing(false);
+                    }
+                  }}
+                  className={cn(
+                    "relative group flex flex-col items-center transition-all duration-200 w-full",
+                    logic.activeTab === item.id
+                      ? "text-white"
+                      : "text-neutral-600 hover:text-neutral-400"
+                  )}
+                >
+                  <div className={cn(
+                    "p-1 rounded-lg transition-all duration-200 mb-0.5",
+                    logic.activeTab === item.id ? "text-white" : ""
+                  )}>
+                    <item.icon size={18} strokeWidth={logic.activeTab === item.id ? 2.5 : 1.5} />
+                  </div>
+
+                  <span className={cn(
+                    "text-[7px] font-bold uppercase mt-0.5 transition-all duration-200 tracking-tighter",
+                    logic.activeTab === item.id ? "text-white" : "text-neutral-600 text-[6px]"
+                  )}>
+                    {item.label}
+                  </span>
+
+                  {logic.activeTab === item.id && (
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[2px] h-5 bg-blue-500 rounded-l-full shadow-[0_0_8px_rgba(37,99,235,0.6)]" />
+                  )}
+                </button>
+              ))}
             </div>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
-  );
-};
+      </div>
 
-export default ConversationModal;
+      <AnimatePresence>
+        {logic.previewFile && (
+          <FilePreviewModal
+            isOpen={!!logic.previewFile}
+            onClose={() => logic.setPreviewFile(null)}
+            fileUrl={logic.previewFile.url}
+            fileName={logic.previewFile.name}
+            fileType={logic.previewFile.type}
+          />
+        )}
+      </AnimatePresence>
+    </motion.div >
+  );
+}

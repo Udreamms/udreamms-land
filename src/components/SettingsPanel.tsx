@@ -3,7 +3,7 @@
 import React from 'react';
 import { Node } from 'reactflow';
 import { Button } from './ui/button';
-import { Trash2, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Trash2, ChevronRight, ChevronLeft, Bot } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { GeneralSettings } from './settings/nodes/GeneralSettings';
@@ -40,8 +40,8 @@ interface SettingsPanelProps {
 }
 
 interface NodeSettingsProps {
-    node: Node;
-    updateNodeConfig: (nodeId: string, data: object) => void;
+  node: Node;
+  updateNodeConfig: (nodeId: string, data: object) => void;
 }
 
 const SettingsPanel = ({ selectedNode, updateNodeConfig, deleteNode, isOpen, onToggle }: SettingsPanelProps) => {
@@ -79,42 +79,51 @@ const SettingsPanel = ({ selectedNode, updateNodeConfig, deleteNode, isOpen, onT
     templateNode: TemplateSettings,
     humanHandoffNode: HumanHandoffSettings,
   };
-  
+
   const NodeSpecificSettings = selectedNode && selectedNode.type && nodeSettingsMap[selectedNode.type] ? nodeSettingsMap[selectedNode.type] : null;
 
   return (
-    <aside className={cn("w-96 bg-neutral-950/80 backdrop-blur-sm p-3 border-l border-neutral-800 text-white flex flex-col transition-transform duration-300 ease-in-out", isOpen ? "translate-x-0" : "translate-x-full")}>
-      <div className="flex items-center justify-between pb-3 border-b border-neutral-800">
-        <h3 className="font-bold text-lg">Configuración de Nodo</h3>
-        <Button variant="ghost" size="icon" onClick={onToggle} className="hover:bg-neutral-800 text-neutral-400 hover:text-white"><ChevronRight className="h-5 w-5" /></Button>
+    <aside className={cn(
+      "w-80 h-[calc(100%-48px)] my-6 mr-4 bg-neutral-950/90 backdrop-blur-md p-4 border border-neutral-800 text-white flex flex-col transition-transform duration-300 ease-in-out shadow-2xl rounded-2xl",
+      isOpen ? "translate-x-0" : "translate-x-[calc(100%+16px)]"
+    )}>
+      <div className="flex items-center justify-between pb-2 flex-shrink-0 border-b border-neutral-800/50">
+        <h3 className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.2em]">CONFIGURACIÓN</h3>
+        <Button variant="ghost" size="icon" onClick={onToggle} className="h-6 w-6 hover:bg-neutral-800 text-neutral-600 hover:text-white rounded-md">
+          <ChevronRight className="h-3 w-3" />
+        </Button>
       </div>
 
       {selectedNode ? (
-        <div className="flex-grow flex flex-col mt-3 overflow-hidden">
-          <Tabs defaultValue="specific" className="flex-grow flex flex-col">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="specific">Específico</TabsTrigger>
-              <TabsTrigger value="general">General</TabsTrigger>
+        <div className="flex-grow flex flex-col mt-3 overflow-hidden min-h-0 relative">
+          <Tabs defaultValue="specific" className="flex-grow flex flex-col min-h-0">
+            <TabsList className="grid w-full grid-cols-2 flex-shrink-0 bg-neutral-900/50 h-8 p-1 border border-neutral-800/50 rounded-lg">
+              <TabsTrigger value="specific" className="text-[10px] uppercase font-black tracking-widest data-[state=active]:bg-neutral-800 data-[state=active]:text-white">Ajustes</TabsTrigger>
+              <TabsTrigger value="general" className="text-[10px] uppercase font-black tracking-widest data-[state=active]:bg-neutral-800 data-[state=active]:text-white">Estilo</TabsTrigger>
             </TabsList>
-            <div className="flex-grow overflow-y-auto mt-4 space-y-4 pr-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-neutral-700 [&::-webkit-scrollbar-track]:bg-neutral-800/50">
-                <TabsContent value="specific">
-                    {NodeSpecificSettings ? <NodeSpecificSettings node={selectedNode} updateNodeConfig={updateNodeConfig} /> : <p className="text-neutral-500 text-center py-8">Este nodo no tiene configuraciones específicas.</p>}
-                </TabsContent>
-                <TabsContent value="general">
-                    <GeneralSettings node={selectedNode} updateNodeConfig={updateNodeConfig} />
-                </TabsContent>
+            <div className="flex-grow overflow-y-auto mt-3 space-y-3 pr-1 scrollbar-thin scrollbar-thumb-neutral-800 scrollbar-track-transparent min-h-0 pb-4">
+              <TabsContent value="specific" className="mt-0">
+                {NodeSpecificSettings ? <NodeSpecificSettings node={selectedNode} updateNodeConfig={updateNodeConfig} /> : <p className="text-neutral-600 text-center py-6 text-[10px] font-bold uppercase tracking-wider">No settings.</p>}
+              </TabsContent>
+              <TabsContent value="general" className="mt-0">
+                <GeneralSettings node={selectedNode} updateNodeConfig={updateNodeConfig} />
+              </TabsContent>
             </div>
           </Tabs>
-          <div className="mt-auto pt-3 border-t border-neutral-800">
-            {/* El nodo de inicio usualmente no se debería borrar, pero lo dejo por consistencia si el usuario quiere */}
-            <Button variant="destructive" onClick={() => deleteNode(selectedNode.id)} className="w-full">
-              <Trash2 className="mr-2 h-4 w-4" /> Eliminar Nodo
+          <div className="mt-auto pt-4 flex-shrink-0 border-t border-neutral-800/50">
+            <Button variant="ghost" onClick={() => deleteNode(selectedNode.id)} className="w-full h-9 text-red-500/60 hover:text-red-400 hover:bg-red-500/10 text-[10px] font-black uppercase tracking-[0.2em] transition-all rounded-xl border border-transparent hover:border-red-500/20">
+              <Trash2 className="mr-2 h-4 w-4" /> ELIMINAR NODO
             </Button>
           </div>
         </div>
       ) : (
-        <div className="flex-grow flex items-center justify-center">
-          <p className="text-neutral-500 text-center">Selecciona un nodo para <br/> ver su configuración</p>
+        <div className="flex-grow flex flex-col items-center justify-center p-8 text-center space-y-4">
+          <div className="w-12 h-12 rounded-full bg-neutral-900 flex items-center justify-center border border-white/5">
+            <Bot className="w-6 h-6 text-neutral-700" />
+          </div>
+          <p className="text-[10px] text-neutral-600 font-bold uppercase tracking-widest leading-relaxed">
+            Select a node to <br /> consult configuration
+          </p>
         </div>
       )}
     </aside>

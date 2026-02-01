@@ -11,17 +11,21 @@ import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/
 import { app } from '@/lib/firebase';
 
 export const SettingsSection = ({ title, children }: { title: string, children: React.ReactNode }) => (
-    <div className="space-y-4 p-4 border border-neutral-800 rounded-lg bg-neutral-900">
-      <h4 className="font-semibold text-lg text-white">{title}</h4>
-      <div className="space-y-4">{children}</div>
+    <div className="flex flex-col space-y-4 py-3 border-b border-neutral-800/50 last:border-0 px-1">
+        <h4 className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.15em] mb-1">{title}</h4>
+        <div className="flex flex-col gap-3">{children}</div>
     </div>
 );
 
 export const Field = ({ label, htmlFor, children, description = null }: { label: string, htmlFor: string, children: React.ReactNode, description?: string | null }) => (
-    <div className="space-y-2">
-        <Label htmlFor={htmlFor} className="text-xs font-semibold text-neutral-400">{label}</Label>
-        {description && <p className="text-xs text-neutral-500 -mt-1">{description}</p>}
-        {children}
+    <div className="flex flex-col space-y-1.5 px-1 py-1">
+        <div className="flex flex-col">
+            <Label htmlFor={htmlFor} className="text-[9px] font-black text-neutral-500 uppercase tracking-[0.15em] leading-tight mb-1">{label}</Label>
+            {description && <p className="text-[9px] text-neutral-600 font-bold uppercase tracking-wider leading-tight mb-2">{description}</p>}
+        </div>
+        <div className="w-full">
+            {children}
+        </div>
     </div>
 );
 
@@ -81,7 +85,7 @@ export const FileUploader = ({ onUploadSuccess, initialUrl = null, initialFilena
             <div className="p-3 bg-neutral-800 rounded-lg flex items-center justify-between border border-neutral-700">
                 <p className="text-sm text-white truncate pr-4">{filename}</p>
                 <Button variant="ghost" size="icon" onClick={handleRemoveFile} className="h-7 w-7">
-                    <XCircle className="text-red-500 hover:text-red-400" size={18}/>
+                    <XCircle className="text-red-500 hover:text-red-400" size={18} />
                 </Button>
             </div>
         );
@@ -97,11 +101,11 @@ export const FileUploader = ({ onUploadSuccess, initialUrl = null, initialFilena
                 </div>
             ) : (
                 <div className="flex flex-col items-center gap-2 text-neutral-500">
-                    <UploadCloud size={32}/>
+                    <UploadCloud size={32} />
                     <p className="text-sm">
                         {isDragActive ? "Suelta el archivo aquí" : "Arrastra un archivo o haz clic"}
                     </p>
-                     {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+                    {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
                 </div>
             )}
         </div>

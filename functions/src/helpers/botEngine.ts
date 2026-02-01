@@ -2,11 +2,11 @@
 // src/helpers/botEngine.ts
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import { 
-    sendMessage, 
-    sendMediaMessage, 
-    sendButtonMessage, 
-    sendListMessage, 
+import {
+    sendMessage,
+    sendMediaMessage,
+    sendButtonMessage,
+    sendListMessage,
     sendLocationMessage,
     markAsRead
 } from './whatsappAPI';
@@ -17,7 +17,12 @@ const db = admin.firestore();
 const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
 export async function getActiveBot(): Promise<any | null> {
-    const botsSnapshot = await db.collection('chatbots').where('isActive', '==', true).limit(1).get();
+    const botsSnapshot = await db.collection('chatbots')
+        .where('isActive', '==', true)
+        .orderBy('updatedAt', 'desc') // Tomar el más recientemente activado para consistencia
+        .limit(1)
+        .get();
+
     if (botsSnapshot.empty) return null;
     const botData = botsSnapshot.docs[0].data();
     if (!botData.flow || !botData.flow.nodes || !botData.flow.edges) return null;
@@ -42,12 +47,12 @@ function replaceVariables(text: string, cardData: any): string {
 
 // Calcula el tiempo de "escritura humana" en MS
 function calculateTypingDelay(text: string): number {
-    const charsPerSecond = 25; 
-    const baseDelay = 1000; 
+    const charsPerSecond = 25;
+    const baseDelay = 1000;
     let typingTime = (text.length / charsPerSecond) * 1000;
-    
+
     if (typingTime < 1500) typingTime = 1500;
-    if (typingTime > 6000) typingTime = 6000; 
+    if (typingTime > 6000) typingTime = 6000;
 
     return baseDelay + typingTime;
 }
@@ -57,7 +62,7 @@ function sanitizeListData(data: any): any[] {
     if (Array.isArray(data.sections) && data.sections.length > 0) {
         for (const sec of data.sections) {
             const rows = sec.rows || [];
-            const options = sec.options || []; 
+            const options = sec.options || [];
             const validRows: any[] = [];
             if (Array.isArray(rows)) {
                 rows.forEach((r: any) => { if (r && r.title && r.title.trim() !== '') validRows.push(r); });
@@ -101,14 +106,14 @@ export async function executeBotFlow(bot: any, to: string, cardData: any, userMe
         const currentNode = bot.flow.nodes.find((n: any) => String(n.id) === String(currentNodeId));
         if (!currentNode) return;
 
-        await markAsRead(userMessage); 
-        await delay(500); 
+        await markAsRead(userMessage);
+        await delay(500);
 
         if (currentNode.type === 'captureInputNode') {
             const validation = validateInput(userMessage, currentNode.data);
             if (!validation.isValid) {
                 await sendMessage(to, validation.errorMessage || "Respuesta inválida.");
-                return; 
+                return;
             }
             let varName = currentNode.data.variableName;
             if (!varName || varName === 'undefined') {
@@ -117,13 +122,25 @@ export async function executeBotFlow(bot: any, to: string, cardData: any, userMe
                 else varName = `captured_${currentNode.id}`;
             }
             if (varName) {
-                await saveVariable(to, varName, userMessage);
+                // Validación de seguridad para nombres: Si el usuario escribe mucho (frase), 
+                // probablemente no es SOLO su nombre. Intentamos extraerlo o ignorar capturas absurdas.
+                let valueToSave = userMessage.trim();
+
+                if (['nombre', 'name'].includes(varName) && valueToSave.length > 30) {
+                    // Si el nombre es muy largo, podría ser una frase. 
+                    // Intentamos tomar la última palabra o algo simple, o dejamos el anterior.
+                    functions.logger.info(`Name capture too long, might be a sentence: ${valueToSave}`);
+                    // Por ahora solo lo truncamos o lo guardamos pero limitamos el daño en la UI
+                    valueToSave = valueToSave.split(' ').slice(-2).join(' '); // Tomar un intento de nombre/apellido
+                }
+
+                await saveVariable(to, varName, valueToSave);
                 if (!cardData.customFields) cardData.customFields = {};
-                cardData.customFields[varName] = userMessage;
-                if (['nombre', 'name'].includes(varName)) cardData.contactName = userMessage;
+                cardData.customFields[varName] = valueToSave;
+                if (['nombre', 'name'].includes(varName)) cardData.contactName = valueToSave;
             }
         }
-        
+
         const outgoingEdges = bot.flow.edges.filter((e: any) => String(e.source) === String(currentNodeId));
         let selectedEdge = null;
 
@@ -133,7 +150,7 @@ export async function executeBotFlow(bot: any, to: string, cardData: any, userMe
             } else {
                 if (currentNode.type === 'quickReplyNode') {
                     const buttons = sanitizeButtonsData(currentNode.data.buttons || []);
-                    const matchedBtn = buttons.find((btn: any) => 
+                    const matchedBtn = buttons.find((btn: any) =>
                         (btn.title || '').toLowerCase().trim() === userMessage.toLowerCase().trim() ||
                         (btn.id || '') === userMessage
                     );
@@ -145,7 +162,7 @@ export async function executeBotFlow(bot: any, to: string, cardData: any, userMe
                     const sections = sanitizeListData(currentNode.data);
                     let matchedRowId = null;
                     for (const sec of sections) {
-                        const row = sec.rows.find((r: any) => 
+                        const row = sec.rows.find((r: any) =>
                             (r.title || '').toLowerCase().trim() === userMessage.toLowerCase().trim() ||
                             (r.id || '') === userMessage
                         );
@@ -184,7 +201,7 @@ export async function executeBotFlow(bot: any, to: string, cardData: any, userMe
         if (['textMessageNode', 'mediaMessageNode', 'quickReplyNode', 'listMessageNode'].includes(nextNode.type)) {
             // Por defecto es TRUE (Humano) a menos que se desactive explícitamente en el editor
             const simulateTyping = nextNode.data.typingSimulation !== false;
-            
+
             if (simulateTyping) {
                 const content = nextNode.data.content || nextNode.data.text || nextNode.data.caption || '';
                 const humanDelay = calculateTypingDelay(content);
@@ -203,7 +220,7 @@ export async function executeBotFlow(bot: any, to: string, cardData: any, userMe
                 break;
 
             case 'captureInputNode':
-                shouldContinue = false; 
+                shouldContinue = false;
                 break;
 
             case 'mediaMessageNode':
@@ -221,7 +238,7 @@ export async function executeBotFlow(bot: any, to: string, cardData: any, userMe
                 if (buttons.length > 0) {
                     await sendButtonMessage(to, qrText, buttons);
                     await logBotMessage(to, `[Botones] ${qrText}`);
-                    shouldContinue = false; 
+                    shouldContinue = false;
                 } else {
                     await sendMessage(to, qrText);
                     nextNodeId = getNextNodeId(bot, nextNodeId);
@@ -254,7 +271,7 @@ export async function executeBotFlow(bot: any, to: string, cardData: any, userMe
                 await delay(ms);
                 nextNodeId = getNextNodeId(bot, nextNodeId);
                 break;
-            
+
             case 'conditionNode':
                 const trueEdge = bot.flow.edges.find((e: any) => String(e.source) === String(nextNodeId) && e.sourceHandle === 'true');
                 if (trueEdge) nextNodeId = trueEdge.target;
@@ -287,7 +304,7 @@ async function saveVariable(contactNumber: string, variable: string, value: stri
     if (!variable) return;
     const cardsRef = db.collectionGroup('cards').where('contactNumber', '==', contactNumber);
     const snapshot = await cardsRef.get();
-    
+
     const updateData: any = {};
     updateData[`customFields.${variable}`] = value;
     if (['nombre', 'name', 'fullname'].includes(variable.toLowerCase())) {
