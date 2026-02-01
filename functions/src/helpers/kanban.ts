@@ -75,7 +75,13 @@ export async function handleKanbanUpdate(from: string, contactName: string, body
                 groupId: groupId,
                 createdAt: admin.firestore.FieldValue.serverTimestamp(),
                 updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-                messages: [{ sender: 'user', text: body, timestamp: new Date() }],
+                messages: [{
+                    sender: 'user',
+                    text: body,
+                    timestamp: new Date(),
+                    // We can add a type field here later if we pass it from the webhook
+                    type: body.startsWith('[') && body.endsWith(']') ? 'system' : 'text'
+                }],
             };
 
             // Ejecutamos la creación (SET) dentro de la transacción
