@@ -33,7 +33,7 @@ const itemVariants = {
     visible: {
         y: 0,
         opacity: 1,
-        transition: { duration: 0.5, ease: "easeOut" }
+        transition: { duration: 0.5, ease: "easeOut" as any }
     }
 };
 
@@ -42,7 +42,7 @@ const lineVariants = {
     visible: {
         pathLength: 1,
         opacity: 0.3,
-        transition: { duration: 1.5, ease: "easeInOut", delay: 0.5 }
+        transition: { duration: 1.5, ease: "easeInOut" as any, delay: 0.5 }
     }
 };
 
