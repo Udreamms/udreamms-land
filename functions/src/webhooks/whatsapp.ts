@@ -49,9 +49,27 @@ export const whatsappWebhook = functions.https.onRequest(async (req, res) => {
         } else if (interactive.type === 'list_reply') {
             body = interactive.list_reply.id || interactive.list_reply.title;
         }
+    } else if (['image', 'video', 'audio', 'voice', 'document', 'sticker'].includes(message.type)) {
+        // Handle Media Message
+        // We will store a placeholder text like "[Imagen]" and pass metadata
+        body = `[${message.type.toUpperCase()}]`;
+
+        // Extract media ID and MIME type if available
+        const mediaObj = message[message.type];
+        if (mediaObj) {
+            // We can pass this extra data to handleKanbanUpdate if we modify it, 
+            // or just let the body serve as notification. 
+            // For now, let's treat it as text so it at least appears.
+            // Ideally, we should fetch the media URL using the ID, but that requires another API call.
+            // The system seems to rely on the body string.
+            if (mediaObj.caption) {
+                body += ` ${mediaObj.caption}`;
+            }
+        }
     } else {
         functions.logger.info(`Received non-text message type: ${message.type}`);
-        return;
+        // Fallback for unknown types to prevent silence
+        body = `[Mensaje tipo: ${message.type}]`;
     }
 
     functions.logger.info(`📩 Webhook Received from ${from}: "${body}" (Type: ${message.type})`);

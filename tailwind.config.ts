@@ -1,5 +1,6 @@
 
 import type { Config } from 'tailwindcss';
+// Refresh cache
 import { fontFamily } from 'tailwindcss/defaultTheme';
 
 const config = {
