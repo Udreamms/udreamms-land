@@ -20,6 +20,9 @@ import Testimonial from "@/components/landing/Testimonial";
 import JoinOurStudents from "@/components/landing/JoinOurStudents";
 import CityPartnerships from "@/components/landing/CityPartnerships";
 import PlanButtons from "@/components/landing/PlanButtons";
+import TouristShowcase from "@/components/landing/TouristShowcase";
+import StudentShowcase from "@/components/landing/StudentShowcase";
+import FifaShowcase from "@/components/landing/FifaShowcase";
 
 function HomeContent() {
   const searchParams = useSearchParams();
@@ -56,19 +59,20 @@ function HomeContent() {
     <div className="min-h-screen bg-white">
       {/* TopBar eliminado */}
       <Header />
-      
+
       <Hero onStartQuote={handleStartQuote} />
-      
+
       <ChooseYourPath />
-      
+
+      {/* Product Showcases */}
+      <TouristShowcase />
+      <StudentShowcase />
+      <FifaShowcase />
+
       <Stats />
 
       {/* Flujo Principal: Qué hacemos -> Cómo lo hacemos */}
       <Services onStartQuote={handleStartQuote} onAppClick={handleAppClick} />
-      <Roadmap />
-
-      {/* Auto-identificación del usuario */}
-      <StageDetails />
 
       {/* Herramientas y Valor Diferencial */}
       <AppSection />
@@ -76,9 +80,6 @@ function HomeContent() {
 
       {/* NUEVAS SECCIONES BAJO "POR QUÉ UDREAMMS" */}
       <JoinOurStudents />
-      <Testimonial />
-      <CityPartnerships />
-      <PlanButtons />
 
       {/* Cierre / Conversión */}
       {showCalculator ? (
@@ -91,8 +92,8 @@ function HomeContent() {
       <YouTubeSubscription />
 
       <Footer />
-      <UpsellModal 
-        isOpen={showUpsell} 
+      <UpsellModal
+        isOpen={showUpsell}
         onClose={() => setShowUpsell(false)}
         total={totalPrice}
       />

@@ -12,19 +12,19 @@ export default function SocialProofSection() {
                     <FadeIn className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 text-center divide-x divide-slate-800/50">
                         <div className="space-y-2">
                             <div className="text-3xl md:text-4xl font-bold text-gold">98%</div>
-                            <div className="text-xs md:text-sm text-slate-400 uppercase tracking-widest">Tasa de Aprobación</div>
+                            <div className="text-xs md:text-sm text-slate-400 uppercase tracking-widest">Aprobación Visa Americana</div>
                         </div>
                         <div className="space-y-2">
                             <div className="text-3xl md:text-4xl font-bold text-gold">500+</div>
-                            <div className="text-xs md:text-sm text-slate-400 uppercase tracking-widest">Visas Entregadas</div>
+                            <div className="text-xs md:text-sm text-slate-400 uppercase tracking-widest">Visas de Turismo B1/B2</div>
                         </div>
                         <div className="space-y-2">
                             <div className="text-3xl md:text-4xl font-bold text-gold">15k</div>
-                            <div className="text-xs md:text-sm text-slate-400 uppercase tracking-widest">Horas de Asesoría</div>
+                            <div className="text-xs md:text-sm text-slate-400 uppercase tracking-widest">Citas Consulares</div>
                         </div>
                         <div className="space-y-2">
                             <div className="text-3xl md:text-4xl font-bold text-gold">24/7</div>
-                            <div className="text-xs md:text-sm text-slate-400 uppercase tracking-widest">Soporte Experto</div>
+                            <div className="text-xs md:text-sm text-slate-400 uppercase tracking-widest">Asesoría Migratoria</div>
                         </div>
                     </FadeIn>
                 </div>

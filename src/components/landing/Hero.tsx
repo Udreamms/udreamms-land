@@ -36,7 +36,7 @@ export default function Hero({ onStartQuote }: HeroProps) {
     <section className="relative h-screen min-h-[600px] flex items-end overflow-hidden">
       {/* Background Container */}
       <div className="absolute inset-0 w-full h-full">
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${heroImage})` }}
         />
@@ -55,31 +55,31 @@ export default function Hero({ onStartQuote }: HeroProps) {
             Tu navegador no soporta videos HTML5.
           </video>
         )}
-        
+
         {/* Overlays para legibilidad y transición suave a negro */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#050507] via-transparent to-transparent" />
       </div>
-      
+
       {/* Contenido con márgenes de 5cm */}
       <div className="relative z-10 w-full pb-24 px-[5cm]">
         <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-12 w-full">
-          
-          <div className="max-w-[70%] text-left space-y-2"> 
+
+          <div className="max-w-[70%] text-left space-y-4">
             {/* Texto superior (Eyebrow) */}
-            <p className="text-gray-300 text-lg md:text-xl font-semibold tracking-tight">
-              Asesoría integral para la obtención de tu visa americana
+            <p className="text-gray-300 text-lg md:text-xl font-bold tracking-[0.2em] uppercase">
+              ESTUDIA | VIAJA | DISFRUTA
             </p>
-            
+
             {/* Título Principal */}
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] text-white tracking-tighter">
-              Transforma tu futuro <br />
-              y cumple tu sueño <br />
-              en América
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-[1.05] text-white tracking-tighter">
+              Tu experiencia <br />
+              en Estados Unidos <br />
+              comienza aquí
             </h1>
-            
-            <div className="pt-4 text-lg md:text-xl text-gray-300 font-medium tracking-tight max-w-none">
-              <p>
-                Te guiamos desde la solicitud de la visa hasta que tienes vivienda en USA
+
+            <div className="pt-2">
+              <p className="text-gray-300 text-lg md:text-xl font-medium tracking-tight">
+                Asesoría integral para que vivas la mejor experiencia en Estados Unidos.
               </p>
             </div>
           </div>
@@ -89,14 +89,7 @@ export default function Hero({ onStartQuote }: HeroProps) {
               onClick={onStartQuote}
               className="group relative inline-flex items-center justify-center px-10 py-4 text-lg font-semibold text-white overflow-hidden rounded-full bg-primary hover:bg-primary/90 transition-all duration-300 shadow-lg shadow-primary/20"
             >
-              Evalúa tu perfil Gratis
-            </button>
-            
-            <button
-              onClick={() => document.getElementById('roadmap')?.scrollIntoView({ behavior: 'smooth' })}
-              className="inline-flex items-center justify-center px-10 py-4 text-lg font-semibold text-white rounded-full border-2 border-white/60 hover:bg-white hover:text-black hover:border-white transition-all duration-300 backdrop-blur-md"
-            >
-              Ver Roadmap
+              Obtén tu Cotización Gratis
             </button>
           </div>
 

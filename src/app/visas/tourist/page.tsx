@@ -3,37 +3,42 @@
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import HeroSection from "./_components/HeroSection";
+import SuccessPipeline from "./_components/SuccessPipeline";
 import ValuePropsSection from "./_components/ValuePropsSection";
-import SystemGapSection from "./_components/SystemGapSection";
 import BenefitsSection from "./_components/BenefitsSection";
-import AgitationSection from "./_components/AgitationSection";
 import SuccessVideoSection from "./_components/SuccessVideoSection";
-import SolutionSection from "./_components/SolutionSection";
 import SocialProofSection from "./_components/SocialProofSection";
-import GuaranteeSection from "./_components/GuaranteeSection";
-import FAQSection from "./_components/FAQSection";
-import ScarcitySection from "./_components/ScarcitySection";
-import QuizSection from "./_components/QuizSection";
-
+import BuyCtaSection from "./_components/BuyCtaSection";
+import BasicPlanShowcase from "./_components/BasicPlanShowcase";
+import PremiumPlanShowcase from "./_components/PremiumPlanShowcase";
+import VipPlanShowcase from "./_components/VipPlanShowcase";
 import PlansSection from "./_components/PlansSection";
 
 export default function TouristVisaPage() {
   return (
-    <div className="min-h-screen bg-cloud font-sans">
+    <div className="min-h-screen bg-cloud font-sans text-abyss">
       <Header />
       <HeroSection />
+
+      {/* 1. The Offer (Restored Overview) */}
       <PlansSection />
-      <SystemGapSection />
+
+      {/* 2. Value Reinforcement (Moved here as requested) */}
       <ValuePropsSection />
       <BenefitsSection />
-      <AgitationSection />
+
+      {/* 3. Deep Dives (Information Only) */}
+      <BasicPlanShowcase />
+      <PremiumPlanShowcase />
+      <VipPlanShowcase />
+
+      {/* 5. Social Proof & Evidence */}
       <SuccessVideoSection />
-      <SolutionSection />
       <SocialProofSection />
-      <GuaranteeSection />
-      <FAQSection />
-      <ScarcitySection />
-      <QuizSection />
+
+      {/* 7. Direct Purchase CTA */}
+      <BuyCtaSection />
+
       <Footer />
     </div>
   );

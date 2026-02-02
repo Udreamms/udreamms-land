@@ -106,7 +106,12 @@ export default function PlansSection() {
                 </div>
 
                 {/* Main Container - Professional Slate Theme (bg-slate-50) - Clean & Noise Free */}
-                <div className="max-w-[1400px] mx-auto bg-slate-50 rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-slate-200 relative">
+                <div className="max-w-[1600px] mx-auto bg-slate-50 rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-slate-200 relative overflow-hidden">
+
+                    {/* Limited Time Badge - Animated Gradient */}
+                    <div className="absolute top-0 right-0 bg-gradient-to-r from-orange-600 to-red-600 text-white text-[10px] font-bold uppercase tracking-widest px-6 py-2 rounded-bl-3xl shadow-lg z-20 animate-pulse">
+                        ¡CUPOS LIMITADOS!
+                    </div>
 
                     {/* Inject Gradient Definition */}
                     <GoogleGradient />
@@ -166,12 +171,7 @@ export default function PlansSection() {
 
                                     <Button
                                         // Button - Professional Slate/Black theme
-                                        className={`w-full mb-8 rounded-full py-6 font-bold text-lg shadow-sm transition-transform active:scale-95 border-2
-                                            ${plan.highlight
-                                                ? "bg-slate-900 text-white border-slate-900 hover:bg-black hover:border-black hover:text-white"
-                                                : "bg-white text-slate-900 border-slate-200 hover:border-slate-900 hover:bg-slate-50"
-                                            }
-                                        `}
+                                        className="w-full mb-8 rounded-full py-6 font-bold text-lg shadow-sm transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900"
                                     >
                                         Elegir Plan
                                     </Button>

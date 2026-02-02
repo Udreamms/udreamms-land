@@ -11,17 +11,17 @@ export default function GuaranteeSection() {
                     <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 text-primary">
                         <Shield className="w-8 h-8" />
                     </div>
-                    <h2 className="text-2xl md:text-3xl font-bold text-abyss font-playfair mb-4">Garantía de Confianza Total</h2>
+                    <h2 className="text-2xl md:text-3xl font-bold text-abyss font-playfair mb-4">Garantía de Gestión Experta</h2>
 
                     <p className="text-slate-600 mb-8 leading-relaxed">
-                        Entendemos que este es un paso importante. Por eso, si después de tu primera sesión de simulacro no te sientes con más confianza que antes, <strong className="text-abyss">te regalamos una segunda sesión de refuerzo totalmente GRATIS</strong>.
+                        Nos encargamos de todo el proceso de tu visa de turista y la planificación de tu viaje. Desde la documentación hasta las reservas, tú solo tienes que preocuparte por <strong className="text-abyss">disfrutar.</strong>
                     </p>
                     <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-sm text-slate-500">
                         <div className="flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-gold" /> Sin letra chica
+                            <CheckCircle2 className="w-4 h-4 text-gold" /> Todo gestionado
                         </div>
                         <div className="flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-gold" /> Compromiso de Calidad
+                            <CheckCircle2 className="w-4 h-4 text-gold" /> Sin sorpresas ni letra chica
                         </div>
                     </div>
                 </FadeIn>

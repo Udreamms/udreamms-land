@@ -57,7 +57,7 @@ export default function HeroSection() {
 
                 <FadeIn>
                     <p className="text-cloud/90 text-lg md:text-xl font-medium tracking-widest uppercase mb-2 drop-shadow-md">
-                        PARA ESTUDIANTES CON AMBICIÓN GLOBAL
+                        DOMINA EL INGLÉS EN ESTADOS UNIDOS
                     </p>
                 </FadeIn>
 
@@ -74,8 +74,7 @@ export default function HeroSection() {
                 {/* H2: The How/Credibility */}
                 <FadeIn delay={0.4}>
                     <p className="text-cloud/80 text-sm md:text-xl max-w-3xl mb-8 drop-shadow-md leading-relaxed">
-                        Planificación integral, soporte estructural y preparación consular <br className="hidden md:block" />
-                        estratégica para tu formación en instituciones americanas.
+                        Aprende inglés en las mejores instituciones del país
                     </p>
                 </FadeIn>
 

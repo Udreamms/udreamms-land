@@ -57,40 +57,47 @@ export default function HeroSection() {
             </div>
 
             {/* Overlay Content (Static) */}
-            <div className="absolute inset-0 flex flex-col justify-end items-start z-20 text-left px-6 pb-20 md:pl-[7rem] md:pb-20 pointer-events-none">
+            <div className="absolute inset-0 flex flex-col justify-end pb-32 items-start z-20 text-left px-6 md:pl-[7rem] pointer-events-none">
+                {/* Badge/Eyebrow */}
+                <FadeIn delay={0.1}>
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-600/20 backdrop-blur-md border border-blue-400/30 text-white font-bold text-xs uppercase tracking-widest mb-6 pointer-events-auto">
+                        <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                        Gestionamos tu proceso migratorio y tus vacaciones soñadas
+                    </div>
+                </FadeIn>
+
                 {/* H1: The Big Promise */}
                 <motion.h1
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2 }}
-                    className="text-white text-4xl md:text-6xl lg:text-7xl font-bold font-sans drop-shadow-xl tracking-tighter mb-4"
+                    className="text-white text-4xl md:text-7xl lg:text-8xl font-black font-sans drop-shadow-xl tracking-tighter mb-6 leading-tight"
                 >
-                    Visa de Turismo
+                    Explora USA <br />
+                    <span className="text-blue-500">con total confianza.</span>
                 </motion.h1>
 
                 {/* H2: The How/Credibility */}
                 <FadeIn delay={0.4}>
-                    <p className="text-cloud/80 text-sm md:text-base max-w-lg mb-8 drop-shadow-md leading-relaxed">
-                        Análisis técnico, estratégico y validación experta en cada detalle de tu solicitud, para una presentación impecable.
+                    <p className="text-cloud/90 text-lg md:text-2xl max-w-2xl mb-10 drop-shadow-md leading-relaxed font-medium">
+                        Gestionamos tu visa de turista y planificamos tu viaje a Estados Unidos.
                     </p>
                 </FadeIn>
 
-
-
-
-            </div>
-
-            {/* Bottom Right CTA Button - Fixed */}
-            <div className="fixed bottom-40 right-36 z-50 pointer-events-auto">
-                <FadeIn delay={0.8}>
-                    <Button
-                        size="lg"
-                        className="bg-white hover:bg-slate-100 text-abyss text-xl px-12 py-5 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.7)] transition-all hover:scale-105 font-bold"
-                        onClick={() => document.getElementById('quiz')?.scrollIntoView({ behavior: 'smooth' })}
+                <Button
+                    size="lg"
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-xl px-12 py-8 rounded-full shadow-[0_10px_40px_rgba(37,99,235,0.4)] transition-all hover:scale-105 font-black uppercase tracking-tight group"
+                    onClick={() => document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                    Ver Planes
+                    <motion.span
+                        animate={{ x: [0, 5, 0] }}
+                        transition={{ repeat: Infinity, duration: 1.5 }}
+                        className="ml-3"
                     >
-                        Solicitar ahora
-                    </Button>
-                </FadeIn>
+                        →
+                    </motion.span>
+                </Button>
             </div>
 
 

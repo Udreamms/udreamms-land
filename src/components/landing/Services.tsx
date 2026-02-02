@@ -1,11 +1,11 @@
 "use client";
 
 import { useRef } from "react";
-import { 
-  Shield, 
-  GraduationCap, 
-  Globe, 
-  Users, 
+import {
+  Shield,
+  GraduationCap,
+  Globe,
+  Users,
   Smartphone,
   ChevronLeft,
   ChevronRight
@@ -48,7 +48,7 @@ export default function Services({ onStartQuote, onAppClick }: ServicesProps) {
       image: "/assets/hero-living-space.jpg",
       icon: Users,
     },
-     {
+    {
       category: "Descarga la App",
       title: "Udreamms App",
       description: "Gestiona documentos, conecta con roomies y recibe alertas en tiempo real.",
@@ -61,10 +61,10 @@ export default function Services({ onStartQuote, onAppClick }: ServicesProps) {
     if (scrollContainerRef.current) {
       const scrollAmount = 450;
       const currentScroll = scrollContainerRef.current.scrollLeft;
-      const targetScroll = direction === 'left' 
-        ? currentScroll - scrollAmount 
+      const targetScroll = direction === 'left'
+        ? currentScroll - scrollAmount
         : currentScroll + scrollAmount;
-        
+
       scrollContainerRef.current.scrollTo({
         left: targetScroll,
         behavior: 'smooth'
@@ -79,13 +79,13 @@ export default function Services({ onStartQuote, onAppClick }: ServicesProps) {
       <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-50 to-white" />
 
       <div className="container px-6 md:px-12 mx-auto relative z-10">
-        
+
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
           <div className="max-w-4xl">
             <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 text-gray-900">
               Todo lo que necesitas para <br />
-              <span className="text-gray-400">triunfar en USA.</span>
+              <span className="text-red-600">triunfar en USA.</span>
             </h2>
             <p className="text-xl text-gray-500 font-medium leading-relaxed w-full">
               Un ecosistema de servicios diseñado para acompañarte en cada etapa de tu viaje.
@@ -94,13 +94,13 @@ export default function Services({ onStartQuote, onAppClick }: ServicesProps) {
 
           {/* Navigation Controls */}
           <div className="flex gap-4">
-            <button 
+            <button
               onClick={() => scroll('left')}
               className="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-900 flex items-center justify-center transition-all border border-gray-200 active:scale-95"
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
-            <button 
+            <button
               onClick={() => scroll('right')}
               className="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-900 flex items-center justify-center transition-all border border-gray-200 active:scale-95"
             >
@@ -110,24 +110,24 @@ export default function Services({ onStartQuote, onAppClick }: ServicesProps) {
         </div>
 
         {/* Carousel Container */}
-        <div 
+        <div
           ref={scrollContainerRef}
           className="flex gap-8 overflow-x-auto snap-x snap-mandatory pb-12 scrollbar-hide -mx-6 px-6 md:mx-0 md:px-0"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {services.map((service, index) => (
-            <div 
+            <div
               key={index}
               className="group snap-center shrink-0 w-[85vw] md:w-[400px] flex flex-col gap-4"
             >
               {/* THE CARD */}
               <div className="relative h-[500px] w-full rounded-[2.5rem] overflow-hidden bg-gray-100 shadow-xl shadow-gray-200/50 border border-gray-200 transition-transform duration-300 group-hover:scale-[1.02]">
                 {/* Image Background */}
-                <div 
+                <div
                   className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
                   style={{ backgroundImage: `url('${service.image}')` }}
                 />
-                
+
                 {/* Overlay Gradient */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
 

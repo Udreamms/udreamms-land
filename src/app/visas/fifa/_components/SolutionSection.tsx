@@ -9,13 +9,13 @@ export default function SolutionSection() {
             <div className="max-w-7xl mx-auto px-6 relative z-10">
                 <FadeIn className="text-center mb-16">
                     <h2 className="text-sm font-bold text-yellow-600 tracking-[0.2em] uppercase mb-4 animate-pulse">
-                        El Pack "Fanático Mundialista"
+                        La Experiencia Definitiva
                     </h2>
                     <h3 className="text-3xl md:text-5xl font-black italic text-slate-900 mb-6 leading-none">
-                        ESTRATEGIA <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-600">DE CAMPEONATO</span>
+                        VIVE EL MUNDIAL <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-600">COMO LEYENDA.</span>
                     </h3>
                     <p className="text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto font-medium">
-                        Nuestro software monitorea consulados 24/7. Atrapamos citas canceladas antes que el público general.
+                        Tu acceso total a la Copa del Mundo. Lujo, comodidad y puertas abiertas donde otros solo ven muros.
                     </p>
                 </FadeIn>
 
@@ -30,11 +30,11 @@ export default function SolutionSection() {
                             <FadeIn delay={0.1}>
                                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-start gap-5 hover:scale-[1.02] transition-transform">
                                     <div className="w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center text-yellow-600 shrink-0">
-                                        <Radar className="w-6 h-6" />
+                                        <Users className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-slate-900 mb-1">1. Radar de Citas</h4>
-                                        <p className="text-sm text-slate-600">Sistema automatizado que caza citas de cancelación en tiempo real.</p>
+                                        <h4 className="font-bold text-slate-900 mb-1">1. Hospitality VIP</h4>
+                                        <p className="text-sm text-slate-600">Acceso a zonas exclusivas en estadios con catering gourmet y bebidas.</p>
                                     </div>
                                 </div>
                             </FadeIn>
@@ -45,8 +45,8 @@ export default function SolutionSection() {
                                         <Shield className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-slate-900 mb-1">2. Logística Blindada</h4>
-                                        <p className="text-sm text-slate-600">Guía experta para cruces fronterizos entre sedes (USA-MEX-CAN).</p>
+                                        <h4 className="font-bold text-slate-900 mb-1">2. Traslados Privados</h4>
+                                        <p className="text-sm text-slate-600">Chofer privado para llevarte del hotel al estadio con total seguridad.</p>
                                     </div>
                                 </div>
                             </FadeIn>
@@ -54,11 +54,11 @@ export default function SolutionSection() {
                             <FadeIn delay={0.3}>
                                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-blue-100 flex items-start gap-5 hover:scale-[1.02] transition-transform">
                                     <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 shrink-0">
-                                        <Users className="w-6 h-6" />
+                                        <Radar className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-slate-900 mb-1">3. Comunidad VIP</h4>
-                                        <p className="text-sm text-slate-600">Acceso a grupos privados para compartir hospedaje y transporte.</p>
+                                        <h4 className="font-bold text-slate-900 mb-1">3. Eventos Exclusivos</h4>
+                                        <p className="text-sm text-slate-600">Invitaciones a fiestas oficiales y meet & greet con leyendas del fútbol.</p>
                                     </div>
                                 </div>
                             </FadeIn>
@@ -68,8 +68,8 @@ export default function SolutionSection() {
                         <FadeIn className="w-full lg:w-1/2">
                             <div className="relative group overflow-hidden rounded-[2rem] shadow-2xl border-4 border-white rotate-2 hover:rotate-0 transition-all duration-500">
                                 <img
-                                    src="/assets/generated/soccer_fans_celebrating.png"
-                                    alt="Fans celebrando gol"
+                                    src="/assets/generated/visa_success_premium_lounge.png"
+                                    alt="Experiencia VIP Mundial"
                                     className="w-full h-full object-cover"
                                     onError={(e) => {
                                         e.currentTarget.src = "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?q=80&w=1000&auto=format&fit=crop";

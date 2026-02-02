@@ -83,12 +83,11 @@ const PLANS = [
             { name: "Aplicación escuela + I-20", icon: School },
             { name: "DS-160 + SEVIS + Cita", icon: FileText },
             { name: "Simulacro de Entrevista (3 sesiones)", icon: MessageCircle },
-            { name: "Link vuelos / Seguro Médico", icon: Plane },
+            { name: "Link tickets aéreos", icon: Plane },
             { name: "Pick-up Aeropuerto (UT)", icon: Car },
             { name: "Banco, Celular y Licencia", icon: CreditCard },
-            { name: "Búsqueda de Alojamiento", icon: Home },
-            { name: "Revalidación de Estudios", icon: BookOpen },
-            { name: "Mentoria de Adaptación (6 meses)", icon: Users },
+            { name: "Búsqueda de Alojamiento (Aplicación de vivienda incluida)", icon: Home },
+            { name: "Mentoria de Adaptación (1 mes)", icon: Users },
             { name: "Clases de Inglés (1er Mes Gratis)", icon: Languages },
         ]
     },
@@ -104,12 +103,11 @@ const PLANS = [
             { name: "Aplicación escuela + I-20", icon: School },
             { name: "DS-160 + SEVIS + Cita", icon: FileText },
             { name: "Simulacro de Entrevista (Ilimitadas)", icon: MessageCircle },
-            { name: "Link vuelos / Seguro Médico", icon: Plane },
+            { name: "Tickets aéreos a USA (incluidos)", icon: Plane },
             { name: "Pick-up Aeropuerto (UT)", icon: Car },
             { name: "Banco, Celular y Licencia", icon: CreditCard },
             { name: "Búsqueda de Alojamiento (4 Meses Pagados)", icon: Home },
-            { name: "Revalidación de Estudios", icon: BookOpen },
-            { name: "Mentoria de Adaptación (VIP Anual)", icon: Star },
+            { name: "Mentoria de Adaptación (4 meses)", icon: Star },
             { name: "Clases de Inglés (4 Meses Pagados)", icon: Languages },
         ]
     }
@@ -118,7 +116,7 @@ const PLANS = [
 export default function PlansSection() {
     return (
         <section className="py-24 bg-slate-50 relative overflow-hidden" id="planes">
-            <div className="container mx-auto px-6">
+            <div className="w-full px-4 md:px-8">
                 <div className="text-center mb-16">
                     <FadeIn>
                         <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
@@ -132,7 +130,12 @@ export default function PlansSection() {
                 </div>
 
                 {/* Main Container - Gray Background as requested */}
-                <div className="max-w-[1400px] mx-auto bg-slate-200 rounded-[2.5rem] p-8 md:p-12 shadow-md border border-slate-300 relative">
+                <div className="max-w-[1600px] mx-auto bg-slate-200 rounded-[2.5rem] p-8 md:p-12 shadow-md border border-slate-300 relative overflow-hidden">
+
+                    {/* Limited Time Badge - Animated Gradient */}
+                    <div className="absolute top-0 right-0 bg-gradient-to-r from-orange-600 to-red-600 text-white text-[10px] font-bold uppercase tracking-widest px-6 py-2 rounded-bl-3xl shadow-lg z-20 animate-pulse">
+                        ¡CUPOS LIMITADOS!
+                    </div>
 
                     {/* Inject Gradient Definition */}
                     <GoogleGradient />
@@ -154,7 +157,7 @@ export default function PlansSection() {
                         {PLANS.map((plan, index) => (
                             <ScaleIn delay={index * 0.1} key={index} className="h-full">
                                 <div className={`
-                                    relative p-6 rounded-3xl border transition-all duration-300 h-full flex flex-col bg-slate-50
+                                    relative p-6 rounded-3xl border transition-all duration-300 h-full flex flex-col bg-white
                                     ${plan.highlight
                                         ? "border-slate-400 shadow-xl ring-1 ring-slate-400/50 z-10"
                                         : "border-slate-200 hover:border-slate-300 hover:shadow-lg"
@@ -190,12 +193,7 @@ export default function PlansSection() {
                                     </div>
 
                                     <Button
-                                        className={`w-full mb-8 rounded-full py-6 font-bold text-lg shadow-sm transition-transform active:scale-95 border-2
-                                            ${plan.highlight
-                                                ? "bg-slate-900 text-white border-slate-900 hover:bg-slate-800 hover:border-slate-800 hover:text-white"
-                                                : "bg-white text-slate-800 border-slate-300 hover:border-slate-800 hover:bg-slate-50"
-                                            }
-                                        `}
+                                        className="w-full mb-8 rounded-full py-6 font-bold text-lg shadow-sm transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900"
                                     >
                                         Elegir Plan
                                     </Button>
