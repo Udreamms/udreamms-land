@@ -1,125 +1,151 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Plane, Hotel, Calendar, CheckCircle2, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FileText, Users, Video, Plane, Hotel, Calendar, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+const features = [
+    {
+        id: "vuelos",
+        title: "Vuelos y Traslados Internos",
+        description: "Gestionamos tus boletos y logística de transporte en USA.",
+        icon: Plane,
+        image: "/assets/generated/tourist_premium_showcase.png"
+    },
+    {
+        id: "hospedaje",
+        title: "Hospedaje 4–5 Estrellas",
+        description: "Seleccionamos los mejores hoteles para que tu familia descanse al máximo.",
+        icon: Hotel,
+        image: "/assets/generated/tourist_premium_showcase.png"
+    },
+    {
+        id: "itinerario",
+        title: "Itinerario de 8 Días / 7 Noches",
+        description: "Totalmente planificado para que no te preocupes por nada.",
+        icon: Calendar,
+        image: "/assets/generated/tourist_premium_showcase.png"
+    },
+    {
+        id: "tickets",
+        title: "Actividades y Tickets Incluidos",
+        description: "Entradas a actividades turísticas del destino que elijas.",
+        icon: Sparkles,
+        image: "/assets/generated/tourist_premium_showcase.png"
+    },
+];
+
 export default function PremiumPlanShowcase() {
-    const features = [
-        {
-            title: "Vuelos y Traslados Internos",
-            description: "Gestionamos tus boletos y logística de transporte en USA.",
-            icon: Plane,
-            color: "bg-blue-50 text-blue-600",
-        },
-        {
-            title: "Hospedaje 4–5 Estrellas",
-            description: "Seleccionamos los mejores hoteles para que tu familia descanse al máximo.",
-            icon: Hotel,
-            color: "bg-orange-50 text-orange-600",
-        },
-        {
-            title: "Itinerario de 8 Días / 7 Noches",
-            description: "Totalmente planificado para que no te preocupes por nada.",
-            icon: Calendar,
-            color: "bg-purple-50 text-purple-600",
-        },
-        {
-            title: "Actividades y Tickets Incluidos",
-            description: "Entradas a actividades turísticas del destino que elijas.",
-            icon: Sparkles,
-            color: "bg-green-50 text-green-600",
-        },
-    ];
+    const [activeTab, setActiveTab] = useState(features[0]);
 
     return (
-        <section className="py-24 bg-white overflow-hidden" id="plan-premium">
+        <section className="py-24 bg-white text-black overflow-hidden" id="plan-premium">
             <div className="container mx-auto px-6">
-                <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
 
-                    {/* Content side */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        className="flex-1 space-y-10"
-                    >
-                        <div className="space-y-4">
-                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-100 text-blue-700 font-medium text-xs uppercase tracking-widest">
-                                <Sparkles size={14} />
-                                La Opción Completa
-                            </div>
-                            <h2 className="text-4xl md:text-5xl lg:text-7xl font-medium text-slate-900 leading-[0.9] tracking-tighter">
-                                Vacaciones de <br /> Ensueño: <span className="text-blue-500">Plan Premium.</span>
-                            </h2>
-                            <div className="space-y-4">
-                                <p className="text-xl text-slate-700 font-medium leading-relaxed max-w-xl">
-                                    Elige tu destino: <span className="text-blue-500">Florida, New York, California, Utah, Nevada o Hawaii.</span>
-                                </p>
-                                <p className="text-lg text-slate-600 font-medium leading-relaxed max-w-xl">
-                                    ¿Por qué estresarte planeando? Nosotros nos encargamos de todo: desde la visa hasta el último detalle de tu aventura familiar.
-                                </p>
-                            </div>
+                {/* Header: Title + Button */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-6">
+                    <div>
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 text-slate-600 font-medium text-xs uppercase tracking-widest mb-4">
+                            La Opción Completa
                         </div>
+                        <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-black leading-[1.1]">
+                            Vacaciones de Ensueño<br />
+                            <span className="text-black">Plan Premium</span>
+                        </h2>
+                        <div className="mt-6 space-y-4 max-w-xl">
+                            <p className="text-xl text-black font-normal leading-relaxed">
+                                Elige tu destino: Florida, New York, California, Utah, Nevada o Hawaii.
+                            </p>
+                            <p className="text-lg text-black/70 font-normal leading-relaxed">
+                                ¿Por qué estresarte planeando? Nosotros nos encargamos de todo: desde la visa hasta el último detalle de tu aventura familiar.
+                            </p>
+                        </div>
+                    </div>
+                    <Button
+                        size="lg"
+                        className="rounded-full px-10 py-7 bg-black hover:bg-black/90 text-white font-medium text-lg shadow-xl transition-all"
+                        onClick={() => document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' })}
+                    >
+                        Elegir Plan Premium
+                    </Button>
+                </div>
 
-                        <div className="space-y-6">
-                            {features.map((feature, index) => {
-                                const Icon = feature.icon;
-                                return (
-                                    <div key={index} className="flex items-start gap-4 p-5 rounded-3xl bg-white border border-slate-100 transition-all hover:shadow-lg group">
-                                        <div className={`p-4 rounded-2xl ${feature.color} group-hover:rotate-12 transition-transform shadow-sm`}>
-                                            <Icon size={28} strokeWidth={2.5} />
+                <div className="flex flex-col lg:flex-row gap-16 items-start">
+
+                    {/* Left Column: Interactive List */}
+                    <div className="w-full lg:w-1/3 flex flex-col">
+                        {features.map((feature) => {
+                            const isActive = activeTab.id === feature.id;
+                            const Icon = feature.icon;
+
+                            return (
+                                <div
+                                    key={feature.id}
+                                    className="group cursor-pointer"
+                                    onClick={() => setActiveTab(feature)}
+                                >
+                                    <div className="py-6 border-b border-gray-100 last:border-0">
+                                        <div className="flex items-center gap-4 mb-2">
+                                            <div className={`p-2 rounded-lg transition-colors duration-300 bg-white ${isActive ? "text-black" : "text-black group-hover:bg-gray-50"}`}>
+                                                <Icon size={20} strokeWidth={2.5} />
+                                            </div>
+                                            <h4 className={`text-xl transition-colors duration-300 ${isActive ? 'font-medium text-black' : 'font-medium text-black group-hover:text-black'}`}>
+                                                {feature.title}
+                                            </h4>
                                         </div>
-                                        <div>
-                                            <h4 className="text-xl font-medium text-slate-900 mb-1">{feature.title}</h4>
-                                            <p className="text-slate-600 font-medium leading-snug">{feature.description}</p>
-                                        </div>
+
+                                        <AnimatePresence>
+                                            {isActive && (
+                                                <motion.div
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: "auto", opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
+                                                    className="overflow-hidden pl-[3.25rem]"
+                                                >
+                                                    <p className="pt-2 text-black leading-relaxed font-normal text-lg">
+                                                        {feature.description}
+                                                    </p>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
                                     </div>
-                                );
-                            })}
-                        </div>
+                                </div>
+                            );
+                        })}
+                    </div>
 
-                        <div className="flex flex-col sm:flex-row items-center gap-6 pt-6">
-                            <Button
-                                size="lg"
-                                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-lg md:text-xl px-10 py-7 rounded-full shadow-xl transition-all hover:scale-105 font-medium uppercase tracking-tight"
-                                onClick={() => document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' })}
+                    {/* Right Column: Dynamic Visual */}
+                    <div className="w-full lg:w-2/3 h-full min-h-[500px] relative">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={activeTab.id}
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                                transition={{ duration: 0.5, ease: "easeInOut" }}
+                                className="w-full h-full relative aspect-[4/3] lg:aspect-video rounded-[2.5rem] overflow-hidden bg-white shadow-2xl"
                             >
-                                Elegir Plan Premium
-                            </Button>
-                            <Button
-                                size="lg"
-                                className="w-full sm:w-auto border-2 border-blue-600 bg-blue-600 hover:bg-blue-700 text-white text-lg md:text-xl px-10 py-7 rounded-full shadow-lg transition-all hover:scale-105 font-medium uppercase tracking-tight"
-                                onClick={() => window.open('https://wa.me/yournumber', '_blank')}
-                            >
-                                Quiero saber más
-                            </Button>
-                        </div>
+                                <img
+                                    src={activeTab.image}
+                                    alt={activeTab.title}
+                                    className="w-full h-full object-cover"
+                                />
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
 
-                        <p className="text-sm font-medium text-slate-400 flex items-center gap-2">
-                            <CheckCircle2 size={16} className="text-blue-500" />
-                            Todo incluido: viaja sin preocupaciones
-                        </p>
-                    </motion.div>
+                </div>
 
-                    {/* Visual side */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        className="flex-1 relative"
-                    >
-                        <div className="relative z-10 rounded-[3rem] overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.15)] aspect-[4/5] md:aspect-auto">
-                            <img
-                                src="/assets/generated/tourist_premium_showcase.png"
-                                alt="Familia feliz en Disney con el Plan Premium"
-                                className="w-full h-full object-cover transform hover:scale-110 transition-transform duration-[3s]"
-                            />
-                        </div>
-                        {/* Background Accent */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-400/10 rounded-full blur-[120px] -z-10" />
-                    </motion.div>
-
+                {/* Footer Quote */}
+                <div className="mt-20 flex items-center justify-center gap-3">
+                    <div className="h-px w-12 bg-gray-200" />
+                    <p className="text-sm font-medium text-gray-400 flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                        Todo incluido: viaja sin preocupaciones
+                    </p>
+                    <div className="h-px w-12 bg-gray-200" />
                 </div>
             </div>
         </section>

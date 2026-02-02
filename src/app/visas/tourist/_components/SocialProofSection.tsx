@@ -6,30 +6,6 @@ import { CheckCircle2, Sparkles } from "lucide-react";
 export default function SocialProofSection() {
     return (
         <section className="bg-slate-50 border-t border-slate-200">
-            {/* Stats Bar */}
-            <div className="bg-abyss text-white py-12">
-                <div className="container mx-auto px-6 max-w-6xl">
-                    <FadeIn className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 text-center">
-                        <div className="space-y-2">
-                            <div className="text-3xl md:text-4xl font-medium tracking-tighter text-gold">98%</div>
-                            <div className="text-xs md:text-sm text-slate-400 uppercase tracking-widest font-medium">Aprobación Visa Americana</div>
-                        </div>
-                        <div className="space-y-2 border-l border-slate-800/50">
-                            <div className="text-3xl md:text-4xl font-medium tracking-tighter text-gold">500+</div>
-                            <div className="text-xs md:text-sm text-slate-400 uppercase tracking-widest font-medium">Visas de Turismo B1/B2</div>
-                        </div>
-                        <div className="space-y-2 border-l border-slate-800/50">
-                            <div className="text-3xl md:text-4xl font-medium tracking-tighter text-gold">15k</div>
-                            <div className="text-xs md:text-sm text-slate-400 uppercase tracking-widest font-medium">Citas Consulares</div>
-                        </div>
-                        <div className="space-y-2 border-l border-slate-800/50">
-                            <div className="text-3xl md:text-4xl font-medium tracking-tighter text-gold">24/7</div>
-                            <div className="text-xs md:text-sm text-slate-400 uppercase tracking-widest font-medium">Asesoría Migratoria</div>
-                        </div>
-                    </FadeIn>
-                </div>
-            </div>
-
             {/* Testimonials (Real Chat Style) */}
             <div className="py-24 container mx-auto px-6 max-w-6xl">
                 <FadeIn className="text-center mb-16">
