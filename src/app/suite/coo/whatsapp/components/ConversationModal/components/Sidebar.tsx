@@ -161,7 +161,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex flex-col h-full w-full bg-neutral-900/40">
             {/* Header - Fixed */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-800 bg-black/20 flex-shrink-0">
-                <h2 className="font-bold text-sm text-neutral-300 uppercase tracking-wider">
+                <h2 className="font-medium text-sm text-neutral-300 uppercase tracking-wider">
                     {activeTab === 'perfil' && 'Perfil'}
                     {activeTab === 'pagos' && 'Pagos'}
                     {activeTab === 'notas' && 'Notas'}

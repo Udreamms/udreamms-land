@@ -83,15 +83,15 @@ export const NotesTab: React.FC<NotesTabProps> = ({
             >
                 {/* Intel Header */}
                 <div className="mb-6 flex flex-col gap-1">
-                    <h3 className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.15em] mb-1">Operational Intelligence</h3>
-                    <h2 className="text-xl font-bold text-white leading-tight">LÍNEA DE VIDA</h2>
+                    <h3 className="text-[10px] font-medium text-neutral-500 uppercase tracking-[0.15em] mb-1">Operational Intelligence</h3>
+                    <h2 className="text-xl font-medium text-white leading-tight">LÍNEA DE VIDA</h2>
                 </div>
 
                 <div className="grid grid-cols-1 gap-6">
                     {/* Columna 1: Check-ins */}
                     <div className="flex flex-col">
                         <div className="flex items-center justify-between mb-2 sticky top-0 bg-[#0A0A0A]/95 backdrop-blur-sm z-10 py-1 border-b border-neutral-800/50">
-                            <h3 className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.15em] px-1">
+                            <h3 className="text-[10px] font-medium text-neutral-500 uppercase tracking-[0.15em] px-1">
                                 HITOS
                             </h3>
                             <Button
@@ -114,8 +114,8 @@ export const NotesTab: React.FC<NotesTabProps> = ({
                                     autoFocus
                                 />
                                 <div className="flex justify-end gap-2 mt-2">
-                                    <Button variant="ghost" onClick={() => setIsAddingCheckIn(false)} className="text-[9px] h-5 font-bold text-neutral-600 uppercase tracking-wider hover:text-neutral-400 p-0">Cancel</Button>
-                                    <Button variant="ghost" onClick={handleSaveCheckIn} className="text-[9px] h-5 font-bold text-blue-500 uppercase tracking-wider hover:text-blue-400 p-0 ml-2">Save</Button>
+                                    <Button variant="ghost" onClick={() => setIsAddingCheckIn(false)} className="text-[9px] h-5 font-medium text-neutral-600 uppercase tracking-wider hover:text-neutral-400 p-0">Cancel</Button>
+                                    <Button variant="ghost" onClick={handleSaveCheckIn} className="text-[9px] h-5 font-medium text-blue-500 uppercase tracking-wider hover:text-blue-400 p-0 ml-2">Save</Button>
                                 </div>
                             </div>
                         )}
@@ -149,13 +149,13 @@ export const NotesTab: React.FC<NotesTabProps> = ({
                                                     />
                                                 </div>
                                             ) : (
-                                                <p className={cn("text-[13px] leading-tight break-words font-bold", checkIn.completed ? "line-through text-neutral-600" : "text-neutral-200")}>
+                                                <p className={cn("text-[13px] leading-tight break-words font-medium", checkIn.completed ? "line-through text-neutral-600" : "text-neutral-200")}>
                                                     {checkIn.text}
                                                 </p>
                                             )}
 
                                             <div className="flex items-center justify-between mt-1">
-                                                <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider">
+                                                <span className="text-[9px] text-neutral-500 font-medium uppercase tracking-wider">
                                                     {checkIn.timestamp?.toDate().toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
                                                 </span>
                                                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -167,7 +167,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({
                                     </div>
                                 ))
                             ) : (
-                                <div className="py-8 text-center opacity-20 italic text-[9px] font-black uppercase tracking-widest">No milestones</div>
+                                <div className="py-8 text-center opacity-20 italic text-[9px] font-medium uppercase tracking-widest">No milestones</div>
                             )}
                         </div>
                     </div>
@@ -175,7 +175,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({
                     {/* Columna 2: Notas */}
                     <div className="flex flex-col">
                         <div className="flex items-center justify-between mb-2 sticky top-0 bg-[#0A0A0A]/95 backdrop-blur-sm z-10 py-1 border-b border-neutral-800/50">
-                            <h3 className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.15em] px-1">
+                            <h3 className="text-[10px] font-medium text-neutral-500 uppercase tracking-[0.15em] px-1">
                                 NOTAS
                             </h3>
                             <Button
@@ -198,8 +198,8 @@ export const NotesTab: React.FC<NotesTabProps> = ({
                                     autoFocus
                                 />
                                 <div className="flex justify-end gap-2 mt-2">
-                                    <Button variant="ghost" onClick={() => setIsAddingNote(false)} className="text-[9px] h-5 font-bold text-neutral-600 uppercase tracking-wider hover:text-neutral-400 p-0">Cancel</Button>
-                                    <Button variant="ghost" onClick={handleSaveNote} className="text-[9px] h-5 font-bold text-purple-500 uppercase tracking-wider hover:text-purple-400 p-0 ml-2">Save</Button>
+                                    <Button variant="ghost" onClick={() => setIsAddingNote(false)} className="text-[9px] h-5 font-medium text-neutral-600 uppercase tracking-wider hover:text-neutral-400 p-0">Cancel</Button>
+                                    <Button variant="ghost" onClick={handleSaveNote} className="text-[9px] h-5 font-medium text-purple-500 uppercase tracking-wider hover:text-purple-400 p-0 ml-2">Save</Button>
                                 </div>
                             </div>
                         )}
@@ -223,12 +223,12 @@ export const NotesTab: React.FC<NotesTabProps> = ({
                                             </div>
                                         ) : (
                                             <div className="flex flex-col gap-2">
-                                                <p className="text-[13px] text-neutral-200 font-bold leading-relaxed whitespace-pre-wrap break-words">{note.text}</p>
+                                                <p className="text-[13px] text-neutral-200 font-medium leading-relaxed whitespace-pre-wrap break-words">{note.text}</p>
                                                 <div className="flex items-center justify-between mt-1">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-[9px] font-black text-neutral-500 uppercase tracking-wider">{note.author || 'INTEL'}</span>
+                                                        <span className="text-[9px] font-medium text-neutral-500 uppercase tracking-wider">{note.author || 'INTEL'}</span>
                                                         <span className="text-[9px] text-neutral-800">|</span>
-                                                        <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider">
+                                                        <span className="text-[9px] text-neutral-500 font-medium uppercase tracking-wider">
                                                             {note.timestamp?.toDate().toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
                                                         </span>
                                                     </div>
@@ -242,7 +242,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({
                                     </div>
                                 ))
                             ) : (
-                                <div className="py-12 text-center opacity-20 italic text-[9px] font-black uppercase tracking-widest">No insights</div>
+                                <div className="py-12 text-center opacity-20 italic text-[9px] font-medium uppercase tracking-widest">No insights</div>
                             )}
                         </div>
                     </div>

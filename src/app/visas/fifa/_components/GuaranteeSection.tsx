@@ -12,11 +12,11 @@ export default function GuaranteeSection() {
                         <BadgeCheck className="w-12 h-12" />
                     </div>
                     <div className="text-center md:text-left flex-grow">
-                        <h2 className="text-2xl md:text-3xl font-black italic text-slate-900 mb-3">GARANTÍA "PITAZO INICIAL"</h2>
+                        <h2 className="text-2xl md:text-3xl font-medium italic text-slate-900 mb-3">GARANTÍA "PITAZO INICIAL"</h2>
                         <p className="text-slate-600 leading-relaxed mb-4 text-lg">
                             Si obtenemos tu visa y por un error logístico de nuestra parte no llegas al partido, <strong className="text-yellow-600 bg-yellow-50 px-1">te reembolsamos tus honorarios + $500 USD en efectivo</strong>.
                         </p>
-                        <p className="text-sm text-yellow-600 font-bold uppercase tracking-wide">TU RIESGO ES CERO. LA EMOCIÓN ES TOTAL.</p>
+                        <p className="text-sm text-yellow-600 font-medium uppercase tracking-wide">TU RIESGO ES CERO. LA EMOCIÓN ES TOTAL.</p>
                     </div>
                 </FadeIn>
             </div>

@@ -1,82 +1,131 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { CheckCircle2, ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, Play } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
+const features = [
+    {
+        id: "ds160",
+        title: "Formulario DS-160",
+        description: "Llenado profesional del Formulario DS-160 para evitar errores críticos que podrían causar el rechazo de tu visa.",
+        image: "/assets/generated/tourist_showcase_disney.png",
+        video: "https://www.youtube.com/embed/ksaKUwErSGw"
+    },
+    {
+        id: "entrevista",
+        title: "Entrevista Consular",
+        description: "Simulacros individuales con expertos para garantizar tu confianza y preparación ante las preguntas del oficial consular.",
+        image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=1000&auto=format&fit=crop",
+    },
+    {
+        id: "citas",
+        title: "Citas Prioritarias",
+        description: "Monitoreo constante del sistema para obtener tu cita en el menor tiempo posible, adelantando meses de espera.",
+        image: "https://images.unsplash.com/photo-1506784917876-491d607bd931?q=80&w=1000&auto=format&fit=crop",
+    },
+    {
+        id: "itinerario",
+        title: "Itinerario y Alojamiento",
+        description: "Planificación personalizada de tu viaje a los mejores destinos de EE. UU., asegurando una experiencia vacacional completa.",
+        image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=1000&auto=format&fit=crop",
+    },
+];
+
 export default function TouristShowcase() {
+    const [activeTab, setActiveTab] = useState(features[0]);
+
     return (
-        <section className="py-24 bg-white overflow-hidden">
+        <section className="py-24 bg-white text-black overflow-hidden">
             <div className="container mx-auto px-6">
-                <div className="flex flex-col lg:flex-row items-center gap-16">
 
-                    {/* Visual Impact */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        className="w-full lg:w-1/2 relative"
-                    >
-                        <div className="relative rounded-[3rem] overflow-hidden shadow-2xl">
-                            <img
-                                src="/assets/generated/tourist_showcase_disney.png"
-                                alt="Vacaciones en Familia USA"
-                                className="w-full h-[600px] object-cover hover:scale-105 transition-transform duration-700"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                        </div>
-
-                        {/* Decorative element */}
-                        <div className="absolute -bottom-6 -right-6 bg-gold text-white p-8 rounded-3xl shadow-xl hidden md:block">
-                            <p className="text-4xl font-black italic">95%</p>
-                            <p className="text-xs uppercase font-bold tracking-widest">Tasa de Éxito</p>
-                        </div>
-                    </motion.div>
-
-                    {/* Text Content */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        className="w-full lg:w-1/2"
-                    >
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 text-slate-800 font-bold text-xs uppercase tracking-widest mb-6">
-                            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-                            Visa de Turismo B1/B2
-                        </div>
-
-                        <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-6 tracking-tighter leading-tight">
-                            Tus vacaciones soñadas <br /> <span className="text-blue-600">sin complicaciones.</span>
+                {/* Header: Title + Learn More Pill */}
+                <div className="flex justify-between items-center mb-16">
+                    <div>
+                        <h3 className="text-2xl font-medium tracking-tight text-black">Visa de Turismo</h3>
+                        <h2 className="text-4xl md:text-5xl font-medium tracking-tighter text-black mt-1">
+                            Tu puerta de entrada a USA
                         </h2>
+                    </div>
+                    <Link
+                        href="https://travel.state.gov/content/travel/en/us-visas/tourism-visit.html"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <Button className="rounded-full px-10 py-7 bg-black hover:bg-black/90 text-white font-medium text-lg shadow-xl transition-all">
+                            Saber más
+                        </Button>
+                    </Link>
+                </div>
 
-                        <p className="text-lg text-slate-600 mb-10 leading-relaxed font-medium">
-                            Gestionamos tu Visa de Turismo de principio a fin para que tú solo te preocupes por hacer las maletas. Desde la estrategia consular hasta el itinerario de viaje.
-                        </p>
+                <div className="flex flex-col lg:flex-row gap-16 items-start">
 
-                        <ul className="space-y-4 mb-12">
-                            {[
-                                "Llenado profesional del Formulario DS-160",
-                                "Simulacros de Entrevista Individuales",
-                                "Monitoreo de Citas Prioritarias",
-                                "Planificación de Itinerario y Alojamiento"
-                            ].map((item, i) => (
-                                <li key={i} className="flex items-center gap-3 text-slate-700 font-semibold">
-                                    <CheckCircle2 className="w-6 h-6 text-green-500 flex-shrink-0" />
-                                    {item}
-                                </li>
-                            ))}
-                        </ul>
+                    {/* Left Column: Interactive List */}
+                    <div className="w-full lg:w-1/3 flex flex-col">
+                        {features.map((feature) => {
+                            const isActive = activeTab.id === feature.id;
+                            return (
+                                <div
+                                    key={feature.id}
+                                    className="group cursor-pointer"
+                                    onClick={() => setActiveTab(feature)}
+                                >
+                                    <div className="py-4">
+                                        <h4 className={`text-xl transition-colors duration-300 ${isActive ? 'font-medium text-black' : 'font-medium text-black group-hover:underline underline-offset-8'}`}>
+                                            {feature.title}
+                                        </h4>
 
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            <Link href="/visas/tourist">
-                                <Button size="lg" className="bg-slate-900 hover:bg-black text-white px-10 py-7 rounded-full text-lg font-bold shadow-xl flex items-center gap-3 group">
-                                    Conoce el Plan Turismo
-                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
-                                </Button>
-                            </Link>
-                        </div>
-                    </motion.div>
+                                        <AnimatePresence>
+                                            {isActive && (
+                                                <motion.div
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: "auto", opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
+                                                    className="overflow-hidden"
+                                                >
+                                                    <p className="pt-4 text-black leading-relaxed font-normal text-lg">
+                                                        {feature.description}
+                                                    </p>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Right Column: Dynamic Visual */}
+                    <div className="w-full lg:w-2/3 h-full min-h-[500px] relative">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={activeTab.id}
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                                transition={{ duration: 0.5, ease: "easeInOut" }}
+                                className="w-full h-full relative aspect-video lg:aspect-auto lg:h-[600px] rounded-[2.5rem] overflow-hidden bg-white shadow-2xl"
+                            >
+                                {activeTab.video ? (
+                                    <iframe
+                                        src={activeTab.video}
+                                        className="w-full h-full border-0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                    />
+                                ) : (
+                                    <img
+                                        src={activeTab.image}
+                                        alt={activeTab.title}
+                                        className="w-full h-full object-cover"
+                                    />
+                                )}
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
 
                 </div>
             </div>

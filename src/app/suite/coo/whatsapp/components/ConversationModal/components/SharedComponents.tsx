@@ -43,7 +43,7 @@ export function ContactFieldCard({
                 {icon}
             </div>
             <div className="flex-1 min-w-0">
-                <p className="text-[10px] uppercase tracking-wider font-semibold text-neutral-500 mb-1">
+                <p className="text-[10px] uppercase tracking-wider font-medium text-neutral-500 mb-1">
                     {label}
                 </p>
                 {isEditing ? (

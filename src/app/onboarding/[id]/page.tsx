@@ -130,7 +130,7 @@ export default function OnboardingPage() {
         return (
             <div className="min-h-screen bg-neutral-950 flex items-center justify-center text-white p-4 text-center">
                 <div>
-                    <h1 className="text-3xl font-bold mb-4">Enlace Expirado o Inválido</h1>
+                    <h1 className="text-3xl font-medium mb-4">Enlace Expirado o Inválido</h1>
                     <p className="text-neutral-400">Lo sentimos, no pudimos encontrar tu registro. Por favor contacta a soporte.</p>
                 </div>
             </div>
@@ -148,12 +148,12 @@ export default function OnboardingPage() {
                     <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                         <CheckCircle2 className="text-emerald-500 w-10 h-10" />
                     </div>
-                    <h2 className="text-3xl font-black text-white mb-4 tracking-tight">¡Todo Listo!</h2>
+                    <h2 className="text-3xl font-medium text-white mb-4 tracking-tight">¡Todo Listo!</h2>
                     <p className="text-neutral-400 mb-8 leading-relaxed">
                         Tu perfil ha sido actualizado correctamente. Nuestro equipo revisará tu información en breve.
                     </p>
                     <Button
-                        className="w-full h-12 rounded-xl bg-white text-black hover:bg-neutral-200 font-bold"
+                        className="w-full h-12 rounded-xl bg-white text-black hover:bg-neutral-200 font-medium"
                         onClick={() => window.close()}
                     >
                         Cerrar Ventana
@@ -181,7 +181,7 @@ export default function OnboardingPage() {
                     <div className="inline-flex items-center justify-center p-4 bg-white/[0.03] rounded-3xl border border-white/5 shadow-2xl mb-4 backdrop-blur-xl">
                         <Send className="w-8 h-8 text-rose-500 rotate-12" />
                     </div>
-                    <h1 className="text-5xl md:text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
+                    <h1 className="text-5xl md:text-6xl font-medium tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
                         Comienza tu Aventura
                     </h1>
                     <p className="text-lg text-neutral-400 max-w-xl mx-auto leading-relaxed">
@@ -202,7 +202,7 @@ export default function OnboardingPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
                         {/* Name */}
                         <div className="space-y-4">
-                            <label className="text-sm font-bold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
+                            <label className="text-sm font-medium text-neutral-300 uppercase tracking-wider flex items-center gap-2">
                                 <User size={16} className="text-rose-500" /> Nombre
                             </label>
                             <Input
@@ -215,7 +215,7 @@ export default function OnboardingPage() {
                             />
                         </div>
                         <div className="space-y-4">
-                            <label className="text-sm font-bold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
+                            <label className="text-sm font-medium text-neutral-300 uppercase tracking-wider flex items-center gap-2">
                                 <User size={16} className="text-rose-500 opacity-0" /> Apellido
                             </label>
                             <Input
@@ -230,7 +230,7 @@ export default function OnboardingPage() {
 
                         {/* Contact */}
                         <div className="space-y-4">
-                            <label className="text-sm font-bold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
+                            <label className="text-sm font-medium text-neutral-300 uppercase tracking-wider flex items-center gap-2">
                                 <Mail size={16} className="text-blue-400" /> Correo Electrónico
                             </label>
                             <Input
@@ -244,13 +244,13 @@ export default function OnboardingPage() {
                             />
                         </div>
                         <div className="space-y-4">
-                            <label className="text-sm font-bold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
+                            <label className="text-sm font-medium text-neutral-300 uppercase tracking-wider flex items-center gap-2">
                                 <Phone size={16} className="text-emerald-400" /> WhatsApp / Teléfono
                             </label>
                             <div className="relative">
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pr-3 border-r border-white/10">
                                     <span className="text-xl">🇺🇸</span>
-                                    {/* <span className="text-sm font-bold text-neutral-400">+1</span> */}
+                                    {/* <span className="text-sm font-medium text-neutral-400">+1</span> */}
                                 </div>
                                 <Input
                                     name="contactNumber"
@@ -265,7 +265,7 @@ export default function OnboardingPage() {
 
                         {/* Location & Details */}
                         <div className="space-y-4">
-                            <label className="text-sm font-bold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
+                            <label className="text-sm font-medium text-neutral-300 uppercase tracking-wider flex items-center gap-2">
                                 <Globe size={16} className="text-purple-400" /> Idioma preferido
                             </label>
                             <div className="relative">
@@ -285,7 +285,7 @@ export default function OnboardingPage() {
                         </div>
 
                         <div className="space-y-4">
-                            <label className="text-sm font-bold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
+                            <label className="text-sm font-medium text-neutral-300 uppercase tracking-wider flex items-center gap-2">
                                 <MapPin size={16} className="text-amber-400" /> País de Residencia
                             </label>
                             <Input
@@ -298,7 +298,7 @@ export default function OnboardingPage() {
                         </div>
 
                         <div className="space-y-4">
-                            <label className="text-sm font-bold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
+                            <label className="text-sm font-medium text-neutral-300 uppercase tracking-wider flex items-center gap-2">
                                 <Globe size={16} className="text-cyan-400" /> Nacionalidad
                             </label>
                             <Input
@@ -311,7 +311,7 @@ export default function OnboardingPage() {
                         </div>
 
                         <div className="space-y-4">
-                            <label className="text-sm font-bold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
+                            <label className="text-sm font-medium text-neutral-300 uppercase tracking-wider flex items-center gap-2">
                                 <FileText size={16} className="text-indigo-400" /> ¿Tienes pasaporte válido?
                             </label>
                             <div className="relative">
@@ -331,7 +331,7 @@ export default function OnboardingPage() {
                         </div>
 
                         <div className="md:col-span-2 space-y-4">
-                            <label className="text-sm font-bold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
+                            <label className="text-sm font-medium text-neutral-300 uppercase tracking-wider flex items-center gap-2">
                                 <Send size={16} className="text-pink-400" /> ¿A qué tipo de visa deseas aplicar?
                             </label>
                             <div className="relative">
@@ -357,7 +357,7 @@ export default function OnboardingPage() {
                         <Button
                             type="button"
                             variant="outline"
-                            className="w-full md:w-auto h-12 rounded-xl border-white/10 bg-transparent text-white hover:bg-white/5 font-bold"
+                            className="w-full md:w-auto h-12 rounded-xl border-white/10 bg-transparent text-white hover:bg-white/5 font-medium"
                             onClick={() => window.history.back()}
                         >
                             Cancelar
@@ -365,7 +365,7 @@ export default function OnboardingPage() {
                         <Button
                             type="submit"
                             disabled={submitting}
-                            className="w-full md:flex-1 h-14 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white shadow-xl shadow-rose-600/20 font-black tracking-wide text-lg transition-all transform hover:scale-[1.02]"
+                            className="w-full md:flex-1 h-14 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white shadow-xl shadow-rose-600/20 font-medium tracking-wide text-lg transition-all transform hover:scale-[1.02]"
                         >
                             {submitting ? (
                                 <span className="flex items-center gap-2">

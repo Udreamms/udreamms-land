@@ -61,16 +61,16 @@ export const ContactGrid: React.FC<ContactGridProps> = ({
                     </div>
 
                     <div className="mb-6">
-                        <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-2xl font-black text-white shadow-lg mb-4 group-hover:scale-110 transition-transform">
+                        <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-2xl font-medium text-white shadow-lg mb-4 group-hover:scale-110 transition-transform">
                             {contact.name?.charAt(0)}
                         </div>
                         <Badge variant="outline" className={`${contact.stage === 'Closed' ? 'border-emerald-500/50 text-emerald-500' :
-                            contact.stage === 'In Progress' ? 'border-blue-500/50 text-blue-500' : 'border-orange-500/50 text-orange-500'} px-3 py-0.5 text-[8px] uppercase tracking-widest font-bold`}>
+                            contact.stage === 'In Progress' ? 'border-blue-500/50 text-blue-500' : 'border-orange-500/50 text-orange-500'} px-3 py-0.5 text-[8px] uppercase tracking-widest font-medium`}>
                             {contact.stage}
                         </Badge>
                     </div>
 
-                    <h3 className="text-lg font-black text-neutral-100 mb-1 truncate pr-10">{contact.name}</h3>
+                    <h3 className="text-lg font-medium text-neutral-100 mb-1 truncate pr-10">{contact.name}</h3>
                     <p className="text-xs text-neutral-400 mb-6 truncate">{contact.email}</p>
 
                     <div className="space-y-2 mb-6">

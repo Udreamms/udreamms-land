@@ -10,7 +10,7 @@ export default function BenefitsSection() {
             <div className="container mx-auto">
                 <FadeIn className="mt-2 text-center space-y-12 max-w-4xl mx-auto">
                     {/* Phrase */}
-                    <h3 className="text-3xl md:text-5xl font-bold text-abyss font-playfair leading-tight">
+                    <h3 className="text-3xl md:text-5xl font-medium text-abyss font-playfair leading-tight tracking-tight">
                         Tu admisión académica está lista.<br />
                         <span className="text-slate-500">Ahora blindemos tu entrada legal.</span>
                     </h3>

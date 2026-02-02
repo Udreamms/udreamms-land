@@ -66,12 +66,12 @@ export default function Hero({ onStartQuote }: HeroProps) {
 
           <div className="max-w-[70%] text-left space-y-4">
             {/* Texto superior (Eyebrow) */}
-            <p className="text-gray-300 text-lg md:text-xl font-bold tracking-[0.2em] uppercase">
+            <p className="text-gray-300 text-lg md:text-xl font-medium tracking-[0.2em] uppercase">
               ESTUDIA | VIAJA | DISFRUTA
             </p>
 
             {/* Título Principal */}
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-[1.05] text-white tracking-tighter">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-medium leading-[1.05] text-white tracking-tighter">
               Tu experiencia <br />
               en Estados Unidos <br />
               comienza aquí
@@ -87,7 +87,7 @@ export default function Hero({ onStartQuote }: HeroProps) {
           <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-4 shrink-0 mb-4">
             <button
               onClick={onStartQuote}
-              className="group relative inline-flex items-center justify-center px-10 py-4 text-lg font-semibold text-white overflow-hidden rounded-full bg-primary hover:bg-primary/90 transition-all duration-300 shadow-lg shadow-primary/20"
+              className="group relative inline-flex items-center justify-center px-10 py-4 text-lg font-medium text-white overflow-hidden rounded-full bg-primary hover:bg-primary/90 transition-all duration-300 shadow-lg shadow-primary/20"
             >
               Obtén tu Cotización Gratis
             </button>

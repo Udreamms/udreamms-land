@@ -33,7 +33,7 @@ export default function PremiumPlanShowcase() {
     ];
 
     return (
-        <section className="py-24 bg-slate-50 overflow-hidden" id="plan-premium">
+        <section className="py-24 bg-white overflow-hidden" id="plan-premium">
             <div className="container mx-auto px-6">
                 <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
 
@@ -45,16 +45,16 @@ export default function PremiumPlanShowcase() {
                         className="flex-1 space-y-10"
                     >
                         <div className="space-y-4">
-                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-100 text-blue-700 font-bold text-xs uppercase tracking-widest">
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-100 text-blue-700 font-medium text-xs uppercase tracking-widest">
                                 <Sparkles size={14} />
                                 La Opción Completa
                             </div>
-                            <h2 className="text-4xl md:text-5xl lg:text-7xl font-black text-slate-900 leading-[1] tracking-tighter">
-                                Vacaciones de <br /> Ensueño: <span className="text-blue-600 italic font-serif">Plan Premium.</span>
+                            <h2 className="text-4xl md:text-5xl lg:text-7xl font-medium text-slate-900 leading-[0.9] tracking-tighter">
+                                Vacaciones de <br /> Ensueño: <span className="text-blue-500">Plan Premium.</span>
                             </h2>
                             <div className="space-y-4">
-                                <p className="text-xl text-slate-700 font-bold leading-relaxed max-w-xl">
-                                    Elige tu destino: <span className="text-blue-600">Florida, New York, California, Utah, Nevada o Hawaii.</span>
+                                <p className="text-xl text-slate-700 font-medium leading-relaxed max-w-xl">
+                                    Elige tu destino: <span className="text-blue-500">Florida, New York, California, Utah, Nevada o Hawaii.</span>
                                 </p>
                                 <p className="text-lg text-slate-600 font-medium leading-relaxed max-w-xl">
                                     ¿Por qué estresarte planeando? Nosotros nos encargamos de todo: desde la visa hasta el último detalle de tu aventura familiar.
@@ -71,7 +71,7 @@ export default function PremiumPlanShowcase() {
                                             <Icon size={28} strokeWidth={2.5} />
                                         </div>
                                         <div>
-                                            <h4 className="text-xl font-bold text-slate-900 mb-1">{feature.title}</h4>
+                                            <h4 className="text-xl font-medium text-slate-900 mb-1">{feature.title}</h4>
                                             <p className="text-slate-600 font-medium leading-snug">{feature.description}</p>
                                         </div>
                                     </div>
@@ -82,21 +82,21 @@ export default function PremiumPlanShowcase() {
                         <div className="flex flex-col sm:flex-row items-center gap-6 pt-6">
                             <Button
                                 size="lg"
-                                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-lg md:text-xl px-10 py-7 rounded-full shadow-xl transition-all hover:scale-105 font-bold uppercase tracking-tight"
+                                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-lg md:text-xl px-10 py-7 rounded-full shadow-xl transition-all hover:scale-105 font-medium uppercase tracking-tight"
                                 onClick={() => document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' })}
                             >
                                 Elegir Plan Premium
                             </Button>
                             <Button
                                 size="lg"
-                                className="w-full sm:w-auto border-2 border-blue-600 bg-blue-600 hover:bg-blue-700 text-white text-lg md:text-xl px-10 py-7 rounded-full shadow-lg transition-all hover:scale-105 font-bold uppercase tracking-tight"
+                                className="w-full sm:w-auto border-2 border-blue-600 bg-blue-600 hover:bg-blue-700 text-white text-lg md:text-xl px-10 py-7 rounded-full shadow-lg transition-all hover:scale-105 font-medium uppercase tracking-tight"
                                 onClick={() => window.open('https://wa.me/yournumber', '_blank')}
                             >
                                 Quiero saber más
                             </Button>
                         </div>
 
-                        <p className="text-sm font-semibold text-slate-400 flex items-center gap-2">
+                        <p className="text-sm font-medium text-slate-400 flex items-center gap-2">
                             <CheckCircle2 size={16} className="text-blue-500" />
                             Todo incluido: viaja sin preocupaciones
                         </p>

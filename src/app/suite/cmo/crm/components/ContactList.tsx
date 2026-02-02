@@ -44,7 +44,7 @@ export const ContactList: React.FC<ContactListProps> = ({
             className="bg-black/40 rounded-lg border border-white/5 shadow-2xl overflow-hidden"
         >
             <div className={cn(
-                "grid px-6 py-3 border-b border-white/5 text-[10px] font-black text-neutral-500 uppercase tracking-widest bg-white/[0.01]",
+                "grid px-6 py-3 border-b border-white/5 text-[10px] font-medium text-neutral-500 uppercase tracking-widest bg-white/[0.01]",
                 isChatOpen
                     ? "grid-cols-[40px_1fr_40px]"
                     : "grid-cols-[40px_2.5fr_2fr_1.5fr_1fr_1fr_1fr_80px] gap-4"
@@ -83,13 +83,13 @@ export const ContactList: React.FC<ContactListProps> = ({
                         </div>
                         <div className="flex items-center space-x-3 overflow-hidden">
                             <div className={cn(
-                                "rounded bg-neutral-800 flex-shrink-0 flex items-center justify-center font-bold text-neutral-400 group-hover:text-blue-400 transition-colors",
+                                "rounded bg-neutral-800 flex-shrink-0 flex items-center justify-center font-medium text-neutral-400 group-hover:text-blue-400 transition-colors",
                                 isChatOpen ? "w-8 h-8 text-[10px]" : "w-7 h-7 text-[9px]"
                             )}>
                                 {contact.name?.charAt(0) || '?'}
                             </div>
                             <div className="flex flex-col min-w-0">
-                                <div className="font-bold text-neutral-200 group-hover:text-white truncate text-xs">{contact.name}</div>
+                                <div className="font-medium text-neutral-200 group-hover:text-white truncate text-xs">{contact.name}</div>
                                 {isChatOpen && (
                                     <span className="text-[10px] text-neutral-500 font-mono truncate">{formatPhoneNumber(contact.phone || contact.email)}</span>
                                 )}
@@ -99,10 +99,10 @@ export const ContactList: React.FC<ContactListProps> = ({
                             <>
                                 <div className="text-neutral-400 text-[11px] truncate">{contact.email || '—'}</div>
                                 <div className="text-neutral-400 font-mono text-[11px] truncate tracking-tighter">{formatPhoneNumber(contact.phone)}</div>
-                                <div className="text-neutral-500 font-bold text-[10px] tracking-tight uppercase text-center">{contact.source}</div>
+                                <div className="text-neutral-500 font-medium text-[10px] tracking-tight uppercase text-center">{contact.source}</div>
                                 <div className="flex justify-center">
                                     <Badge variant="outline" className={cn(
-                                        "px-2 py-0 border-0 text-[9px] font-black uppercase rounded",
+                                        "px-2 py-0 border-0 text-[9px] font-medium uppercase rounded",
                                         contact.stage === 'Closed' ? 'text-emerald-500 bg-emerald-500/10' :
                                             contact.stage === 'In Progress' ? 'text-blue-500 bg-blue-500/10' :
                                                 'text-orange-500 bg-orange-500/10'
@@ -112,9 +112,9 @@ export const ContactList: React.FC<ContactListProps> = ({
                                 </div>
                                 <div className="flex flex-wrap gap-1 items-center">
                                     {contact.tags?.slice(0, 1).map((tag: string) => (
-                                        <span key={tag} className="px-1.5 py-0.5 bg-neutral-900 text-[9px] text-neutral-500 rounded border border-white/5 uppercase font-bold">{tag}</span>
+                                        <span key={tag} className="px-1.5 py-0.5 bg-neutral-900 text-[9px] text-neutral-500 rounded border border-white/5 uppercase font-medium">{tag}</span>
                                     ))}
-                                    {contact.tags?.length > 1 && <span className="text-[9px] text-neutral-600 font-bold">+{contact.tags.length - 1}</span>}
+                                    {contact.tags?.length > 1 && <span className="text-[9px] text-neutral-600 font-medium">+{contact.tags.length - 1}</span>}
                                 </div>
                             </>
                         )}
@@ -126,15 +126,15 @@ export const ContactList: React.FC<ContactListProps> = ({
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent className="bg-neutral-900 border-neutral-800 text-white rounded-md shadow-2xl py-1">
-                                    <DropdownMenuItem onClick={() => { setSelectedContact(contact); setIsDetailModalOpen(true); setIsEditingProfile(false); }} className="hover:bg-blue-600 rounded-sm cursor-pointer mx-1 text-xs font-bold uppercase tracking-wider py-2">
+                                    <DropdownMenuItem onClick={() => { setSelectedContact(contact); setIsDetailModalOpen(true); setIsEditingProfile(false); }} className="hover:bg-blue-600 rounded-sm cursor-pointer mx-1 text-xs font-medium uppercase tracking-wider py-2">
                                         <UserPlus className="w-3 h-3 mr-2" /> View Details
                                     </DropdownMenuItem>
                                     {!isChatOpen && (
-                                        <DropdownMenuItem onClick={() => handleContactClick(contact)} className="hover:bg-blue-600 rounded-sm cursor-pointer mx-1 text-xs font-bold uppercase tracking-wider py-2">
+                                        <DropdownMenuItem onClick={() => handleContactClick(contact)} className="hover:bg-blue-600 rounded-sm cursor-pointer mx-1 text-xs font-medium uppercase tracking-wider py-2">
                                             <MessageSquare className="w-3 h-3 mr-2" /> Open Instance
                                         </DropdownMenuItem>
                                     )}
-                                    <DropdownMenuItem onClick={() => { handleDeleteContact(contact.id) }} className="hover:bg-red-600 rounded-sm cursor-pointer mx-1 text-xs font-bold uppercase tracking-wider py-2 text-red-500 focus:text-white">
+                                    <DropdownMenuItem onClick={() => { handleDeleteContact(contact.id) }} className="hover:bg-red-600 rounded-sm cursor-pointer mx-1 text-xs font-medium uppercase tracking-wider py-2 text-red-500 focus:text-white">
                                         <Trash2 className="w-3 h-3 mr-2" /> Purge Profile
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -147,7 +147,7 @@ export const ContactList: React.FC<ContactListProps> = ({
             {contacts.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-32 text-neutral-400">
                     <Search className="w-16 h-16 mb-6 opacity-20" />
-                    <p className="text-xl font-bold tracking-tight">Zero matches detected.</p>
+                    <p className="text-xl font-medium tracking-tight">Zero matches detected.</p>
                 </div>
             )}
         </motion.div>

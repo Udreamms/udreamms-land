@@ -14,7 +14,7 @@ export default function QuizSection() {
                 <FadeIn className="bg-white p-8 md:p-12 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
                     {step === 1 && (
                         <div className="space-y-6 fade-in">
-                            <h2 className="text-2xl font-bold text-center mb-8 text-abyss">Verifica si Calificas</h2>
+                            <h2 className="text-2xl font-medium text-center mb-8 text-abyss tracking-tight">Verifica si Calificas</h2>
 
                             <div className="space-y-4">
                                 <label className="block text-sm font-medium text-slate-700">1. ¿Tienes pasaporte vigente para viajar a EE. UU.?</label>
@@ -28,7 +28,7 @@ export default function QuizSection() {
 
                     {step === 2 && (
                         <div className="space-y-6 fade-in">
-                            <h2 className="text-2xl font-bold text-center mb-8 text-abyss">Verifica si Calificas</h2>
+                            <h2 className="text-2xl font-medium text-center mb-8 text-abyss tracking-tight">Verifica si Calificas</h2>
                             <div className="space-y-4">
                                 <label className="block text-sm font-medium text-slate-700">2. ¿Planeas viajar a Estados Unidos por turismo en los próximos 12 meses?</label>
                                 <div className="grid grid-cols-2 gap-4">
@@ -41,7 +41,7 @@ export default function QuizSection() {
 
                     {step === 3 && (
                         <div className="space-y-6 fade-in">
-                            <h2 className="text-2xl font-bold text-center mb-8 text-abyss">Verifica si Calificas</h2>
+                            <h2 className="text-2xl font-medium text-center mb-8 text-abyss tracking-tight">Verifica si Calificas</h2>
                             <div className="space-y-4">
                                 <label className="block text-sm font-medium text-slate-700">3. ¿Estás listo para iniciar tu trámite y gestión de viaje con nuestro equipo?</label>
                                 <div className="grid grid-cols-2 gap-4">
@@ -57,14 +57,14 @@ export default function QuizSection() {
                             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <CheckCircle2 className="w-8 h-8 text-green-600" />
                             </div>
-                            <h2 className="text-2xl font-bold mb-4 text-abyss">¡Felicidades! Cumples con los requisitos.</h2>
+                            <h2 className="text-2xl font-medium mb-4 text-abyss tracking-tight">¡Felicidades! Cumples con los requisitos.</h2>
                             <p className="text-slate-600 mb-8">Reserva tu plan antes de que se agoten los últimos cupos.</p>
 
                             <a
                                 href="https://wa.me/5215512345678?text=Hola,%20ya%20verifiqué%20mi%20perfil%20y%20quiero%20iniciar%20mi%20trámite%20de%20visa"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="w-full bg-[#25D366] hover:bg-[#20bd5a] h-14 text-lg rounded-xl text-white shadow-lg shadow-green-500/20 transform transition hover:scale-[1.02] flex items-center justify-center gap-2 font-bold"
+                                className="w-full bg-[#25D366] hover:bg-[#20bd5a] h-14 text-lg rounded-xl text-white shadow-lg shadow-green-500/20 transform transition hover:scale-[1.02] flex items-center justify-center gap-2 font-medium"
                             >
                                 Contactar por WhatsApp
                             </a>

@@ -53,14 +53,14 @@ export const LaneChecklist = ({
         <div className="p-8 bg-white/[0.02] rounded-[2.5rem] border border-white/5 shadow-inner">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex flex-col">
-                    <h5 className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.2em] mb-1">
+                    <h5 className="text-[10px] font-medium text-neutral-500 uppercase tracking-[0.2em] mb-1">
                         Operative Checklist
                     </h5>
-                    <p className="text-sm font-bold text-white uppercase tracking-tight">{groupName || 'General Flow'}</p>
+                    <p className="text-sm font-medium text-white uppercase tracking-tight">{groupName || 'General Flow'}</p>
                 </div>
                 <div className="text-right">
-                    <span className="text-2xl font-black text-blue-500 tracking-tighter">{progress}%</span>
-                    <p className="text-[9px] font-black text-neutral-500 uppercase tracking-widest mt-1">Efficiency</p>
+                    <span className="text-2xl font-medium text-blue-500 tracking-tighter">{progress}%</span>
+                    <p className="text-[9px] font-medium text-neutral-500 uppercase tracking-widest mt-1">Efficiency</p>
                 </div>
             </div>
 
@@ -102,7 +102,7 @@ export const LaneChecklist = ({
                                 {isChecked && <CheckCheck size={14} className="animate-in zoom-in-50 duration-300" />}
                             </div>
                             <span className={cn(
-                                "text-xs font-bold tracking-tight transition-colors",
+                                "text-xs font-medium tracking-tight transition-colors",
                                 isChecked ? "text-neutral-500 line-through" : "text-neutral-200"
                             )}>
                                 {item.text}
@@ -113,7 +113,7 @@ export const LaneChecklist = ({
 
                 {!hasItems && (
                     <div className="col-span-full py-8 text-center opacity-30 border border-dashed border-white/10 rounded-[1.5rem]">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] italic">No active milestones</p>
+                        <p className="text-[10px] font-medium uppercase tracking-[0.2em] italic">No active milestones</p>
                     </div>
                 )}
             </div>
@@ -154,11 +154,11 @@ export const IndividualChecklist = ({
                     <div className="w-8 h-8 rounded-lg bg-blue-600/10 flex items-center justify-center text-blue-500 border border-blue-500/20">
                         <CheckCircle size={16} />
                     </div>
-                    <p className="text-xs font-black text-white uppercase tracking-tight">Checklist Individual</p>
+                    <p className="text-xs font-medium text-white uppercase tracking-tight">Checklist Individual</p>
                 </div>
                 <Button
                     onClick={() => setIsAdding(true)}
-                    className="h-8 px-5 bg-blue-600 hover:bg-blue-700 text-[8px] font-black uppercase tracking-widest rounded-xl shadow-xl shadow-blue-600/20 transition-all"
+                    className="h-8 px-5 bg-blue-600 hover:bg-blue-700 text-[8px] font-medium uppercase tracking-widest rounded-xl shadow-xl shadow-blue-600/20 transition-all"
                 >
                     + Nueva Tarea
                 </Button>
@@ -199,11 +199,11 @@ export const IndividualChecklist = ({
                                     {item.completed && <CheckCheck size={14} />}
                                 </button>
                                 <div className="flex-1 min-w-0">
-                                    <p className={cn("text-sm font-bold tracking-tight mb-2", item.completed ? "line-through text-neutral-500" : "text-neutral-100")}>
+                                    <p className={cn("text-sm font-medium tracking-tight mb-2", item.completed ? "line-through text-neutral-500" : "text-neutral-100")}>
                                         {item.text}
                                     </p>
                                     <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-3 text-[9px] font-black text-neutral-500 uppercase tracking-widest">
+                                        <div className="flex items-center gap-3 text-[9px] font-medium text-neutral-500 uppercase tracking-widest">
                                             <User size={12} className="text-blue-500/50" />
                                             <span>{item.author || 'Agente'}</span>
                                             <span className="opacity-30">|</span>
@@ -221,7 +221,7 @@ export const IndividualChecklist = ({
                 ) : (
                     <div className="flex-1 flex flex-col items-center justify-center text-center py-10 opacity-30">
                         <Plus size={32} className="mb-2" />
-                        <p className="text-[10px] font-black uppercase tracking-[0.3em]">No hay tareas pendientes</p>
+                        <p className="text-[10px] font-medium uppercase tracking-[0.3em]">No hay tareas pendientes</p>
                     </div>
                 )}
             </div>

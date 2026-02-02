@@ -8,7 +8,7 @@ export default function FAQSection() {
         <section className="bg-white py-24">
             <div className="container mx-auto px-6 max-w-3xl">
                 <FadeIn className="text-center mb-16">
-                    <h2 className="text-3xl font-black italic text-slate-900 mb-4">PREGUNTAS DEL HINCHA</h2>
+                    <h2 className="text-3xl font-medium tracking-tight italic text-slate-900 mb-4">PREGUNTAS DEL HINCHA</h2>
                     <p className="text-slate-600">Todo lo que necesitas saber antes del viaje.</p>
                 </FadeIn>
 
@@ -16,7 +16,7 @@ export default function FAQSection() {
                     {/* FAQ Item 1 */}
                     <div className="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden">
                         <button className="w-full flex items-center justify-between p-6 text-left hover:bg-slate-100 transition-colors group">
-                            <span className="font-bold text-slate-900">¿Necesito visa separada para Canada/Mexico?</span>
+                            <span className="font-medium text-slate-900">¿Necesito visa separada para Canada/Mexico?</span>
                             <ChevronDown className="w-5 h-5 text-slate-400 group-hover:text-yellow-500 transition-colors" />
                         </button>
                         <div className="px-6 pb-6 text-slate-600 text-sm leading-relaxed">
@@ -27,7 +27,7 @@ export default function FAQSection() {
                     {/* FAQ Item 2 */}
                     <div className="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden">
                         <button className="w-full flex items-center justify-between p-6 text-left hover:bg-slate-100 transition-colors group">
-                            <span className="font-bold text-slate-900">¿El Radar garantiza la cita?</span>
+                            <span className="font-medium text-slate-900">¿El Radar garantiza la cita?</span>
                             <ChevronDown className="w-5 h-5 text-slate-400 group-hover:text-yellow-500 transition-colors" />
                         </button>
                         <div className="px-6 pb-6 text-slate-600 text-sm leading-relaxed">
@@ -38,7 +38,7 @@ export default function FAQSection() {
                     {/* FAQ Item 3 */}
                     <div className="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden">
                         <button className="w-full flex items-center justify-between p-6 text-left hover:bg-slate-100 transition-colors group">
-                            <span className="font-bold text-slate-900">¿Ayudan con boletos de partido?</span>
+                            <span className="font-medium text-slate-900">¿Ayudan con boletos de partido?</span>
                             <ChevronDown className="w-5 h-5 text-slate-400 group-hover:text-yellow-500 transition-colors" />
                         </button>
                         <div className="px-6 pb-6 text-slate-600 text-sm leading-relaxed">

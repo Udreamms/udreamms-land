@@ -16,7 +16,7 @@ export default function PortalPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  
+
   // Login States
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -59,20 +59,20 @@ export default function PortalPage() {
       <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="container mx-auto pt-32 px-4">
-           <Card>
-             <CardHeader>
-               <CardTitle>Bienvenido al Portal de Cliente, {user.email}</CardTitle>
-               <CardDescription>Aquí podrás ver el estado de tu trámite, documentos y más.</CardDescription>
-             </CardHeader>
-             <CardContent>
-               <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800">
-                 🚧 Portal en construcción. Pronto verás aquí el avance de tu visa en tiempo real.
-               </div>
-               <Button onClick={() => auth.signOut()} variant="outline" className="mt-4">
-                 Cerrar Sesión
-               </Button>
-             </CardContent>
-           </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Bienvenido al Portal de Cliente, {user.email}</CardTitle>
+              <CardDescription>Aquí podrás ver el estado de tu trámite, documentos y más.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800">
+                🚧 Portal en construcción. Pronto verás aquí el avance de tu visa en tiempo real.
+              </div>
+              <Button onClick={() => auth.signOut()} variant="outline" className="mt-4">
+                Cerrar Sesión
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -80,10 +80,10 @@ export default function PortalPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
-       <div className="flex-1 flex items-center justify-center p-4">
+      <div className="flex-1 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">Portal Udreamms</CardTitle>
+            <CardTitle className="text-2xl font-medium">Portal Udreamms</CardTitle>
             <CardDescription>Ingresa para gestionar tu proceso</CardDescription>
           </CardHeader>
           <Tabs defaultValue="login" className="w-full">
@@ -91,7 +91,7 @@ export default function PortalPage() {
               <TabsTrigger value="login">Iniciar Sesión</TabsTrigger>
               <TabsTrigger value="register">Registrarse</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="login">
               <form onSubmit={handleLogin}>
                 <CardContent className="space-y-4 pt-4">
@@ -122,7 +122,7 @@ export default function PortalPage() {
                     <Label htmlFor="r-password">Contraseña</Label>
                     <Input id="r-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                   </div>
-                   {error && <p className="text-red-500 text-sm">{error}</p>}
+                  {error && <p className="text-red-500 text-sm">{error}</p>}
                 </CardContent>
                 <CardFooter>
                   <Button type="submit" className="w-full">Crear Cuenta</Button>
@@ -131,7 +131,7 @@ export default function PortalPage() {
             </TabsContent>
           </Tabs>
         </Card>
-       </div>
+      </div>
     </div>
   );
 }

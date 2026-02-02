@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  signInWithEmailAndPassword, 
-  GoogleAuthProvider, 
-  OAuthProvider, 
-  signInWithPopup 
+import {
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  OAuthProvider,
+  signInWithPopup
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import Image from 'next/image';
@@ -64,9 +64,9 @@ export default function LoginPage() {
       {/* Left side - Brand/Logo */}
       <div className="flex-1 flex items-center justify-center p-12 bg-[#050505]">
         <div className="relative w-full max-w-[400px] aspect-square">
-           <Image 
-            src="/assets/Logo Udreamms.png" 
-            alt="Udreamms Logo" 
+          <Image
+            src="/assets/Logo Udreamms.png"
+            alt="Udreamms Logo"
             fill
             className="object-contain"
             priority
@@ -78,16 +78,16 @@ export default function LoginPage() {
       <div className="flex-1 flex flex-col justify-center px-8 md:px-24 py-12 border-l border-white/10">
         <div className="max-w-[400px] w-full mx-auto space-y-8">
           <div>
-            <h1 className="text-5xl md:text-6xl font-black tracking-tighter mb-12">
+            <h1 className="text-5xl md:text-6xl font-medium tracking-tighter mb-12">
               Es un gusto que trabajes con nosotros
             </h1>
-            <h2 className="text-3xl font-bold mb-8 italic text-white/90">Acceso Staff</h2>
+            <h2 className="text-3xl font-medium mb-8 italic text-white/90">Acceso Staff</h2>
           </div>
 
           <div className="space-y-4">
-            <Button 
-              variant="outline" 
-              className="w-full h-12 rounded-full bg-white text-black hover:bg-white/90 font-semibold text-base flex items-center justify-center gap-3 border-none"
+            <Button
+              variant="outline"
+              className="w-full h-12 rounded-full bg-white text-black hover:bg-white/90 font-medium text-base flex items-center justify-center gap-3 border-none"
               onClick={handleGoogleLogin}
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -111,9 +111,9 @@ export default function LoginPage() {
               Continuar con Google
             </Button>
 
-            <Button 
-              variant="outline" 
-              className="w-full h-12 rounded-full bg-white text-black hover:bg-white/90 font-semibold text-base flex items-center justify-center gap-3 border-none"
+            <Button
+              variant="outline"
+              className="w-full h-12 rounded-full bg-white text-black hover:bg-white/90 font-medium text-base flex items-center justify-center gap-3 border-none"
               onClick={handleMicrosoftLogin}
             >
               <svg className="w-5 h-5" viewBox="0 0 23 23">
@@ -135,10 +135,10 @@ export default function LoginPage() {
               <form onSubmit={handleEmailLogin} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Correo institucional</Label>
-                  <Input 
-                    id="email" 
-                    type="email" 
-                    placeholder="staff@udreamms.com" 
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="staff@udreamms.com"
                     className="bg-black border-white/20 rounded-md h-12 focus:border-blue-500"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -147,19 +147,19 @@ export default function LoginPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Contraseña</Label>
-                  <Input 
-                    id="password" 
-                    type="password" 
-                    placeholder="••••••••" 
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
                     className="bg-black border-white/20 rounded-md h-12 focus:border-blue-500"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
                 </div>
-                <Button 
-                  type="submit" 
-                  className="w-full h-12 rounded-full bg-blue-500 hover:bg-blue-600 text-white font-bold text-base transition-all disabled:opacity-50"
+                <Button
+                  type="submit"
+                  className="w-full h-12 rounded-full bg-blue-500 hover:bg-blue-600 text-white font-medium text-base transition-all disabled:opacity-50"
                   disabled={loading}
                 >
                   {loading ? 'Iniciando sesión...' : 'Ingresar al sistema'}
@@ -173,9 +173,9 @@ export default function LoginPage() {
           </div>
 
           <div className="pt-10">
-            <Button 
-              variant="outline" 
-              className="w-full h-12 rounded-full bg-white text-black hover:bg-white/90 font-bold text-base border-none"
+            <Button
+              variant="outline"
+              className="w-full h-12 rounded-full bg-white text-black hover:bg-white/90 font-medium text-base border-none"
               onClick={() => toast.info('Contacta al administrador del sistema')}
             >
               ¿Necesitas ayuda?

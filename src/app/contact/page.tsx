@@ -57,9 +57,9 @@ export default function ContactPage() {
     try {
       // Aquí puedes agregar la lógica para enviar el formulario
       console.log("Form data:", data);
-      
+
       toast.success("¡Formulario enviado! Nos pondremos en contacto contigo pronto.");
-      
+
       form.reset();
     } catch (error) {
       toast.error("Hubo un problema al enviar el formulario. Por favor intenta de nuevo.");
@@ -77,7 +77,7 @@ export default function ContactPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-primary-glow rounded-full mb-6">
               <Mail className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent mb-6">
+            <h2 className="text-4xl lg:text-5xl font-medium tracking-tight bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent mb-6">
               Contacta a un Asesor
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
@@ -240,7 +240,7 @@ export default function ContactPage() {
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full"
+                      className="w-full font-medium"
                       size="lg"
                     >
                       {isSubmitting ? "Enviando..." : "Enviar Formulario"}

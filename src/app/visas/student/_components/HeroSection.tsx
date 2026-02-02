@@ -56,7 +56,7 @@ export default function HeroSection() {
             <div className="absolute inset-0 flex flex-col justify-end items-start z-20 text-left px-6 pb-20 md:pl-[7rem] md:pb-20 pointer-events-none">
 
                 <FadeIn>
-                    <p className="text-cloud/90 text-lg md:text-xl font-medium tracking-widest uppercase mb-2 drop-shadow-md">
+                    <p className="text-white text-lg md:text-xl font-medium tracking-[0.2em] uppercase mb-4 drop-shadow-md opacity-80">
                         DOMINA EL INGLÉS EN ESTADOS UNIDOS
                     </p>
                 </FadeIn>
@@ -66,14 +66,14 @@ export default function HeroSection() {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2 }}
-                    className="text-white text-4xl md:text-6xl lg:text-7xl font-bold font-sans drop-shadow-xl tracking-tighter mb-4"
+                    className="text-white text-4xl md:text-6xl lg:text-7xl font-medium font-sans drop-shadow-xl tracking-tighter mb-4"
                 >
                     Visa de Estudiante F-1
                 </motion.h1>
 
                 {/* H2: The How/Credibility */}
                 <FadeIn delay={0.4}>
-                    <p className="text-cloud/80 text-sm md:text-xl max-w-3xl mb-8 drop-shadow-md leading-relaxed">
+                    <p className="text-white text-sm md:text-xl max-w-3xl mb-8 drop-shadow-md leading-relaxed font-medium opacity-70">
                         Aprende inglés en las mejores instituciones del país
                     </p>
                 </FadeIn>
@@ -85,8 +85,8 @@ export default function HeroSection() {
                 <FadeIn delay={0.8}>
                     <Button
                         size="lg"
-                        className="bg-white hover:bg-slate-100 text-abyss text-xl px-12 py-5 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.7)] transition-all hover:scale-105 font-bold"
-                        onClick={() => document.getElementById('quiz')?.scrollIntoView({ behavior: 'smooth' })}
+                        className="bg-white hover:bg-slate-100 text-black text-xl px-12 py-5 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.7)] transition-all hover:scale-105 font-medium"
+                        onClick={() => document.getElementById('calculator-section')?.scrollIntoView({ behavior: 'smooth' })}
                     >
                         Solicitar ahora
                     </Button>

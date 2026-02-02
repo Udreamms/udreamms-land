@@ -135,17 +135,17 @@ const Card = ({ card, groupId, onClick, cardColor = 'bg-neutral-800' }) => {
                 }
                 return <WhatsappIcon className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />;
               })()}
-              <h3 className="font-bold text-[11px] text-white truncate leading-none">
+              <h3 className="font-medium text-[11px] text-white truncate leading-none tracking-tight">
                 {card.contactName || 'Desconocido'}
               </h3>
             </div>
 
             <div className="flex items-center gap-1.5 flex-shrink-0">
-              <span className="text-[8px] font-bold text-neutral-500 uppercase tracking-tight tabular-nums leading-none">
+              <span className="text-[8px] font-medium text-neutral-500 uppercase tracking-tight tabular-nums leading-none">
                 {formatTimestamp(card.updatedAt || card.createdAt)}
               </span>
               {card.unreadCount > 0 && (
-                <Badge className="bg-blue-600 text-white border-transparent h-3.5 min-w-[14px] flex items-center justify-center p-0 text-[9px] font-bold rounded-sm">
+                <Badge className="bg-blue-600 text-white border-transparent h-3.5 min-w-[14px] flex items-center justify-center p-0 text-[9px] font-medium rounded-sm">
                   {card.unreadCount}
                 </Badge>
               )}

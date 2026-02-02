@@ -36,16 +36,16 @@ export const TabBackground: React.FC<TabBackgroundProps> = ({ contact, updateFie
         <div className="space-y-6">
             <Card className="bg-neutral-900 border-neutral-800">
                 <CardHeader>
-                    <CardTitle className="text-sm font-bold text-white uppercase tracking-wider">Información de Fondo</CardTitle>
+                    <CardTitle className="text-sm font-medium text-white uppercase tracking-wider">Información de Fondo</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">¿Por qué quieres estudiar inglés?</Label>
+                        <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">¿Por qué quieres estudiar inglés?</Label>
                         <Textarea value={contact.studyReason || ''} onChange={e => updateField('studyReason', e.target.value)} className="bg-neutral-950 border-neutral-800 rounded-md min-h-[60px]" />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Tiempo de Estudio</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Tiempo de Estudio</Label>
                             <Select value={contact.studyDuration || ''} onValueChange={val => updateField('studyDuration', val)}>
                                 <SelectTrigger className="bg-neutral-950 border-neutral-800 h-9 rounded-md">
                                     <SelectValue placeholder="Seleccionar" />
@@ -58,7 +58,7 @@ export const TabBackground: React.FC<TabBackgroundProps> = ({ contact, updateFie
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Semestre de Inicio</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Semestre de Inicio</Label>
                             <Select value={contact.startSemester || ''} onValueChange={val => updateField('startSemester', val)}>
                                 <SelectTrigger className="bg-neutral-950 border-neutral-800 h-9 rounded-md">
                                     <SelectValue placeholder="Seleccionar" />
@@ -73,7 +73,7 @@ export const TabBackground: React.FC<TabBackgroundProps> = ({ contact, updateFie
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Horario Preferido</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Horario Preferido</Label>
                             <Select value={contact.preferredSchedule || ''} onValueChange={val => updateField('preferredSchedule', val)}>
                                 <SelectTrigger className="bg-neutral-950 border-neutral-800 h-9 rounded-md">
                                     <SelectValue placeholder="Seleccionar" />
@@ -86,14 +86,14 @@ export const TabBackground: React.FC<TabBackgroundProps> = ({ contact, updateFie
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Escuela Destino</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Escuela Destino</Label>
                             <Input value={contact.targetSchool || ''} onChange={e => updateField('targetSchool', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">¿Rechazo de Visa previo?</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">¿Rechazo de Visa previo?</Label>
                             <Select value={contact.visaRefusal || 'no'} onValueChange={val => updateField('visaRefusal', val)}>
                                 <SelectTrigger className="bg-neutral-950 border-neutral-800 h-9 rounded-md">
                                     <SelectValue placeholder="Seleccionar" />
@@ -105,7 +105,7 @@ export const TabBackground: React.FC<TabBackgroundProps> = ({ contact, updateFie
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">¿Servicio Militar?</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">¿Servicio Militar?</Label>
                             <Select value={contact.militaryService || 'no'} onValueChange={val => updateField('militaryService', val)}>
                                 <SelectTrigger className="bg-neutral-950 border-neutral-800 h-9 rounded-md">
                                     <SelectValue placeholder="Seleccionar" />
@@ -119,7 +119,7 @@ export const TabBackground: React.FC<TabBackgroundProps> = ({ contact, updateFie
                     </div>
 
                     <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">¿Qué idiomas hablas?</Label>
+                        <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">¿Qué idiomas hablas?</Label>
                         <Input value={contact.languages || ''} onChange={e => updateField('languages', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                     </div>
                 </CardContent>
@@ -127,7 +127,7 @@ export const TabBackground: React.FC<TabBackgroundProps> = ({ contact, updateFie
 
             <Card className="bg-neutral-900 border-neutral-800">
                 <CardHeader>
-                    <CardTitle className="text-sm font-bold text-white uppercase tracking-wider">Contactos de Emergencia (No familiares)</CardTitle>
+                    <CardTitle className="text-sm font-medium text-white uppercase tracking-wider">Contactos de Emergencia (No familiares)</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {emergencyContacts.map((emerg: any, index: number) => (
@@ -135,7 +135,7 @@ export const TabBackground: React.FC<TabBackgroundProps> = ({ contact, updateFie
                             <button onClick={() => removeEmergencyContact(index)} className="absolute top-2 right-2 text-neutral-500 hover:text-red-500">
                                 <Trash2 className="w-4 h-4" />
                             </button>
-                            <h4 className="text-xs font-bold text-neutral-400 mb-3 uppercase">Contacto #{index + 1}</h4>
+                            <h4 className="text-xs font-medium text-neutral-400 mb-3 uppercase">Contacto #{index + 1}</h4>
                             <div className="grid grid-cols-2 gap-4 mb-2">
                                 <Input placeholder="Nombre Completo" value={emerg.name || ''} onChange={e => updateEmergencyContact(index, 'name', e.target.value)} className="bg-neutral-900 border-neutral-800 h-8" />
                                 <Input placeholder="Relación/Amistad" value={emerg.relation || ''} onChange={e => updateEmergencyContact(index, 'relation', e.target.value)} className="bg-neutral-900 border-neutral-800 h-8" />

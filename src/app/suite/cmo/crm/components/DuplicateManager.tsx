@@ -121,7 +121,7 @@ export const DuplicateManager: React.FC<DuplicateManagerProps> = ({
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="bg-[#0b141a] border-neutral-800 text-white sm:max-w-4xl p-0 overflow-hidden outline-none">
                 <DialogHeader className="p-6 border-b border-white/5 bg-neutral-900/50">
-                    <DialogTitle className="text-xl font-black flex items-center gap-2">
+                    <DialogTitle className="text-xl font-medium flex items-center gap-2">
                         <Merge className="text-blue-500" />
                         Gestor de Duplicados
                     </DialogTitle>
@@ -134,7 +134,7 @@ export const DuplicateManager: React.FC<DuplicateManagerProps> = ({
                     {/* Groups List */}
                     <div className="w-1/3 border-r border-white/5 pr-6 space-y-4">
                         <div className="flex justify-between items-center mb-4">
-                            <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider">
+                            <span className="text-xs font-medium text-neutral-500 uppercase tracking-wider">
                                 {duplicates.length} Grupos Encontrados
                             </span>
                             <Button variant="ghost" size="sm" onClick={analyzeDuplicates} disabled={analyzing}>
@@ -160,7 +160,7 @@ export const DuplicateManager: React.FC<DuplicateManagerProps> = ({
                                         {group.length} Contactos
                                     </Badge>
                                 </div>
-                                <p className="font-bold text-sm truncate">{group[0].name}</p>
+                                <p className="font-medium text-sm truncate">{group[0].name}</p>
                                 <p className="text-xs text-neutral-500 truncate">{group[0].phone}</p>
                             </div>
                         ))}
@@ -211,12 +211,12 @@ const MergeView = ({ group, onMerge, processing }: { group: any[], onMerge: (id:
                                     {primaryId === contact.id && <div className="w-2 h-2 bg-white rounded-full" />}
                                 </div>
                                 <div>
-                                    <p className="font-bold text-sm text-white">{contact.name}</p>
+                                    <p className="font-medium text-sm text-white">{contact.name}</p>
                                     <p className="text-xs text-neutral-400">{contact.phone} • {contact.email || 'Sin Email'}</p>
                                 </div>
                             </div>
                             <div className="text-right">
-                                <span className="text-[10px] font-bold text-neutral-500 uppercase">Tags</span>
+                                <span className="text-[10px] font-medium text-neutral-500 uppercase">Tags</span>
                                 <div className="flex gap-1 justify-end mt-1">
                                     {(contact.tags || []).slice(0, 3).map((t: string) => (
                                         <div key={t} className="w-2 h-2 rounded-full bg-neutral-600" title={t} />
@@ -238,7 +238,7 @@ const MergeView = ({ group, onMerge, processing }: { group: any[], onMerge: (id:
                 <Button
                     onClick={() => onMerge(primaryId)}
                     disabled={processing}
-                    className="bg-blue-600 hover:bg-blue-500 text-white font-bold"
+                    className="bg-blue-600 hover:bg-blue-500 text-white font-medium"
                 >
                     {processing ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : <Merge className="w-4 h-4 mr-2" />}
                     Fusionar y Eliminar Duplicados

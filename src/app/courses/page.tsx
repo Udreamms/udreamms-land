@@ -106,31 +106,31 @@ export default function CoursesPage() {
   return (
     <div className="min-h-screen bg-white font-sans selection:bg-primary/10">
       <Header />
-      
+
       <main>
         {/* Hero Section - Apple Display Style */}
         <section className="relative pt-40 pb-24 bg-[#F5F5F7]">
           <div className="container mx-auto px-6 md:px-12 max-w-[1400px]">
             <div className="max-w-4xl text-left">
-              <motion.span 
+              <motion.span
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-primary font-bold tracking-tight text-xl mb-4 block"
+                className="text-primary font-medium tracking-tight text-xl mb-4 block"
               >
                 Oferta Académica
               </motion.span>
-              
-              <motion.h1 
+
+              <motion.h1
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="text-6xl md:text-8xl font-bold text-[#1d1d1f] tracking-tighter leading-[0.9] mb-8"
+                className="text-6xl md:text-8xl font-medium text-[#1d1d1f] tracking-tighter leading-[0.9] mb-8"
               >
                 El camino correcto <br />
                 para tus metas.
               </motion.h1>
-              
-              <motion.p 
+
+              <motion.p
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
@@ -147,7 +147,7 @@ export default function CoursesPage() {
           <div className="container mx-auto px-6 md:px-12 max-w-[1400px]">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {courses.map((course, index) => (
-                <motion.div 
+                <motion.div
                   key={course.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -159,21 +159,21 @@ export default function CoursesPage() {
                 >
                   {/* Top Content */}
                   <div className="z-10 relative">
-                    <span className="text-xs font-bold text-[#86868b] uppercase tracking-[0.2em] mb-3 block">
+                    <span className="text-xs font-medium text-[#86868b] uppercase tracking-[0.2em] mb-3 block">
                       {course.category}
                     </span>
-                    <h3 className="text-4xl font-bold text-[#1d1d1f] mb-6 leading-tight">
+                    <h3 className="text-4xl font-medium text-[#1d1d1f] mb-6 leading-tight">
                       {course.title}
                     </h3>
                     <p className="text-lg font-medium text-[#86868b] leading-relaxed mb-8">
                       {course.description}
                     </p>
-                    
+
                     <ul className="space-y-3">
                       {course.features.map((feature, i) => (
-                        <li key={i} className="flex items-center gap-3 text-[#1d1d1f] font-semibold text-sm">
-                           <CheckCircle2 className={`w-5 h-5 ${course.color}`} />
-                           {feature}
+                        <li key={i} className="flex items-center gap-3 text-[#1d1d1f] font-medium text-sm">
+                          <CheckCircle2 className={`w-5 h-5 ${course.color}`} />
+                          {feature}
                         </li>
                       ))}
                     </ul>
@@ -186,15 +186,15 @@ export default function CoursesPage() {
 
                   {/* Action Button */}
                   <div className="relative z-10 flex items-center justify-between mt-8">
-                     <div className="flex flex-col">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Duración</span>
-                        <span className="text-sm font-bold text-[#1d1d1f]">{course.duration}</span>
-                     </div>
-                     <Link href="/?calculator=true">
-                        <button className="bg-[#1d1d1f] text-white rounded-full p-4 hover:bg-primary transition-colors shadow-lg group-hover:scale-110 duration-300">
-                          <ArrowRight className="w-6 h-6" />
-                        </button>
-                     </Link>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-medium uppercase tracking-widest text-slate-400">Duración</span>
+                      <span className="text-sm font-medium text-[#1d1d1f]">{course.duration}</span>
+                    </div>
+                    <Link href="/?calculator=true">
+                      <button className="bg-[#1d1d1f] text-white rounded-full p-4 hover:bg-primary transition-colors shadow-lg group-hover:scale-110 duration-300">
+                        <ArrowRight className="w-6 h-6" />
+                      </button>
+                    </Link>
                   </div>
                 </motion.div>
               ))}
@@ -204,66 +204,66 @@ export default function CoursesPage() {
 
         {/* Comparison / Advantage Section */}
         <section className="py-32 bg-white">
-           <div className="container mx-auto px-6 md:px-12 max-w-5xl">
-              <div className="text-center mb-20">
-                <h2 className="text-4xl md:text-6xl font-bold text-[#1d1d1f] tracking-tight">¿Por qué Udreamms?</h2>
-                <p className="text-xl text-[#86868b] mt-4 font-medium">La diferencia entre un curso y un plan estratégico.</p>
-              </div>
-              
-              <div className="grid md:grid-cols-2 gap-16">
-                 {[
-                   { title: "Metodología USA", desc: "No solo gramática. Te enseñamos a pensar, debatir y trabajar en el entorno real americano.", icon: Sparkles },
-                   { title: "Partner Oficial", desc: "Contamos con alianzas directas en las escuelas más prestigiosas de los 50 estados.", icon: CheckCircle2 }
-                 ].map((item, i) => (
-                   <div key={i} className="flex flex-col gap-6">
-                      <div className="w-16 h-16 bg-[#F5F5F7] rounded-3xl flex items-center justify-center text-primary">
-                         <item.icon className="w-8 h-8" />
-                      </div>
-                      <h3 className="text-2xl font-bold text-[#1d1d1f]">{item.title}</h3>
-                      <p className="text-[#86868b] text-lg leading-relaxed font-medium">{item.desc}</p>
-                   </div>
-                 ))}
-              </div>
-           </div>
+          <div className="container mx-auto px-6 md:px-12 max-w-5xl">
+            <div className="text-center mb-20">
+              <h2 className="text-4xl md:text-6xl font-medium text-[#1d1d1f] tracking-tight">¿Por qué Udreamms?</h2>
+              <p className="text-xl text-[#86868b] mt-4 font-medium">La diferencia entre un curso y un plan estratégico.</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-16">
+              {[
+                { title: "Metodología USA", desc: "No solo gramática. Te enseñamos a pensar, debatir y trabajar en el entorno real americano.", icon: Sparkles },
+                { title: "Partner Oficial", desc: "Contamos con alianzas directas en las escuelas más prestigiosas de los 50 estados.", icon: CheckCircle2 }
+              ].map((item, i) => (
+                <div key={i} className="flex flex-col gap-6">
+                  <div className="w-16 h-16 bg-[#F5F5F7] rounded-3xl flex items-center justify-center text-primary">
+                    <item.icon className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-2xl font-medium text-[#1d1d1f]">{item.title}</h3>
+                  <p className="text-[#86868b] text-lg leading-relaxed font-medium">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
 
         {/* Final CTA - Apple Display Style */}
         <section className="py-40 bg-[#F5F5F7]">
-           <div className="container px-6 md:px-12 mx-auto">
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="max-w-4xl text-left"
-              >
-                 <motion.div className="mb-10">
-                    <Sparkles className="w-12 h-12 text-[#1d1d1f]" />
-                 </motion.div>
-                 
-                 <span className="text-[#1d1d1f] font-bold tracking-tight text-xl mb-4 block">
-                    Tu Futuro
-                 </span>
-                 
-                 <h2 className="text-6xl md:text-8xl font-bold text-[#1d1d1f] tracking-tighter leading-[0.9] mb-10">
-                   Asegura tu lugar <br />
-                   en las mejores escuelas.
-                 </h2>
-                 
-                 <p className="text-xl md:text-2xl text-[#86868b] mb-12 font-medium max-w-2xl leading-relaxed">
-                   No pierdas tiempo con trámites confusos. Nuestro equipo experto gestiona tu admisión de principio a fin.
-                 </p>
-                 
-                 <Link href="/?calculator=true">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-14 py-7 rounded-full bg-primary text-white font-black text-xl shadow-[0_20px_50px_rgba(220,38,38,0.3)] hover:shadow-primary/50 transition-all"
-                    >
-                      Solicitar Cotización
-                    </motion.button>
-                 </Link>
+          <div className="container px-6 md:px-12 mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="max-w-4xl text-left"
+            >
+              <motion.div className="mb-10">
+                <Sparkles className="w-12 h-12 text-[#1d1d1f]" />
               </motion.div>
-           </div>
+
+              <span className="text-[#1d1d1f] font-medium tracking-tight text-xl mb-4 block">
+                Tu Futuro
+              </span>
+
+              <h2 className="text-6xl md:text-8xl font-medium text-[#1d1d1f] tracking-tighter leading-[0.9] mb-10">
+                Asegura tu lugar <br />
+                en las mejores escuelas.
+              </h2>
+
+              <p className="text-xl md:text-2xl text-[#86868b] mb-12 font-medium max-w-2xl leading-relaxed">
+                No pierdas tiempo con trámites confusos. Nuestro equipo experto gestiona tu admisión de principio a fin.
+              </p>
+
+              <Link href="/?calculator=true">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-14 py-7 rounded-full bg-primary text-white font-medium text-xl shadow-[0_20px_50px_rgba(220,38,38,0.3)] hover:shadow-primary/50 transition-all"
+                >
+                  Solicitar Cotización
+                </motion.button>
+              </Link>
+            </motion.div>
+          </div>
         </section>
       </main>
 

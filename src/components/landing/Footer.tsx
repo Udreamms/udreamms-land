@@ -8,7 +8,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
           {/* Left Section */}
           <div className="md:col-span-1">
-            <p className="text-white text-2xl"><strong>Haciendo que Udreamms sea útil para todos</strong></p>
+            <p className="text-white text-2xl font-medium tracking-tight">Haciendo que Udreamms sea útil para todos</p>
             <div className="mt-8">
               <img src="/assets/Logo Udreamms.png" alt="Udreamms Logo" className="w-16 h-auto opacity-80 mb-4" />
               <p className="text-gray-500 text-sm">
@@ -21,7 +21,7 @@ const Footer = () => {
 
           {/* Programas Educativos / Visas */}
           <div className="mb-24">
-            <h4 className="font-semibold mb-3 text-sm">Visas y Programas</h4>
+            <h4 className="font-medium mb-3 text-sm text-slate-200">Visas y Programas</h4>
             <ul className="text-gray-400 space-y-2 text-sm mb-4">
               <li>
                 <Link href="/visas/student" className="hover:text-primary transition-colors">Visa de Estudiante (F-1)</Link>
@@ -37,7 +37,7 @@ const Footer = () => {
               </li>
             </ul>
 
-            <h4 className="font-semibold mt-16 mb-3 text-sm">Confianza y Legal</h4>
+            <h4 className="font-medium mt-16 mb-3 text-sm text-slate-200">Confianza y Legal</h4>
             <ul className="text-gray-400 space-y-2 text-sm">
               <li>
                 <Link href="/about" className="hover:text-primary transition-colors">Transparencia en Visas</Link>
@@ -56,7 +56,7 @@ const Footer = () => {
 
           {/* Tu Vida en USA - CONECTADO A SERVICIOS */}
           <div className="mb-24">
-            <h4 className="font-semibold mb-3 text-sm">Ecosistema de Llegada</h4>
+            <h4 className="font-medium mb-3 text-sm text-slate-200">Ecosistema de Llegada</h4>
             <ul className="text-gray-400 space-y-2 text-sm">
               <li>
                 <Link href="/services" className="hover:text-primary transition-colors">Vivienda Segura</Link>
@@ -73,7 +73,7 @@ const Footer = () => {
             </ul>
 
             {/* Sobre Udreamms */}
-            <h4 className="font-semibold mt-16 mb-3 text-sm">Sobre Udreamms</h4>
+            <h4 className="font-medium mt-16 mb-3 text-sm text-slate-200">Sobre Udreamms</h4>
             <ul className="text-gray-400 space-y-2 text-sm mt-auto">
               <li>
                 <Link href="/about" className="hover:text-primary transition-colors">Nuestra Historia</Link>
@@ -94,7 +94,7 @@ const Footer = () => {
 
           {/* Oportunidades y Destinos */}
           <div>
-            <h4 className="font-semibold mb-3 text-sm">Comunidad</h4>
+            <h4 className="font-medium mb-3 text-sm text-slate-200">Comunidad</h4>
             <ul className="text-gray-400 space-y-2 text-sm">
               <li>
                 <Link href="/destinos" className="hover:text-primary transition-colors">Destinos Top en USA</Link>
@@ -106,14 +106,14 @@ const Footer = () => {
                 <Link href="/#reviews" className="hover:text-primary transition-colors">Testimonios Reales</Link>
               </li>
               <li>
-                <Link href="/portal" className="hover:text-primary transition-colors font-bold text-white">Portal de Cliente</Link>
+                <Link href="/portal" className="hover:text-primary transition-colors font-medium text-white">Portal de Cliente</Link>
               </li>
             </ul>
           </div>
 
           {/* Síguenos */}
           <div>
-            <h4 className="font-semibold mb-3 text-sm">Síguenos</h4>
+            <h4 className="font-medium mb-3 text-sm text-slate-200">Síguenos</h4>
             <ul className="text-gray-400 space-y-4 text-sm">
               <li>
                 <a href="https://www.facebook.com/udreamms/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><Image src="/assets/f.jpg" alt="Facebook" width={32} height={32} style={{ height: 'auto' }} className="rounded-md" /></a>
@@ -122,7 +122,7 @@ const Footer = () => {
                 <a href="https://www.instagram.com/udreamms/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><Image src="/assets/i.jpg" alt="Instagram" width={32} height={32} style={{ height: 'auto' }} className="rounded-md" /></a>
               </li>
               <li>
-                <a href="https://wa.me/16507840581" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><Image src="/assets/w.jpg"  alt="Whatsapp" width={32} height={32} style={{ height: 'auto' }} className="rounded-md" /></a>
+                <a href="https://wa.me/16507840581" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><Image src="/assets/w.jpg" alt="Whatsapp" width={32} height={32} style={{ height: 'auto' }} className="rounded-md" /></a>
               </li>
               <li>
                 <a href="https://x.com/udreamms" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><Image src="/assets/x.jpg" alt="X" width={32} height={32} style={{ height: 'auto' }} className="rounded-md" /></a>
@@ -139,7 +139,7 @@ const Footer = () => {
 
         {/* Footer Bottom */}
         <div className="items-center flex mt-20 flex-col md:flex-row gap-4">
-          <Link href="/" className="text-white text-lg font-bold hover:text-primary transition-colors">Udreamms</Link>
+          <Link href="/" className="text-white text-lg font-medium hover:text-primary transition-colors tracking-tight">Udreamms</Link>
           <div className="flex justify-center space-x-6 w-full flex-wrap">
             <Link href="/about" className="text-gray-400 hover:text-primary transition-colors text-xs">Acerca de Udreamms</Link>
             <Link href="/visas/student" className="text-gray-400 hover:text-primary transition-colors text-xs">Visa Estudiante</Link>
@@ -148,7 +148,7 @@ const Footer = () => {
             <Link href="/terminos" className="text-gray-400 hover:text-primary transition-colors text-xs">Términos</Link>
           </div>
           <div className="text-gray-600 text-[10px] w-full text-center md:text-right">
-             © {new Date().getFullYear()} Udreamms LLC. All rights reserved.
+            © {new Date().getFullYear()} Udreamms LLC. All rights reserved.
           </div>
         </div>
       </div>

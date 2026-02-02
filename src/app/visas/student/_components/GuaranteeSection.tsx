@@ -11,7 +11,7 @@ export default function GuaranteeSection() {
                     <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white shadow-lg shadow-blue-200">
                         <ShieldCheck className="w-8 h-8" />
                     </div>
-                    <h2 className="text-2xl md:text-3xl font-bold text-abyss font-playfair mb-4">Garantía de Validez Académica</h2>
+                    <h2 className="text-2xl md:text-3xl font-medium text-abyss font-playfair mb-4 tracking-tight">Garantía de Validez Académica</h2>
 
                     <p className="text-slate-600 mb-8 leading-relaxed">
                         Si tras nuestra evaluación inicial no podemos presentarte <strong className="text-blue-600">al menos 3 opciones universitarias reales</strong> que se ajusten a tu perfil y presupuesto, te devolvemos el 100% de tu inversión en la consulta.

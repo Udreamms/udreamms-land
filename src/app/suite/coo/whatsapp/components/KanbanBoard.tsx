@@ -297,12 +297,12 @@ const KanbanBoard = () => {
     <div className="flex flex-col h-full bg-neutral-950 text-white overflow-hidden relative">
       <div className="px-6 py-3 border-b border-neutral-800/60 bg-neutral-950/50 backdrop-blur-md flex items-center justify-between flex-shrink-0 sticky top-0 z-30">
         <div className="flex flex-col gap-1">
-          <h1 className="text-xl font-black tracking-tight bg-gradient-to-br from-white to-neutral-500 bg-clip-text text-transparent">Buzón</h1>
+          <h1 className="text-xl font-medium tracking-tight bg-gradient-to-br from-white to-neutral-500 bg-clip-text text-transparent">Buzón</h1>
 
           <div className="flex items-center gap-3 mt-0.5">
             <div className="flex items-center gap-1.5">
               <MessageCircle size={11} className="text-blue-500" />
-              <span className="text-[11px] font-bold text-neutral-300">{allCards.length}</span>
+              <span className="text-[11px] font-medium text-neutral-300">{allCards.length}</span>
             </div>
 
             <div className="w-[1px] h-2.5 bg-neutral-800" />
@@ -311,39 +311,39 @@ const KanbanBoard = () => {
               <div className="text-emerald-500">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 2c-5.523 0-10 4.477-10 10 0 1.765.459 3.42 1.258 4.86l-1.289 4.704 4.819-1.264c1.404.757 3.012 1.196 4.722 1.196 5.523 0 10-4.477 10-10s-4.477-10-10-10zm0 18.411c-1.577 0-3.054-.429-4.327-1.178l-.31-.182-3.197.838.852-3.111-.2-.317c-.771-1.233-1.222-2.697-1.222-4.261 0-4.414 3.589-8.003 8.003-8.003 4.414 0 8.003 3.589 8.003 8.003 0 4.414-3.59 8.012-11.893 11.211z" /></svg>
               </div>
-              <span className="text-[11px] font-bold text-neutral-300">{channelStats.whatsapp}</span>
+              <span className="text-[11px] font-medium text-neutral-300">{channelStats.whatsapp}</span>
             </div>
 
             <div className="flex items-center gap-1.5">
               <Instagram size={11} className="text-pink-500" />
-              <span className="text-[11px] font-bold text-neutral-300">{channelStats.instagram}</span>
+              <span className="text-[11px] font-medium text-neutral-300">{channelStats.instagram}</span>
             </div>
 
             <div className="flex items-center gap-1.5">
               <MessageSquare size={11} className="text-blue-400" />
-              <span className="text-[11px] font-bold text-neutral-300">{channelStats.messenger}</span>
+              <span className="text-[11px] font-medium text-neutral-300">{channelStats.messenger}</span>
             </div>
 
             <div className="flex items-center gap-1.5">
               <Facebook size={11} className="text-blue-600" />
-              <span className="text-[11px] font-bold text-neutral-300">{channelStats.facebook}</span>
+              <span className="text-[11px] font-medium text-neutral-300">{channelStats.facebook}</span>
             </div>
 
             <div className="flex items-center gap-1.5">
               <Globe size={11} className="text-cyan-400" />
-              <span className="text-[11px] font-bold text-neutral-300">{channelStats.web}</span>
+              <span className="text-[11px] font-medium text-neutral-300">{channelStats.web}</span>
             </div>
 
             <div className="flex items-center gap-1.5">
               <Ghost size={11} className="text-yellow-400" />
-              <span className="text-[11px] font-bold text-neutral-300">{channelStats.snapchat}</span>
+              <span className="text-[11px] font-medium text-neutral-300">{channelStats.snapchat}</span>
             </div>
 
             <div className="w-[1px] h-2.5 bg-neutral-800" />
 
             <div className="flex items-center gap-1.5">
               <Users size={11} className="text-purple-500" />
-              <span className="text-[11px] font-bold text-neutral-300">{groups.length}</span>
+              <span className="text-[11px] font-medium text-neutral-300">{groups.length}</span>
             </div>
           </div>
         </div>
@@ -371,11 +371,11 @@ const KanbanBoard = () => {
                   <div className="max-h-[300px] overflow-y-auto p-1">
                     {searchResults.map(card => (
                       <div key={card.id} className="p-3 hover:bg-neutral-800/80 cursor-pointer rounded-lg flex items-center gap-3 transition-colors" onClick={() => handleCardClick(card)}>
-                        <div className="w-8 h-8 rounded-full bg-blue-600/20 flex items-center justify-center text-blue-500 font-bold text-xs">
+                        <div className="w-8 h-8 rounded-full bg-blue-600/20 flex items-center justify-center text-blue-500 font-medium text-xs">
                           {card.contactName.charAt(0)}
                         </div>
                         <div>
-                          <p className="font-semibold text-sm text-white">{card.contactName}</p>
+                          <p className="font-medium text-sm text-white">{card.contactName}</p>
                           <p className="text-xs text-neutral-500">{card.contactNumber}</p>
                         </div>
                       </div>
@@ -486,7 +486,7 @@ const KanbanBoard = () => {
                 title="Añadir otra bandeja"
               >
                 <Plus className="w-4 h-4 text-neutral-600 group-hover/add-lane:text-blue-500 transition-colors" />
-                <span className="text-xs font-semibold text-neutral-600 group-hover/add-lane:text-neutral-400 transition-colors">Añadir otro grupo</span>
+                <span className="text-xs font-medium text-neutral-600 group-hover/add-lane:text-neutral-400 transition-colors">Añadir otro grupo</span>
               </button>
 
               {/* Dynamic Spacer to allow scrolling when modal is open */}

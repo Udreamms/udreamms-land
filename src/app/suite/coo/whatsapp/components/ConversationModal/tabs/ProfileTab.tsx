@@ -115,14 +115,14 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
         <div className="h-full w-full overflow-y-auto overflow-x-hidden p-3 space-y-5 pb-24 dark:bg-neutral-950 dark:text-neutral-200 custom-scrollbar">
             {/* Header Section from Image */}
             <div className="flex items-center justify-between border-b border-neutral-800/50 pb-2 mb-2">
-                <h2 className="text-xs font-black text-white uppercase tracking-[0.2em]">PERFIL</h2>
+                <h2 className="text-xs font-medium text-white uppercase tracking-[0.2em]">PERFIL</h2>
                 <ChevronRight size={14} className="text-neutral-600" />
             </div>
 
             {/* Profile Info Row (Simplified) */}
             <div className="flex items-center gap-4 px-1">
                 <div className="relative shrink-0">
-                    <div className="w-16 h-16 rounded-full bg-neutral-800 flex items-center justify-center text-xl font-bold text-neutral-300 border border-neutral-700">
+                    <div className="w-16 h-16 rounded-full bg-neutral-800 flex items-center justify-center text-xl font-medium text-neutral-300 border border-neutral-700">
                         {contactInfo.contactName?.substring(0, 1).toUpperCase() || 'C'}
                     </div>
                     <div className="absolute bottom-1 right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-neutral-950 rounded-full"></div>
@@ -135,16 +135,16 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
                                 name="contactName"
                                 value={contactInfo.contactName || ''}
                                 onChange={handleInfoChange}
-                                className="h-8 text-sm font-bold bg-neutral-900 border-neutral-700 rounded-md focus:ring-1 focus:ring-blue-500"
+                                className="h-8 text-sm font-medium bg-neutral-900 border-neutral-700 rounded-md focus:ring-1 focus:ring-blue-500"
                                 placeholder="Nombre"
                             />
                         </div>
                     ) : (
                         <div className="group cursor-pointer" onClick={() => setIsEditing(true)}>
-                            <h2 className="text-xl font-bold text-white leading-tight hover:text-blue-400 transition-colors truncate">
+                            <h2 className="text-xl font-medium text-white leading-tight hover:text-blue-400 transition-colors truncate">
                                 {contactInfo.contactName || 'Nuevo Cliente'}
                             </h2>
-                            <p className="text-xs text-neutral-500 font-bold uppercase tracking-wider">{currentGroupName || 'SEVIS'}</p>
+                            <p className="text-xs text-neutral-500 font-medium uppercase tracking-wider">{currentGroupName || 'SEVIS'}</p>
                         </div>
                     )}
                 </div>
@@ -152,7 +152,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
 
             {/* 2. Datos de Contacto */}
             <div className="space-y-4 pt-2">
-                <h3 className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.15em] border-b border-neutral-800/50 pb-1.5 px-1">INFORMACIÓN DE CONTACTO</h3>
+                <h3 className="text-[10px] font-medium text-neutral-500 uppercase tracking-[0.15em] border-b border-neutral-800/50 pb-1.5 px-1">INFORMACIÓN DE CONTACTO</h3>
                 <div className="flex flex-col">
                     {FIXED_FIELDS.map((field) => (
                         <div key={field.key} className="flex items-center gap-4 px-2 py-3 hover:bg-white/[0.02] transition-colors group rounded-md">
@@ -172,8 +172,8 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
                                 ) : (
                                     <div className="flex items-center justify-between cursor-pointer" onClick={() => setEditingField(field.key)}>
                                         <div className="flex flex-col">
-                                            <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider mb-0.5">{field.label}</span>
-                                            <span className="text-[13px] text-neutral-200 font-bold truncate">
+                                            <span className="text-[9px] text-neutral-500 font-medium uppercase tracking-wider mb-0.5">{field.label}</span>
+                                            <span className="text-[13px] text-neutral-200 font-medium truncate">
                                                 {(contactInfo as any)[field.key] || <span className="text-neutral-600 italic font-normal">{field.placeholder}</span>}
                                             </span>
                                         </div>
@@ -189,7 +189,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             {/* 3. Información Adicional (Optional Fields) */}
             <div className="space-y-3">
                 <div className="flex items-center justify-between border-b border-neutral-800 pb-1">
-                    <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Detalles Adicionales</h3>
+                    <h3 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Detalles Adicionales</h3>
                     <Button variant="ghost" size="sm" onClick={() => setShowSuggestions(!showSuggestions)} className="h-5 px-2 text-[10px] text-blue-400 hover:text-blue-300 hover:bg-neutral-900">
                         {showSuggestions ? 'Cerrar' : '+ Agregar'}
                     </Button>
@@ -254,8 +254,8 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
                                 ) : (
                                     <div className="flex items-center justify-between cursor-pointer group/val" onClick={() => setEditingField(field.key)}>
                                         <div className="flex flex-col">
-                                            <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider mb-0.5">{field.label}</span>
-                                            <span className="text-[13px] text-neutral-200 font-bold truncate">
+                                            <span className="text-[9px] text-neutral-500 font-medium uppercase tracking-wider mb-0.5">{field.label}</span>
+                                            <span className="text-[13px] text-neutral-200 font-medium truncate">
                                                 {field.key === 'gender' ? (contactInfo.gender === 'man' ? 'Hombre' : contactInfo.gender === 'woman' ? 'Mujer' : '--') :
                                                     field.key === 'birthDate' ? (contactInfo.birthDate ? new Date(contactInfo.birthDate.seconds * 1000).toLocaleDateString() : '--') :
                                                         ((contactInfo as any)[field.key] || '--')}
@@ -278,7 +278,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
 
             {/* 4. Documentos (Restored) */}
             <div className="space-y-3">
-                <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider border-b border-neutral-800 pb-1 flex justify-between items-center">
+                <h3 className="text-xs font-medium text-neutral-500 uppercase tracking-wider border-b border-neutral-800 pb-1 flex justify-between items-center">
                     Documentos
                     <span className="text-[10px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded-full">{liveCardData?.documents?.length || 0}</span>
                 </h3>
@@ -318,13 +318,13 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             {/* 5. Checklist (Simplified) */}
             <div className="space-y-3">
                 <div className="flex items-center justify-between border-b border-neutral-800 pb-1">
-                    <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Checklist Operativo</h3>
-                    <span className="text-xs font-bold text-blue-500">{checklistProgress}%</span>
+                    <h3 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Checklist Operativo</h3>
+                    <span className="text-xs font-medium text-blue-500">{checklistProgress}%</span>
                 </div>
 
                 <div className="bg-neutral-900 rounded-lg border border-neutral-800 overflow-hidden">
                     <div className="p-3 bg-neutral-900 border-b border-neutral-800 flex justify-between items-center">
-                        <span className="text-xs font-bold text-neutral-300 uppercase">{currentGroupName || 'General'}</span>
+                        <span className="text-xs font-medium text-neutral-300 uppercase">{currentGroupName || 'General'}</span>
                         <div className="h-1.5 w-16 bg-neutral-800 rounded-full overflow-hidden">
                             <div className="h-full bg-blue-500 transition-all duration-500" style={{ width: `${checklistProgress}%` }} />
                         </div>

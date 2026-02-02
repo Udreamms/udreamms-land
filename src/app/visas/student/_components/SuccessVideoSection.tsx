@@ -16,7 +16,7 @@ export default function SuccessVideoSection() {
                     className="w-full h-auto block scale-[1.08] origin-top opacity-80"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
-                    <h3 className="text-white text-3xl font-bold drop-shadow-lg z-10 px-4 text-center">
+                    <h3 className="text-white text-3xl font-medium drop-shadow-lg z-10 px-4 text-center">
                         Estudiantes Aprobados en Top Universities
                     </h3>
                 </div>

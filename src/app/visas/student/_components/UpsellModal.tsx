@@ -42,7 +42,7 @@ export const UpsellModal = ({ isOpen, onClose, total }: UpsellModalProps) => {
             <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
               <CheckCircle2 className="w-6 h-6 text-primary-foreground" />
             </div>
-            <h3 className="text-xl font-bold">Servicio Completo</h3>
+            <h3 className="text-xl font-medium tracking-tight">Servicio Completo</h3>
             <p className="text-sm text-muted-foreground">
               Nos encargamos de todo el proceso por ti. Solo relájate y prepárate para tu viaje.
             </p>
@@ -74,8 +74,8 @@ export const UpsellModal = ({ isOpen, onClose, total }: UpsellModalProps) => {
               <BookOpen className="w-6 h-6 text-accent-foreground" />
             </div>
             <div>
-              <h3 className="text-xl font-bold">Guía DIY</h3>
-              <div className="inline-block mt-1 bg-accent text-accent-foreground px-2 py-1 rounded text-xs font-semibold">
+              <h3 className="text-xl font-medium tracking-tight">Guía DIY</h3>
+              <div className="inline-block mt-1 bg-accent text-accent-foreground px-2 py-1 rounded text-xs font-medium">
                 OFERTA ESPECIAL
               </div>
             </div>
@@ -84,10 +84,10 @@ export const UpsellModal = ({ isOpen, onClose, total }: UpsellModalProps) => {
             </p>
             <div className="space-y-2">
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-accent">$29.99</span>
-                <span className="text-sm text-muted-foreground line-through">$49.99</span>
+                <span className="text-3xl font-medium tracking-tighter text-accent">$29.99</span>
+                <span className="text-sm text-muted-foreground line-through font-medium">$49.99</span>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground font-medium">
                 Ahorra ${total - 29.99} y hazlo por tu cuenta
               </p>
             </div>

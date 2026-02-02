@@ -41,8 +41,8 @@ export default function COODashboard() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.6 }}
                     >
-                        <h6 className="text-teal-500 uppercase tracking-widest text-xs font-bold mb-2">Operations Department</h6>
-                        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-white/50 bg-clip-text text-transparent">COO Office</h1>
+                        <h6 className="text-teal-500 uppercase tracking-widest text-xs font-medium mb-2">Operations Department</h6>
+                        <h1 className="text-4xl md:text-5xl font-medium bg-gradient-to-r from-white to-white/50 bg-clip-text text-transparent tracking-tight">COO Office</h1>
                         <p className="text-white/40 mt-4 max-w-xl text-lg font-light">
                             Ensure operational excellence, rapid visa processing, and world-class customer service.
                         </p>
@@ -60,10 +60,10 @@ export default function COODashboard() {
                             className={`group cursor-pointer p-8 rounded-2xl border ${tool.color} hover:bg-opacity-20 transition-all duration-300 relative overflow-hidden`}
                         >
                             <tool.icon className="w-10 h-10 mb-6" />
-                            <h3 className="text-xl font-semibold mb-2 text-white/90">{tool.name}</h3>
+                            <h3 className="text-xl font-medium mb-2 text-white/90 tracking-tight">{tool.name}</h3>
                             <p className="text-sm text-white/50 leading-relaxed mb-6">{tool.description}</p>
 
-                            <div className="flex items-center text-xs font-bold uppercase tracking-wider opacity-60 group-hover:opacity-100 transition-opacity">
+                            <div className="flex items-center text-xs font-medium uppercase tracking-wider opacity-60 group-hover:opacity-100 transition-opacity">
                                 Launch Tool <ArrowRight className="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" />
                             </div>
                         </motion.div>

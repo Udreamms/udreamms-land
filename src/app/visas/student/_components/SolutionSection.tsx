@@ -12,10 +12,10 @@ export default function SolutionSection() {
 
             <div className="max-w-7xl mx-auto px-6 relative z-10">
                 <FadeIn className="text-center mb-16 -mt-24">
-                    <h2 className="text-sm font-bold text-primary tracking-[0.2em] uppercase mb-4">
+                    <h2 className="text-sm font-medium text-primary tracking-[0.2em] uppercase mb-4">
                         Tu Ecosistema de Aprobación
                     </h2>
-                    <h3 className="text-3xl md:text-5xl font-bold text-abyss font-playfair mb-6 leading-tight">
+                    <h3 className="text-3xl md:text-5xl font-medium text-abyss font-playfair mb-6 leading-tight tracking-tight">
                         No dejamos nada al azar. <br className="hidden md:block" />
                         <span>Admisión + <span className="text-[#82111f]">Estrategia Legal.</span></span>
                     </h3>
@@ -37,7 +37,7 @@ export default function SolutionSection() {
                                             <GraduationCap className="w-6 h-6" />
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-abyss mb-1">1. Admisión Estratégica</h4>
+                                            <h4 className="font-medium text-abyss mb-1 tracking-tight">1. Admisión Estratégica</h4>
                                             <p className="text-sm text-slate-600">Seleccionamos universidades con historial de aceptación a latinos y becas disponibles.</p>
                                         </div>
                                     </div>
@@ -49,7 +49,7 @@ export default function SolutionSection() {
                                             <ShieldCheck className="w-6 h-6" />
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-abyss mb-1">2. Auditoría I-20 Blindada</h4>
+                                            <h4 className="font-medium text-abyss mb-1 tracking-tight">2. Auditoría I-20 Blindada</h4>
                                             <p className="text-sm text-slate-600">Analizamos técnicamente tus documentos financieros antes del consulado.</p>
                                         </div>
                                     </div>
@@ -61,7 +61,7 @@ export default function SolutionSection() {
                                             <BrainCircuit className="w-6 h-6" />
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-abyss mb-1">3. Narrativa de Retorno</h4>
+                                            <h4 className="font-medium text-abyss mb-1 tracking-tight">3. Narrativa de Retorno</h4>
                                             <p className="text-sm text-slate-600">Entrenamiento para demostrar lazos y responder la pregunta trampa: "¿Te quedarás?".</p>
                                         </div>
                                     </div>

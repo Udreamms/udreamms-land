@@ -84,7 +84,7 @@ export const TabFiles: React.FC<TabFilesProps> = ({ contact, updateField }) => {
         <div className="space-y-6">
             <Card className="bg-neutral-900 border-neutral-800">
                 <CardHeader>
-                    <CardTitle className="text-sm font-bold text-white uppercase tracking-wider">Foto ID (Tipo Pasaporte 5x5)</CardTitle>
+                    <CardTitle className="text-sm font-medium text-white uppercase tracking-wider">Foto ID (Tipo Pasaporte 5x5)</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex items-center gap-4">
@@ -101,7 +101,7 @@ export const TabFiles: React.FC<TabFilesProps> = ({ contact, updateField }) => {
                             )}
                         </div>
                         <div>
-                            <Label htmlFor="id-upload" className="cursor-pointer bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md text-xs font-bold transition-all flex items-center gap-2">
+                            <Label htmlFor="id-upload" className="cursor-pointer bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md text-xs font-medium transition-all flex items-center gap-2">
                                 {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                                 Subir Foto ID
                             </Label>
@@ -114,7 +114,7 @@ export const TabFiles: React.FC<TabFilesProps> = ({ contact, updateField }) => {
 
             <Card className="bg-neutral-900 border-neutral-800">
                 <CardHeader>
-                    <CardTitle className="text-sm font-bold text-white uppercase tracking-wider">Documentos Adjuntos</CardTitle>
+                    <CardTitle className="text-sm font-medium text-white uppercase tracking-wider">Documentos Adjuntos</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -132,7 +132,7 @@ export const TabFiles: React.FC<TabFilesProps> = ({ contact, updateField }) => {
                                         {doc.type?.includes('image') ? <ImageIcon className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-xs font-bold text-neutral-300 truncate" title={doc.name}>{doc.name}</p>
+                                        <p className="text-xs font-medium text-neutral-300 truncate" title={doc.name}>{doc.name}</p>
                                         <p className="text-[10px] text-neutral-600 truncate">{new Date(doc.uploadedAt || Date.now()).toLocaleDateString()}</p>
                                     </div>
                                 </div>
@@ -140,7 +140,7 @@ export const TabFiles: React.FC<TabFilesProps> = ({ contact, updateField }) => {
                                     href={doc.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="block w-full text-center bg-neutral-900 hover:bg-neutral-800 text-neutral-400 py-1.5 rounded text-[10px] font-bold transition-colors"
+                                    className="block w-full text-center bg-neutral-900 hover:bg-neutral-800 text-neutral-400 py-1.5 rounded text-[10px] font-medium transition-colors"
                                 >
                                     <Eye className="w-3 h-3 inline mr-1" /> Ver Archivo
                                 </a>
@@ -149,7 +149,7 @@ export const TabFiles: React.FC<TabFilesProps> = ({ contact, updateField }) => {
 
                         <label className="bg-neutral-950 p-3 rounded-lg border-2 border-dashed border-neutral-800 flex flex-col items-center justify-center cursor-pointer hover:border-neutral-600 transition-all min-h-[100px]">
                             {uploading ? <Loader2 className="w-6 h-6 animate-spin text-neutral-500" /> : <Plus className="w-6 h-6 text-neutral-500" />}
-                            <span className="text-[10px] text-neutral-500 font-bold mt-2 uppercase tracking-wider">Agregar PDF/IMG</span>
+                            <span className="text-[10px] text-neutral-500 font-medium mt-2 uppercase tracking-wider">Agregar PDF/IMG</span>
                             <input type="file" className="hidden" onChange={(e) => handleFileUpload(e, 'document')} disabled={uploading} />
                         </label>
                     </div>

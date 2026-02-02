@@ -23,7 +23,7 @@ export default function AgitationSection() {
                     {/* Right: The Data and Pain Points */}
                     <div className="w-full lg:w-1/2 order-1 lg:order-2 space-y-10">
                         <FadeIn>
-                            <h3 className="text-3xl md:text-4xl font-bold text-abyss leading-tight mb-6">
+                            <h3 className="text-3xl md:text-4xl font-medium text-abyss leading-tight mb-6 tracking-tight">
                                 Viaja sin límites con el <br />
                                 <span className="text-blue-600">Plan Turista Premium.</span>
                             </h3>
@@ -40,7 +40,7 @@ export default function AgitationSection() {
                                         <FileText className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-abyss mb-1">1. Itinerario Personalizado</h4>
+                                        <h4 className="font-medium text-abyss mb-1 tracking-tight">1. Itinerario Personalizado</h4>
                                         <p className="text-sm text-slate-600">8 días y 7 noches planificados al detalle para ti.</p>
                                     </div>
                                 </div>
@@ -52,7 +52,7 @@ export default function AgitationSection() {
                                         <CircleDollarSign className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-abyss mb-1">2. Logística Completa</h4>
+                                        <h4 className="font-medium text-abyss mb-1 tracking-tight">2. Logística Completa</h4>
                                         <p className="text-sm text-slate-600">Vuelos, traslados y hoteles 4-5 estrellas incluidos.</p>
                                     </div>
                                 </div>
@@ -64,7 +64,7 @@ export default function AgitationSection() {
                                         <Zap className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-abyss mb-1">3. Experiencias Únicas</h4>
+                                        <h4 className="font-medium text-abyss mb-1 tracking-tight">3. Experiencias Únicas</h4>
                                         <p className="text-sm text-slate-600">Acceso a parques, shows y aventuras exclusivas.</p>
                                     </div>
                                 </div>

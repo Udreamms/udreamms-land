@@ -80,7 +80,7 @@ export default function ConversationModal(props: ConversationModalProps) {
           )}>
             <div className="px-4 pt-4 pb-2 space-y-3">
               <div className="flex items-center gap-2">
-                <h2 className="text-[10px] font-black text-white uppercase tracking-widest">
+                <h2 className="text-[10px] font-medium text-white uppercase tracking-widest">
                   {props.currentGroupName || 'Bandeja'}
                 </h2>
                 <span className="text-neutral-500 text-[9px] font-mono">
@@ -129,7 +129,7 @@ export default function ConversationModal(props: ConversationModalProps) {
                       )} />
 
                       <h3 className={cn(
-                        "text-[11px] font-bold truncate tracking-tight transition-colors",
+                        "text-[11px] font-medium truncate tracking-tight transition-colors",
                         props.card?.id === conv.id ? "text-blue-400" : "text-neutral-300 group-hover:text-neutral-200"
                       )}>
                         {conv.contactName || conv.name}
@@ -165,7 +165,7 @@ export default function ConversationModal(props: ConversationModalProps) {
               <header className="h-[42px] border-b border-white/5 flex items-center justify-between px-4 bg-transparent flex-shrink-0 drag-handle cursor-move relative z-50">
                 <div className="flex items-center gap-2.5">
                   <div className="relative group">
-                    <div className="w-7 h-7 rounded-[10px] flex items-center justify-center text-white font-black text-[10px] shadow-lg transition-transform duration-300 bg-neutral-700">
+                    <div className="w-7 h-7 rounded-[10px] flex items-center justify-center text-white font-medium text-[10px] shadow-lg transition-transform duration-300 bg-neutral-700">
                       {props.card?.contactName?.charAt(0) || props.card?.name?.charAt(0) || '?'}
                     </div>
                     <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-neutral-900 border border-black flex items-center justify-center">
@@ -175,9 +175,9 @@ export default function ConversationModal(props: ConversationModalProps) {
                   <div>
                     <div className="flex items-center gap-1.5">
                       {/* Name */}
-                      <h3 className="font-black text-white text-xs leading-none uppercase tracking-wide">{props.card?.contactName || props.card?.name || 'Skyler'}</h3>
+                      <h3 className="font-medium text-white text-xs leading-none uppercase tracking-wide">{props.card?.contactName || props.card?.name || 'Skyler'}</h3>
                     </div>
-                    <p className="text-neutral-500 text-[8px] font-bold mt-0.5 uppercase tracking-widest">{props.card?.contactNumber || 'NO ID'}</p>
+                    <p className="text-neutral-500 text-[8px] font-medium mt-0.5 uppercase tracking-widest">{props.card?.contactNumber || 'NO ID'}</p>
                   </div>
                 </div>
 
@@ -212,20 +212,20 @@ export default function ConversationModal(props: ConversationModalProps) {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="center" className="bg-neutral-900 border-neutral-800 text-neutral-200 text-xs">
-                        <DropdownMenuLabel className="text-[10px] uppercase font-black tracking-widest text-neutral-500">Silenciar</DropdownMenuLabel>
+                        <DropdownMenuLabel className="text-[10px] uppercase font-medium tracking-widest text-neutral-500">Silenciar</DropdownMenuLabel>
                         <DropdownMenuSeparator className="bg-neutral-800" />
                         {[
                           { label: '8 Horas', val: '8h' },
                           { label: '1 Semana', val: '1w' },
                           { label: 'Siempre', val: 'always' }
                         ].map((opt) => (
-                          <DropdownMenuItem key={opt.val} onClick={() => { setMuteDuration(opt.val); logic.handleSaveMute(opt.val); }} className="flex justify-between cursor-pointer focus:bg-neutral-800 text-[10px] font-bold">
+                          <DropdownMenuItem key={opt.val} onClick={() => { setMuteDuration(opt.val); logic.handleSaveMute(opt.val); }} className="flex justify-between cursor-pointer focus:bg-neutral-800 text-[10px] font-medium">
                             <span>{opt.label}</span>
                             {muteDuration === opt.val && <CheckCheck size={12} className="text-blue-500" />}
                           </DropdownMenuItem>
                         ))}
                         <DropdownMenuSeparator className="bg-neutral-800" />
-                        <DropdownMenuItem onClick={() => { setMuteDuration(null); logic.handleSaveMute(null); }} className="cursor-pointer text-red-400 focus:bg-neutral-800 focus:text-red-300 text-[10px] font-bold">
+                        <DropdownMenuItem onClick={() => { setMuteDuration(null); logic.handleSaveMute(null); }} className="cursor-pointer text-red-400 focus:bg-neutral-800 focus:text-red-300 text-[10px] font-medium">
                           Desactivar silencio
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -265,7 +265,7 @@ export default function ConversationModal(props: ConversationModalProps) {
                             <div className={cn("w-6 h-6 rounded-md flex items-center justify-center", platform.bgColor, platform.color)}>
                               <platform.icon className={platform.name === 'TikTok' ? 'w-3 h-3 fill-current' : 'w-3.5 h-3.5'} />
                             </div>
-                            <span className="font-bold text-[10px] uppercase tracking-wide">{platform.name}</span>
+                            <span className="font-medium text-[10px] uppercase tracking-wide">{platform.name}</span>
                             {logic.activePlatform === platform.name && <CheckCheck size={12} className="ml-auto" />}
                           </DropdownMenuItem>
                         ))}
@@ -406,7 +406,7 @@ export default function ConversationModal(props: ConversationModalProps) {
                   </div>
 
                   <span className={cn(
-                    "text-[7px] font-bold uppercase mt-0.5 transition-all duration-200 tracking-tighter",
+                    "text-[7px] font-medium uppercase mt-0.5 transition-all duration-200 tracking-tighter",
                     logic.activeTab === item.id ? "text-white" : "text-neutral-600 text-[6px]"
                   )}>
                     {item.label}

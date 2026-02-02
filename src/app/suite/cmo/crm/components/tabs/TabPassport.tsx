@@ -14,44 +14,44 @@ export const TabPassport: React.FC<TabPassportProps> = ({ contact, updateField }
         <div className="space-y-6">
             <Card className="bg-neutral-900 border-neutral-800">
                 <CardHeader>
-                    <CardTitle className="text-sm font-bold text-white uppercase tracking-wider">Información del Pasaporte</CardTitle>
+                    <CardTitle className="text-sm font-medium text-white uppercase tracking-wider">Información del Pasaporte</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Número de Pasaporte</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Número de Pasaporte</Label>
                             <Input value={contact.passportNumber || ''} onChange={e => updateField('passportNumber', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md font-mono" />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">País de Emisión</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">País de Emisión</Label>
                             <Input value={contact.passportCountry || ''} onChange={e => updateField('passportCountry', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Ciudad de Emisión</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Ciudad de Emisión</Label>
                             <Input value={contact.passportCity || ''} onChange={e => updateField('passportCity', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Estado/Provincia</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Estado/Provincia</Label>
                             <Input value={contact.passportState || ''} onChange={e => updateField('passportState', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Fecha de Emisión</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Fecha de Emisión</Label>
                             <Input type="date" value={contact.passportIssuedDate || ''} onChange={e => updateField('passportIssuedDate', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Fecha de Expiración</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Fecha de Expiración</Label>
                             <Input type="date" value={contact.passportExpiryDate || ''} onChange={e => updateField('passportExpiryDate', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">¿Has perdido tu pasaporte alguna vez?</Label>
+                        <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">¿Has perdido tu pasaporte alguna vez?</Label>
                         <Select value={contact.passportLost || 'no'} onValueChange={val => updateField('passportLost', val)}>
                             <SelectTrigger className="bg-neutral-950 border-neutral-800 h-9 rounded-md">
                                 <SelectValue />
@@ -67,11 +67,11 @@ export const TabPassport: React.FC<TabPassportProps> = ({ contact, updateField }
 
             <Card className="bg-neutral-900 border-neutral-800">
                 <CardHeader>
-                    <CardTitle className="text-sm font-bold text-white uppercase tracking-wider">Visado</CardTitle>
+                    <CardTitle className="text-sm font-medium text-white uppercase tracking-wider">Visado</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">¿Tienes visa de turista actual?</Label>
+                        <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">¿Tienes visa de turista actual?</Label>
                         <Select value={contact.hasTouristVisa || 'no'} onValueChange={val => updateField('hasTouristVisa', val)}>
                             <SelectTrigger className="bg-neutral-950 border-neutral-800 h-9 rounded-md">
                                 <SelectValue />
@@ -85,11 +85,11 @@ export const TabPassport: React.FC<TabPassportProps> = ({ contact, updateField }
                     {contact.hasTouristVisa === 'yes' && (
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Fecha de Emisión Visa</Label>
+                                <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Fecha de Emisión Visa</Label>
                                 <Input type="date" value={contact.visaIssuedDate || ''} onChange={e => updateField('visaIssuedDate', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Fecha de Expiración Visa</Label>
+                                <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Fecha de Expiración Visa</Label>
                                 <Input type="date" value={contact.visaExpiryDate || ''} onChange={e => updateField('visaExpiryDate', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                             </div>
                         </div>

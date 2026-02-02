@@ -88,7 +88,7 @@ export default function HeroSection() {
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.8, delay: 0.2 }}
-                        className="text-white text-5xl md:text-7xl lg:text-8xl font-bold font-sans tracking-tighter my-4 leading-none"
+                        className="text-white text-5xl md:text-7xl lg:text-8xl font-medium font-sans tracking-tighter my-4 leading-[0.9]"
                     >
                         Visa FIFA PASS
                     </motion.h1>
@@ -108,7 +108,7 @@ export default function HeroSection() {
                 <FadeIn delay={0.8}>
                     <Button
                         size="lg"
-                        className="bg-white hover:bg-slate-100 text-abyss text-xl px-12 py-5 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.7)] transition-all hover:scale-105 font-bold"
+                        className="bg-white hover:bg-slate-100 text-slate-900 text-xl px-12 py-5 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.7)] transition-all hover:scale-105 font-medium"
                         onClick={() => document.getElementById('quiz')?.scrollIntoView({ behavior: 'smooth' })}
                     >
                         Solicitar ahora

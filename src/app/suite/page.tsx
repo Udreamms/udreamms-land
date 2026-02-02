@@ -71,7 +71,7 @@ const OrgNode = ({ href, icon: Icon, title, subtitle, color, isMain }: OrgNodePr
       `}>
                 <Icon className={`w-6 h-6 text-${color}-400 group-hover:text-${color}-300 transition-colors`} />
             </div>
-            <h3 className="text-lg font-bold text-white tracking-tight mb-1">{title}</h3>
+            <h3 className="text-lg font-medium text-white tracking-tight mb-1">{title}</h3>
             <p className="text-[10px] font-medium text-neutral-400 uppercase tracking-widest group-hover:text-neutral-300">{subtitle}</p>
 
             {/* Decorative Glow */}
@@ -96,7 +96,7 @@ export default function SuiteDashboard() {
             >
 
                 <motion.div className="text-center mb-16" variants={itemVariants}>
-                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-4 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
+                    <h1 className="text-4xl md:text-5xl font-medium tracking-tighter mb-4 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
                         Autonomous Enterprise
                     </h1>
                     <p className="text-neutral-400 text-sm uppercase tracking-[0.2em] font-medium">Organizational Structure</p>

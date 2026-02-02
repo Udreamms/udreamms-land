@@ -40,7 +40,7 @@ export function DepartmentSidebar({ items, title, colorClass = "bg-blue-600" }: 
                         <div className={`p-1.5 rounded-lg ${colorClass}`}>
                             <LayoutDashboard className="w-5 h-5 text-white" />
                         </div>
-                        <span className="font-bold text-lg text-white">{title}</span>
+                        <span className="font-medium text-lg text-white">{title}</span>
                     </div>
                     <Button variant="ghost" size="icon" onClick={toggleSidebar} className="hover:bg-neutral-800 text-neutral-400 hover:text-white">
                         {isCollapsed ? <Menu className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}

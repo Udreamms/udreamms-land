@@ -19,7 +19,7 @@ export default function SystemGapSection() {
                         transition={{ duration: 0.8, ease: "easeOut" }}
                     >
 
-                        <h2 className="text-3xl md:text-5xl text-abyss font-bold font-playfair block leading-[1.2] tracking-tight drop-shadow-sm mb-8">
+                        <h2 className="text-3xl md:text-5xl text-abyss font-medium font-playfair block leading-[1.2] tracking-tight drop-shadow-sm mb-8">
                             Empieza con el pie derecho: <span className="text-primary">Plan Turista Básico.</span>
                         </h2>
 

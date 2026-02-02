@@ -36,11 +36,11 @@ export const TabFamily: React.FC<TabFamilyProps> = ({ contact, updateField }) =>
         <div className="space-y-6">
             <Card className="bg-neutral-900 border-neutral-800">
                 <CardHeader>
-                    <CardTitle className="text-sm font-bold text-white uppercase tracking-wider">Patrocinador / Sponsor</CardTitle>
+                    <CardTitle className="text-sm font-medium text-white uppercase tracking-wider">Patrocinador / Sponsor</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">¿Tienes Patrocinador?</Label>
+                        <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">¿Tienes Patrocinador?</Label>
                         <Select value={contact.hasSponsor || 'no'} onValueChange={val => updateField('hasSponsor', val)}>
                             <SelectTrigger className="bg-neutral-950 border-neutral-800 h-9 rounded-md">
                                 <SelectValue />
@@ -56,26 +56,26 @@ export const TabFamily: React.FC<TabFamilyProps> = ({ contact, updateField }) =>
                         <>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Nombres</Label>
+                                    <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Nombres</Label>
                                     <Input value={contact.sponsorFirstName || ''} onChange={e => updateField('sponsorFirstName', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Apellidos</Label>
+                                    <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Apellidos</Label>
                                     <Input value={contact.sponsorLastName || ''} onChange={e => updateField('sponsorLastName', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Celular</Label>
+                                    <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Celular</Label>
                                     <Input value={contact.sponsorPhone || ''} onChange={e => updateField('sponsorPhone', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Email</Label>
+                                    <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Email</Label>
                                     <Input value={contact.sponsorEmail || ''} onChange={e => updateField('sponsorEmail', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Parentesco (Papá, Tío, etc)</Label>
+                                <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Parentesco (Papá, Tío, etc)</Label>
                                 <Input value={contact.sponsorRelation || ''} onChange={e => updateField('sponsorRelation', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                             </div>
                         </>
@@ -85,11 +85,11 @@ export const TabFamily: React.FC<TabFamilyProps> = ({ contact, updateField }) =>
 
             <Card className="bg-neutral-900 border-neutral-800">
                 <CardHeader>
-                    <CardTitle className="text-sm font-bold text-white uppercase tracking-wider">Hijos que viajarán contigo</CardTitle>
+                    <CardTitle className="text-sm font-medium text-white uppercase tracking-wider">Hijos que viajarán contigo</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">¿Tienes hijos que vendrán?</Label>
+                        <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">¿Tienes hijos que vendrán?</Label>
                         <Select value={contact.hasChildrenTraveling || 'no'} onValueChange={val => updateField('hasChildrenTraveling', val)}>
                             <SelectTrigger className="bg-neutral-950 border-neutral-800 h-9 rounded-md">
                                 <SelectValue />
@@ -108,7 +108,7 @@ export const TabFamily: React.FC<TabFamilyProps> = ({ contact, updateField }) =>
                                     <button onClick={() => removeChild(index)} className="absolute top-2 right-2 text-neutral-500 hover:text-red-500">
                                         <Trash2 className="w-4 h-4" />
                                     </button>
-                                    <h4 className="text-xs font-bold text-neutral-400 mb-3 uppercase">Hijo #{index + 1}</h4>
+                                    <h4 className="text-xs font-medium text-neutral-400 mb-3 uppercase">Hijo #{index + 1}</h4>
                                     <div className="grid grid-cols-2 gap-4 mb-2">
                                         <Input placeholder="Nombres" value={child.firstName || ''} onChange={e => updateChild(index, 'firstName', e.target.value)} className="bg-neutral-900 border-neutral-800 h-8" />
                                         <Input placeholder="Apellidos" value={child.lastName || ''} onChange={e => updateChild(index, 'lastName', e.target.value)} className="bg-neutral-900 border-neutral-800 h-8" />
@@ -135,24 +135,24 @@ export const TabFamily: React.FC<TabFamilyProps> = ({ contact, updateField }) =>
 
             <Card className="bg-neutral-900 border-neutral-800">
                 <CardHeader>
-                    <CardTitle className="text-sm font-bold text-white uppercase tracking-wider">Datos de los Padres</CardTitle>
+                    <CardTitle className="text-sm font-medium text-white uppercase tracking-wider">Datos de los Padres</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Nombre Completo de la Madre</Label>
+                        <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Nombre Completo de la Madre</Label>
                         <Input value={contact.motherName || ''} onChange={e => updateField('motherName', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                     </div>
                     <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Fecha Nac. Madre</Label>
+                        <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Fecha Nac. Madre</Label>
                         <Input type="date" value={contact.motherBirthDate || ''} onChange={e => updateField('motherBirthDate', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                     </div>
                     <div className="h-px bg-neutral-800 my-2" />
                     <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Nombre Completo del Padre</Label>
+                        <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Nombre Completo del Padre</Label>
                         <Input value={contact.fatherName || ''} onChange={e => updateField('fatherName', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                     </div>
                     <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Fecha Nac. Padre</Label>
+                        <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Fecha Nac. Padre</Label>
                         <Input type="date" value={contact.fatherBirthDate || ''} onChange={e => updateField('fatherBirthDate', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                     </div>
                 </CardContent>

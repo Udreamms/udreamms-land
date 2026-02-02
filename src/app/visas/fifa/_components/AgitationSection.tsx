@@ -27,7 +27,7 @@ export default function AgitationSection() {
                     {/* Right: The Data and Pain Points */}
                     <div className="w-full lg:w-1/2 order-1 lg:order-2 space-y-10">
                         <FadeIn>
-                            <h3 className="text-3xl md:text-4xl font-black italic text-slate-900 leading-none mb-6">
+                            <h3 className="text-3xl md:text-4xl font-medium tracking-tight italic text-slate-900 leading-none mb-6">
                                 SIGUE A TU SELECCIÓN<br />
                                 <span className="text-red-600">SIN FRONTERAS.</span>
                             </h3>
@@ -44,7 +44,7 @@ export default function AgitationSection() {
                                         <TrendingDown className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-slate-900 mb-1 uppercase tracking-wide">Movilidad Inter-Sedes</h4>
+                                        <h4 className="font-medium text-slate-900 mb-1 uppercase tracking-wide">Movilidad Inter-Sedes</h4>
                                         <p className="text-sm text-slate-600">Rutas de transporte coordinadas entre las ciudades anfitrionas.</p>
                                     </div>
                                 </div>
@@ -56,7 +56,7 @@ export default function AgitationSection() {
                                         <Ban className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-slate-900 mb-1 uppercase tracking-wide">Hospedaje Estratégico</h4>
+                                        <h4 className="font-medium text-slate-900 mb-1 uppercase tracking-wide">Hospedaje Estratégico</h4>
                                         <p className="text-sm text-slate-600">Hoteles seleccionados cerca de los estadios para evitar el tráfico del infierno.</p>
                                     </div>
                                 </div>

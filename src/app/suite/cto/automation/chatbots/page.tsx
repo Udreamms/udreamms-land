@@ -125,11 +125,11 @@ const ChatbotsPage = () => {
           <Button variant="outline" size="icon" onClick={handleGoBack} className="h-8 w-8">
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-xl font-bold tracking-tight">Mis Chatbots</h1>
+          <h1 className="text-xl font-medium tracking-tight">Mis Chatbots</h1>
         </div>
         <Button
           onClick={handleCreateNewBot}
-          className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-1.5 px-3 rounded-lg shadow-md transform transition-transform duration-200 hover:scale-105 h-8"
+          className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium py-1.5 px-3 rounded-lg shadow-md transform transition-transform duration-200 hover:scale-105 h-8"
         >
           <Plus className="mr-1.5 h-4 w-4" /> Crear Nuevo Bot
         </Button>
@@ -155,7 +155,7 @@ const ChatbotsPage = () => {
                     <MessageCircle className="w-6 h-6 text-blue-400 group-hover:text-blue-300 transition-colors" />
                     <div className="flex items-center gap-2">
                       <span
-                        className={`px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded-full ${bot.isActive
+                        className={`px-2 py-0.5 text-[10px] uppercase font-medium tracking-wider rounded-full ${bot.isActive
                           ? 'bg-green-500/20 text-green-300'
                           : 'bg-neutral-600/50 text-neutral-400'
                           }`}
@@ -172,7 +172,7 @@ const ChatbotsPage = () => {
                       </Button>
                     </div>
                   </div>
-                  <h2 className="text-sm font-bold text-white truncate mb-1">
+                  <h2 className="text-sm font-medium text-white truncate mb-1">
                     {bot.name}
                   </h2>
                   <p className="text-[10px] text-neutral-500 font-mono break-all leading-tight">
@@ -186,7 +186,7 @@ const ChatbotsPage = () => {
                       e.stopPropagation();
                       handleToggleBotStatus(bot);
                     }}
-                    className={`w-full font-semibold transition-colors duration-200 flex items-center justify-center ${bot.isActive
+                    className={`w-full font-medium transition-colors duration-200 flex items-center justify-center ${bot.isActive
                       ? 'bg-red-600 hover:bg-red-700 text-white'
                       : 'bg-green-600 hover:bg-green-700 text-white'
                       }`}
@@ -222,13 +222,13 @@ const ChatbotsPage = () => {
           <DialogHeader>
             <DialogTitle>Eliminar Bot</DialogTitle>
             <DialogDescription className="text-neutral-400">
-              Esta acción no se puede deshacer. Esto eliminará permanentemente el bot <span className="font-bold text-white">{botToDelete?.name}</span> y eliminará sus datos de nuestros servidores.
+              Esta acción no se puede deshacer. Esto eliminará permanentemente el bot <span className="font-medium text-white">{botToDelete?.name}</span> y eliminará sus datos de nuestros servidores.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <p className="text-sm text-neutral-300">
-                Escribe <span className="font-bold select-none">delete</span> para confirmar.
+                Escribe <span className="font-medium select-none">delete</span> para confirmar.
               </p>
               <Input
                 value={deleteConfirmation}

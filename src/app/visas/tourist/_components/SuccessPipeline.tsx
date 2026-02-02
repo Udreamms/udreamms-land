@@ -31,7 +31,7 @@ export default function SuccessPipeline() {
             <div className="container mx-auto px-6">
                 <div className="text-center mb-16">
                     <FadeIn>
-                        <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight uppercase">
+                        <h2 className="text-4xl md:text-5xl font-medium text-slate-900 mb-6 tracking-tight uppercase">
                             El Sistema de <span className="text-blue-600">Éxito Migratorio</span>
                         </h2>
                         <p className="text-lg text-slate-600 max-w-2xl mx-auto font-medium">
@@ -59,13 +59,13 @@ export default function SuccessPipeline() {
                                     <div className={`w-20 h-20 rounded-2xl ${step.color} flex items-center justify-center mb-8 shadow-lg shadow-${step.color.split('-')[1]}-200`}>
                                         <Icon className="w-10 h-10 text-white" />
                                     </div>
-                                    <h3 className="text-2xl font-bold text-slate-900 mb-4">{step.title}</h3>
+                                    <h3 className="text-2xl font-medium text-slate-900 mb-4 tracking-tight">{step.title}</h3>
                                     <p className="text-slate-600 leading-relaxed font-medium">
                                         {step.description}
                                     </p>
 
                                     {/* Step Number */}
-                                    <div className="mt-8 text-4xl font-black text-slate-100 group-hover:text-slate-200 transition-colors">
+                                    <div className="mt-8 text-4xl font-medium text-slate-100 group-hover:text-slate-200 transition-colors">
                                         0{index + 1}
                                     </div>
                                 </motion.div>

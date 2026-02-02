@@ -9,7 +9,7 @@ import {
 
 export default function ValuePropsSection() {
     return (
-        <div className="relative z-30 pt-24 pb-20 px-6 bg-cloud">
+        <div className="relative z-30 pt-24 pb-20 px-6 bg-white">
             <div className="container mx-auto">
                 {/* Floating Icons adapted for Students */}
                 <FadeIn>

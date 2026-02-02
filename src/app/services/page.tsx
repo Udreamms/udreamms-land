@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { 
-  ShieldCheck, Home as HomeIcon, Star, Heart, 
-  Plane, CreditCard, Car, Smartphone, ArrowRight 
+import {
+  ShieldCheck, Home as HomeIcon, Star, Heart,
+  Plane, CreditCard, Car, Smartphone, ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/landing/Header';
@@ -73,12 +73,12 @@ export default function ServicesPage() {
   return (
     <div className="min-h-screen bg-black text-white selection:bg-primary selection:text-white">
       <Header />
-      
+
       <main className="pt-32 pb-20 px-6 md:px-[5cm]">
         {/* Hero Section Page */}
         <div className="max-w-4xl mb-20">
-          <p className="text-primary font-bold tracking-widest uppercase text-sm mb-4">Servicios Integrales</p>
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-8 leading-[1.05]">
+          <p className="text-primary font-medium tracking-widest uppercase text-sm mb-4">Servicios Integrales</p>
+          <h1 className="text-5xl md:text-7xl font-medium tracking-tighter mb-8 leading-[1.05]">
             Mucho más que una <br />
             <span className="text-gray-500 italic">agencia de estudios.</span>
           </h1>
@@ -90,14 +90,14 @@ export default function ServicesPage() {
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-32">
           {services.map((service, idx) => (
-            <div 
-              key={idx} 
+            <div
+              key={idx}
               className="group p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] hover:border-white/10 transition-all duration-500"
             >
               <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 duration-500 ${service.color}`}>
                 <service.icon className="w-8 h-8" />
               </div>
-              <h3 className="text-2xl font-bold mb-4 group-hover:text-primary transition-colors">{service.title}</h3>
+              <h3 className="text-2xl font-medium mb-4 group-hover:text-primary transition-colors">{service.title}</h3>
               <p className="text-gray-400 mb-8 leading-relaxed font-light">
                 {service.desc}
               </p>
@@ -109,7 +109,7 @@ export default function ServicesPage() {
                   </li>
                 ))}
               </ul>
-              <Button variant="ghost" className="p-0 hover:bg-transparent text-white group-hover:text-primary gap-2 font-bold transition-colors">
+              <Button variant="ghost" className="p-0 hover:bg-transparent text-white group-hover:text-primary gap-2 font-medium transition-colors">
                 Saber más <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
               </Button>
             </div>
@@ -119,16 +119,16 @@ export default function ServicesPage() {
         {/* CTA Section */}
         <div className="relative rounded-[3rem] overflow-hidden p-12 md:p-20 text-center bg-gradient-to-br from-neutral-900 to-black border border-white/5">
           <div className="relative z-10 max-w-2xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-bold mb-8 tracking-tight">¿Listo para comenzar tu aventura?</h2>
+            <h2 className="text-4xl md:text-5xl font-medium mb-8 tracking-tight">¿Listo para comenzar tu aventura?</h2>
             <p className="text-gray-400 text-lg mb-12">
               Agenda una asesoría gratuita hoy mismo y permítenos diseñar tu plan de vida en Estados Unidos.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-6">
-              <Button className="bg-primary hover:bg-primary/90 text-white rounded-full h-14 px-10 text-lg font-bold">
+              <Button className="bg-primary hover:bg-primary/90 text-white rounded-full h-14 px-10 text-lg font-medium">
                 Agendar Asesoría
               </Button>
               <Link href="/contact">
-                <Button variant="outline" className="border-white/20 hover:bg-white/10 text-white rounded-full h-14 px-10 text-lg font-bold">
+                <Button variant="outline" className="border-white/20 hover:bg-white/10 text-white rounded-full h-14 px-10 text-lg font-medium">
                   Contactar Soporte
                 </Button>
               </Link>

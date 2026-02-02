@@ -10,7 +10,7 @@ export default function BenefitsSection() {
             <div className="container mx-auto">
                 <FadeIn className="mt-2 text-center space-y-12 max-w-4xl mx-auto">
                     {/* Phrase */}
-                    <h3 className="text-3xl md:text-5xl font-black italic text-slate-900 leading-tight">
+                    <h3 className="text-3xl md:text-5xl font-medium text-slate-900 leading-[0.9] tracking-tighter">
                         No vendemos visas. <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-600">Vendemos goles en vivo.</span>
                     </h3>
@@ -38,7 +38,7 @@ export default function BenefitsSection() {
                                     >
                                         <Icon className={`w-10 h-10 ${item.color}`} strokeWidth={2} />
                                     </motion.div>
-                                    <span className="text-lg text-slate-900 font-bold max-w-[160px] leading-tight">{item.label}</span>
+                                    <span className="text-lg text-slate-900 font-medium max-w-[160px] leading-tight tracking-tight">{item.label}</span>
                                 </div>
                             );
                         })}

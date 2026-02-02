@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState } from "react";
-import Roadmap from "@/components/landing/Roadmap";
+// import Roadmap from "@/components/landing/Roadmap"; // Component missing
 import Services from "@/components/landing/Services";
 
 interface StudentMarketingProps {
@@ -20,19 +20,11 @@ interface StudentMarketingProps {
 export default function StudentMarketing({ onStartQuote, onAppClick }: StudentMarketingProps) {
     return (
         <section className="bg-white text-abyss">
-
-
-
             {/* SECCIÓN DE SERVICIOS AGREGADA ARRIBA DEL ROADMAP */}
             <Services onStartQuote={onStartQuote} onAppClick={onAppClick} />
 
-            {/* B. EL PROBLEMA REEMPLAZADO POR ROADMAP */}
-            <Roadmap />
-
-
-
-
-
+            {/* B. EL PROBLEMA REEMPLAZADO POR ROADMAP - Componente eliminado por faltar */}
+            {/* <Roadmap /> */}
         </section>
     );
 }

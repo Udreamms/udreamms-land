@@ -20,7 +20,7 @@ export default function SuccessVideoSection() {
                     />
                     {/* Fallback overlay if video fails or acts as poster */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-10">
-                        <h3 className="text-4xl md:text-6xl font-black italic text-white mb-4 drop-shadow-2xl">
+                        <h3 className="text-4xl md:text-6xl font-medium italic text-white mb-4 drop-shadow-2xl tracking-tight">
                             VIVE LA PASIÓN <span className="text-yellow-500">EN VIVO</span>
                         </h3>
                         <p className="text-xl text-gray-300 max-w-2xl font-light">

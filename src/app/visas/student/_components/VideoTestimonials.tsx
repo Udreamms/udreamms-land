@@ -49,7 +49,7 @@ export default function VideoTestimonials() {
             <div className="container px-6 md:px-12 mx-auto">
                 <div className="mb-12 flex flex-col md:flex-row justify-between items-end gap-6">
                     <div className="max-w-4xl">
-                        <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 text-black">
+                        <h2 className="text-4xl md:text-6xl font-medium tracking-tight mb-4 text-black">
                             Historias de Éxito <br />
                             <span className="text-red-600">Reales.</span>
                         </h2>
@@ -98,7 +98,7 @@ export default function VideoTestimonials() {
                                     href="https://www.instagram.com/udreamms/"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-2 text-white font-bold hover:text-pink-400 transition-colors"
+                                    className="flex items-center gap-2 text-white font-medium hover:text-pink-400 transition-colors"
                                 >
                                     <Instagram className="w-5 h-5" />
                                     {test.name}
@@ -116,7 +116,7 @@ export default function VideoTestimonials() {
                         href="https://www.instagram.com/udreamms/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white font-bold py-4 px-10 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+                        className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white font-medium py-4 px-10 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
                     >
                         Ver más en Instagram
                         <Instagram className="w-5 h-5" />

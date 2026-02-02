@@ -12,7 +12,7 @@ export default function OrchestratorPage() {
                 {/* Header */}
                 <div className="mb-10 flex justify-between items-start">
                     <div>
-                        <h1 className="text-4xl font-bold tracking-tight">Master Flow Editor</h1>
+                        <h1 className="text-4xl font-medium tracking-tight">Master Flow Editor</h1>
                         <p className="text-neutral-400 mt-3 text-lg">
                             Orquesta todos tus módulos de IA y servicios externos.
                         </p>
@@ -21,7 +21,7 @@ export default function OrchestratorPage() {
                         <button className="bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl flex items-center gap-2 transition-all border border-white/5">
                             <Zap className="w-4 h-4 text-yellow-400" /> Disparadores
                         </button>
-                        <button className="bg-red-600 hover:bg-red-500 px-6 py-2 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-red-600/20 font-semibold">
+                        <button className="bg-red-600 hover:bg-red-500 px-6 py-2 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-red-600/20 font-medium">
                             <PlusCircle className="w-4 h-4" /> Nuevo Flujo
                         </button>
                     </div>
@@ -37,7 +37,7 @@ export default function OrchestratorPage() {
                             <div className="w-64 bg-white/10 border border-white/20 p-4 rounded-2xl backdrop-blur-xl shadow-2xl relative z-20">
                                 <div className="flex items-center gap-3 mb-3 border-b border-white/10 pb-2">
                                     <Bell className="w-5 h-5 text-yellow-400" />
-                                    <span className="text-sm font-bold">New Form Lead</span>
+                                    <span className="text-sm font-medium">New Form Lead</span>
                                 </div>
                                 <p className="text-[10px] text-gray-500">Google Forms → Webhook</p>
                             </div>
@@ -53,7 +53,7 @@ export default function OrchestratorPage() {
                                 <div className="absolute inset-0 bg-red-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                 <div className="flex items-center gap-3 mb-3 border-b border-white/10 pb-2">
                                     <Zap className="w-5 h-5 text-red-500" />
-                                    <span className="text-sm font-bold">Analyze & Action</span>
+                                    <span className="text-sm font-medium">Analyze & Action</span>
                                 </div>
                                 <p className="text-[10px] text-gray-500">GPT-4o Agent Integration</p>
                             </div>

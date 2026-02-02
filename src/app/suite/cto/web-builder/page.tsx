@@ -11,13 +11,13 @@ export default function WebBuilderPage() {
             {/* Sidebar Toolset */}
             <div className="w-56 border-r border-white/5 bg-[#0d0d0d] flex flex-col">
                 <div className="p-4 border-b border-white/5">
-                    <h1 className="text-base font-bold text-white tracking-tight">
+                    <h1 className="text-base font-medium text-white tracking-tight">
                         Web Builder AI
                     </h1>
                 </div>
                 <div className="flex-1 p-3 space-y-4 overflow-auto">
                     <div>
-                        <p className="text-[9px] text-gray-500 uppercase font-black mb-2 ml-1 tracking-wider">Componentes</p>
+                        <p className="text-[9px] text-gray-500 uppercase font-medium mb-2 ml-1 tracking-wider">Componentes</p>
                         <div className="grid grid-cols-2 gap-2">
                             {[
                                 { icon: <Layout className="w-3.5 h-3.5" />, label: "Hero" },
@@ -34,13 +34,13 @@ export default function WebBuilderPage() {
                     </div>
 
                     <div>
-                        <p className="text-[9px] text-gray-500 uppercase font-black mb-2 ml-1 tracking-wider">Prompt a Web</p>
+                        <p className="text-[9px] text-gray-500 uppercase font-medium mb-2 ml-1 tracking-wider">Prompt a Web</p>
                         <div className="space-y-2">
                             <textarea
                                 placeholder="Ex: Crea una landing page para un spa de lujo..."
                                 className="w-full h-20 bg-black/40 border border-white/10 rounded-lg p-2.5 text-[10px] focus:ring-1 focus:ring-blue-500 focus:outline-none placeholder:text-gray-600 resize-none font-medium text-white"
                             />
-                            <button className="w-full bg-blue-600 hover:bg-blue-500 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wide flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-blue-600/10">
+                            <button className="w-full bg-blue-600 hover:bg-blue-500 py-1.5 rounded-md text-[10px] font-medium uppercase tracking-wide flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-blue-600/10">
                                 <Rocket className="w-3 h-3" /> Generar con IA
                             </button>
                         </div>
@@ -57,8 +57,8 @@ export default function WebBuilderPage() {
                         <button className="p-0.5 hover:bg-white/10 rounded transition-colors"><Code2 className="w-3.5 h-3.5 text-gray-500" /></button>
                     </div>
                     <div className="flex items-center gap-2">
-                        <button className="text-[10px] font-bold text-gray-400 hover:text-white transition-colors px-2 uppercase tracking-wide">Previsualizar</button>
-                        <button className="bg-white text-black px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide hover:bg-gray-200 transition-colors">Publicar</button>
+                        <button className="text-[10px] font-medium text-gray-400 hover:text-white transition-colors px-2 uppercase tracking-wide">Previsualizar</button>
+                        <button className="bg-white text-black px-3 py-1 rounded-full text-[10px] font-medium uppercase tracking-wide hover:bg-gray-200 transition-colors">Publicar</button>
                     </div>
                 </div>
 

@@ -134,9 +134,9 @@ export default function Header() {
           <div className="flex items-center gap-12 h-full">
             <Link href="/" className="flex items-center gap-3 z-50 shrink-0 group">
               <div className="w-9 h-9 relative transition-transform duration-300 group-hover:scale-110">
-                <img src="/assets/Logo Udreamms.png" alt="Udreamms" className="object-contain w-full h-full drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]" />
+                <img src="/assets/Logo Udreamms.png" alt="Udreamms" className="object-contain w-full h-full drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
               </div>
-              <span className="text-xl font-bold tracking-tight text-white group-hover:text-primary transition-colors">Udreamms</span>
+              <span className="text-xl font-medium tracking-tight text-white group-hover:text-primary transition-colors">Udreamms</span>
             </Link>
 
             {/* DESKTOP NAV - Ocultar en landings de visa */}
@@ -171,7 +171,7 @@ export default function Header() {
           <div className="hidden lg:flex items-center gap-4 z-50">
             {/* Solo mostrar Staff si NO es landing de visa, o podrías dejarlo oculto si quieres algo más limpio */}
             {!isVisaLandingPage && (
-              <Link href="/login" className="text-[10px] font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1.5 opacity-60 hover:opacity-100">
+              <Link href="/login" className="text-[10px] font-medium text-gray-400 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1.5 opacity-80 hover:opacity-100">
                 <Lock className="w-3 h-3" /> Staff
               </Link>
             )}
@@ -184,7 +184,7 @@ export default function Header() {
 
             <Button
               onClick={handleApplyClick}
-              className="bg-primary text-white hover:bg-primary/90 rounded-full h-10 px-8 font-bold text-sm transition-all hover:scale-105 shadow-[0_0_20px_rgba(225,29,72,0.3)] border-none"
+              className="bg-primary text-white hover:bg-primary/90 rounded-full h-10 px-8 font-medium text-sm transition-all hover:scale-105 shadow-[0_0_20px_rgba(225,29,72,0.3)] border-none"
             >
               Aplica Ahora
             </Button>
@@ -239,7 +239,7 @@ export default function Header() {
                         {/* COL 1: INTRO (3 cols) */}
                         <div className="col-span-3 pr-6 border-r border-white/5 flex flex-col justify-between">
                           <div>
-                            <h3 className="text-3xl font-bold text-white mb-4 tracking-tight leading-tight">
+                            <h3 className="text-3xl font-medium text-white mb-4 tracking-tight leading-tight">
                               {item.megaMenu.title}
                             </h3>
                             <p className="text-gray-400 text-lg leading-relaxed mb-8 font-light">
@@ -269,7 +269,7 @@ export default function Header() {
                                   <subItem.icon className={`${item.label === 'Visas' ? 'w-5 h-5' : 'w-6 h-6'}`} strokeWidth={2} />
                                 </div>
                                 <div className="flex flex-col">
-                                  <div className={`text-white font-bold ${item.label === 'Visas' ? 'text-sm mb-0.5' : 'text-lg mb-1'} group-hover:text-primary transition-colors flex items-center gap-2`}>
+                                  <div className={`text-white font-medium ${item.label === 'Visas' ? 'text-sm mb-0.5' : 'text-lg mb-1'} group-hover:text-primary transition-colors flex items-center gap-2`}>
                                     {subItem.title}
                                   </div>
                                   <p className={`text-gray-500 font-medium leading-tight group-hover:text-gray-400 ${item.label === 'Visas' ? 'text-xs' : 'text-sm leading-normal'}`}>
@@ -284,7 +284,7 @@ export default function Header() {
                         {/* COL 3: SOCIALS (2 cols - Only if they exist) */}
                         {item.megaMenu.socials && (
                           <div className="col-span-2 pl-2 flex flex-col justify-center">
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-6 block">Síguenos</span>
+                            <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-gray-500 mb-6 block">Síguenos</span>
                             <div className="flex flex-col gap-4">
                               {item.megaMenu.socials.map((social, idx) => (
                                 <a
@@ -301,7 +301,7 @@ export default function Header() {
                                       className="w-full h-full rounded-lg object-cover border border-white/10 shadow-sm transition-all duration-300 group-hover:border-primary/50"
                                     />
                                   </div>
-                                  <span className="text-[11px] font-bold text-gray-400 group-hover:text-white uppercase tracking-wider">{social.label}</span>
+                                  <span className="text-[11px] font-medium text-gray-400 group-hover:text-white uppercase tracking-wider">{social.label}</span>
                                 </a>
                               ))}
                             </div>
@@ -331,7 +331,7 @@ export default function Header() {
           >
             <div className="p-6">
               <div className="flex justify-between items-center mb-8">
-                <span className="text-xl font-bold text-white">Menú</span>
+                <span className="text-xl font-medium text-white">Menú</span>
                 <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-white bg-white/10 rounded-full">
                   <X />
                 </button>
@@ -340,7 +340,7 @@ export default function Header() {
               <div className="space-y-6">
                 {menuData.map((item) => (
                   <div key={item.label} className="border-b border-white/10 pb-4">
-                    <span className="text-2xl font-bold text-white mb-4 block tracking-tight">{item.label}</span>
+                    <span className="text-2xl font-medium text-white mb-4 block tracking-tight">{item.label}</span>
                     {item.megaMenu && (
                       <div className="grid grid-cols-1 gap-4 pl-2">
                         {item.megaMenu.items.map((subItem, idx) => (
@@ -354,7 +354,7 @@ export default function Header() {
                               <subItem.icon className="w-6 h-6" />
                             </div>
                             <div className="flex flex-col">
-                              <span className="text-gray-200 font-bold text-lg">{subItem.title}</span>
+                              <span className="text-gray-200 font-medium text-lg">{subItem.title}</span>
                               <span className="text-gray-600 text-xs">{subItem.desc}</span>
                             </div>
                           </Link>
@@ -365,7 +365,7 @@ export default function Header() {
                             {item.megaMenu.socials.map((social, idx) => (
                               <a key={idx} href={social.href} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2 p-4 bg-white/5 rounded-2xl active:scale-95 transition-transform">
                                 <img src={social.imgSrc} alt={social.label} className="w-12 h-12 rounded-xl" />
-                                <span className="text-[10px] text-gray-500 font-black uppercase tracking-widest">{social.label}</span>
+                                <span className="text-[10px] text-gray-500 font-medium uppercase tracking-widest">{social.label}</span>
                               </a>
                             ))}
                           </div>
@@ -384,7 +384,7 @@ export default function Header() {
                   </Link>
                   <Button
                     onClick={handleApplyClick}
-                    className="w-full bg-primary text-white hover:bg-primary/90 h-16 rounded-2xl text-xl font-bold shadow-lg border-none"
+                    className="w-full bg-primary text-white hover:bg-primary/90 h-16 rounded-2xl text-xl font-medium shadow-lg border-none"
                   >
                     Aplica Ahora
                   </Button>

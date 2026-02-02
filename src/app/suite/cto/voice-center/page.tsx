@@ -13,7 +13,7 @@ export default function VoiceCenterPage() {
                 {/* Header */}
                 <div className="mb-10 flex justify-between items-start">
                     <div>
-                        <h1 className="text-4xl font-bold tracking-tight">Voice AI Center</h1>
+                        <h1 className="text-4xl font-medium tracking-tight">Voice AI Center</h1>
                         <p className="text-neutral-400 mt-3 text-lg">
                             Automatización de llamadas con inteligencia artificial humana.
                         </p>
@@ -33,7 +33,7 @@ export default function VoiceCenterPage() {
                     {/* Active Agents Column */}
                     <div className="glass-card p-6 border border-white/5 bg-white/5 rounded-2xl flex flex-col gap-4">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-lg font-semibold flex items-center gap-2">
+                            <h2 className="text-lg font-medium flex items-center gap-2">
                                 <Bot className="text-blue-400" /> Agentes Activos
                             </h2>
                             <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full border border-green-500/20">3 Online</span>
@@ -43,7 +43,7 @@ export default function VoiceCenterPage() {
                                 <div key={i} className="p-4 bg-white/5 rounded-xl border border-white/5 hover:border-white/10 transition-all cursor-pointer group">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-bold">A{i}</div>
+                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-medium">A{i}</div>
                                             <div>
                                                 <h3 className="text-sm font-medium">Soporte Nivel {i}</h3>
                                                 <p className="text-xs text-gray-500">ElevenLabs - Spanish</p>
@@ -58,7 +58,7 @@ export default function VoiceCenterPage() {
 
                     {/* Real-time Monitor Column */}
                     <div className="glass-card md:col-span-2 p-6 border border-white/5 bg-white/5 rounded-2xl flex flex-col gap-4">
-                        <h2 className="text-lg font-semibold flex items-center gap-2">
+                        <h2 className="text-lg font-medium flex items-center gap-2">
                             <Mic className="text-red-400" /> Monitor en Tiempo Real
                         </h2>
                         <div className="flex-1 rounded-2xl bg-black/40 border border-white/5 flex flex-col items-center justify-center text-center p-12 space-y-4">

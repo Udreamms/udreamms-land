@@ -85,41 +85,41 @@ export default function FAQsPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [expandedIndex, setExpandedIndex] = useState<string | null>(null);
 
-  const filteredFaqs = selectedCategory === "all" 
+  const filteredFaqs = selectedCategory === "all"
     ? categories.flatMap(cat => cat.faqs.map(faq => ({ ...faq, category: cat.title, icon: cat.icon, color: cat.color })))
     : categories.find(cat => cat.id === selectedCategory)?.faqs.map(faq => {
-        const cat = categories.find(c => c.id === selectedCategory)!;
-        return { ...faq, category: cat.title, icon: cat.icon, color: cat.color };
-      }) || [];
+      const cat = categories.find(c => c.id === selectedCategory)!;
+      return { ...faq, category: cat.title, icon: cat.icon, color: cat.color };
+    }) || [];
 
   return (
     <div className="min-h-screen bg-white font-sans selection:bg-primary/10">
       <Header />
-      
+
       <main>
         {/* Hero Section - Apple Style Title */}
         <section className="relative pt-40 pb-20 overflow-hidden bg-[#F5F5F7]">
           <div className="container px-6 md:px-12 relative z-10">
             <div className="max-w-4xl text-left">
-              <motion.span 
+              <motion.span
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-primary font-bold tracking-tight text-xl mb-4 block"
+                className="text-primary font-medium tracking-tight text-xl mb-4 block"
               >
                 Preguntas y Respuestas
               </motion.span>
-              
-              <motion.h1 
+
+              <motion.h1
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="text-6xl md:text-8xl font-bold text-[#1d1d1f] tracking-tighter leading-[0.9] mb-8"
+                className="text-6xl md:text-8xl font-medium text-[#1d1d1f] tracking-tighter leading-[0.9] mb-8"
               >
                 Tus dudas resueltas <br />
                 de forma directa.
               </motion.h1>
-              
-              <motion.p 
+
+              <motion.p
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
@@ -129,17 +129,17 @@ export default function FAQsPage() {
               </motion.p>
 
               <div className="flex flex-wrap gap-3 mt-12">
-                <button 
+                <button
                   onClick={() => setSelectedCategory("all")}
-                  className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all ${selectedCategory === "all" ? 'bg-[#1d1d1f] text-white' : 'bg-white text-[#1d1d1f] border border-slate-200 hover:bg-slate-100'}`}
+                  className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all ${selectedCategory === "all" ? 'bg-[#1d1d1f] text-white' : 'bg-white text-[#1d1d1f] border border-slate-200 hover:bg-slate-100'}`}
                 >
                   Todas
                 </button>
                 {categories.map(cat => (
-                  <button 
+                  <button
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.id)}
-                    className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all ${selectedCategory === cat.id ? 'bg-[#1d1d1f] text-white' : 'bg-white text-[#1d1d1f] border border-slate-200 hover:bg-slate-100'}`}
+                    className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all ${selectedCategory === cat.id ? 'bg-[#1d1d1f] text-white' : 'bg-white text-[#1d1d1f] border border-slate-200 hover:bg-slate-100'}`}
                   >
                     {cat.title}
                   </button>
@@ -157,9 +157,9 @@ export default function FAQsPage() {
                 {filteredFaqs.map((faq, index) => {
                   const id = `${faq.category}-${index}`;
                   const isExpanded = expandedIndex === id;
-                  
+
                   return (
-                    <motion.div 
+                    <motion.div
                       layout
                       key={id}
                       initial={{ opacity: 0, scale: 0.9 }}
@@ -169,16 +169,16 @@ export default function FAQsPage() {
                       className={`group relative bg-white rounded-[2.5rem] p-10 min-h-[420px] flex flex-col justify-between overflow-hidden shadow-sm hover:shadow-md transition-all duration-500 border border-transparent hover:border-slate-100 ${isExpanded ? 'lg:col-span-2' : ''}`}
                     >
                       <div className="z-10 relative text-left">
-                        <span className="text-xs font-bold text-[#86868b] uppercase tracking-[0.2em] mb-4 block">
+                        <span className="text-xs font-medium text-[#86868b] uppercase tracking-[0.2em] mb-4 block">
                           {faq.category}
                         </span>
-                        <h3 className="text-2xl md:text-4xl font-bold text-[#1d1d1f] mb-6 leading-tight">
+                        <h3 className="text-2xl md:text-4xl font-medium text-[#1d1d1f] mb-6 leading-tight">
                           {faq.question}
                         </h3>
-                        
+
                         <AnimatePresence>
                           {isExpanded && (
-                            <motion.p 
+                            <motion.p
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               className="text-lg md:text-xl font-medium text-[#86868b] leading-relaxed mt-6"
@@ -194,7 +194,7 @@ export default function FAQsPage() {
                       </div>
 
                       <div className="absolute bottom-8 right-8">
-                        <button 
+                        <button
                           onClick={() => setExpandedIndex(isExpanded ? null : id)}
                           className={`rounded-full p-4 transition-all duration-500 shadow-lg ${isExpanded ? 'bg-[#1d1d1f] text-white' : 'bg-[#F5F5F7] text-[#1d1d1f] hover:bg-primary hover:text-white'}`}
                         >
@@ -208,14 +208,14 @@ export default function FAQsPage() {
             </div>
 
             {/* --- SOPORTE FINAL --- */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="bg-white rounded-[3.5rem] p-10 md:p-24 shadow-sm border border-slate-50 text-center max-w-5xl mx-auto"
             >
               <MessageCircle className="w-16 h-16 text-primary mx-auto mb-8" />
-              <h2 className="text-4xl md:text-6xl font-bold text-[#1d1d1f] mb-8 tracking-tighter">
+              <h2 className="text-4xl md:text-6xl font-medium text-[#1d1d1f] mb-8 tracking-tighter">
                 ¿Aún tienes dudas?
               </h2>
               <p className="text-xl text-[#86868b] mb-12 font-medium max-w-2xl mx-auto">
@@ -225,7 +225,7 @@ export default function FAQsPage() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-12 py-6 rounded-full bg-primary text-white font-black text-xl shadow-[0_20px_50px_rgba(220,38,38,0.3)] hover:shadow-primary/50 transition-all flex items-center gap-3"
+                  className="px-12 py-6 rounded-full bg-primary text-white font-medium text-xl shadow-[0_20px_50px_rgba(220,38,38,0.3)] hover:shadow-primary/50 transition-all flex items-center gap-3"
                 >
                   Hablar por WhatsApp
                   <Sparkles className="w-6 h-6" />

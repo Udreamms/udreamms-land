@@ -218,7 +218,7 @@ const Group = ({ group, allGroups = [], onCardClick, onUpdateColor }: {
         <div {...attributes} {...listeners} className="flex justify-between items-center cursor-grab touch-none group/header">
           <div className="flex items-center gap-3">
             <div className={`w-2 h-6 rounded-sm ${selectedColor.value.replace('/50', '').replace('-900', '-500')}`}></div>
-            <h2 className="font-bold text-white text-sm tracking-tight truncate">{group.name}</h2>
+            <h2 className="font-medium text-white text-sm tracking-tight truncate">{group.name}</h2>
             <Badge variant="secondary" className="bg-black/40 text-neutral-400 border-neutral-800 font-mono text-[10px] px-2 py-0 rounded-sm">
               {cards.length}
             </Badge>

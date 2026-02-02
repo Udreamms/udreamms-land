@@ -14,65 +14,65 @@ export const TabStudentInfo: React.FC<TabStudentInfoProps> = ({ contact, updateF
         <div className="space-y-6">
             <Card className="bg-neutral-900 border-neutral-800">
                 <CardHeader>
-                    <CardTitle className="text-sm font-bold text-white uppercase tracking-wider">Información Personal</CardTitle>
+                    <CardTitle className="text-sm font-medium text-white uppercase tracking-wider">Información Personal</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Nombres</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Nombres</Label>
                             <Input value={contact.firstName || ''} onChange={e => updateField('firstName', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Apellidos</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Apellidos</Label>
                             <Input value={contact.lastName || ''} onChange={e => updateField('lastName', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                         </div>
                     </div>
                     {/* Fallback for legacy 'name' field if firstName/lastName not set */}
                     {!contact.firstName && !contact.lastName && (
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Nombre Completo (Legacy)</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Nombre Completo (Legacy)</Label>
                             <Input value={contact.name || ''} onChange={e => updateField('name', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                         </div>
                     )}
 
                     <div className="grid grid-cols-3 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Fecha de Nacimiento</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Fecha de Nacimiento</Label>
                             <Input type="date" value={contact.birthDate || ''} onChange={e => updateField('birthDate', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Lugar de Nacimiento</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Lugar de Nacimiento</Label>
                             <Input value={contact.birthPlace || ''} onChange={e => updateField('birthPlace', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Nacionalidad</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Nacionalidad</Label>
                             <Input value={contact.nationality || ''} onChange={e => updateField('nationality', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Ciudad (Nacimiento)</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Ciudad (Nacimiento)</Label>
                             <Input value={contact.birthCity || ''} onChange={e => updateField('birthCity', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Estado/Provincia</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Estado/Provincia</Label>
                             <Input value={contact.birthState || ''} onChange={e => updateField('birthState', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">País</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">País</Label>
                             <Input value={contact.birthCountry || ''} onChange={e => updateField('birthCountry', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Número de Identificación Nacional (DNI/CURP)</Label>
+                        <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Número de Identificación Nacional (DNI/CURP)</Label>
                         <Input value={contact.nationalId || ''} onChange={e => updateField('nationalId', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">¿Otra Nacionalidad?</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">¿Otra Nacionalidad?</Label>
                             <Select value={contact.hasOtherNationality || 'no'} onValueChange={val => updateField('hasOtherNationality', val)}>
                                 <SelectTrigger className="bg-neutral-950 border-neutral-800 h-9 rounded-md">
                                     <SelectValue />
@@ -85,7 +85,7 @@ export const TabStudentInfo: React.FC<TabStudentInfoProps> = ({ contact, updateF
                         </div>
                         {contact.hasOtherNationality === 'yes' && (
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">¿Qué país?</Label>
+                                <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">¿Qué país?</Label>
                                 <Input value={contact.otherNationalityCountry || ''} onChange={e => updateField('otherNationalityCountry', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                             </div>
                         )}
@@ -93,7 +93,7 @@ export const TabStudentInfo: React.FC<TabStudentInfoProps> = ({ contact, updateF
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">¿Residente Permanente de otro país?</Label>
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">¿Residente Permanente de otro país?</Label>
                             <Select value={contact.isPermanentResidentOther || 'no'} onValueChange={val => updateField('isPermanentResidentOther', val)}>
                                 <SelectTrigger className="bg-neutral-950 border-neutral-800 h-9 rounded-md">
                                     <SelectValue />
@@ -106,7 +106,7 @@ export const TabStudentInfo: React.FC<TabStudentInfoProps> = ({ contact, updateF
                         </div>
                         {contact.isPermanentResidentOther === 'yes' && (
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">¿Qué país?</Label>
+                                <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">¿Qué país?</Label>
                                 <Input value={contact.permanentResidentCountry || ''} onChange={e => updateField('permanentResidentCountry', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                             </div>
                         )}
@@ -116,11 +116,11 @@ export const TabStudentInfo: React.FC<TabStudentInfoProps> = ({ contact, updateF
 
             <Card className="bg-neutral-900 border-neutral-800">
                 <CardHeader>
-                    <CardTitle className="text-sm font-bold text-white uppercase tracking-wider">Estado Civil</CardTitle>
+                    <CardTitle className="text-sm font-medium text-white uppercase tracking-wider">Estado Civil</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Estado Civil</Label>
+                        <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Estado Civil</Label>
                         <Select value={contact.maritalStatus || 'single'} onValueChange={val => updateField('maritalStatus', val)}>
                             <SelectTrigger className="bg-neutral-950 border-neutral-800 h-9 rounded-md">
                                 <SelectValue />
@@ -137,30 +137,30 @@ export const TabStudentInfo: React.FC<TabStudentInfoProps> = ({ contact, updateF
                     {contact.maritalStatus === 'married' && (
                         <div className="space-y-4 pl-4 border-l-2 border-blue-600">
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Nombre del Cónyuge</Label>
+                                <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Nombre del Cónyuge</Label>
                                 <Input value={contact.spouseName || ''} onChange={e => updateField('spouseName', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Fecha de Matrimonio</Label>
+                                    <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Fecha de Matrimonio</Label>
                                     <Input type="date" value={contact.marriageDate || ''} onChange={e => updateField('marriageDate', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Fecha Nac. Cónyuge</Label>
+                                    <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Fecha Nac. Cónyuge</Label>
                                     <Input type="date" value={contact.spouseBirthDate || ''} onChange={e => updateField('spouseBirthDate', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                                 </div>
                             </div>
                             <div className="grid grid-cols-3 gap-4">
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Ciudad (Cónyuge)</Label>
+                                    <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Ciudad (Cónyuge)</Label>
                                     <Input value={contact.spouseCity || ''} onChange={e => updateField('spouseCity', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Estado (Cónyuge)</Label>
+                                    <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Estado (Cónyuge)</Label>
                                     <Input value={contact.spouseState || ''} onChange={e => updateField('spouseState', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-neutral-400">País (Cónyuge)</Label>
+                                    <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">País (Cónyuge)</Label>
                                     <Input value={contact.spouseCountry || ''} onChange={e => updateField('spouseCountry', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                                 </div>
                             </div>

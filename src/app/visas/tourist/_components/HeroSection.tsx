@@ -60,7 +60,7 @@ export default function HeroSection() {
             <div className="absolute inset-0 flex flex-col justify-end pb-32 items-start z-20 text-left px-6 md:pl-[7rem] pointer-events-none">
                 {/* Badge/Eyebrow */}
                 <FadeIn delay={0.1}>
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-600/20 backdrop-blur-md border border-blue-400/30 text-white font-bold text-xs uppercase tracking-widest mb-6 pointer-events-auto">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-600/20 backdrop-blur-md border border-blue-400/30 text-white font-medium text-xs uppercase tracking-widest mb-6 pointer-events-auto">
                         <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
                         Gestionamos tu proceso migratorio y tus vacaciones soñadas
                     </div>
@@ -71,7 +71,7 @@ export default function HeroSection() {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2 }}
-                    className="text-white text-4xl md:text-7xl lg:text-8xl font-black font-sans drop-shadow-xl tracking-tighter mb-6 leading-tight"
+                    className="text-white text-4xl md:text-7xl lg:text-8xl font-medium font-sans drop-shadow-xl tracking-tighter mb-6 leading-[0.9]"
                 >
                     Explora USA <br />
                     <span className="text-blue-500">con total confianza.</span>
@@ -86,7 +86,7 @@ export default function HeroSection() {
 
                 <Button
                     size="lg"
-                    className="bg-blue-600 hover:bg-blue-700 text-white text-xl px-12 py-8 rounded-full shadow-[0_10px_40px_rgba(37,99,235,0.4)] transition-all hover:scale-105 font-black uppercase tracking-tight group"
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-xl px-12 py-8 rounded-full shadow-[0_10px_40px_rgba(37,99,235,0.4)] transition-all hover:scale-105 font-medium uppercase tracking-tight group"
                     onClick={() => document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                     Ver Planes

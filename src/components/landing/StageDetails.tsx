@@ -52,7 +52,7 @@ export default function StageDetails() {
 
         {/* Header */}
         <div className="mb-12 pb-6 max-w-4xl">
-          <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 text-black">
+          <h2 className="text-4xl md:text-6xl font-medium tracking-tight mb-4 text-slate-900">
             ¿En qué fase <br />
             <span className="text-gray-400">te encuentras?</span>
           </h2>
@@ -74,13 +74,13 @@ export default function StageDetails() {
 
                 {/* Title Part 1 (Tag) */}
                 <div className="mb-2">
-                  <span className={`text-xl font-bold ${stage.color}`}>
+                  <span className={`text-xl font-medium ${stage.color}`}>
                     {stage.tag}
                   </span>
                 </div>
 
                 {/* Title Part 2 (Main Title) */}
-                <h3 className={`text-3xl md:text-4xl font-bold ${stage.color} mb-4 leading-tight`}>
+                <h3 className={`text-3xl md:text-4xl font-medium tracking-tighter ${stage.color} mb-4 leading-tight`}>
                   {stage.title}
                 </h3>
 
@@ -112,11 +112,11 @@ export default function StageDetails() {
 
               {/* Textos */}
               <div className="flex-1 space-y-4">
-                <span className="text-xl font-bold text-[#D31245] mb-1 block">
+                <span className="text-xl font-medium text-[#D31245] mb-1 block">
                   Fase 5
                 </span>
 
-                <h3 className="text-3xl md:text-4xl font-black text-[#D31245] mb-3 leading-tight">
+                <h3 className="text-3xl md:text-4xl font-medium tracking-tighter text-[#D31245] mb-3 leading-tight">
                   ¿Ya vives en USA?
                 </h3>
 
@@ -126,7 +126,7 @@ export default function StageDetails() {
                   </p>
 
                   {/* Mensaje Llamativo */}
-                  <p className="text-gray-500 font-bold">
+                  <p className="text-gray-500 font-medium">
                     Todo lo podrás hacer desde nuestra App. <br />
                     <span className="text-[#D31245]">Descárgala ya en App Store o Google Play.</span> <br />
                     ¡Te esperamos!
@@ -136,7 +136,7 @@ export default function StageDetails() {
 
               {/* Botón a la derecha */}
               <div className="shrink-0 self-start lg:self-center">
-                <button className="inline-flex items-center px-8 py-4 rounded-full bg-[#D31245] text-white font-bold hover:bg-red-700 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95 text-base whitespace-nowrap">
+                <button className="inline-flex items-center px-8 py-4 rounded-full bg-[#D31245] text-white font-medium hover:bg-red-700 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95 text-base whitespace-nowrap">
                   Unirme a la comunidad
                   <ArrowRight className="w-5 h-5 ml-3" />
                 </button>

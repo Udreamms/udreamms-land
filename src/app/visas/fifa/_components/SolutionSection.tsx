@@ -8,10 +8,10 @@ export default function SolutionSection() {
         <div className="w-full bg-white pt-24 pb-24 my-0 relative">
             <div className="max-w-7xl mx-auto px-6 relative z-10">
                 <FadeIn className="text-center mb-16">
-                    <h2 className="text-sm font-bold text-yellow-600 tracking-[0.2em] uppercase mb-4 animate-pulse">
+                    <h2 className="text-sm font-medium text-yellow-600 tracking-[0.2em] uppercase mb-4 animate-pulse">
                         La Experiencia Definitiva
                     </h2>
-                    <h3 className="text-3xl md:text-5xl font-black italic text-slate-900 mb-6 leading-none">
+                    <h3 className="text-3xl md:text-5xl font-medium italic text-slate-900 mb-6 leading-none tracking-tight">
                         VIVE EL MUNDIAL <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-600">COMO LEYENDA.</span>
                     </h3>
                     <p className="text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto font-medium">
@@ -33,7 +33,7 @@ export default function SolutionSection() {
                                         <Users className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-slate-900 mb-1">1. Hospitality VIP</h4>
+                                        <h4 className="font-medium text-slate-900 mb-1 tracking-tight">1. Hospitality VIP</h4>
                                         <p className="text-sm text-slate-600">Acceso a zonas exclusivas en estadios con catering gourmet y bebidas.</p>
                                     </div>
                                 </div>
@@ -45,7 +45,7 @@ export default function SolutionSection() {
                                         <Shield className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-slate-900 mb-1">2. Traslados Privados</h4>
+                                        <h4 className="font-medium text-slate-900 mb-1 tracking-tight">2. Traslados Privados</h4>
                                         <p className="text-sm text-slate-600">Chofer privado para llevarte del hotel al estadio con total seguridad.</p>
                                     </div>
                                 </div>
@@ -57,7 +57,7 @@ export default function SolutionSection() {
                                         <Radar className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-slate-900 mb-1">3. Eventos Exclusivos</h4>
+                                        <h4 className="font-medium text-slate-900 mb-1 tracking-tight">3. Eventos Exclusivos</h4>
                                         <p className="text-sm text-slate-600">Invitaciones a fiestas oficiales y meet & greet con leyendas del fútbol.</p>
                                     </div>
                                 </div>

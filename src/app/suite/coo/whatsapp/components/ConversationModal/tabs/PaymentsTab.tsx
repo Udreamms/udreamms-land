@@ -76,23 +76,23 @@ export const PaymentsTab: React.FC<PaymentsTabProps> = ({
                     <div className="group p-3 border-l-2 border-emerald-500 bg-white/[0.02] hover:bg-white/[0.04] transition-colors rounded-r-md">
                         <div className="flex items-center gap-2 mb-1">
                             <DollarSign size={10} className="text-emerald-500" />
-                            <h5 className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.15em]">Capital Consolidado</h5>
+                            <h5 className="text-[10px] font-medium text-neutral-500 uppercase tracking-[0.15em]">Capital Consolidado</h5>
                         </div>
-                        <p className="text-lg font-bold text-white tracking-tight font-mono">${totalSpent.toFixed(2)}</p>
+                        <p className="text-lg font-medium text-white tracking-tight font-mono">${totalSpent.toFixed(2)}</p>
                     </div>
                     <div className="group p-3 border-l-2 border-blue-500 bg-white/[0.02] hover:bg-white/[0.04] transition-colors rounded-r-md">
                         <div className="flex items-center gap-2 mb-1">
                             <Calendar size={10} className="text-blue-500" />
-                            <h5 className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.15em]">Próximo Débito</h5>
+                            <h5 className="text-[10px] font-medium text-neutral-500 uppercase tracking-[0.15em]">Próximo Débito</h5>
                         </div>
-                        <p className="text-lg font-bold text-white tracking-tight font-mono">{nextBillingDateStr}</p>
+                        <p className="text-lg font-medium text-white tracking-tight font-mono">{nextBillingDateStr}</p>
                     </div>
                 </div>
 
                 <div className="space-y-6">
                     {/* 0. SUSCRIPCIONES ACTIVAS */}
                     <div>
-                        <h4 className="flex items-center gap-2 text-[10px] font-black text-neutral-500 uppercase tracking-[0.15em] px-1 mb-2 border-b border-neutral-800/50 pb-2">
+                        <h4 className="flex items-center gap-2 text-[10px] font-medium text-neutral-500 uppercase tracking-[0.15em] px-1 mb-2 border-b border-neutral-800/50 pb-2">
                             SUSCRIPCIONES
                         </h4>
 
@@ -102,9 +102,9 @@ export const PaymentsTab: React.FC<PaymentsTabProps> = ({
                                     <div key={sub.id} className="group flex items-center justify-between px-2 py-3 hover:bg-white/[0.02] transition-colors rounded-md border-b border-transparent">
                                         <div>
                                             <div className="flex items-center gap-2">
-                                                <h5 className="font-bold text-neutral-200 text-sm">{sub.name}</h5>
+                                                <h5 className="font-medium text-neutral-200 text-sm">{sub.name}</h5>
                                                 <span className={cn(
-                                                    "text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-widest bg-neutral-800/50",
+                                                    "text-[8px] font-medium px-1.5 py-0.5 rounded-full uppercase tracking-widest bg-neutral-800/50",
                                                     sub.status === 'active' ? "text-emerald-500" :
                                                         sub.status === 'past_due' ? "text-amber-500" :
                                                             "text-red-500"
@@ -113,11 +113,11 @@ export const PaymentsTab: React.FC<PaymentsTabProps> = ({
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-2 mt-1">
-                                                <p className="text-[11px] text-neutral-400 font-bold">
+                                                <p className="text-[11px] text-neutral-400 font-medium">
                                                     ${sub.price.toFixed(2)} / {sub.interval === 'month' ? 'MES' : 'AÑO'}
                                                 </p>
                                                 <span className="text-[10px] text-neutral-700">|</span>
-                                                <p className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider">
+                                                <p className="text-[9px] text-neutral-500 font-medium uppercase tracking-wider">
                                                     Próximo: {sub.nextBillingDate?.toDate().toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
                                                 </p>
                                             </div>
@@ -136,7 +136,7 @@ export const PaymentsTab: React.FC<PaymentsTabProps> = ({
                     {/* 1. MÉTODOS DE PAGO */}
                     <div>
                         <div className="flex items-center justify-between px-1 mb-2 border-b border-neutral-800/50 pb-2">
-                            <h4 className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.15em]">
+                            <h4 className="text-[10px] font-medium text-neutral-500 uppercase tracking-[0.15em]">
                                 BÓVEDA DE PAGOS
                             </h4>
                             <Button
@@ -152,7 +152,7 @@ export const PaymentsTab: React.FC<PaymentsTabProps> = ({
                             <div className="mb-4 p-3 border border-white/10 bg-neutral-900/50">
                                 <div className="grid grid-cols-2 gap-3 mb-3">
                                     <div className="space-y-1">
-                                        <label className="text-[8px] uppercase font-bold text-neutral-500">Proveedor</label>
+                                        <label className="text-[8px] uppercase font-medium text-neutral-500">Proveedor</label>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="outline" className="w-full h-7 text-left justify-start bg-transparent border-white/10 text-[10px] px-2 text-neutral-300">
@@ -167,7 +167,7 @@ export const PaymentsTab: React.FC<PaymentsTabProps> = ({
                                         </DropdownMenu>
                                     </div>
                                     <div className="space-y-1">
-                                        <label className="text-[8px] uppercase font-bold text-neutral-500">Últimos 4</label>
+                                        <label className="text-[8px] uppercase font-medium text-neutral-500">Últimos 4</label>
                                         <Input
                                             maxLength={4}
                                             value={newPayment.last4}
@@ -196,14 +196,14 @@ export const PaymentsTab: React.FC<PaymentsTabProps> = ({
                                                 {method.type === 'visa' ? <CreditCard size={12} className="text-blue-400" /> : <CreditCard size={12} className="text-neutral-400" />}
                                             </div>
                                             <div className="flex flex-col">
-                                                <p className="text-[13px] font-bold text-neutral-200 tracking-wider">
+                                                <p className="text-[13px] font-medium text-neutral-200 tracking-wider">
                                                     •••• {method.last4 || '0000'}
                                                 </p>
                                                 <div className="flex items-center gap-2 mt-0.5">
-                                                    <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider">
+                                                    <span className="text-[9px] text-neutral-500 font-medium uppercase tracking-wider">
                                                         EXP: {method.expiry || '--/--'}
                                                     </span>
-                                                    {method.isDefault && <span className="text-[8px] text-blue-500 font-black uppercase tracking-[0.1em]">PREDETERMINADA</span>}
+                                                    {method.isDefault && <span className="text-[8px] text-blue-500 font-medium uppercase tracking-[0.1em]">PREDETERMINADA</span>}
                                                 </div>
                                             </div>
                                         </div>
@@ -223,7 +223,7 @@ export const PaymentsTab: React.FC<PaymentsTabProps> = ({
                     {/* 2. TRANSACTION HISTORY */}
                     <div>
                         <div className="flex items-center justify-between px-1 mb-2 border-b border-neutral-800/50 pb-2">
-                            <h4 className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.15em]">
+                            <h4 className="text-[10px] font-medium text-neutral-500 uppercase tracking-[0.15em]">
                                 HISTORIAL
                             </h4>
                         </div>
@@ -240,14 +240,14 @@ export const PaymentsTab: React.FC<PaymentsTabProps> = ({
                                                         tx.status === 'pending' ? "bg-amber-500" : "bg-red-500"
                                                 )} />
                                                 <div>
-                                                    <p className="text-[11px] font-bold text-neutral-200 tracking-tight">{tx.description.toUpperCase()}</p>
-                                                    <p className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider mt-0.5">
+                                                    <p className="text-[11px] font-medium text-neutral-200 tracking-tight">{tx.description.toUpperCase()}</p>
+                                                    <p className="text-[9px] text-neutral-500 font-medium uppercase tracking-wider mt-0.5">
                                                         {tx.date?.toDate ? tx.date.toDate().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}
                                                     </p>
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <span className="text-sm font-bold text-white tracking-tight font-mono">${tx.amount.toFixed(2)}</span>
+                                                <span className="text-sm font-medium text-white tracking-tight font-mono">${tx.amount.toFixed(2)}</span>
                                             </div>
                                         </div>
                                     ))}

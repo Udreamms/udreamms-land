@@ -156,7 +156,7 @@ export default function ConexionPage() {
             <main className="flex-1 p-8 overflow-y-auto">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-2xl font-bold mb-1">Channel Catalog</h1>
+                    <h1 className="text-2xl font-medium tracking-tight mb-1">Channel Catalog</h1>
                     <p className="text-neutral-400">Manage your messaging channels and discover new ones to help you acquire more customers.</p>
                 </div>
 
@@ -170,8 +170,8 @@ export default function ConexionPage() {
                                 key={category}
                                 onClick={() => setSelectedCategory(category)}
                                 className={`text-sm font-medium whitespace-nowrap pb-2 border-b-2 transition-colors ${selectedCategory === category
-                                        ? 'text-blue-500 border-blue-500'
-                                        : 'text-neutral-400 border-transparent hover:text-white'
+                                    ? 'text-blue-500 border-blue-500'
+                                    : 'text-neutral-400 border-transparent hover:text-white'
                                     }`}
                             >
                                 {category}
@@ -209,7 +209,7 @@ export default function ConexionPage() {
 
                                 return (
                                     <div key={cat}>
-                                        <h2 className="text-lg font-semibold mb-4 text-white">{cat}</h2>
+                                        <h2 className="text-lg font-medium tracking-tight mb-4 text-white">{cat}</h2>
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                             {items.map(integration => (
                                                 <IntegrationCard key={integration.id} integration={integration} />
@@ -243,7 +243,7 @@ function IntegrationCard({ integration }: { integration: Integration }) {
     return (
         <div className="bg-[#111] border border-neutral-800 rounded-xl p-5 flex flex-col h-full hover:border-neutral-700 transition-colors relative group">
             {integration.popular && (
-                <div className="absolute top-4 left-4 bg-green-500/20 text-green-500 text-xs font-bold px-2 py-0.5 rounded flex items-center gap-1">
+                <div className="absolute top-4 left-4 bg-green-500/20 text-green-500 text-xs font-medium px-2 py-0.5 rounded flex items-center gap-1">
                     <span className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></span>
                     Popular
                 </div>
@@ -256,7 +256,7 @@ function IntegrationCard({ integration }: { integration: Integration }) {
                 </div>
             </div>
 
-            <h3 className="font-bold text-white text-lg mb-2 pr-12">{integration.name}</h3>
+            <h3 className="font-medium tracking-tight text-white text-lg mb-2 pr-12">{integration.name}</h3>
             <p className="text-neutral-400 text-sm mb-6 flex-grow">{integration.description}</p>
 
             <div className="mt-auto flex justify-end">

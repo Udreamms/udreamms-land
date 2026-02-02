@@ -14,16 +14,16 @@ export default function SocialProofSection() {
                 <div className="container mx-auto px-6 max-w-6xl">
                     <FadeIn className="flex flex-wrap justify-center gap-12 md:gap-24 text-center">
                         <div className="space-y-2">
-                            <div className="flex items-center justify-center gap-2 text-4xl md:text-5xl font-black text-yellow-500 italic">
+                            <div className="flex items-center justify-center gap-2 text-4xl md:text-5xl font-medium tracking-tight text-yellow-500 italic">
                                 <Zap className="w-8 h-8 fill-current" /> 14 Días
                             </div>
-                            <div className="text-xs md:text-sm text-gray-500 uppercase tracking-widest font-bold">Récord Cita Conseguida</div>
+                            <div className="text-xs md:text-sm text-gray-500 uppercase tracking-widest font-medium">Récord Cita Conseguida</div>
                         </div>
                         <div className="space-y-2">
-                            <div className="flex items-center justify-center gap-2 text-4xl md:text-5xl font-black text-green-500 italic">
+                            <div className="flex items-center justify-center gap-2 text-4xl md:text-5xl font-medium tracking-tight text-green-500 italic">
                                 <Plane className="w-8 h-8 fill-current" /> 100%
                             </div>
-                            <div className="text-xs md:text-sm text-gray-500 uppercase tracking-widest font-bold">Asistencia a Partido Inaugural</div>
+                            <div className="text-xs md:text-sm text-gray-500 uppercase tracking-widest font-medium">Asistencia a Partido Inaugural</div>
                         </div>
                     </FadeIn>
                 </div>
@@ -32,8 +32,8 @@ export default function SocialProofSection() {
             {/* Testimonials */}
             <div className="py-24 container mx-auto px-6 max-w-6xl relative z-10">
                 <FadeIn className="text-center mb-16">
-                    <span className="text-green-500 font-bold tracking-widest uppercase text-sm mb-4 block">Resultados Comprobados</span>
-                    <h2 className="text-3xl md:text-5xl font-black italic mb-6 text-white">"PENSÉ QUE NO LLEGABA..."</h2>
+                    <span className="text-green-500 font-medium tracking-widest uppercase text-sm mb-4 block">Resultados Comprobados</span>
+                    <h2 className="text-3xl md:text-5xl font-medium tracking-tight italic mb-6 text-white">"PENSÉ QUE NO LLEGABA..."</h2>
                 </FadeIn>
 
                 <div className="grid md:grid-cols-3 gap-8">
@@ -41,9 +41,9 @@ export default function SocialProofSection() {
                     <FadeIn delay={0.1} className="bg-zinc-900/80 border border-white/10 p-8 rounded-2xl relative backdrop-blur-sm">
                         <div className="absolute top-6 right-6 text-yellow-500 flex"><Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" /></div>
                         <div className="flex items-center gap-4 mb-6">
-                            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center font-bold text-lg">AR</div>
+                            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center font-medium text-lg">AR</div>
                             <div>
-                                <div className="font-bold">Alejandro R.</div>
+                                <div className="font-medium">Alejandro R.</div>
                                 <div className="text-xs text-gray-400">Fanático de Argentina</div>
                             </div>
                         </div>
@@ -54,11 +54,11 @@ export default function SocialProofSection() {
 
                     {/* Review 2 (Highlighted) */}
                     <FadeIn delay={0.2} className="bg-zinc-800 border border-yellow-500/50 p-8 rounded-2xl relative transform md:-translate-y-4 shadow-[0_0_30px_rgba(234,179,8,0.15)]">
-                        <div className="absolute top-0 right-0 bg-yellow-500 text-black text-[10px] font-black italic px-3 py-1 rounded-bl-xl uppercase">Caso Qatar</div>
+                        <div className="absolute top-0 right-0 bg-yellow-500 text-black text-[10px] font-medium italic px-3 py-1 rounded-bl-xl uppercase">Caso Qatar</div>
                         <div className="flex items-center gap-4 mb-6">
-                            <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center font-bold text-lg">MC</div>
+                            <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center font-medium text-lg">MC</div>
                             <div>
-                                <div className="font-bold">María C.</div>
+                                <div className="font-medium">María C.</div>
                                 <div className="text-xs text-gray-400">Fanática de México</div>
                             </div>
                         </div>
@@ -71,9 +71,9 @@ export default function SocialProofSection() {
                     <FadeIn delay={0.3} className="bg-zinc-900/80 border border-white/10 p-8 rounded-2xl relative backdrop-blur-sm">
                         <div className="absolute top-6 right-6 text-yellow-500 flex"><Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" /></div>
                         <div className="flex items-center gap-4 mb-6">
-                            <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center font-bold text-lg">JL</div>
+                            <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center font-medium text-lg">JL</div>
                             <div>
-                                <div className="font-bold">Jorge L.</div>
+                                <div className="font-medium">Jorge L.</div>
                                 <div className="text-xs text-gray-400">Fanático de España</div>
                             </div>
                         </div>

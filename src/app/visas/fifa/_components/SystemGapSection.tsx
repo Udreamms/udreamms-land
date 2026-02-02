@@ -18,12 +18,12 @@ export default function SystemGapSection() {
                         viewport={{ once: true, margin: "-100px" }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
                     >
-                        <div className="flex items-center gap-2 mb-4 text-red-600 font-bold uppercase text-sm tracking-widest animate-pulse">
+                        <div className="flex items-center gap-2 mb-4 text-red-600 font-medium uppercase text-sm tracking-widest animate-pulse">
                             <AlertOctagon className="w-5 h-5" />
                             <span>Alerta Roja Mundialista</span>
                         </div>
 
-                        <h2 className="text-3xl md:text-5xl text-slate-900 font-black italic block leading-[1] tracking-tighter drop-shadow-sm mb-8">
+                        <h2 className="text-3xl md:text-5xl text-slate-900 font-medium italic block leading-[1] tracking-tighter drop-shadow-sm mb-8">
                             Asegura tu lugar con el <br />
                             <span className="text-red-600 underline decoration-red-200 underline-offset-8">Plan Fan Pass.</span>
                         </h2>
@@ -35,7 +35,7 @@ export default function SystemGapSection() {
                                 <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 shrink-0 group-hover:bg-red-100 group-hover:text-red-600 transition-colors">
                                     <TrendingDown size={20} />
                                 </div>
-                                <span className="text-lg font-bold text-slate-800">Visa Express (Prioridad)</span>
+                                <span className="text-lg font-medium tracking-tight text-slate-800">Visa Express (Prioridad)</span>
                             </div>
 
                             {/* 2. Logistics */}
@@ -43,7 +43,7 @@ export default function SystemGapSection() {
                                 <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 shrink-0 group-hover:bg-red-100 group-hover:text-red-600 transition-colors">
                                     <Ban size={20} />
                                 </div>
-                                <span className="text-lg font-bold text-slate-800">Guía de Sedes 2026</span>
+                                <span className="text-lg font-medium tracking-tight text-slate-800">Guía de Sedes 2026</span>
                             </div>
                         </div>
 
@@ -52,7 +52,7 @@ export default function SystemGapSection() {
                         </p>
 
                         <div className="flex justify-start">
-                            <a href="#planes" className="bg-red-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-red-700 transition-all flex items-center gap-2 group">
+                            <a href="#planes" className="bg-red-600 text-white font-medium py-3 px-8 rounded-full shadow-lg hover:bg-red-700 transition-all flex items-center gap-2 group">
                                 Solicitar ahora
                                 <span className="group-hover:translate-x-1 transition-transform">→</span>
                             </a>

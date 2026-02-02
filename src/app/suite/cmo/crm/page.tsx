@@ -495,25 +495,25 @@ export default function ContactsPage() {
                 <div className="h-16 border-b border-white/5 bg-black/50 backdrop-blur-md flex items-center justify-between px-8 z-20 shrink-0">
                     <div className="flex items-center gap-8">
                         <div className="flex flex-col">
-                            <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Total Database</span>
-                            <span className="text-xl font-black text-white">{contacts.length}</span>
+                            <span className="text-[10px] font-medium text-neutral-500 uppercase tracking-widest">Total Database</span>
+                            <span className="text-xl font-medium text-white">{contacts.length}</span>
                         </div>
                         <div className="h-8 w-px bg-white/10" />
                         <div className="flex flex-col">
-                            <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Active Leads</span>
-                            <span className="text-xl font-black text-blue-500">{contacts.filter(c => c.stage === 'In Progress').length}</span>
+                            <span className="text-[10px] font-medium text-neutral-500 uppercase tracking-widest">Active Leads</span>
+                            <span className="text-xl font-medium text-blue-500">{contacts.filter(c => c.stage === 'In Progress').length}</span>
                         </div>
                         <div className="h-8 w-px bg-white/10" />
                         <div className="flex flex-col">
-                            <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Conversion</span>
-                            <span className="text-xl font-black text-emerald-500">{contacts.length > 0 ? Math.round((contacts.filter(c => c.stage === 'Closed').length / contacts.length) * 100) : 0}%</span>
+                            <span className="text-[10px] font-medium text-neutral-500 uppercase tracking-widest">Conversion</span>
+                            <span className="text-xl font-medium text-emerald-500">{contacts.length > 0 ? Math.round((contacts.filter(c => c.stage === 'Closed').length / contacts.length) * 100) : 0}%</span>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-3">
                         <div className="px-3 py-1.5 rounded-md bg-neutral-900 border border-neutral-800 flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">System Live</span>
+                            <span className="text-[10px] font-medium text-neutral-400 uppercase tracking-wider">System Live</span>
                         </div>
                     </div>
                 </div>
@@ -568,7 +568,7 @@ export default function ContactsPage() {
                         <div className="flex items-center justify-center py-20">
                             <div className="text-center">
                                 <RefreshCw className="w-10 h-10 text-neutral-700 animate-spin mx-auto mb-4" />
-                                <p className="text-neutral-500 font-bold text-xs uppercase tracking-widest">Consulting Core Database...</p>
+                                <p className="text-neutral-500 font-medium text-xs uppercase tracking-widest">Consulting Core Database...</p>
                             </div>
                         </div>
                     ) : (

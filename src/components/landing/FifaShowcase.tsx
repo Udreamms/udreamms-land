@@ -12,6 +12,7 @@ const fifaFeatures = [
         title: "Estrategia FIFA",
         description: "Diseño de un perfil migratorio sólido enfocado específicamente en tu asistencia al Mundial 2026 para maximizar probabilidades de aprobación.",
         image: "/assets/generated/fifa_showcase_stadium.png",
+        video: "https://www.youtube.com/embed/wlJmb3TwPF4"
     },
     {
         id: "logistica",
@@ -37,20 +38,24 @@ export default function FifaShowcase() {
     const [activeTab, setActiveTab] = useState(fifaFeatures[0]);
 
     return (
-        <section className="py-24 bg-white text-slate-900 overflow-hidden">
+        <section className="py-24 bg-white text-black overflow-hidden">
             <div className="container mx-auto px-6">
 
                 {/* Header: Title + Learn More Pill */}
-                <div className="flex justify-between items-center mb-16 border-b border-slate-100 pb-8">
+                <div className="flex justify-between items-center mb-16">
                     <div>
-                        <h3 className="text-2xl font-bold tracking-tight text-[#D31245]">FIFA Fan Pass</h3>
-                        <h2 className="text-4xl md:text-5xl font-medium tracking-tighter text-slate-600 mt-1">
+                        <h3 className="text-2xl font-medium tracking-tight text-black">FIFA Fan Pass</h3>
+                        <h2 className="text-4xl md:text-5xl font-medium tracking-tighter text-black mt-1">
                             Asegura tu lugar en el Mundial
                         </h2>
                     </div>
-                    <Link href="/visas/fifa">
-                        <Button variant="outline" className="rounded-full px-8 py-6 border-[#D31245]/20 hover:bg-[#D31245] hover:text-white text-[#D31245] font-bold border-2 transition-all">
-                            Ver Fan Pass
+                    <Link
+                        href="https://www.state.gov/fifa-world-cup-26-visas"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <Button className="rounded-full px-10 py-7 bg-black hover:bg-black/90 text-white font-medium text-lg shadow-xl transition-all">
+                            Saber más
                         </Button>
                     </Link>
                 </div>
@@ -67,8 +72,8 @@ export default function FifaShowcase() {
                                     className="group cursor-pointer"
                                     onClick={() => setActiveTab(feature)}
                                 >
-                                    <div className="py-6 border-b border-slate-100">
-                                        <h4 className={`text-xl font-medium transition-colors duration-300 ${isActive ? 'text-[#D31245]' : 'text-slate-400 group-hover:text-slate-600'}`}>
+                                    <div className="py-4">
+                                        <h4 className={`text-xl transition-colors duration-300 ${isActive ? 'font-medium text-black' : 'font-medium text-black group-hover:underline underline-offset-8'}`}>
                                             {feature.title}
                                         </h4>
 
@@ -81,11 +86,9 @@ export default function FifaShowcase() {
                                                     transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
                                                     className="overflow-hidden"
                                                 >
-                                                    <p className="pt-4 text-slate-500 leading-relaxed font-light text-lg">
+                                                    <p className="pt-4 text-black leading-relaxed font-normal text-lg">
                                                         {feature.description}
                                                     </p>
-                                                    <div className="mt-8 border-t border-[#D31245] w-full pt-4">
-                                                    </div>
                                                 </motion.div>
                                             )}
                                         </AnimatePresence>
@@ -104,21 +107,22 @@ export default function FifaShowcase() {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
                                 transition={{ duration: 0.5, ease: "easeInOut" }}
-                                className="w-full h-full relative aspect-video lg:aspect-auto lg:h-[600px] rounded-[2.5rem] overflow-hidden bg-slate-100 shadow-2xl"
+                                className="w-full h-full relative aspect-video lg:aspect-auto lg:h-[600px] rounded-[2.5rem] overflow-hidden bg-white shadow-2xl"
                             >
-                                <img
-                                    src={activeTab.image}
-                                    alt={activeTab.title}
-                                    className="w-full h-full object-cover"
-                                />
-
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/5 group cursor-pointer">
-                                    <div className="w-20 h-20 rounded-full bg-[#D31245]/90 backdrop-blur-md flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
-                                        <Trophy className="w-8 h-8 text-white" />
-                                    </div>
-                                </div>
-
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+                                {activeTab.video ? (
+                                    <iframe
+                                        src={activeTab.video}
+                                        className="w-full h-full border-0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                    />
+                                ) : (
+                                    <img
+                                        src={activeTab.image}
+                                        alt={activeTab.title}
+                                        className="w-full h-full object-cover"
+                                    />
+                                )}
                             </motion.div>
                         </AnimatePresence>
                     </div>

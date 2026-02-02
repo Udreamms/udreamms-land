@@ -21,7 +21,7 @@ export default function ScarcitySection() {
                     <div className="w-32 h-2 bg-amber-100 rounded-full overflow-hidden">
                         <div className="w-[85%] h-full bg-amber-500 rounded-full" />
                     </div>
-                    <span className="font-bold">85%</span>
+                    <span className="font-medium">85%</span>
                 </div>
             </FadeIn>
         </div>

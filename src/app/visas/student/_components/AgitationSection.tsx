@@ -27,7 +27,7 @@ export default function AgitationSection() {
                     {/* Right: The Data and Pain Points */}
                     <div className="w-full lg:w-1/2 order-1 lg:order-2 space-y-10">
                         <FadeIn>
-                            <h3 className="text-3xl md:text-4xl font-bold text-abyss leading-tight mb-6">
+                            <h3 className="text-3xl md:text-4xl font-medium text-abyss leading-tight mb-6 tracking-tight">
                                 Causas Reales de <span className="text-red-500">Rechazo de Visa F-1</span>
                             </h3>
                             <p className="text-lg text-slate-600 leading-relaxed">
@@ -43,7 +43,7 @@ export default function AgitationSection() {
                                         <TrendingUp className="w-6 h-6 text-red-500" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-abyss mb-1">Inconsistencias Financieras (35%)</h4>
+                                        <h4 className="font-medium text-abyss mb-1 tracking-tight">Inconsistencias Financieras (35%)</h4>
                                         <p className="text-sm text-slate-600">Si tu I-20 dice una cosa y tus estados de cuenta otra, es rechazo automático.</p>
                                     </div>
                                 </div>
@@ -55,7 +55,7 @@ export default function AgitationSection() {
                                         <FileWarning className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-abyss mb-1">Mal desempeño en entrevista (25%)</h4>
+                                        <h4 className="font-medium text-abyss mb-1 tracking-tight">Mal desempeño en entrevista (25%)</h4>
                                         <p className="text-sm text-slate-600">No saber explicar por qué elegiste esa universidad o cómo pagarás tus estudios.</p>
                                     </div>
                                 </div>
@@ -67,7 +67,7 @@ export default function AgitationSection() {
                                         <XCircle className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-abyss mb-1">Falta de lazos demostrables (15%)</h4>
+                                        <h4 className="font-medium text-abyss mb-1 tracking-tight">Falta de lazos demostrables (15%)</h4>
                                         <p className="text-sm text-slate-600">Parecer una amenaza migratoria que se quedará a trabajar ilegalmente.</p>
                                     </div>
                                 </div>

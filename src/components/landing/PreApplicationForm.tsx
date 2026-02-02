@@ -28,17 +28,17 @@ import { X, Send, User, Mail, Globe, Book, Plane, FileQuestion } from "lucide-re
 
 // Lista ampliada de países
 const countries = [
-  "Argentina", "Bolivia", "Brasil", "Chile", "Colombia", "Costa Rica", "Cuba", 
-  "República Dominicana", "Ecuador", "El Salvador", "Guatemala", "Honduras", 
-  "México", "Nicaragua", "Panamá", "Paraguay", "Perú", "Puerto Rico", "Uruguay", 
-  "Venezuela", "España", "Estados Unidos", "Portugal", "Haití", "Jamaica", 
+  "Argentina", "Bolivia", "Brasil", "Chile", "Colombia", "Costa Rica", "Cuba",
+  "República Dominicana", "Ecuador", "El Salvador", "Guatemala", "Honduras",
+  "México", "Nicaragua", "Panamá", "Paraguay", "Perú", "Puerto Rico", "Uruguay",
+  "Venezuela", "España", "Estados Unidos", "Portugal", "Haití", "Jamaica",
   "Trinidad y Tobago", "Canadá", "Francia", "Italia", "Alemania", "Reino Unido",
   "China", "Japón", "Corea del Sur", "India", "Australia", "Otro"
 ].sort();
 
 // Lista ampliada de idiomas
 const languages = [
-  "Español", "Inglés", "Portugués", "Francés", "Alemán", "Italiano", 
+  "Español", "Inglés", "Portugués", "Francés", "Alemán", "Italiano",
   "Chino", "Japonés", "Coreano", "Árabe", "Hindi", "Otro"
 ].sort();
 
@@ -98,7 +98,7 @@ const PreApplicationForm = ({ onClose }: PreApplicationFormProps) => {
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] max-w-3xl w-full my-8 relative border border-gray-100 dark:border-gray-800">
-        
+
         {/* Header con gradiente sutil */}
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary via-purple-500 to-pink-500 rounded-t-2xl" />
 
@@ -115,7 +115,7 @@ const PreApplicationForm = ({ onClose }: PreApplicationFormProps) => {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
               <Send className="w-8 h-8 text-primary" />
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <h2 className="text-3xl font-medium text-gray-900 dark:text-white mb-2">
               Comienza tu Aventura
             </h2>
             <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
@@ -125,7 +125,7 @@ const PreApplicationForm = ({ onClose }: PreApplicationFormProps) => {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              
+
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Nombre */}
                 <FormField
@@ -163,7 +163,7 @@ const PreApplicationForm = ({ onClose }: PreApplicationFormProps) => {
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
-                 {/* Email */}
+                {/* Email */}
                 <FormField
                   control={form.control}
                   name="email"
@@ -180,7 +180,7 @@ const PreApplicationForm = ({ onClose }: PreApplicationFormProps) => {
                   )}
                 />
 
-                 {/* Teléfono con selector de país */}
+                {/* Teléfono con selector de país */}
                 <FormField
                   control={form.control}
                   name="phone"
@@ -275,7 +275,7 @@ const PreApplicationForm = ({ onClose }: PreApplicationFormProps) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                         <Globe className="w-4 h-4" /> Nacionalidad
+                        <Globe className="w-4 h-4" /> Nacionalidad
                       </FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
@@ -303,7 +303,7 @@ const PreApplicationForm = ({ onClose }: PreApplicationFormProps) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                         <Plane className="w-4 h-4" /> ¿Tienes pasaporte válido?
+                        <Plane className="w-4 h-4" /> ¿Tienes pasaporte válido?
                       </FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
@@ -331,7 +331,7 @@ const PreApplicationForm = ({ onClose }: PreApplicationFormProps) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                         <FileQuestion className="w-4 h-4" /> ¿A qué tipo de visa deseas aplicar?
+                        <FileQuestion className="w-4 h-4" /> ¿A qué tipo de visa deseas aplicar?
                       </FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>

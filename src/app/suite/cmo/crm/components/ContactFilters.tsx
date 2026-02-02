@@ -72,7 +72,7 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
                     placeholder="Search database..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 bg-transparent border-none h-9 focus:ring-0 text-white font-bold placeholder:text-neutral-600 text-xs uppercase tracking-wider"
+                    className="pl-10 bg-transparent border-none h-9 focus:ring-0 text-white font-medium placeholder:text-neutral-600 text-xs uppercase tracking-wider"
                 />
             </div>
 
@@ -101,11 +101,11 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
 
                     <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
                         <DialogTrigger asChild>
-                            <Button variant="ghost" className="h-9 text-neutral-500 hover:text-white font-bold text-xs uppercase tracking-wider flex items-center group">
+                            <Button variant="ghost" className="h-9 text-neutral-500 hover:text-white font-medium text-xs uppercase tracking-wider flex items-center group">
                                 <Filter className="w-3.5 h-3.5 mr-2 group-hover:text-blue-500 transition-colors" />
                                 Filters
                                 {activeFiltersCount > 0 && (
-                                    <Badge className="ml-2 bg-blue-600 text-white text-[9px] px-1.5 py-0 font-black rounded-sm">
+                                    <Badge className="ml-2 bg-blue-600 text-white text-[9px] px-1.5 py-0 font-medium rounded-sm">
                                         {activeFiltersCount}
                                     </Badge>
                                 )}
@@ -113,7 +113,7 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
                         </DialogTrigger>
                         <DialogContent className="bg-neutral-950 border-neutral-800 text-white sm:max-w-2xl rounded-lg p-6 backdrop-blur-3xl">
                             <DialogHeader>
-                                <DialogTitle className="text-2xl font-black tracking-tight uppercase flex items-center justify-between">
+                                <DialogTitle className="text-2xl font-medium tracking-tight uppercase flex items-center justify-between">
                                     <span className="flex items-center">
                                         <Filter className="w-6 h-6 mr-3 text-blue-500" />
                                         Advanced Filters
@@ -122,7 +122,7 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
                                         <Button
                                             variant="ghost"
                                             onClick={clearAllFilters}
-                                            className="text-xs text-red-400 hover:text-red-300 font-bold"
+                                            className="text-xs text-red-400 hover:text-red-300 font-medium"
                                         >
                                             Clear All
                                         </Button>
@@ -136,7 +136,7 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
                             <div className="space-y-8 py-6">
                                 {/* Stage Filter */}
                                 <div>
-                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 mb-4 block">
+                                    <Label className="text-[10px] font-medium uppercase tracking-[0.2em] text-neutral-400 mb-4 block">
                                         Stage / Status
                                     </Label>
                                     <div className="flex flex-wrap gap-2">
@@ -153,7 +153,7 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
                                                     );
                                                 }}
                                                 className={cn(
-                                                    "h-9 px-4 text-xs font-bold rounded-xl transition-all",
+                                                    "h-9 px-4 text-xs font-medium rounded-xl transition-all",
                                                     selectedStages.includes(stage)
                                                         ? "bg-blue-600 text-white shadow-lg shadow-blue-600/30 border-blue-500"
                                                         : "bg-neutral-900/50 text-neutral-400 border-neutral-800 hover:border-blue-500/50 hover:text-neutral-200"
@@ -167,7 +167,7 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
 
                                 {/* Source Filter */}
                                 <div>
-                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 mb-4 block">
+                                    <Label className="text-[10px] font-medium uppercase tracking-[0.2em] text-neutral-400 mb-4 block">
                                         Source / Origin
                                     </Label>
                                     <div className="flex flex-wrap gap-2">
@@ -184,7 +184,7 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
                                                     );
                                                 }}
                                                 className={cn(
-                                                    "h-9 px-4 text-xs font-bold rounded-xl transition-all",
+                                                    "h-9 px-4 text-xs font-medium rounded-xl transition-all",
                                                     selectedSources.includes(source)
                                                         ? "bg-blue-600 text-white shadow-lg shadow-blue-600/30 border-blue-500"
                                                         : "bg-neutral-900/50 text-neutral-400 border-neutral-800 hover:border-blue-500/50 hover:text-neutral-200"
@@ -199,7 +199,7 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
                                 {/* Tags Filter */}
                                 {availableTags.length > 0 && (
                                     <div>
-                                        <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 mb-4 block">
+                                        <Label className="text-[10px] font-medium uppercase tracking-[0.2em] text-neutral-400 mb-4 block">
                                             Tags / Categories
                                         </Label>
                                         <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto custom-scrollbar">
@@ -216,7 +216,7 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
                                                         );
                                                     }}
                                                     className={cn(
-                                                        "h-9 px-4 text-xs font-bold rounded-xl transition-all",
+                                                        "h-9 px-4 text-xs font-medium rounded-xl transition-all",
                                                         selectedTags.includes(tag)
                                                             ? "bg-blue-600 text-white shadow-lg shadow-blue-600/30 border-blue-500"
                                                             : "bg-neutral-900/50 text-neutral-400 border-neutral-800 hover:border-blue-500/50 hover:text-neutral-200"
@@ -233,11 +233,11 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
                             <DialogFooter className="mt-6">
                                 <div className="flex items-center justify-between w-full">
                                     <p className="text-sm text-neutral-400">
-                                        <span className="font-bold text-blue-400">{filteredCount}</span> contacts match your filters
+                                        <span className="font-medium text-blue-400">{filteredCount}</span> contacts match your filters
                                     </p>
                                     <Button
                                         onClick={() => setIsFilterOpen(false)}
-                                        className="bg-blue-600 hover:bg-blue-700 px-8 rounded-xl font-black shadow-lg shadow-blue-600/20"
+                                        className="bg-blue-600 hover:bg-blue-700 px-8 rounded-xl font-medium shadow-lg shadow-blue-600/20"
                                     >
                                         Apply Filters
                                     </Button>

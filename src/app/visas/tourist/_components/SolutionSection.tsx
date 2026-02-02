@@ -12,10 +12,10 @@ export default function SolutionSection() {
 
             <div className="max-w-7xl mx-auto px-6 relative z-10">
                 <FadeIn className="text-center mb-16 -mt-24">
-                    <h2 className="text-sm font-bold text-primary tracking-[0.2em] uppercase mb-4">
+                    <h2 className="text-sm font-medium text-primary tracking-[0.2em] uppercase mb-4">
                         UDREAMMS
                     </h2>
-                    <h3 className="text-3xl md:text-5xl font-bold text-abyss font-playfair mb-6 leading-tight">
+                    <h3 className="text-3xl md:text-5xl font-medium text-abyss font-playfair mb-6 leading-tight tracking-tight">
                         Descubre lo extraordinario con la <br className="hidden md:block" />
                         <span><span className="text-purple-600">Experiencia VIP.</span></span>
                     </h3>
@@ -37,7 +37,7 @@ export default function SolutionSection() {
                                             <Shield className="w-6 h-6" />
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-abyss mb-1">1. Ruta Multi-Estado</h4>
+                                            <h4 className="font-medium text-abyss mb-1 tracking-tight">1. Ruta Multi-Estado</h4>
                                             <p className="text-sm text-slate-600">Explora lo mejor de la costa este y oeste en un solo viaje inolvidable.</p>
                                         </div>
                                     </div>
@@ -49,7 +49,7 @@ export default function SolutionSection() {
                                             <Sparkles className="w-6 h-6" />
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-abyss mb-1">2. Hospedaje y Traslados Incluidos</h4>
+                                            <h4 className="font-medium text-abyss mb-1 tracking-tight">2. Hospedaje y Traslados Incluidos</h4>
                                             <p className="text-sm text-slate-600">Hoteles 4-5 estrellas y transporte privado en cada destino.</p>
                                         </div>
                                     </div>
@@ -61,7 +61,7 @@ export default function SolutionSection() {
                                             <Zap className="w-6 h-6" />
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-abyss mb-1">3. Gestión integral del viaje, todo cubierto</h4>
+                                            <h4 className="font-medium text-abyss mb-1 tracking-tight">3. Gestión integral del viaje, todo cubierto</h4>
                                             <p className="text-sm text-slate-600">Asesor de compras y guía exclusivo a tu disposición 24/7.</p>
                                         </div>
                                     </div>

@@ -51,7 +51,7 @@ export default function UdreammsAppPromo() {
                 >
                     <a
                         href="#"
-                        className="flex items-center gap-3 bg-white text-[#D31245] px-10 py-5 rounded-full text-lg font-bold hover:bg-gray-100 transition-all duration-300 shadow-xl shadow-black/10"
+                        className="flex items-center gap-3 bg-white text-[#D31245] px-10 py-5 rounded-full text-lg font-medium hover:bg-gray-100 transition-all duration-300 shadow-xl shadow-black/10"
                     >
                         <Smartphone className="w-5 h-5" />
                         Descargar Udreamms App

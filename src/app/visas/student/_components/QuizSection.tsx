@@ -15,8 +15,8 @@ export default function QuizSection() {
         <section id="quiz" className="py-24 bg-cloud">
             <div className="container mx-auto px-6 max-w-2xl text-center">
                 <FadeIn>
-                    <h2 className="text-3xl font-bold mb-8 text-abyss">¿Listo para comenzar tu viaje académico?</h2>
-                    <Button onClick={() => setShowForm(true)} className="bg-blue-600 hover:bg-blue-700 text-white h-16 px-10 rounded-xl text-xl font-bold shadow-xl hover:scale-105 transition-transform flex items-center gap-3 mx-auto">
+                    <h2 className="text-3xl font-medium mb-8 text-abyss tracking-tight">¿Listo para comenzar tu viaje académico?</h2>
+                    <Button onClick={() => setShowForm(true)} className="bg-blue-600 hover:bg-blue-700 text-white h-16 px-10 rounded-xl text-xl font-medium shadow-xl hover:scale-105 transition-transform flex items-center gap-3 mx-auto">
                         Iniciar Evaluación de Perfil F-1 <ArrowRight className="w-6 h-6" />
                     </Button>
                     <p className="mt-4 text-sm text-slate-500">

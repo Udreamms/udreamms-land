@@ -95,7 +95,7 @@ export default function PlansSection() {
                 <div className="text-center mb-16">
                     <FadeIn>
                         {/* Title - Professional Black */}
-                        <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
+                        <h2 className="text-4xl md:text-5xl font-medium text-slate-900 mb-6 tracking-tight">
                             Elige tu Nivel de Fan
                         </h2>
                         {/* Subtitle - Professional Gray */}
@@ -109,7 +109,7 @@ export default function PlansSection() {
                 <div className="max-w-[1600px] mx-auto bg-slate-50 rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-slate-200 relative overflow-hidden">
 
                     {/* Limited Time Badge - Animated Gradient */}
-                    <div className="absolute top-0 right-0 bg-gradient-to-r from-orange-600 to-red-600 text-white text-[10px] font-bold uppercase tracking-widest px-6 py-2 rounded-bl-3xl shadow-lg z-20 animate-pulse">
+                    <div className="absolute top-0 right-0 bg-gradient-to-r from-orange-600 to-red-600 text-white text-[10px] font-medium uppercase tracking-widest px-6 py-2 rounded-bl-3xl shadow-lg z-20 animate-pulse">
                         ¡CUPOS LIMITADOS!
                     </div>
 
@@ -140,19 +140,19 @@ export default function PlansSection() {
                                     }
                                 `}>
                                     {/* Discount Badge - Subtle Slate */}
-                                    <div className="absolute top-6 right-6 bg-slate-100 text-slate-700 px-4 py-2 rounded-md text-sm font-bold tracking-wide shadow-sm transform rotate-0">
+                                    <div className="absolute top-6 right-6 bg-slate-100 text-slate-700 px-4 py-2 rounded-md text-sm font-medium tracking-wide shadow-sm transform rotate-0">
                                         {plan.discount}
                                     </div>
 
                                     {plan.highlight && (
                                         // "Más Popular" - Solid Black/Slate-900 for professionalism
-                                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-1.5 rounded-full text-sm font-semibold tracking-wide shadow-md">
+                                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-1.5 rounded-full text-sm font-medium tracking-wide shadow-md">
                                             MÁS POPULAR
                                         </div>
                                     )}
 
                                     <div className="mb-6 mt-12">
-                                        <h3 className={`text-xl font-bold mb-2 ${plan.highlight ? "text-slate-900" : "text-slate-800"}`}>
+                                        <h3 className={`text-xl font-medium mb-2 tracking-tight ${plan.highlight ? "text-slate-900" : "text-slate-800"}`}>
                                             {plan.name}
                                         </h3>
 
@@ -162,7 +162,7 @@ export default function PlansSection() {
                                                 {plan.originalPrice}
                                             </span>
                                             <div className="flex items-baseline gap-1">
-                                                <span className="text-3xl font-extrabold text-slate-900">{plan.price}</span>
+                                                <span className="text-3xl font-medium text-slate-900 tracking-tighter">{plan.price}</span>
                                             </div>
                                         </div>
 
@@ -171,13 +171,13 @@ export default function PlansSection() {
 
                                     <Button
                                         // Button - Professional Slate/Black theme
-                                        className="w-full mb-8 rounded-full py-6 font-bold text-lg shadow-sm transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900"
+                                        className="w-full mb-8 rounded-full py-6 font-medium text-lg shadow-sm transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900"
                                     >
                                         Elegir Plan
                                     </Button>
 
                                     <div className="space-y-4 flex-grow">
-                                        <p className="font-semibold text-xs text-slate-400 mb-4 uppercase tracking-wider border-b border-gray-100 pb-2">
+                                        <p className="font-medium text-xs text-slate-400 mb-4 uppercase tracking-wider border-b border-gray-100 pb-2">
                                             LO QUE INCLUYE:
                                         </p>
                                         {plan.features.map((feature, i) => {

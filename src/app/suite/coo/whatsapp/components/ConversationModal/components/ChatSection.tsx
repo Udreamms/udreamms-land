@@ -74,7 +74,7 @@ export const ChatSection: React.FC<ChatSectionProps> = ({
         const parts = text.split(new RegExp(`(${term})`, 'gi'));
         return parts.map((part, i) =>
             part.toLowerCase() === term.toLowerCase()
-                ? <span key={i} className="bg-yellow-500/40 text-white font-bold px-0.5 rounded">{part}</span>
+                ? <span key={i} className="bg-yellow-500/40 text-white font-medium px-0.5 rounded">{part}</span>
                 : part
         );
     };
@@ -109,7 +109,7 @@ export const ChatSection: React.FC<ChatSectionProps> = ({
                                     )}
 
                                     <div className="text-center mb-8">
-                                        <p className="font-bold text-lg text-white mb-1 truncate max-w-xs">{selectedFile.name}</p>
+                                        <p className="font-medium text-lg text-white mb-1 truncate max-w-xs">{selectedFile.name}</p>
                                         <p className="text-sm text-neutral-500">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
                                     </div>
 
@@ -117,7 +117,7 @@ export const ChatSection: React.FC<ChatSectionProps> = ({
                                         onClick={handleDisplayFileSend}
                                         disabled={uploading}
                                         size="lg"
-                                        className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-full text-base transition-all"
+                                        className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-full text-base transition-all"
                                     >
                                         {uploading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Send className="mr-2 h-5 w-5" />}
                                         Enviar Archivo
@@ -138,7 +138,7 @@ export const ChatSection: React.FC<ChatSectionProps> = ({
                                 {Object.entries(groupedMessages).map(([date, messages]) => (
                                     <React.Fragment key={date}>
                                         <div className="flex justify-center my-2">
-                                            <span className="text-[9px] font-bold text-neutral-400 bg-neutral-800/90 px-2 py-0.5 rounded-full uppercase tracking-wide">
+                                            <span className="text-[9px] font-medium text-neutral-400 bg-neutral-800/90 px-2 py-0.5 rounded-full uppercase tracking-wide">
                                                 {date}
                                             </span>
                                         </div>
@@ -194,7 +194,7 @@ export const ChatSection: React.FC<ChatSectionProps> = ({
                                                                         )} />
                                                                     </div>
                                                                     <div className="min-w-0 flex-1">
-                                                                        <p className="text-xs font-bold truncate">{msg.fileName || 'Archivo adjunto'}</p>
+                                                                        <p className="text-xs font-medium truncate">{msg.fileName || 'Archivo adjunto'}</p>
                                                                         <p className="text-[9px] text-white/60">
                                                                             {msg.fileType === 'application/pdf' ? 'PDF • Clic para ver' :
                                                                                 msg.fileType?.includes('word') || msg.fileType?.includes('document') ? 'DOCX • Clic para ver' :
@@ -289,11 +289,11 @@ export const ChatSection: React.FC<ChatSectionProps> = ({
                     )}>
                         <currentPlatform.icon className={activePlatform === 'TikTok' ? 'w-16 h-16 text-white' : 'w-14 h-14'} />
                     </div>
-                    <h3 className="text-2xl font-black text-white mb-3 tracking-tight">Conectar {activePlatform}</h3>
+                    <h3 className="text-2xl font-medium text-white mb-3 tracking-tight">Conectar {activePlatform}</h3>
                     <p className="text-sm text-neutral-500 max-w-[280px] text-center mb-10 leading-relaxed">
                         La integración con {activePlatform} no está configurada o no hay mensajes recientes.
                     </p>
-                    <Button variant="outline" className="h-12 px-8 border-neutral-800 bg-[#0A0A0A] hover:bg-neutral-800 hover:text-white text-xs font-bold uppercase tracking-widest rounded-xl transition-all active:scale-95 shadow-lg">
+                    <Button variant="outline" className="h-12 px-8 border-neutral-800 bg-[#0A0A0A] hover:bg-neutral-800 hover:text-white text-xs font-medium uppercase tracking-widest rounded-xl transition-all active:scale-95 shadow-lg">
                         Configurar Integración
                     </Button>
                 </div>

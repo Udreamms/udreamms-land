@@ -39,11 +39,11 @@ export default function BasicPlanShowcase() {
                         className="flex-1 space-y-10"
                     >
                         <div className="space-y-4">
-                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 text-slate-600 font-bold text-xs uppercase tracking-widest">
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 text-slate-600 font-medium text-xs uppercase tracking-widest">
                                 Opción Esencial
                             </div>
-                            <h2 className="text-4xl md:text-5xl lg:text-7xl font-black text-slate-900 leading-[1] tracking-tighter">
-                                Empieza con el <br /> pie derecho: <span className="text-red-600 italic font-serif">Plan Básico.</span>
+                            <h2 className="text-4xl md:text-5xl lg:text-7xl font-medium text-slate-900 leading-[0.9] tracking-tighter">
+                                Empieza con el <br /> pie derecho: <span className="text-red-500">Plan Básico.</span>
                             </h2>
                             <p className="text-xl text-slate-600 font-medium leading-relaxed max-w-xl">
                                 Nuestra gestión incluye auditoría, llenado de formularios y preparación para la entrevista consular con acompañamiento 1 a 1.
@@ -59,7 +59,7 @@ export default function BasicPlanShowcase() {
                                             <Icon size={28} strokeWidth={2.5} />
                                         </div>
                                         <div>
-                                            <h4 className="text-xl font-bold text-slate-900 mb-1">{feature.title}</h4>
+                                            <h4 className="text-xl font-medium text-slate-900 mb-1">{feature.title}</h4>
                                             <p className="text-slate-600 font-medium leading-snug">{feature.description}</p>
                                         </div>
                                     </div>
@@ -70,14 +70,14 @@ export default function BasicPlanShowcase() {
                         <div className="flex flex-col sm:flex-row items-center gap-8 pt-6">
                             <Button
                                 size="lg"
-                                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white text-xl px-16 py-9 rounded-full shadow-[0_10px_40px_rgba(220,38,38,0.3)] transition-all hover:scale-105 font-black uppercase tracking-tight"
+                                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white text-xl px-16 py-9 rounded-full shadow-[0_10px_40px_rgba(220,38,38,0.3)] transition-all hover:scale-105 font-medium uppercase tracking-tight"
                                 onClick={() => document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' })}
                             >
                                 Elegir Plan Básico
                             </Button>
                         </div>
 
-                        <p className="text-sm font-semibold text-slate-400 flex items-center gap-2">
+                        <p className="text-sm font-medium text-slate-400 flex items-center gap-2">
                             <CheckCircle2 size={16} className="text-green-500" />
                             Gestión garantizada por expertos Udreamms
                         </p>
@@ -98,8 +98,8 @@ export default function BasicPlanShowcase() {
                             />
                             {/* Floating Badge */}
                             <div className="absolute top-8 right-8 bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-xl flex flex-col items-center">
-                                <span className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Aprobación</span>
-                                <span className="text-3xl font-black text-slate-900">98%</span>
+                                <span className="text-slate-500 text-xs font-medium uppercase tracking-widest mb-1">Aprobación</span>
+                                <span className="text-3xl font-medium tracking-tighter text-slate-900">98%</span>
                             </div>
                         </div>
                         {/* Background Accent */}

@@ -121,7 +121,7 @@ export default function ChooseYourPath() {
 
                 {/* Floating Tag for FIFA */}
                 {path.tag && (
-                  <div className={`absolute top-0 right-0 ${path.tagColor} text-white text-[10px] font-bold uppercase tracking-widest px-6 py-2 rounded-bl-3xl shadow-lg z-20 animate-pulse`}>
+                  <div className={`absolute top-0 right-0 ${path.tagColor} text-white text-[10px] font-medium uppercase tracking-widest px-6 py-2 rounded-bl-3xl shadow-lg z-20 animate-pulse`}>
                     {path.tag}
                   </div>
                 )}

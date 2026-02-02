@@ -79,7 +79,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
         return (
             <div className="flex flex-col items-center justify-center h-full p-8 text-center">
                 <File size={64} className="text-neutral-500 mb-4" />
-                <p className="text-lg font-semibold text-white mb-2">{fileName}</p>
+                <p className="text-lg font-medium tracking-tight text-white mb-2">{fileName}</p>
                 <p className="text-sm text-neutral-400 mb-6">
                     No se puede previsualizar este tipo de archivo
                 </p>
@@ -120,7 +120,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
                                     <File size={20} className="text-neutral-500 flex-shrink-0" />
                                 )}
                                 <div className="min-w-0 flex-1">
-                                    <p className="text-sm font-semibold text-white truncate">{fileName}</p>
+                                    <p className="text-sm font-medium tracking-tight text-white truncate">{fileName}</p>
                                     <p className="text-xs text-neutral-500">
                                         {isPDF ? 'PDF Document' : isImage ? 'Imagen' : isWord ? 'Word Document' : isExcel ? 'Excel Spreadsheet' : 'Archivo'}
                                     </p>

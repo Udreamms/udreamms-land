@@ -146,10 +146,10 @@ function FlowPage() {
             <Input
               value={chatbotName}
               onChange={(e) => setChatbotName(e.target.value)}
-              className="bg-transparent border-transparent hover:border-neutral-700 focus:border-neutral-600 focus:bg-neutral-900 text-lg font-semibold text-white w-[300px] h-9 px-2 transition-all"
+              className="bg-transparent border-transparent hover:border-neutral-700 focus:border-neutral-600 focus:bg-neutral-900 text-lg font-medium text-white w-[300px] h-9 px-2 transition-all"
               placeholder="Nombre del Chatbot"
             />
-            <span className="opacity-0 group-hover:opacity-100 text-neutral-600 text-[10px] ml-2 transition-opacity uppercase tracking-wider font-bold">
+            <span className="opacity-0 group-hover:opacity-100 text-neutral-600 text-[10px] ml-2 transition-opacity uppercase tracking-wider font-medium">
               Editar
             </span>
           </div>

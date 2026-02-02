@@ -87,32 +87,27 @@ export default function Stats() {
   return (
     <section className="py-24 bg-white relative overflow-hidden">
       <div className="container px-6 md:px-12 mx-auto relative z-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-12 gap-x-8 relative">
-          
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-16 gap-x-8">
+
           {stats.map((stat, index) => {
             return (
-              <div key={index} className="relative group flex flex-col items-center text-center">
-                
-                {/* Separador Vertical */}
-                {index !== 0 && (
-                   <div className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 h-24 w-px bg-gray-100"></div>
-                )}
+              <div key={index} className="flex flex-col items-center text-center group">
 
-                {/* Icono con fondo suave */}
-                <div className="mb-6 p-4 rounded-2xl bg-primary/5 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 shadow-sm group-hover:shadow-lg group-hover:shadow-primary/30 group-hover:-translate-y-1">
-                  <stat.icon className="w-8 h-8" strokeWidth={2} />
+                {/* Icono minimalista */}
+                <div className="mb-8 p-5 rounded-full bg-white border border-black/5 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                  <stat.icon className="w-8 h-8 text-black" strokeWidth={1.5} />
                 </div>
 
-                {/* Número Grande con Gradiente */}
-                <div className="text-5xl md:text-6xl font-black mb-3 tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-gray-900 to-gray-600 group-hover:from-primary group-hover:to-secondary transition-all duration-300">
+                {/* Número Grande Minimalista */}
+                <div className="text-6xl md:text-7xl font-medium mb-4 tracking-tighter text-black">
                   <CountUp end={stat.number} suffix={stat.suffix} />
                 </div>
 
-                {/* Título y Descripción */}
-                <h3 className="text-lg font-bold text-gray-900 mb-2">
+                {/* Título y Descripción en Negro Sólido */}
+                <h3 className="text-xl font-medium text-black mb-3">
                   {stat.title}
                 </h3>
-                <p className="text-sm text-gray-500 font-medium max-w-[200px] leading-relaxed">
+                <p className="text-base text-black font-normal max-w-[220px] leading-relaxed">
                   {stat.description}
                 </p>
               </div>

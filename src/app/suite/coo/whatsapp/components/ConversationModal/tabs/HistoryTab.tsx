@@ -63,7 +63,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ liveCardData }) => {
 
     return (
         <div className="h-full pt-4 pb-20 overflow-y-auto custom-scrollbar">
-            <h3 className="text-[9px] font-black text-neutral-600 uppercase tracking-widest mb-4 px-4 sticky top-0 bg-[#0A0A0A]/95 backdrop-blur-sm z-10 py-2 border-b border-white/5">
+            <h3 className="text-[9px] font-medium text-neutral-600 uppercase tracking-widest mb-4 px-4 sticky top-0 bg-[#0A0A0A]/95 backdrop-blur-sm z-10 py-2 border-b border-white/5">
                 Activity Log
             </h3>
 

@@ -45,16 +45,16 @@ export default function VipPlanShowcase() {
                         className="flex-1 space-y-10"
                     >
                         <div className="space-y-4">
-                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-100 text-amber-700 font-bold text-xs uppercase tracking-widest">
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-100 text-amber-700 font-medium text-xs uppercase tracking-widest">
                                 <Trophy size={14} />
                                 La Élite del Viajero
                             </div>
-                            <h2 className="text-4xl md:text-5xl lg:text-7xl font-sans font-black text-slate-900 leading-[1] tracking-tighter">
+                            <h2 className="text-4xl md:text-5xl lg:text-7xl font-sans font-medium text-slate-900 leading-[0.9] tracking-tighter">
                                 Libertad Sin Límites: <br />
-                                <span className="text-amber-600 italic font-serif lowercase">VIP Experience.</span>
+                                <span className="text-amber-500">VIP EXPERIENCE.</span>
                             </h2>
                             <div className="space-y-6">
-                                <p className="text-xl text-slate-700 font-bold leading-relaxed max-w-xl">
+                                <p className="text-xl text-slate-700 font-medium leading-relaxed max-w-xl">
                                     Elige tu gran ruta:
                                 </p>
                                 <ul className="space-y-2 text-lg text-slate-600 font-medium">
@@ -86,7 +86,7 @@ export default function VipPlanShowcase() {
                                             <Icon size={28} strokeWidth={2.5} />
                                         </div>
                                         <div>
-                                            <h4 className="text-xl font-bold text-slate-900 mb-1">{feature.title}</h4>
+                                            <h4 className="text-xl font-medium text-slate-900 mb-1">{feature.title}</h4>
                                             <p className="text-slate-600 font-medium leading-snug">{feature.description}</p>
                                         </div>
                                     </div>
@@ -97,21 +97,21 @@ export default function VipPlanShowcase() {
                         <div className="flex flex-col sm:flex-row items-center gap-6 pt-6">
                             <Button
                                 size="lg"
-                                className="w-full sm:w-auto bg-slate-900 hover:bg-black text-white text-lg md:text-xl px-10 py-7 rounded-full shadow-xl transition-all hover:scale-105 font-bold uppercase tracking-tight"
+                                className="w-full sm:w-auto bg-slate-900 hover:bg-black text-white text-lg md:text-xl px-10 py-7 rounded-full shadow-xl transition-all hover:scale-105 font-medium uppercase tracking-tight"
                                 onClick={() => document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' })}
                             >
                                 Elegir Experiencia VIP
                             </Button>
                             <Button
                                 size="lg"
-                                className="w-full sm:w-auto border-2 border-slate-900 bg-slate-900 hover:bg-black text-white text-lg md:text-xl px-10 py-7 rounded-full shadow-lg transition-all hover:scale-105 font-bold uppercase tracking-tight"
+                                className="w-full sm:w-auto border-2 border-slate-900 bg-slate-900 hover:bg-black text-white text-lg md:text-xl px-10 py-7 rounded-full shadow-lg transition-all hover:scale-105 font-medium uppercase tracking-tight"
                                 onClick={() => window.open('https://wa.me/yournumber', '_blank')}
                             >
                                 Quiero más información
                             </Button>
                         </div>
 
-                        <div className="pt-4 flex items-center gap-2 text-slate-400 font-bold uppercase tracking-widest text-xs">
+                        <div className="pt-4 flex items-center gap-2 text-slate-400 font-medium uppercase tracking-widest text-xs">
                             <CheckCircle2 size={16} className="text-amber-500" />
                             Soporte exclusivo 24/7 incluido
                         </div>
