@@ -49,6 +49,16 @@ export default function ValuePropsSection() {
                         })}
                     </div>
                 </FadeIn>
+
+                {/* Introductory Phrase */}
+                <FadeIn delay={0.4}>
+                    <div className="text-center mt-12 max-w-4xl mx-auto">
+                        <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-[#1a2b3b] leading-[4]">
+                            El respaldo que necesitas para <br />
+                            <span className="text-slate-500">tu futuro académico</span>
+                        </h2>
+                    </div>
+                </FadeIn>
             </div>
         </div>
     );

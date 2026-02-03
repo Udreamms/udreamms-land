@@ -80,18 +80,7 @@ export default function HeroSection() {
 
             </div>
 
-            {/* Bottom Right CTA Button - Fixed */}
-            <div className="fixed bottom-40 right-36 z-50 pointer-events-auto">
-                <FadeIn delay={0.8}>
-                    <Button
-                        size="lg"
-                        className="bg-white hover:bg-slate-100 text-black text-xl px-12 py-5 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.7)] transition-all hover:scale-105 font-medium"
-                        onClick={() => document.getElementById('calculator-section')?.scrollIntoView({ behavior: 'smooth' })}
-                    >
-                        Solicitar ahora
-                    </Button>
-                </FadeIn>
-            </div>
+
 
         </div>
     );

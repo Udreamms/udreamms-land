@@ -9,10 +9,19 @@ import ValuePropsSection from "./_components/ValuePropsSection";
 import StageDetails from "@/components/landing/StageDetails";
 import AppSection from "@/components/landing/AppSection";
 import WhyChooseUs from "./_components/WhyChooseUs";
-import JoinOurStudents from "./_components/JoinOurStudents";
+import SuccessStoriesSection from "./_components/SuccessStoriesSection";
+import YouTubeSocialSection from "./_components/YouTubeSocialSection";
+import FinalAdventureCTA from "./_components/FinalAdventureCTA";
 import CtaSection from "./_components/CtaSection";
 import CalculatorSection from "./_components/CalculatorSection";
 import PlansSection from "./_components/PlansSection";
+import EssentialPlanShowcase from "./_components/EssentialPlanShowcase";
+import ProPlanShowcase from "./_components/ProPlanShowcase";
+import ElitePlanShowcase from "./_components/ElitePlanShowcase";
+import AllInclusivePlanShowcase from "./_components/AllInclusivePlanShowcase";
+import StatsBar from "./_components/StatsBar";
+import EnglishSchoolsShowcase from "./_components/EnglishSchoolsShowcase";
+import StudentRequirements from "./_components/StudentRequirements";
 import { UpsellModal } from "./_components/UpsellModal";
 
 function StudentVisaContent() {
@@ -51,13 +60,21 @@ function StudentVisaContent() {
       <Header />
       <HeroSection />
       <PlansSection />
-
       <ValuePropsSection />
+      <EssentialPlanShowcase />
+      <ProPlanShowcase />
+      <ElitePlanShowcase />
+      <AllInclusivePlanShowcase />
+      <StatsBar />
+      <EnglishSchoolsShowcase />
+      <StudentRequirements />
       <StageDetails />
       <AppSection />
 
       <WhyChooseUs />
-      <JoinOurStudents />
+      <SuccessStoriesSection />
+      <YouTubeSocialSection />
+      <FinalAdventureCTA />
 
       <div id="calculator-section">
         {showCalculator ? (

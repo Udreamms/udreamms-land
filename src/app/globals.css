@@ -41,7 +41,7 @@
     --shadow-soft: 0 4px 20px -2px hsl(348 83% 47% / 0.15);
     --shadow-elevated: 0 10px 40px -10px hsl(348 83% 47% / 0.25);
     --shadow-glow: 0 0 40px hsl(348 100% 65% / 0.4);
-    
+
     /* Sidebar specific variables (keeping existing ones if needed, or using new scheme) */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -82,7 +82,7 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 348 83% 47%;
-    
+
     --gradient-hero: linear-gradient(135deg, hsl(348 83% 42%), hsl(348 100% 58%));
     --gradient-card: linear-gradient(135deg, hsl(348 83% 42% / 0.1), hsl(15 93% 55% / 0.1));
     --gradient-tech: linear-gradient(135deg, hsl(348 83% 42%), hsl(15 93% 55%), hsl(348 100% 58%));
@@ -106,6 +106,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -115,27 +116,43 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
   .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
   }
 
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
+  .hover-scrollbar::-webkit-scrollbar {
+    width: 5px;
   }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 10px;
+
+  .hover-scrollbar::-webkit-scrollbar-button {
+    display: none;
   }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    border: 2px solid transparent;
-    background-clip: content-box;
+
+  .hover-scrollbar::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 20px;
+    transition: background-color 0.3s ease;
   }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
-    background-clip: content-box;
+
+  .hover-scrollbar:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .hover-scrollbar::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  /* Firefox */
+  .hover-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+
+  .hover-scrollbar:hover {
+    scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
   }
 }
-
