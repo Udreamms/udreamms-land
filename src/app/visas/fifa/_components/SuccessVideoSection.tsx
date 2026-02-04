@@ -16,8 +16,8 @@ export default function SuccessVideoSection() {
     const videoSrc = `https://www.youtube.com/embed/u7ReSqyFW3Y?autoplay=1&mute=${isMuted ? 1 : 0}&controls=0&loop=1&playlist=u7ReSqyFW3Y&modestbranding=1&rel=0`;
 
     return (
-        <div className="w-full bg-black py-12">
-            <FadeIn className="max-w-[calc(100%-40px)] md:max-w-6xl mx-auto relative overflow-hidden rounded-[2.5rem] shadow-[0_0_50px_rgba(234,179,8,0.2)] bg-neutral-900 border border-neutral-800">
+        <div className="w-full py-12">
+            <FadeIn className="max-w-[calc(100%-40px)] md:max-w-6xl mx-auto relative overflow-hidden rounded-[2.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.1)] border border-neutral-100">
                 <div className="aspect-video w-full relative">
 
                     {/* Video Player */}
