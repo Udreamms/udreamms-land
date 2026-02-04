@@ -7,7 +7,6 @@ import Footer from "@/components/landing/Footer";
 import HeroSection from "./_components/HeroSection";
 import ValuePropsSection from "./_components/ValuePropsSection";
 import StageDetails from "@/components/landing/StageDetails";
-import AppSection from "@/components/landing/AppSection";
 import WhyChooseUs from "./_components/WhyChooseUs";
 import SuccessStoriesSection from "./_components/SuccessStoriesSection";
 import YouTubeSocialSection from "./_components/YouTubeSocialSection";
@@ -65,8 +64,6 @@ function StudentVisaContent() {
       <StatsBar />
       <StudentRequirements />
       <StageDetails />
-      <AppSection />
-
       <WhyChooseUs />
       <SuccessStoriesSection />
       <YouTubeSocialSection />
