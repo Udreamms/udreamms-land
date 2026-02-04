@@ -9,28 +9,28 @@ import { Button } from "@/components/ui/button";
 const studentFeatures = [
   {
     id: "i20",
-    title: "Aplicación I-20",
-    description: "Gestión completa de tu proceso de admisión y obtención del formulario I-20 en las instituciones más prestigiosas.",
+    title: "Aplicación I-20 y Gestión de Visa",
+    description: "Gestionamos todo tu proceso migratorio para que obtengas tu visa F-1: preparación profesional de documentos, seguimiento personalizado y simulaciones de entrevista consular.",
     image: "/assets/generated/student_showcase_campus.png",
     video: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2FVideo%20completo.mov?alt=media&token=f11b4b46-3521-45e7-bbd0-46c18a10bcb8"
   },
   {
     id: "nivelacion",
-    title: "Nivelación Académica",
-    description: "Programas de inglés y preparación académica diseñados para garantizar tu éxito en el sistema universitario de EE. UU.",
+    title: "Programas de Inglés Intensivo y Académico",
+    description: "Acceso a instituciones reconocidas en Estados Unidos con programas de inglés ESL, TOEFL, inglés de negocios y preparación académica. Te ayudamos a elegir el programa que se adapte a tus objetivos educativos.",
     image: "https://images.unsplash.com/photo-1523050853063-bd388fef54ce?q=80&w=1000&auto=format&fit=crop",
   },
   {
-    id: "finanzas",
-    title: "Estrategia Financiera",
-    description: "Asesoría experta en la presentación de solvencia económica y búsqueda de becas para optimizar tu inversión educativa.",
-    image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=1000&auto=format&fit=crop",
+    id: "vida",
+    title: "Servicios de Vida Estudiantil en EE. UU.",
+    description: "Apoyo integral para tu experiencia en el extranjero: alojamiento seguro, transporte, apertura de cuentas bancarias y orientación cultural para estudiantes internacionales.",
+    image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000&auto=format&fit=crop",
   },
   {
-    id: "vida",
-    title: "Vida Estudiantil",
-    description: "Apoyo integral en alojamiento, seguros médicos y adaptación cultural para que disfrutes tu vida en el campus desde el primer día.",
-    image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000&auto=format&fit=crop",
+    id: "finanzas",
+    title: "Planificación Financiera y Estrategia de Estudio",
+    description: "Asesoría financiera para tu estancia estudiantil y planificación académica estratégica, incluyendo becas, costos de vida y gestión de pagos escolares.",
+    image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=1000&auto=format&fit=crop",
   },
 ];
 

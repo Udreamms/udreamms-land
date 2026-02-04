@@ -17,10 +17,8 @@ import CalculatorSection from "./_components/CalculatorSection";
 import PlansSection from "./_components/PlansSection";
 import EssentialPlanShowcase from "./_components/EssentialPlanShowcase";
 import ProPlanShowcase from "./_components/ProPlanShowcase";
-import ElitePlanShowcase from "./_components/ElitePlanShowcase";
 import AllInclusivePlanShowcase from "./_components/AllInclusivePlanShowcase";
 import StatsBar from "./_components/StatsBar";
-import EnglishSchoolsShowcase from "./_components/EnglishSchoolsShowcase";
 import StudentRequirements from "./_components/StudentRequirements";
 import { UpsellModal } from "./_components/UpsellModal";
 
@@ -63,10 +61,8 @@ function StudentVisaContent() {
       <ValuePropsSection />
       <EssentialPlanShowcase />
       <ProPlanShowcase />
-      <ElitePlanShowcase />
       <AllInclusivePlanShowcase />
       <StatsBar />
-      <EnglishSchoolsShowcase />
       <StudentRequirements />
       <StageDetails />
       <AppSection />
