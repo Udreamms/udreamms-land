@@ -35,50 +35,51 @@ export const LaneChecklist = ({
     dynamicItems = [],
     onToggle,
     onToggleDynamic,
-    progress
+    progress,
+    hideHeader = false
 }: {
     groupName?: string,
-    checklistStatus: Record<string, boolean>,
+    checklistStatus?: Record<string, boolean>,
     dynamicItems?: ChecklistItem[],
     onToggle: (item: string) => void,
     onToggleDynamic?: (item: ChecklistItem) => void,
-    progress: number
+    progress: number,
+    hideHeader?: boolean
 }) => {
     const staticChecklist = (groupName && COLUMN_CHECKLISTS[groupName]) ? COLUMN_CHECKLISTS[groupName] : COLUMN_CHECKLISTS['default'];
-
-    // Combine items for display if needed, but we handle them separately for cleaner logic
     const hasItems = staticChecklist.length > 0 || dynamicItems.length > 0;
 
     return (
-        <div className="p-8 bg-white/[0.02] rounded-[2.5rem] border border-white/5 shadow-inner">
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex flex-col">
-                    <h5 className="text-[10px] font-medium text-neutral-500 uppercase tracking-[0.2em] mb-1">
-                        Operative Checklist
-                    </h5>
-                    <p className="text-sm font-medium text-white uppercase tracking-tight">{groupName || 'General Flow'}</p>
-                </div>
-                <div className="text-right">
-                    <span className="text-2xl font-medium text-blue-500 tracking-tighter">{progress}%</span>
-                    <p className="text-[9px] font-medium text-neutral-500 uppercase tracking-widest mt-1">Efficiency</p>
-                </div>
-            </div>
+        <div className={cn(
+            !hideHeader && "p-8 bg-white/[0.02] rounded-[2.5rem] border border-white/5 shadow-inner"
+        )}>
+            {!hideHeader && (
+                <>
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="flex flex-col">
+                            <h5 className="text-[10px] font-medium text-neutral-500 uppercase tracking-[0.2em] mb-1">
+                                Operative Checklist
+                            </h5>
+                            <p className="text-sm font-medium text-white uppercase tracking-tight">{groupName || 'General Flow'}</p>
+                        </div>
+                        <div className="text-right">
+                            <span className="text-2xl font-medium text-blue-500 tracking-tighter">{progress}%</span>
+                            <p className="text-[9px] font-medium text-neutral-500 uppercase tracking-widest mt-1">Efficiency</p>
+                        </div>
+                    </div>
 
-            <div className="mb-8 relative h-1.5 bg-white/5 rounded-full overflow-hidden">
-                <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progress}%` }}
-                    className="absolute top-0 left-0 h-full bg-blue-600 shadow-[0_0_20px_rgba(37,99,235,0.4)]"
-                    transition={{ duration: 0.7, ease: "easeOut" }}
-                />
-            </div>
+                    <div className="mb-8 relative h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progress}%` }}
+                            className="absolute top-0 left-0 h-full bg-blue-600 shadow-[0_0_20px_rgba(37,99,235,0.4)]"
+                            transition={{ duration: 0.7, ease: "easeOut" }}
+                        />
+                    </div>
+                </>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {/* [MODIFIED] Static items removed by user request to keep checklists individual */}
-                {/* 
-                {staticChecklist.map((item, idx) => { ... })}
-                */}
-
                 {dynamicItems.map((item) => {
                     const isChecked = item.completed || false;
                     return (

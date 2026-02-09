@@ -16,39 +16,43 @@ interface SidebarProps {
     liveCardData: CardData | null;
     contactInfo: Partial<CardData>;
     handleInfoChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    handleInfoSave: () => Promise<void>;
+    handleInfoSave: () => Promise<any>;
     setContactInfo: React.Dispatch<React.SetStateAction<Partial<CardData>>>;
     currentGroupName: string;
-    toggleChecklistItem: (item: string) => Promise<void>;
-    handleToggleCheckIn: (checkIn: CheckIn) => Promise<void>;
+    toggleChecklistItem: (item: string) => Promise<any>;
+    handleToggleCheckIn: (checkIn: CheckIn) => Promise<any>;
     checklistProgress: number;
     isAddingPayment: boolean;
     setIsAddingPayment: (val: boolean) => void;
     newPayment: any;
     setNewPayment: any;
-    handleSavePaymentMethod: () => Promise<void>;
+    handleSavePaymentMethod: () => Promise<any>;
     isAddingCheckIn: boolean;
     setIsAddingCheckIn: (val: boolean) => void;
     newCheckIn: string;
     setNewCheckIn: (val: string) => void;
-    handleSaveCheckIn: () => Promise<void>;
+    handleSaveCheckIn: () => Promise<any>;
     editingCheckInId: string | null;
     setEditingCheckInId: (id: string | null) => void;
     editText: string;
     setEditText: (val: string) => void;
-    handleSaveEditedCheckIn: () => Promise<void>;
+    handleSaveEditedCheckIn: () => Promise<any>;
     handleEditCheckIn: (checkIn: CheckIn) => void;
-    handleDeleteCheckIn: (id: string) => Promise<void>;
+    handleDeleteCheckIn: (id: string) => Promise<any>;
     isAddingNote: boolean;
     setIsAddingNote: (val: boolean) => void;
     newNote: string;
     setNewNote: (val: string) => void;
-    handleSaveNote: () => Promise<void>;
+    handleSaveNote: () => Promise<any>;
     editingNoteId: string | null;
     setEditingNoteId: (id: string | null) => void;
     handleEditNote: (note: Note) => void;
-    handleDeleteNote: (id: string) => Promise<void>;
-    handleSaveEditedNote: () => Promise<void>;
+    handleDeleteNote: (id: string) => Promise<any>;
+    handleSaveEditedNote: () => Promise<any>;
+    newHistoryComment: string;
+    setNewHistoryComment: (val: string) => void;
+    handleSaveHistoryComment: () => Promise<any>;
+    crmId: string | null | undefined;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -91,7 +95,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setEditingNoteId,
     handleEditNote,
     handleDeleteNote,
-    handleSaveEditedNote
+    handleSaveEditedNote,
+    newHistoryComment,
+    setNewHistoryComment,
+    handleSaveHistoryComment,
+    crmId
 }) => {
     const renderSidebarContent = () => {
         switch (activeTab) {
@@ -109,6 +117,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         toggleChecklistItem={toggleChecklistItem}
                         handleToggleCheckIn={handleToggleCheckIn}
                         checklistProgress={checklistProgress}
+                        crmId={crmId}
                     />
                 );
             case 'pagos':
@@ -120,6 +129,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         newPayment={newPayment}
                         setNewPayment={setNewPayment}
                         handleSavePaymentMethod={handleSavePaymentMethod}
+                        serviceType={contactInfo.serviceType as string}
+                        setServiceType={(type) => setContactInfo(prev => ({ ...prev, serviceType: type }))}
+                        serviceDetails={contactInfo.serviceDetails as string}
+                        setServiceDetails={(val) => setContactInfo(prev => ({ ...prev, serviceDetails: val }))}
                     />
                 );
             case 'notas':
@@ -149,10 +162,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         handleEditNote={handleEditNote}
                         handleDeleteNote={handleDeleteNote}
                         handleSaveEditedNote={handleSaveEditedNote}
+                        checklistProgress={checklistProgress}
+                        currentGroupName={currentGroupName}
                     />
                 );
             case 'historial':
-                return <HistoryTab liveCardData={liveCardData} />;
+                return (
+                    <HistoryTab
+                        liveCardData={liveCardData}
+                        newHistoryComment={newHistoryComment}
+                        setNewHistoryComment={setNewHistoryComment}
+                        handleSaveHistoryComment={handleSaveHistoryComment}
+                    />
+                );
             default:
                 return null;
         }
@@ -161,11 +183,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex flex-col h-full w-full bg-neutral-900/40">
             {/* Header - Fixed */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-800 bg-black/20 flex-shrink-0">
-                <h2 className="font-medium text-sm text-neutral-300 uppercase tracking-wider">
-                    {activeTab === 'perfil' && 'Perfil'}
-                    {activeTab === 'pagos' && 'Pagos'}
-                    {activeTab === 'notas' && 'Notas'}
-                    {activeTab === 'historial' && 'Historial'}
+                <h2 className="font-bold text-xs text-neutral-400 uppercase tracking-[0.2em]">
+                    {activeTab === 'perfil' && 'PERFIL'}
+                    {activeTab === 'pagos' && 'PAGOS'}
+                    {activeTab === 'notas' && 'NOTAS'}
+                    {activeTab === 'historial' && 'HISTORIAL'}
                 </h2>
                 <button
                     onClick={() => setActiveTab(null)}

@@ -7,7 +7,7 @@ const admin = require("firebase-admin");
 const whatsappAPI_1 = require("../helpers/whatsappAPI");
 const db = admin.firestore();
 // Common function to log any outgoing message to the Firestore card
-async function logMessageInCard(groupId, cardId, text) {
+async function logMessageInCard(groupId, cardId, text, whatsappMessageId) {
     const cardRef = db.collection('kanban-groups').doc(groupId).collection('cards').doc(cardId);
     await cardRef.update({
         lastMessage: text.length > 40 ? text.substring(0, 37) + '...' : text,
@@ -16,11 +16,13 @@ async function logMessageInCard(groupId, cardId, text) {
             sender: 'agent', // Represents a human agent, not the bot
             text: text,
             timestamp: new Date(),
+            whatsappMessageId: whatsappMessageId || null,
         }),
     });
 }
 // Function to handle sending TEXT messages
 exports.sendWhatsappMessage = functions.https.onCall(async (data, context) => {
+    var _a, _b;
     if (!context.auth) {
         throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
     }
@@ -29,17 +31,19 @@ exports.sendWhatsappMessage = functions.https.onCall(async (data, context) => {
         throw new functions.https.HttpsError('invalid-argument', 'Missing required data for sending a text message.');
     }
     try {
-        await (0, whatsappAPI_1.sendMessage)(toNumber, message);
-        await logMessageInCard(groupId, cardId, message);
-        return { success: true };
+        const response = await (0, whatsappAPI_1.sendMessage)(toNumber, message);
+        const wa_id = (_b = (_a = response === null || response === void 0 ? void 0 : response.messages) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.id;
+        await logMessageInCard(groupId, cardId, message, wa_id);
+        return { success: true, messageId: wa_id };
     }
     catch (error) {
-        functions.logger.error(`Error in sendWhatsappMessage for card ${cardId}:`, error);
-        throw error; // Re-throw the error to be caught by the client
+        functions.logger.error(`Error in sendWhatsappMessage for card ${cardId}:`, error.message);
+        throw new functions.https.HttpsError('internal', error.message);
     }
 });
 // Function to handle sending MEDIA messages (images, documents, etc.)
 exports.sendWhatsappMediaMessage = functions.https.onCall(async (data, context) => {
+    var _a, _b;
     if (!context.auth) {
         throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
     }
@@ -48,14 +52,15 @@ exports.sendWhatsappMediaMessage = functions.https.onCall(async (data, context) 
         throw new functions.https.HttpsError('invalid-argument', 'Missing required data for sending a media message.');
     }
     try {
-        await (0, whatsappAPI_1.sendMediaMessage)(toNumber, fileUrl, fileName);
+        const response = await (0, whatsappAPI_1.sendMediaMessage)(toNumber, fileUrl, fileName);
+        const wa_id = (_b = (_a = response === null || response === void 0 ? void 0 : response.messages) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.id;
         const logText = `Archivo enviado: ${fileName}`;
-        await logMessageInCard(groupId, cardId, logText);
-        return { success: true };
+        await logMessageInCard(groupId, cardId, logText, wa_id);
+        return { success: true, messageId: wa_id };
     }
     catch (error) {
-        functions.logger.error(`Error in sendWhatsappMediaMessage for card ${cardId}:`, error);
-        throw error; // Re-throw the error to be caught by the client
+        functions.logger.error(`Error in sendWhatsappMediaMessage for card ${cardId}:`, error.message);
+        throw new functions.https.HttpsError('internal', error.message);
     }
 });
 //# sourceMappingURL=whatsapp.js.map

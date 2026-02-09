@@ -12,13 +12,16 @@ import { TabEmployment } from './tabs/TabEmployment';
 import { TabEducation } from './tabs/TabEducation';
 import { TabBackground } from './tabs/TabBackground';
 import { TabFiles } from './tabs/TabFiles';
+import { TabDynamicOther } from './tabs/TabDynamicOther';
+import { HelpCircle } from 'lucide-react';
 
 interface ContactFormProps {
     contact: any;
     onChange: (updates: any) => void;
+    isEditing?: boolean;
 }
 
-export const EnhancedContactForm: React.FC<ContactFormProps> = ({ contact, onChange }) => {
+export const EnhancedContactForm: React.FC<ContactFormProps> = ({ contact, onChange, isEditing = false }) => {
     const updateField = (field: string, value: any) => {
         onChange({ ...contact, [field]: value });
     };
@@ -59,18 +62,29 @@ export const EnhancedContactForm: React.FC<ContactFormProps> = ({ contact, onCha
                         <FolderOpen className="w-3.5 h-3.5 mr-2" />
                         Archivos
                     </TabsTrigger>
+                    {contact.extraData && Object.keys(contact.extraData).length > 0 && (
+                        <TabsTrigger value="others" className="data-[state=active]:bg-amber-600 rounded-lg px-4 py-2 text-xs">
+                            <HelpCircle className="w-3.5 h-3.5 mr-2" />
+                            Otros
+                        </TabsTrigger>
+                    )}
                 </TabsList>
             </div>
 
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                <TabsContent value="student" className="mt-0"><TabStudentInfo contact={contact} updateField={updateField} /></TabsContent>
-                <TabsContent value="passport" className="mt-0"><TabPassport contact={contact} updateField={updateField} /></TabsContent>
-                <TabsContent value="address" className="mt-0"><TabAddress contact={contact} updateField={updateField} /></TabsContent>
-                <TabsContent value="family" className="mt-0"><TabFamily contact={contact} updateField={updateField} /></TabsContent>
-                <TabsContent value="employment" className="mt-0"><TabEmployment contact={contact} updateField={updateField} /></TabsContent>
-                <TabsContent value="education" className="mt-0"><TabEducation contact={contact} updateField={updateField} /></TabsContent>
-                <TabsContent value="background" className="mt-0"><TabBackground contact={contact} updateField={updateField} /></TabsContent>
-                <TabsContent value="files" className="mt-0"><TabFiles contact={contact} updateField={updateField} /></TabsContent>
+                <TabsContent value="student" className="mt-0"><TabStudentInfo contact={contact} updateField={updateField} isEditing={isEditing} /></TabsContent>
+                <TabsContent value="passport" className="mt-0"><TabPassport contact={contact} updateField={updateField} isEditing={isEditing} /></TabsContent>
+                <TabsContent value="address" className="mt-0"><TabAddress contact={contact} updateField={updateField} isEditing={isEditing} /></TabsContent>
+                <TabsContent value="family" className="mt-0"><TabFamily contact={contact} updateField={updateField} isEditing={isEditing} /></TabsContent>
+                <TabsContent value="employment" className="mt-0"><TabEmployment contact={contact} updateField={updateField} isEditing={isEditing} /></TabsContent>
+                <TabsContent value="education" className="mt-0"><TabEducation contact={contact} updateField={updateField} isEditing={isEditing} /></TabsContent>
+                <TabsContent value="background" className="mt-0"><TabBackground contact={contact} updateField={updateField} isEditing={isEditing} /></TabsContent>
+                <TabsContent value="files" className="mt-0"><TabFiles contact={contact} updateField={updateField} isEditing={isEditing} /></TabsContent>
+                {contact.extraData && Object.keys(contact.extraData).length > 0 && (
+                    <TabsContent value="others" className="mt-0">
+                        <TabDynamicOther contact={contact} updateField={updateField} isEditing={isEditing} />
+                    </TabsContent>
+                )}
             </div>
         </Tabs>
     );

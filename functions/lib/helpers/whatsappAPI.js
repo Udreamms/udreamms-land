@@ -10,30 +10,35 @@ exports.sendLocationMessage = sendLocationMessage;
 const functions = require("firebase-functions");
 const axios_1 = require("axios");
 const whatsappConfig = functions.config().whatsapp;
-const accessToken = whatsappConfig === null || whatsappConfig === void 0 ? void 0 : whatsappConfig.access_token;
-const phoneNumberId = whatsappConfig === null || whatsappConfig === void 0 ? void 0 : whatsappConfig.phone_number_id;
+// Updated with user provided keys as primary or fallback
+const accessToken = (whatsappConfig === null || whatsappConfig === void 0 ? void 0 : whatsappConfig.access_token) || 'EAARnTi3ZAPNYBQFC70F28fb9MispCQZAVtfnHhmPsdZBNqyWQZBcA3bE7pU4430ZBzDJxEoHZAbmUD2EWOxZBS9aRirmHvM5luC6U03sIz752oracncCSZCb9WPOtaLaIcAiXkytFuFPF5AuJrmoLvB6leQ09wyOWNfS217JjNZAvjYYxjfEZCtvfxyZChGBkWzZBQZDZD';
+const phoneNumberId = (whatsappConfig === null || whatsappConfig === void 0 ? void 0 : whatsappConfig.phone_number_id) || '676837795516836';
 const WHATSAPP_API_URL = `https://graph.facebook.com/v19.0/${phoneNumberId}/messages`;
+function cleanNumber(phone) {
+    return phone.replace(/\D/g, ''); // Solo números, quita el '+'
+}
 async function makeWhatsAppRequest(data, type) {
     var _a;
     if (!accessToken || !phoneNumberId) {
         functions.logger.error('Missing WhatsApp API credentials.');
-        // No lanzamos error para no detener el flujo si faltan credenciales en dev
-        return;
+        throw new Error('WhatsApp API credentials are not configured.');
     }
     try {
-        await axios_1.default.post(WHATSAPP_API_URL, data, {
+        const response = await axios_1.default.post(WHATSAPP_API_URL, data, {
             headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
         });
-        // functions.logger.info(`WhatsApp API Response (${type}): OK`);
+        return response.data;
     }
     catch (error) {
-        functions.logger.error(`WhatsApp API Error (${type}):`, ((_a = error.response) === null || _a === void 0 ? void 0 : _a.data) || error.message);
+        const errorData = ((_a = error.response) === null || _a === void 0 ? void 0 : _a.data) || error.message;
+        functions.logger.error(`WhatsApp API Error (${type}):`, errorData);
+        throw new Error(`WhatsApp API Error: ${JSON.stringify(errorData)}`);
     }
 }
 async function markAsRead(messageId) {
     if (!messageId)
         return;
-    await makeWhatsAppRequest({
+    return await makeWhatsAppRequest({
         messaging_product: 'whatsapp',
         status: 'read',
         message_id: messageId
@@ -42,7 +47,8 @@ async function markAsRead(messageId) {
 async function sendMessage(to, message) {
     if (!message)
         return;
-    await makeWhatsAppRequest({ messaging_product: 'whatsapp', to, text: { body: message } }, 'Text');
+    const cleanTo = cleanNumber(to);
+    return await makeWhatsAppRequest({ messaging_product: 'whatsapp', to: cleanTo, text: { body: message } }, 'Text');
 }
 async function sendMediaMessage(to, fileUrl, caption = '', fileName = 'file') {
     const mediaType = getMediaType(fileUrl, fileName);
@@ -50,8 +56,9 @@ async function sendMediaMessage(to, fileUrl, caption = '', fileName = 'file') {
         functions.logger.warn(`Unsupported media: ${fileName}`);
         return;
     }
-    await makeWhatsAppRequest({
-        messaging_product: 'whatsapp', to, type: mediaType,
+    const cleanTo = cleanNumber(to);
+    return await makeWhatsAppRequest({
+        messaging_product: 'whatsapp', to: cleanTo, type: mediaType,
         [mediaType]: { link: fileUrl, caption: caption }
     }, 'Media');
 }
@@ -68,7 +75,7 @@ async function sendButtonMessage(to, bodyText, buttons) {
         return;
     const payload = {
         messaging_product: 'whatsapp',
-        to,
+        to: cleanNumber(to),
         type: 'interactive',
         interactive: {
             type: 'button',
@@ -105,7 +112,7 @@ async function sendListMessage(to, bodyText, buttonText, sections) {
     let validBtnText = (buttonText || "Ver Opciones").substring(0, 20);
     const payload = {
         messaging_product: 'whatsapp',
-        to,
+        to: cleanNumber(to),
         type: 'interactive',
         interactive: {
             type: 'list',
@@ -117,7 +124,7 @@ async function sendListMessage(to, bodyText, buttonText, sections) {
 }
 async function sendLocationMessage(to, lat, long, name, address) {
     await makeWhatsAppRequest({
-        messaging_product: 'whatsapp', to, type: 'location',
+        messaging_product: 'whatsapp', to: cleanNumber(to), type: 'location',
         location: { latitude: lat, longitude: long, name: name, address: address }
     }, 'Location');
 }

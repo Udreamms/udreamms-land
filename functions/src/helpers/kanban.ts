@@ -6,35 +6,57 @@ import * as functions from 'firebase-functions';
 const db = admin.firestore();
 
 export async function handleKanbanUpdate(from: string, contactName: string, body: string, source: string = 'whatsapp'): Promise<any> {
-    // Usamos runTransaction para evitar condiciones de carrera (tarjetas duplicadas)
-    return db.runTransaction(async (transaction) => {
-        // 1. Buscamos si ya existe una tarjeta con este número (LECTURA)
-        const cardsRef = db.collectionGroup('cards').where('contactNumber', '==', from);
-        const existingCardSnapshot = await transaction.get(cardsRef);
+    // 1. Buscamos si ya existe una tarjeta con este número (FUERA de la transacción)
+    // Firestore no permite collectionGroup dentro de runTransaction
+    let cardsRef = db.collectionGroup('cards').where('contactNumber', '==', from);
+    let existingCardSnapshot = await cardsRef.get();
 
+    if (existingCardSnapshot.empty) {
+        const alternativeFrom = from.startsWith('+') ? from.substring(1) : `+${from}`;
+        const altCardsRef = db.collectionGroup('cards').where('contactNumber', '==', alternativeFrom);
+        existingCardSnapshot = await altCardsRef.get();
+    }
+
+    // NEW: Robust Check using 'contactNumberClean' (for formatted numbers like +593 99...)
+    if (existingCardSnapshot.empty) {
+        // from is usually digits only (e.g. 59399...)
+        const cleanRef = db.collectionGroup('cards').where('contactNumberClean', '==', from);
+        existingCardSnapshot = await cleanRef.get();
+    }
+
+    // Devolvemos el resultado de la transacción
+    return db.runTransaction(async (transaction) => {
         if (!existingCardSnapshot.empty) {
             // --- CASO 1: LA TARJETA YA EXISTE ---
-            functions.logger.info(`[Transaction] Existing card found for ${from}. Updating it.`);
-
             const cardDoc = existingCardSnapshot.docs[0];
             const cardRef = cardDoc.ref;
 
+            // Re-leemos el documento dentro de la transacción para consistencia
+            const freshSnap = await transaction.get(cardRef);
+            if (!freshSnap.exists) return null; // Por si se borró en el milisegundo intermedio
+
+            functions.logger.info(`[Transaction] Updating existing card for ${from}.`);
+
             const updateData = {
                 lastMessage: body,
-                source: source, // Actualizamos el origen por si cambia (ej: de WhatsApp a Web)
+                source: source,
                 updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                contactNumberClean: from, // Self-healing: Ensure clean number is stored
                 messages: admin.firestore.FieldValue.arrayUnion({
                     sender: 'user', text: body, timestamp: new Date(),
                 }),
             };
 
-            // Ejecutamos la actualización dentro de la transacción
             transaction.update(cardRef, updateData);
 
-            // Devolvemos los datos simulados
-            const currentData = cardDoc.data();
+            const currentData = freshSnap.data() || {};
+            const parentGroup = cardRef.parent.parent;
+            const groupId = parentGroup ? parentGroup.id : null;
+
             return {
                 ...currentData,
+                id: freshSnap.id,
+                groupId: groupId,
                 lastMessage: body,
                 source: source,
                 isNew: false
@@ -42,9 +64,8 @@ export async function handleKanbanUpdate(from: string, contactName: string, body
 
         } else {
             // --- CASO 2: CREAR NUEVA TARJETA ---
-            functions.logger.info(`[Transaction] No existing card for ${from}. Creating a new one from source: ${source}`);
+            functions.logger.info(`[Transaction] Creating new card for ${from}.`);
 
-            // Necesitamos encontrar el grupo "Bandeja de Entrada".
             const groupsRef = db.collection('kanban-groups');
             const inboxGroupQuery = groupsRef.where('name', '==', 'Bandeja de Entrada').limit(1);
             const inboxGroupSnapshot = await transaction.get(inboxGroupQuery);
@@ -53,25 +74,19 @@ export async function handleKanbanUpdate(from: string, contactName: string, body
             if (!inboxGroupSnapshot.empty) {
                 groupId = inboxGroupSnapshot.docs[0].id;
             } else {
-                functions.logger.warn('"Bandeja de Entrada" group not found. Using the first available group.');
                 const anyGroupQuery = groupsRef.orderBy('order').limit(1);
                 const anyGroupSnapshot = await transaction.get(anyGroupQuery);
-
-                if (anyGroupSnapshot.empty) {
-                    functions.logger.error("No groups found in Firestore at all.");
-                    throw new Error('No groups found in Firestore.');
-                }
+                if (anyGroupSnapshot.empty) throw new Error('No groups found.');
                 groupId = anyGroupSnapshot.docs[0].id;
             }
 
-            // Crear la referencia del nuevo documento (auto-ID)
             const newCardRef = db.collection('kanban-groups').doc(groupId).collection('cards').doc();
-
             const newCardData = {
                 contactName,
                 contactNumber: from,
+                contactNumberClean: from, // Store clean number for future matches
                 lastMessage: body,
-                source: source, // Guardamos el origen (whatsapp, facebook, form, etc.)
+                source: source,
                 groupId: groupId,
                 createdAt: admin.firestore.FieldValue.serverTimestamp(),
                 updatedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -79,15 +94,12 @@ export async function handleKanbanUpdate(from: string, contactName: string, body
                     sender: 'user',
                     text: body,
                     timestamp: new Date(),
-                    // We can add a type field here later if we pass it from the webhook
                     type: body.startsWith('[') && body.endsWith(']') ? 'system' : 'text'
                 }],
             };
 
-            // Ejecutamos la creación (SET) dentro de la transacción
             transaction.set(newCardRef, newCardData);
 
-            // Devolvemos los datos de la nueva tarjeta
             return {
                 ...newCardData,
                 id: newCardRef.id,

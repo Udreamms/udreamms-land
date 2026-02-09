@@ -63,6 +63,14 @@ export interface AttachedDocument {
     uploadedAt: Timestamp;
 }
 
+export interface HistoryEvent {
+    id: string;
+    type: 'message' | 'edit' | 'status' | 'comment' | 'file' | 'system';
+    content: string;
+    timestamp: Timestamp;
+    author?: string;
+}
+
 export interface CardData {
     id: string;
     groupId: string;
@@ -79,52 +87,88 @@ export interface CardData {
     paymentStatus?: string;
     checklistStatus?: { [key: string]: boolean };
     city?: string;
+    state?: string;
+    country?: string;
     postalCode?: string;
-    birthDate?: Timestamp;
+    birthDate?: any; // Can be Timestamp or string
+    birthPlace?: string;
+    birthCity?: string;
+    birthState?: string;
+    birthCountry?: string;
+    nationalId?: string;
+    maritalStatus?: 'single' | 'married' | 'divorced' | 'widowed';
+    spouseCity?: string;
+    spouseState?: string;
+    spouseCountry?: string;
+    usAddress?: string;
+    hasOtherNationality?: 'yes' | 'no';
+    otherNationalityCountry?: string;
+    isPermanentResidentOther?: 'yes' | 'no';
+    permanentResidentCountry?: string;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+
+    // Travel & Visa
     clientType?: 'persona' | 'empresa' | 'estudiante';
     gender?: 'man' | 'woman' | 'other';
     passport?: string;
     passportNumber?: string;
     passportCountry?: string;
-    passportIssueDate?: Timestamp;
-    passportExpiryDate?: Timestamp;
-    passportPlaceOfBirth?: string;
+    passportCity?: string;
+    passportState?: string;
+    passportIssuedDate?: any; // Renamed from issueDate
+    passportExpiryDate?: any;
+    passportLost?: 'yes' | 'no';
+    hasTouristVisa?: 'yes' | 'no';
+    visaIssuedDate?: any;
+    visaExpiryDate?: any;
+
+    // Family
+    spouseName?: string;
+    spouseBirthDate?: any;
+    marriageDate?: any;
+    fatherName?: string;
+    fatherBirthDate?: any;
+    motherName?: string;
+    motherBirthDate?: any;
+
+    // Education
+    schoolName?: string;
+    schoolProgram?: string;
+    universityName?: string;
+    universityProgram?: string;
+
+    // Employment
+    occupation?: string;
+    currentEmployer?: string;
+    monthlySalary?: string;
+    jobStartDate?: any;
+    jobDescription?: string;
+
+    // Background
+    studyReason?: string;
+    languages?: string;
+    visaRefusal?: 'yes' | 'no';
+    militaryService?: 'yes' | 'no';
+
+    // Identity & More
     nationality?: string;
     primaryLanguage?: string;
     additionalLanguages?: string[];
     emergencyContactName?: string;
     emergencyContactPhone?: string;
     emergencyContactRelationship?: string;
-    seatPreference?: string;
-    mealPreference?: string;
-    specialAssistance?: string;
-    frequentFlyerPrograms?: any[];
-    visaRequired?: boolean;
-    visaStatus?: string;
-    visaNumber?: string;
-    visaExpiryDate?: Timestamp;
-    visaCountry?: string;
-    travelInsurance?: boolean;
-    insuranceProvider?: string;
-    insurancePolicyNumber?: string;
-    insuranceCoverage?: number;
-    insuranceExpiryDate?: Timestamp;
-    travelingWith?: string;
-    numberOfTravelers?: number;
-    companions?: any[];
+
+    // Preferences & Health
     allergies?: string;
     medicalConditions?: string;
-    medications?: string;
-    budgetRange?: string;
-    preferredPaymentMethod?: string;
-    requiresFinancing?: boolean;
     interests?: string;
     profession?: string;
-    occupation?: string;
+
+    // Service
     serviceDetails?: string;
     serviceType?: string;
-    serviceStartDate?: Timestamp;
-    serviceDeliveryDate?: Timestamp;
     backupLink?: string;
     contractLink?: string;
     invoiceLink?: string;
@@ -134,6 +178,11 @@ export interface CardData {
     paymentMethods?: PaymentMethod[];
     transactions?: Transaction[];
     subscriptions?: Subscription[];
+    history?: HistoryEvent[];
+    visaType?: string;
+    hasPassport?: 'yes' | 'no';
+    channel?: string;
+    mutedUntil?: Timestamp | null;
 }
 
 export interface ConversationModalProps {

@@ -10,9 +10,10 @@ import { toast } from 'sonner';
 interface TabFilesProps {
     contact: any;
     updateField: (field: string, value: any) => void;
+    isEditing?: boolean;
 }
 
-export const TabFiles: React.FC<TabFilesProps> = ({ contact, updateField }) => {
+export const TabFiles: React.FC<TabFilesProps> = ({ contact, updateField, isEditing = false }) => {
     const [uploading, setUploading] = useState(false);
 
     // Documents structure: contact.documents = [{ name: 'ID Front', url: '...', type: 'image/jpeg', path: '...' }]
@@ -81,7 +82,7 @@ export const TabFiles: React.FC<TabFilesProps> = ({ contact, updateField }) => {
     };
 
     return (
-        <div className="space-y-6">
+        <fieldset disabled={!isEditing} className="space-y-6 block border-0 p-0 m-0 min-w-0">
             <Card className="bg-neutral-900 border-neutral-800">
                 <CardHeader>
                     <CardTitle className="text-sm font-medium text-white uppercase tracking-wider">Foto ID (Tipo Pasaporte 5x5)</CardTitle>
@@ -155,7 +156,7 @@ export const TabFiles: React.FC<TabFilesProps> = ({ contact, updateField }) => {
                     </div>
                 </CardContent>
             </Card>
-        </div>
+        </fieldset>
     );
 };
 

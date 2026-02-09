@@ -1,111 +1,114 @@
-
 // src/webhooks/whatsapp.ts
 import * as functions from 'firebase-functions';
-import { handleKanbanUpdate, updateReadStatus } from '../helpers/kanban'; // Importar nueva función
+import { handleKanbanUpdate, updateReadStatus } from '../helpers/kanban';
 import { getActiveBot, executeBotFlow } from '../helpers/botEngine';
 
 const TWENTY_FOUR_HOURS_IN_MS = 24 * 60 * 60 * 1000;
 
-export const whatsappWebhook = functions.https.onRequest(async (req, res) => {
-    res.status(200).send('EVENT_RECEIVED');
+export const whatsappWebhook = functions.https.onRequest(async (req: functions.https.Request, res: functions.Response) => {
+    // --- VERIFICACIÓN DE WEBHOOK (GET) ---
+    if (req.method === 'GET') {
+        const mode = req.query['hub.mode'];
+        const token = req.query['hub.verify_token'];
+        const challenge = req.query['hub.challenge'];
 
-    const { entry } = req.body;
+        // Puedes cambiar 'royalty_token_2026' por el que tengas configurado en Meta
+        const VERIFY_TOKEN = functions.config().whatsapp?.verify_token || 'royalty_token_2026';
 
-    // Validar POST
-    if (req.method !== 'POST') return;
-
-    const change = entry?.[0]?.changes?.[0]?.value;
-    if (!change) return;
-
-    // --- CASO 1: MANEJO DE ESTADOS (READ, DELIVERED, SENT) ---
-    if (change.statuses && change.statuses.length > 0) {
-        const statusUpdate = change.statuses[0];
-        // Solo nos importa si el usuario LEYÓ el mensaje
-        if (statusUpdate.status === 'read') {
-            const recipientId = statusUpdate.recipient_id;
-            // Actualizamos la tarjeta con "Visto por última vez: Ahora"
-            await updateReadStatus(recipientId);
+        if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+            functions.logger.info('Webhook Verified Successfully (GET)');
+            res.status(200).send(challenge);
+            return;
+        } else {
+            functions.logger.warn('Webhook Verification Failed (GET)');
+            res.sendStatus(403);
+            return;
         }
-        return; // Terminamos aquí si es solo un estado
     }
 
-    // --- CASO 2: MANEJO DE MENSAJES ENTRANTES ---
-    const message = change.messages?.[0];
-    if (!message) return;
+    // --- RECEPCIÓN DE EVENTOS (POST) ---
+    if (req.method === 'POST') {
+        // Responder rápido a Meta para evitar reintentos
+        res.status(200).send('EVENT_RECEIVED');
 
-    const contact = change.contacts?.[0];
-    const from = message.from;
-    const contactName = contact?.profile?.name || 'Usuario';
+        const { entry } = req.body;
+        const change = entry?.[0]?.changes?.[0]?.value;
+        if (!change) return;
 
-    // EXTRACCIÓN ROBUSTA DEL MENSAJE (Texto, Botón, Lista)
-    let body = '';
-
-    if (message.type === 'text') {
-        body = message.text.body;
-    } else if (message.type === 'interactive') {
-        const interactive = message.interactive;
-        if (interactive.type === 'button_reply') {
-            body = interactive.button_reply.id || interactive.button_reply.title;
-        } else if (interactive.type === 'list_reply') {
-            body = interactive.list_reply.id || interactive.list_reply.title;
-        }
-    } else if (['image', 'video', 'audio', 'voice', 'document', 'sticker'].includes(message.type)) {
-        // Handle Media Message
-        // We will store a placeholder text like "[Imagen]" and pass metadata
-        body = `[${message.type.toUpperCase()}]`;
-
-        // Extract media ID and MIME type if available
-        const mediaObj = message[message.type];
-        if (mediaObj) {
-            // We can pass this extra data to handleKanbanUpdate if we modify it, 
-            // or just let the body serve as notification. 
-            // For now, let's treat it as text so it at least appears.
-            // Ideally, we should fetch the media URL using the ID, but that requires another API call.
-            // The system seems to rely on the body string.
-            if (mediaObj.caption) {
-                body += ` ${mediaObj.caption}`;
+        // --- CASO 1: MANEJO DE ESTADOS (READ, DELIVERED, SENT) ---
+        if (change.statuses && change.statuses.length > 0) {
+            const statusUpdate = change.statuses[0];
+            if (statusUpdate.status === 'read') {
+                const recipientId = statusUpdate.recipient_id;
+                functions.logger.info(`[Status Update] Message read by ${recipientId}`);
+                await updateReadStatus(recipientId);
             }
+            return;
         }
-    } else {
-        functions.logger.info(`Received non-text message type: ${message.type}`);
-        // Fallback for unknown types to prevent silence
-        body = `[Mensaje tipo: ${message.type}]`;
-    }
 
-    functions.logger.info(`📩 Webhook Received from ${from}: "${body}" (Type: ${message.type})`);
+        // --- CASO 2: MANEJO DE MENSAJES ENTRANTES ---
+        const message = change.messages?.[0];
+        if (!message) return;
 
-    try {
-        // 1. Gestionar Tarjeta en Kanban
-        const cardData = await handleKanbanUpdate(from, contactName, body, 'whatsapp');
-        if (!cardData) return;
+        const contact = change.contacts?.[0];
+        const from = message.from; // Formato: 593963142795
+        const contactName = contact?.profile?.name || 'Usuario';
 
-        // 2. Ejecutar Bot
-        const activeBot = await getActiveBot();
-        if (activeBot) {
-            const now = new Date();
-            let shouldRestart = false;
+        // EXTRACCIÓN DEL MENSAJE
+        let body = '';
+        if (message.type === 'text') {
+            body = message.text.body;
+        } else if (message.type === 'interactive') {
+            const interactive = message.interactive;
+            body = interactive.button_reply?.title || interactive.list_reply?.title || '[Interacción]';
+        } else if (['image', 'video', 'audio', 'voice', 'document', 'sticker'].includes(message.type)) {
+            body = `[${message.type.toUpperCase()}]${message[message.type]?.caption ? ' ' + message[message.type].caption : ''}`;
+        } else {
+            body = `[Mensaje tipo: ${message.type}]`;
+        }
 
-            if (cardData.isNew) {
-                shouldRestart = true;
-            } else if (cardData.botState?.lastInteraction) {
-                const lastInteraction = cardData.botState.lastInteraction.toDate ? cardData.botState.lastInteraction.toDate() : new Date(0);
-                const timeDiff = now.getTime() - lastInteraction.getTime();
-                if (timeDiff > TWENTY_FOUR_HOURS_IN_MS) {
+        functions.logger.info(`📩 Webhook Received from ${from} (Card match attempt): "${body}"`);
+
+        try {
+            // 1. Gestionar Tarjeta en Kanban
+            const cardData = await handleKanbanUpdate(from, contactName, body, 'whatsapp');
+
+            if (!cardData) {
+                functions.logger.warn(`[Kanban Sync] Could not find or create card for ${from}`);
+                return;
+            }
+
+            functions.logger.info(`[Kanban Sync] Card ${cardData.isNew ? 'CREATED' : 'UPDATED'} for ${from}`);
+
+            // 2. Ejecutar Bot (Opcional)
+            const activeBot = await getActiveBot();
+            if (activeBot) {
+                // Lógica de reinicio de bot tras 24h
+                const now = new Date();
+                let shouldRestart = false;
+
+                if (cardData.isNew) {
+                    shouldRestart = true;
+                } else if (cardData.botState?.lastInteraction) {
+                    const lastInteraction = cardData.botState.lastInteraction.toDate
+                        ? cardData.botState.lastInteraction.toDate()
+                        : new Date(0);
+                    if ((now.getTime() - lastInteraction.getTime()) > TWENTY_FOUR_HOURS_IN_MS) {
+                        shouldRestart = true;
+                    }
+                } else if (!cardData.botState) {
                     shouldRestart = true;
                 }
-            } else {
-                if (!cardData.botState) shouldRestart = true;
-            }
 
-            if (shouldRestart) {
-                functions.logger.info(`Starting/Restarting bot flow for ${from}.`);
-                delete cardData.botState;
-                await executeBotFlow(activeBot, from, cardData, body);
-            } else if (cardData.botState?.status === 'active') {
-                await executeBotFlow(activeBot, from, cardData, body);
+                if (shouldRestart || cardData.botState?.status === 'active') {
+                    if (shouldRestart) delete cardData.botState;
+                    await executeBotFlow(activeBot, from, cardData, body);
+                }
             }
+        } catch (error) {
+            functions.logger.error('Error in whatsappWebhook processing:', error);
         }
-    } catch (error) {
-        functions.logger.error('Error in whatsappWebhook:', error);
+    } else {
+        res.sendStatus(405); // Method Not Allowed
     }
 });

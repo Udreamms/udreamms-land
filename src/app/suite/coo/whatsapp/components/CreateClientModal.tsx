@@ -17,8 +17,9 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, collectionGroup, where, getDocs, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { toast } from 'sonner';
+import { normalizePhoneNumber } from '@/lib/phoneUtils';
 
 interface GroupData {
     id: string;
@@ -29,12 +30,22 @@ interface CreateClientModalProps {
     isOpen: boolean;
     onClose: () => void;
     groups: GroupData[];
+    initialGroupId?: string;
 }
 
-export function CreateClientModal({ isOpen, onClose, groups }: CreateClientModalProps) {
+import { ALL_COUNTRY_CODES } from '@/lib/countryCodes';
+
+export function CreateClientModal({ isOpen, onClose, groups, initialGroupId }: CreateClientModalProps) {
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
-    const [selectedGroupId, setSelectedGroupId] = useState<string>(groups[0]?.id || '');
+    const [countryCode, setCountryCode] = useState('+593');
+    const [selectedGroupId, setSelectedGroupId] = useState<string>(initialGroupId || groups[0]?.id || '');
+
+    React.useEffect(() => {
+        if (initialGroupId) {
+            setSelectedGroupId(initialGroupId);
+        }
+    }, [initialGroupId]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -44,24 +55,55 @@ export function CreateClientModal({ isOpen, onClose, groups }: CreateClientModal
             return;
         }
 
-        if (!selectedGroupId) {
-            // Fallback if no group selected, try to select first one again
-            if (groups.length > 0) setSelectedGroupId(groups[0].id);
-            else {
-                toast.error("No hay grupos/columnas disponibles para agregar el cliente.");
-                return;
-            }
+        const fullPhone = normalizePhoneNumber(`${countryCode}${phone}`);
+        if (!fullPhone) {
+            toast.error("Número de teléfono inválido");
+            return;
         }
 
-        const groupIdToUse = selectedGroupId || groups[0]?.id;
-
         try {
+            // --- PREVENT DUPLICATES ---
+            const querySnapshot = await getDocs(collection(db, 'contacts'));
+            const existingContact = querySnapshot.docs.find(doc => {
+                const num = (doc.data().phone || '').replace(/\D/g, '');
+                return num === fullPhone.replace(/\D/g, '');
+            });
+
+            if (existingContact) {
+                toast.error(`Ya existe un contacto para este número: ${fullPhone}`);
+                return;
+            }
+
+            const groupIdToUse = selectedGroupId || groups[0]?.id;
+
+            // 1. Create CRM Contact first (let Firestore generate the ID)
+            const contactRef = await addDoc(collection(db, 'contacts'), {
+                name: name,
+                phone: fullPhone,
+                source: 'Manual (Kanban)',
+                stage: groups.find(g => g.id === groupIdToUse)?.name || 'N/A',
+                createdAt: serverTimestamp(),
+                lastUpdated: serverTimestamp()
+            });
+
+            // Get the auto-generated Firestore ID
+            const contactId = contactRef.id;
+
+            // Derive clientId from Firestore ID (same as CRM does)
+            const derivedClientId = `RY${contactId.substring(0, 5).toUpperCase()}`;
+
+            // Update the contact with the clientId
+            await updateDoc(contactRef, {
+                clientId: derivedClientId
+            });
+
+            // 2. Create Kanban Card linked by ID
             await addDoc(collection(db, 'kanban-groups', groupIdToUse, 'cards'), {
                 contactName: name,
-                contactNumber: phone,
+                contactNumber: fullPhone,
+                contactId: contactId, // LINK BY FIRESTORE ID
                 createdAt: serverTimestamp(),
-                groupId: groupIdToUse, // Redundant but useful for flattened queries
-                // Initialize empty/default fields
+                groupId: groupIdToUse,
                 email: '',
                 description: '',
                 checkIns: [],
@@ -80,47 +122,67 @@ export function CreateClientModal({ isOpen, onClose, groups }: CreateClientModal
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-[425px] bg-neutral-900 border-neutral-800 text-white">
+            <DialogContent className="sm:max-w-[425px] bg-neutral-900 border-neutral-800 text-white rounded-2xl">
                 <DialogHeader>
-                    <DialogTitle>Crear Nuevo Cliente</DialogTitle>
+                    <DialogTitle className="text-xl font-medium uppercase tracking-tight">Crear Nuevo Cliente</DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="name" className="text-right text-neutral-400">
-                            Nombre
+                <form onSubmit={handleSubmit} className="grid gap-6 py-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="name" className="text-[10px] font-medium uppercase tracking-widest text-neutral-500">
+                            Nombre Completo
                         </Label>
                         <Input
                             id="name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="col-span-3 bg-neutral-800 border-neutral-700 text-white"
+                            className="bg-neutral-800 border-neutral-700 text-white h-11 rounded-xl"
                             placeholder="Ej. Juan Pérez"
                         />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="phone" className="text-right text-neutral-400">
-                            Teléfono
+
+                    <div className="space-y-2">
+                        <Label htmlFor="phone" className="text-[10px] font-medium uppercase tracking-widest text-neutral-500">
+                            Teléfono de Contacto
                         </Label>
-                        <Input
-                            id="phone"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            className="col-span-3 bg-neutral-800 border-neutral-700 text-white"
-                            placeholder="+52 123 456 7890"
-                        />
+                        <div className="flex gap-2">
+                            <Select value={countryCode} onValueChange={setCountryCode}>
+                                <SelectTrigger className="w-[120px] bg-neutral-800 border-neutral-700 text-white h-11 rounded-xl">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="bg-neutral-900 border-neutral-800 text-white max-h-[300px] overflow-y-auto">
+                                    {ALL_COUNTRY_CODES.map((c, idx) => (
+                                        <SelectItem key={`country-${idx}`} value={c.code}>
+                                            <span className="flex items-center gap-2">
+                                                <span className="text-lg">{c.flag}</span>
+                                                <span className="font-mono text-xs">{c.code}</span>
+                                                <span className="text-[10px] text-neutral-500 truncate max-w-[60px]">{c.country}</span>
+                                            </span>
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <Input
+                                id="phone"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                className="flex-1 bg-neutral-800 border-neutral-700 text-white h-11 rounded-xl"
+                                placeholder="123 456 7890"
+                            />
+                        </div>
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="group" className="text-right text-neutral-400">
-                            Etapa
+
+                    <div className="space-y-2">
+                        <Label htmlFor="group" className="text-[10px] font-medium uppercase tracking-widest text-neutral-500">
+                            Etapa del Embudo
                         </Label>
                         <Select
                             value={selectedGroupId}
                             onValueChange={setSelectedGroupId}
                         >
-                            <SelectTrigger className="col-span-3 bg-neutral-800 border-neutral-700 text-white">
+                            <SelectTrigger className="bg-neutral-800 border-neutral-700 text-white h-11 rounded-xl">
                                 <SelectValue placeholder="Selecciona una etapa" />
                             </SelectTrigger>
-                            <SelectContent className="bg-neutral-800 border-neutral-700 text-white">
+                            <SelectContent className="bg-neutral-900 border-neutral-800 text-white">
                                 {groups.map(group => (
                                     <SelectItem key={group.id} value={group.id}>
                                         {group.name}
@@ -130,12 +192,12 @@ export function CreateClientModal({ isOpen, onClose, groups }: CreateClientModal
                         </Select>
                     </div>
 
-                    <DialogFooter className="mt-4">
-                        <Button type="button" variant="ghost" onClick={onClose} className="hover:bg-neutral-800 hover:text-white">
+                    <DialogFooter className="mt-4 gap-2">
+                        <Button type="button" variant="ghost" onClick={onClose} className="hover:bg-neutral-800 hover:text-white rounded-xl">
                             Cancelar
                         </Button>
-                        <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
-                            Crear Cliente
+                        <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-8 rounded-xl font-medium">
+                            Establecer Cliente
                         </Button>
                     </DialogFooter>
                 </form>

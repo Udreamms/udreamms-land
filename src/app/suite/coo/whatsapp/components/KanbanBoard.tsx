@@ -11,10 +11,11 @@ import {
 import Group from './Group';
 import Card from './Card';
 import ConversationModal from './ConversationModal';
-import { CreateClientModal } from './CreateClientModal'; // New Import
+import { CreateClientModal } from './CreateClientModal';
+import { DuplicateManager } from '@/app/suite/cmo/crm/components/DuplicateManager';
 import {
   Plus, Search, X, Users, MessageCircle, Filter, MoreHorizontal, ArrowLeft,
-  PanelLeftClose, PanelLeftOpen, UserPlus, Download, Settings, Instagram,
+  PanelLeftClose, PanelLeftOpen, UserPlus, Download, RefreshCw, Settings, Instagram,
   Facebook, Globe, Ghost, MessageSquare
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -52,6 +53,7 @@ interface CardData {
   groupId: string;
   contactName: string;
   contactNumber?: string;
+  channel?: string;
   [key: string]: any;
 }
 
@@ -71,6 +73,8 @@ const KanbanBoard = () => {
   const [isInboxCollapsed, setIsInboxCollapsed] = useState(false);
   const [isCreateClientOpen, setIsCreateClientOpen] = useState(false); // New State
   const [lastScrollPos, setLastScrollPos] = useState<number | null>(null);
+  const [isDuplicateManagerOpen, setIsDuplicateManagerOpen] = useState(false);
+  const [contacts, setContacts] = useState<any[]>([]);
 
   const groupIds = useMemo(() => groups.map((g) => g.id), [groups]);
 
@@ -101,6 +105,48 @@ const KanbanBoard = () => {
     });
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const contactsQuery = query(collection(db, 'contacts'));
+    const unsubscribe = onSnapshot(contactsQuery, (snapshot) => {
+      const contactsFromDb = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      setContacts(contactsFromDb);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // --- Real-time Data Sync (Kanban + CRM) ---
+  const syncedCards = useMemo<CardData[]>(() => {
+    return allCards.map(card => {
+      // 1. Find the contact in CRM list
+      const contactId = (card as any).contactId;
+      let contact = null;
+
+      if (contactId) {
+        contact = contacts.find(c => c.id === contactId);
+      }
+
+      if (!contact && card.contactNumber) {
+        const normalizedCardPhone = card.contactNumber.replace(/\D/g, '');
+        if (normalizedCardPhone) {
+          contact = contacts.find(c => (c.phone || '').replace(/\D/g, '') === normalizedCardPhone);
+        }
+      }
+
+      // 2. If contact found, merge vital fields
+      if (contact) {
+        const c = contact as any;
+        return {
+          ...card,
+          contactName: c.name || `${c.firstName || ''} ${c.lastName || ''}`.trim() || card.contactName,
+          contactNumber: c.phone || card.contactNumber,
+          email: c.email || card.email,
+          company: c.company || card.company,
+        };
+      }
+      return card;
+    });
+  }, [allCards, contacts]);
 
   useEffect(() => {
     const handleSearch = async () => {
@@ -145,14 +191,46 @@ const KanbanBoard = () => {
 
   useEffect(() => {
     if (initialChatId && allCards.length > 0) {
-      const cardToOpen = allCards.find(c => c.id === initialChatId);
-      if (cardToOpen) {
+      // 1. First, assume initialChatId is a Contact ID (CRM)
+      const linkedContact = contacts.find(c => c.id === initialChatId);
+      let cardToOpen = null;
+
+      if (linkedContact) {
+        // Find card by direct contactId field IF IT EXISTS, otherwise fallback to phone
+        cardToOpen = (allCards.find(c => (c as any).contactId === linkedContact.id) as any) || null;
+
+        if (!cardToOpen && linkedContact.phone) {
+          const normalizedCRMPhone = linkedContact.phone.replace(/\D/g, '');
+          cardToOpen = (allCards.find(c => {
+            const cardPhone = (c.contactNumber || '').replace(/\D/g, '');
+            return cardPhone === normalizedCRMPhone;
+          }) as any) || null;
+        }
+      }
+
+      // 2. If not found by CRM logic, check if it's a direct Card ID
+      if (!cardToOpen) {
+        cardToOpen = (allCards.find(c => c.id === initialChatId) as any) || null;
+      }
+
+      const foundCard = cardToOpen as CardData | null;
+
+      if (foundCard) {
+        // Find the group element to scroll and position
+        const groupElement = scrollRef.current?.querySelector(`[data-group-id="${foundCard.groupId}"]`) as HTMLElement;
+        if (groupElement) {
+          scrollRef.current?.scrollTo({
+            left: groupElement.offsetLeft - 16,
+            behavior: 'auto'
+          });
+        }
+
         setSelectedCard(cardToOpen);
         // Clean URL without refresh
         window.history.replaceState({}, '', '/suite/coo/whatsapp');
       }
     }
-  }, [initialChatId, allCards]);
+  }, [initialChatId, allCards, contacts]);
 
   // ... (existing useEffects)
 
@@ -266,10 +344,8 @@ const KanbanBoard = () => {
       snapchat: 0,
       others: 0
     };
-    allCards.forEach(card => {
+    syncedCards.forEach(card => {
       const channel = (card.channel || '').toLowerCase();
-      // Assuming 'router' and 'contact' are defined elsewhere if this line is intended to be active.
-      // router.push(`/suite/coo/whatsapp?chatId=${contact.id}`);
       const hasNumber = !!card.contactNumber;
 
       if (channel.includes('whatsapp') || channel === 'manual' || channel === 'csv import' || (hasNumber && !channel.includes('instagram'))) {
@@ -289,7 +365,7 @@ const KanbanBoard = () => {
       }
     });
     return stats;
-  }, [allCards]);
+  }, [syncedCards]);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 10 } }));
 
@@ -299,51 +375,77 @@ const KanbanBoard = () => {
         <div className="flex flex-col gap-1">
           <h1 className="text-xl font-medium tracking-tight bg-gradient-to-br from-white to-neutral-500 bg-clip-text text-transparent">Buzón</h1>
 
-          <div className="flex items-center gap-3 mt-0.5">
+          <div className="flex items-center gap-4 mt-1">
             <div className="flex items-center gap-1.5">
               <MessageCircle size={11} className="text-blue-500" />
-              <span className="text-[11px] font-medium text-neutral-300">{allCards.length}</span>
-            </div>
-
-            <div className="w-[1px] h-2.5 bg-neutral-800" />
-
-            <div className="flex items-center gap-1.5">
-              <div className="text-emerald-500">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 2c-5.523 0-10 4.477-10 10 0 1.765.459 3.42 1.258 4.86l-1.289 4.704 4.819-1.264c1.404.757 3.012 1.196 4.722 1.196 5.523 0 10-4.477 10-10s-4.477-10-10-10zm0 18.411c-1.577 0-3.054-.429-4.327-1.178l-.31-.182-3.197.838.852-3.111-.2-.317c-.771-1.233-1.222-2.697-1.222-4.261 0-4.414 3.589-8.003 8.003-8.003 4.414 0 8.003 3.589 8.003 8.003 0 4.414-3.59 8.012-11.893 11.211z" /></svg>
+              <div className="flex items-center gap-1">
+                <span className="text-[11px] font-bold text-neutral-200">{allCards.length}</span>
+                <span className="text-[8px] font-bold text-neutral-500 uppercase tracking-wider">Total</span>
               </div>
-              <span className="text-[11px] font-medium text-neutral-300">{channelStats.whatsapp}</span>
             </div>
 
-            <div className="flex items-center gap-1.5">
-              <Instagram size={11} className="text-pink-500" />
-              <span className="text-[11px] font-medium text-neutral-300">{channelStats.instagram}</span>
+            <div className="w-[1px] h-2.5 bg-neutral-800/50" />
+
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <div className="text-emerald-500">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 2c-5.523 0-10 4.477-10 10 0 1.765.459 3.42 1.258 4.86l-1.289 4.704 4.819-1.264c1.404.757 3.012 1.196 4.722 1.196 5.523 0 10-4.477 10-10s-4.477-10-10-10zm0 18.411c-1.577 0-3.054-.429-4.327-1.178l-.31-.182-3.197.838.852-3.111-.2-.317c-.771-1.233-1.222-2.697-1.222-4.261 0-4.414 3.589-8.003 8.003-8.003 4.414 0 8.003 3.589 8.003 8.003 0 4.414-3.59 8.012-11.893 11.211z" /></svg>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-[11px] font-bold text-neutral-200">{channelStats.whatsapp}</span>
+                  <span className="text-[8px] font-bold text-neutral-500 uppercase tracking-wider">WhatsApp</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <Instagram size={11} className="text-pink-500" />
+                <div className="flex items-center gap-1">
+                  <span className="text-[11px] font-bold text-neutral-200">{channelStats.instagram}</span>
+                  <span className="text-[8px] font-bold text-neutral-500 uppercase tracking-wider">Instagram</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <MessageSquare size={11} className="text-blue-400" />
+                <div className="flex items-center gap-1">
+                  <span className="text-[11px] font-bold text-neutral-200">{channelStats.messenger}</span>
+                  <span className="text-[8px] font-bold text-neutral-500 uppercase tracking-wider">Messenger</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <Facebook size={11} className="text-blue-600" />
+                <div className="flex items-center gap-1">
+                  <span className="text-[11px] font-bold text-neutral-200">{channelStats.facebook}</span>
+                  <span className="text-[8px] font-bold text-neutral-500 uppercase tracking-wider">Facebook</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <Globe size={11} className="text-cyan-400" />
+                <div className="flex items-center gap-1">
+                  <span className="text-[11px] font-bold text-neutral-200">{channelStats.web}</span>
+                  <span className="text-[8px] font-bold text-neutral-500 uppercase tracking-wider">Web</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <Ghost size={11} className="text-yellow-400" />
+                <div className="flex items-center gap-1">
+                  <span className="text-[11px] font-bold text-neutral-200">{channelStats.snapchat}</span>
+                  <span className="text-[8px] font-bold text-neutral-500 uppercase tracking-wider">Snapchat</span>
+                </div>
+              </div>
             </div>
 
-            <div className="flex items-center gap-1.5">
-              <MessageSquare size={11} className="text-blue-400" />
-              <span className="text-[11px] font-medium text-neutral-300">{channelStats.messenger}</span>
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              <Facebook size={11} className="text-blue-600" />
-              <span className="text-[11px] font-medium text-neutral-300">{channelStats.facebook}</span>
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              <Globe size={11} className="text-cyan-400" />
-              <span className="text-[11px] font-medium text-neutral-300">{channelStats.web}</span>
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              <Ghost size={11} className="text-yellow-400" />
-              <span className="text-[11px] font-medium text-neutral-300">{channelStats.snapchat}</span>
-            </div>
-
-            <div className="w-[1px] h-2.5 bg-neutral-800" />
+            <div className="w-[1px] h-2.5 bg-neutral-800/50" />
 
             <div className="flex items-center gap-1.5">
               <Users size={11} className="text-purple-500" />
-              <span className="text-[11px] font-medium text-neutral-300">{groups.length}</span>
+              <div className="flex items-center gap-1">
+                <span className="text-[11px] font-bold text-neutral-200">{groups.length}</span>
+                <span className="text-[8px] font-bold text-neutral-500 uppercase tracking-wider">Bandejas</span>
+              </div>
             </div>
           </div>
         </div>
@@ -430,6 +532,13 @@ const KanbanBoard = () => {
             <DropdownMenuContent align="end" className="w-56 bg-neutral-900 border-neutral-800 text-neutral-200">
               <DropdownMenuLabel>Opciones</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-neutral-800" />
+              <DropdownMenuItem
+                className="focus:bg-neutral-800 focus:text-white cursor-pointer group"
+                onClick={() => setIsDuplicateManagerOpen(true)}
+              >
+                <RefreshCw className="mr-2 h-4 w-4 opacity-50 group-hover:opacity-100" />
+                <span>Gestionar Duplicados</span>
+              </DropdownMenuItem>
               <DropdownMenuItem className="focus:bg-neutral-800 focus:text-white cursor-pointer group">
                 <Download className="mr-2 h-4 w-4 opacity-50 group-hover:opacity-100" />
                 <span>Exportar CSV</span>
@@ -464,6 +573,7 @@ const KanbanBoard = () => {
                     allGroups={groups}
                     onCardClick={handleCardClick}
                     onUpdateColor={handleUpdateGroupColor}
+                    contacts={contacts}
                   />
                 ))}
               </SortableContext>
@@ -504,8 +614,8 @@ const KanbanBoard = () => {
 
             {typeof document !== 'undefined' && createPortal(
               <DragOverlay>
-                {activeGroup && <Group group={activeGroup} onCardClick={() => { }} onUpdateColor={() => { }} />}
-                {activeCard && <Card card={activeCard} groupId={activeCard.groupId} onClick={() => { }} />}
+                {activeGroup && <Group group={activeGroup} onCardClick={() => { }} onUpdateColor={() => { }} contacts={contacts} />}
+                {activeCard && <Card card={activeCard} groupId={activeCard.groupId} onClick={() => { }} contacts={contacts} />}
               </DragOverlay>,
               document.body
             )}
@@ -517,10 +627,10 @@ const KanbanBoard = () => {
             <ConversationModal
               isOpen={!!selectedCard}
               onClose={handleCloseModal}
-              card={selectedCard}
+              card={selectedCard ? (syncedCards.find(c => c.id === selectedCard.id) || selectedCard) : null}
               groups={groups}
               currentGroupName={selectedCard ? groups.find(g => g.id === selectedCard.groupId)?.name : undefined}
-              allConversations={allCards.filter(c => {
+              allConversations={syncedCards.filter(c => {
                 if (!c.groupId || !selectedCard?.groupId) return false;
                 return c.groupId === selectedCard.groupId;
               })}
@@ -528,7 +638,7 @@ const KanbanBoard = () => {
                 setSelectedCard(card);
               }}
               stats={{
-                totalConversations: allCards.length,
+                totalConversations: syncedCards.length,
                 totalGroups: groups.length
               }}
               position={modalPosition}
@@ -543,6 +653,13 @@ const KanbanBoard = () => {
         isOpen={isCreateClientOpen}
         onClose={() => setIsCreateClientOpen(false)}
         groups={groups}
+      />
+
+      <DuplicateManager
+        isOpen={isDuplicateManagerOpen}
+        onClose={() => setIsDuplicateManagerOpen(false)}
+        contacts={contacts}
+        onContactsUpdated={setContacts}
       />
     </div>
   );

@@ -21,6 +21,8 @@ import {
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { toast } from 'sonner';
+import { SelectContactModal } from './SelectContactModal';
+import { CreateClientModal } from './CreateClientModal';
 
 // --- Interface para Tipado de Tarjetas ---
 interface CardData {
@@ -46,13 +48,16 @@ const colors = [
   { name: 'Rojo', value: 'bg-red-900/50', cardColor: 'bg-red-800' },
 ];
 
-const Group = ({ group, allGroups = [], onCardClick, onUpdateColor }: {
+const Group = ({ group, allGroups = [], onCardClick, onUpdateColor, contacts = [] }: {
   group: any;
   allGroups?: any[];
   onCardClick: any;
   onUpdateColor: any;
+  contacts?: any[];
 }) => {
   const [cards, setCards] = useState<CardData[]>([]);
+  const [isSelectContactOpen, setIsSelectContactOpen] = useState(false);
+  const [isCreateClientOpen, setIsCreateClientOpen] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const {
@@ -82,15 +87,27 @@ const Group = ({ group, allGroups = [], onCardClick, onUpdateColor }: {
     return () => unsubscribe();
   }, [group.id]);
 
-  const handleAddCard = async () => {
-    await addDoc(collection(db, `kanban-groups/${group.id}/cards`), {
-      contactName: "Nuevo Contacto",
-      lastMessage: 'Conversación iniciada...',
-      channel: 'Manual',
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      messages: [],
-    });
+  const handleAddCard = async (contact?: any) => {
+    try {
+      const cardData = {
+        contactName: contact?.name || "Nuevo Contacto",
+        contactNumber: contact?.phone || '',
+        email: contact?.email || '',
+        clientId: contact?.clientId || '',
+        lastMessage: 'Conversación iniciada...',
+        channel: contact ? 'CRM Link' : 'Manual',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        messages: [],
+      };
+
+      await addDoc(collection(db, `kanban-groups/${group.id}/cards`), cardData);
+      toast.success(contact ? `Contacto "${contact.name}" añadido.` : "Nueva conversación creada.");
+      setIsSelectContactOpen(false);
+    } catch (error) {
+      console.error("Error adding card:", error);
+      toast.error("Error al añadir contacto.");
+    }
   };
 
   const handleImportCSV = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -224,7 +241,7 @@ const Group = ({ group, allGroups = [], onCardClick, onUpdateColor }: {
             </Badge>
           </div>
           <div className="flex items-center gap-1 transition-opacity">
-            <Button variant="ghost" size="icon" onClick={handleAddCard} className="h-8 w-8 text-neutral-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-full">
+            <Button variant="ghost" size="icon" onClick={() => setIsSelectContactOpen(true)} className="h-8 w-8 text-neutral-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-full">
               <Plus size={16} />
             </Button>
             <DropdownMenu>
@@ -294,12 +311,28 @@ const Group = ({ group, allGroups = [], onCardClick, onUpdateColor }: {
       <div className="flex-grow overflow-y-auto p-2 space-y-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-neutral-800 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
         <SortableContext items={cards.map(c => c.id)}>
           {cards.map((card) => (
-            <Card key={card.id} card={card} groupId={group.id} onClick={(e) => onCardClick(card, e)} cardColor={selectedColor.cardColor} />
+            <Card key={card.id} card={card} groupId={group.id} onClick={(e) => onCardClick(card, e)} cardColor={selectedColor.cardColor} contacts={contacts} />
           ))}
         </SortableContext>
-
       </div>
-    </div>
+
+      <SelectContactModal
+        isOpen={isSelectContactOpen}
+        onClose={() => setIsSelectContactOpen(false)}
+        onSelect={(contact) => handleAddCard(contact)}
+        onAddNew={() => {
+          setIsSelectContactOpen(false);
+          setIsCreateClientOpen(true);
+        }}
+      />
+
+      <CreateClientModal
+        isOpen={isCreateClientOpen}
+        onClose={() => setIsCreateClientOpen(false)}
+        groups={allGroups}
+        initialGroupId={group.id}
+      />
+    </div >
   );
 };
 

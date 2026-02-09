@@ -10,9 +10,10 @@ import { Plus, Trash2 } from 'lucide-react';
 interface TabBackgroundProps {
     contact: any;
     updateField: (field: string, value: any) => void;
+    isEditing?: boolean;
 }
 
-export const TabBackground: React.FC<TabBackgroundProps> = ({ contact, updateField }) => {
+export const TabBackground: React.FC<TabBackgroundProps> = ({ contact, updateField, isEditing = false }) => {
 
     const emergencyContacts = contact.emergencyContacts || [];
 
@@ -33,7 +34,7 @@ export const TabBackground: React.FC<TabBackgroundProps> = ({ contact, updateFie
     };
 
     return (
-        <div className="space-y-6">
+        <fieldset disabled={!isEditing} className="space-y-6 block border-0 p-0 m-0 min-w-0">
             <Card className="bg-neutral-900 border-neutral-800">
                 <CardHeader>
                     <CardTitle className="text-sm font-medium text-white uppercase tracking-wider">Información de Fondo</CardTitle>
@@ -122,6 +123,19 @@ export const TabBackground: React.FC<TabBackgroundProps> = ({ contact, updateFie
                         <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">¿Qué idiomas hablas?</Label>
                         <Input value={contact.languages || ''} onChange={e => updateField('languages', e.target.value)} className="bg-neutral-950 border-neutral-800 h-9 rounded-md" />
                     </div>
+
+                    <div className="h-px bg-neutral-800 my-2" />
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Alergias</Label>
+                            <Textarea value={contact.allergies || ''} onChange={e => updateField('allergies', e.target.value)} className="bg-neutral-950 border-neutral-800 rounded-md min-h-[60px]" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">Condiciones Médicas</Label>
+                            <Textarea value={contact.medicalConditions || ''} onChange={e => updateField('medicalConditions', e.target.value)} className="bg-neutral-950 border-neutral-800 rounded-md min-h-[60px]" />
+                        </div>
+                    </div>
                 </CardContent>
             </Card>
 
@@ -152,6 +166,6 @@ export const TabBackground: React.FC<TabBackgroundProps> = ({ contact, updateFie
                     </Button>
                 </CardContent>
             </Card>
-        </div>
+        </fieldset>
     );
 };

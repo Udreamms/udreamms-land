@@ -8,11 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 interface TabEmploymentProps {
     contact: any;
     updateField: (field: string, value: any) => void;
+    isEditing?: boolean;
 }
 
-export const TabEmployment: React.FC<TabEmploymentProps> = ({ contact, updateField }) => {
+export const TabEmployment: React.FC<TabEmploymentProps> = ({ contact, updateField, isEditing = false }) => {
     return (
-        <div className="space-y-6">
+        <fieldset disabled={!isEditing} className="space-y-6 block border-0 p-0 m-0 min-w-0">
             <Card className="bg-neutral-900 border-neutral-800">
                 <CardHeader>
                     <CardTitle className="text-sm font-medium text-white uppercase tracking-wider">Situación Laboral Actual</CardTitle>
@@ -138,6 +139,6 @@ export const TabEmployment: React.FC<TabEmploymentProps> = ({ contact, updateFie
                     )}
                 </CardContent>
             </Card>
-        </div>
+        </fieldset>
     );
 };

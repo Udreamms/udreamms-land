@@ -9,9 +9,10 @@ import { Plus, Trash2 } from 'lucide-react';
 interface TabFamilyProps {
     contact: any;
     updateField: (field: string, value: any) => void;
+    isEditing?: boolean;
 }
 
-export const TabFamily: React.FC<TabFamilyProps> = ({ contact, updateField }) => {
+export const TabFamily: React.FC<TabFamilyProps> = ({ contact, updateField, isEditing = false }) => {
 
     // Helper for children array
     const children = contact.children || [];
@@ -33,7 +34,7 @@ export const TabFamily: React.FC<TabFamilyProps> = ({ contact, updateField }) =>
     };
 
     return (
-        <div className="space-y-6">
+        <fieldset disabled={!isEditing} className="space-y-6 block border-0 p-0 m-0 min-w-0">
             <Card className="bg-neutral-900 border-neutral-800">
                 <CardHeader>
                     <CardTitle className="text-sm font-medium text-white uppercase tracking-wider">Patrocinador / Sponsor</CardTitle>
@@ -157,6 +158,6 @@ export const TabFamily: React.FC<TabFamilyProps> = ({ contact, updateField }) =>
                     </div>
                 </CardContent>
             </Card>
-        </div>
+        </fieldset>
     );
 };

@@ -21,6 +21,8 @@ interface ContactListProps {
     setIsDetailModalOpen: (open: boolean) => void;
     setIsEditingProfile: (editing: boolean) => void;
     handleDeleteContact: (id: string) => void;
+    selectedContactIds: string[];
+    setSelectedContactIds: (ids: string[] | ((prev: string[]) => string[])) => void;
 }
 
 export const ContactList: React.FC<ContactListProps> = ({
@@ -32,8 +34,26 @@ export const ContactList: React.FC<ContactListProps> = ({
     setSelectedContact,
     setIsDetailModalOpen,
     setIsEditingProfile,
-    handleDeleteContact
+    handleDeleteContact,
+    selectedContactIds,
+    setSelectedContactIds
 }) => {
+    const toggleSelection = (e: React.MouseEvent, id: string) => {
+        e.stopPropagation();
+        setSelectedContactIds(prev =>
+            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+        );
+    };
+
+    const toggleAll = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (selectedContactIds.length === contacts.length) {
+            setSelectedContactIds([]);
+        } else {
+            setSelectedContactIds(contacts.map(c => c.id));
+        }
+    };
+
     return (
         <motion.div
             key="list"
@@ -47,11 +67,17 @@ export const ContactList: React.FC<ContactListProps> = ({
                 "grid px-6 py-3 border-b border-white/5 text-[10px] font-medium text-neutral-500 uppercase tracking-widest bg-white/[0.01]",
                 isChatOpen
                     ? "grid-cols-[40px_1fr_40px]"
-                    : "grid-cols-[40px_2.5fr_2fr_1.5fr_1fr_1fr_1fr_80px] gap-4"
+                    : "grid-cols-[40px_60px_2.5fr_2fr_1.5fr_1fr_1fr_1fr_80px] gap-4"
             )}>
-                <div className="flex justify-center items-center">
-                    <div className="w-3.5 h-3.5 border border-neutral-800 rounded"></div>
+                <div className="flex justify-center items-center cursor-pointer" onClick={toggleAll}>
+                    <div className={cn(
+                        "w-3.5 h-3.5 border border-neutral-800 rounded flex items-center justify-center transition-colors",
+                        selectedContactIds.length > 0 && selectedContactIds.length === contacts.length ? "bg-blue-600 border-blue-600" : ""
+                    )}>
+                        {selectedContactIds.length > 0 && selectedContactIds.length === contacts.length && <div className="w-1.5 h-1.5 bg-white rounded-sm" />}
+                    </div>
                 </div>
+                {!isChatOpen && <div className="truncate text-center">ID</div>}
                 <div className="truncate">Identity / Name</div>
                 {!isChatOpen && (
                     <>
@@ -70,17 +96,33 @@ export const ContactList: React.FC<ContactListProps> = ({
                     <motion.div
                         key={contact.id}
                         variants={itemVariants}
-                        onClick={() => handleContactClick(contact)}
                         className={cn(
-                            "grid items-center hover:bg-white/[0.02] transition-colors cursor-pointer group",
+                            "grid items-center hover:bg-white/[0.02] transition-colors group",
                             isChatOpen
                                 ? "grid-cols-[40px_1fr_40px] px-3 py-2"
-                                : "grid-cols-[40px_2.5fr_2fr_1.5fr_1fr_1fr_1fr_80px] px-6 py-2 gap-4"
+                                : "grid-cols-[40px_60px_2.5fr_2fr_1.5fr_1fr_1fr_1fr_80px] px-6 py-2 gap-4",
+                            selectedContactIds.includes(contact.id) && "bg-blue-500/5 hover:bg-blue-500/10"
                         )}
                     >
-                        <div className="flex justify-center items-center" onClick={(e) => e.stopPropagation()}>
-                            <div className="w-3.5 h-3.5 border border-neutral-800 rounded group-hover:border-neutral-600 transition-colors"></div>
+                        <div className="flex justify-center items-center cursor-pointer py-3" onClick={(e) => toggleSelection(e, contact.id)}>
+                            <div className={cn(
+                                "w-4 h-4 border border-neutral-700 rounded-md group-hover:border-neutral-500 transition-all flex items-center justify-center shadow-sm",
+                                selectedContactIds.includes(contact.id) ? "bg-blue-600 border-blue-600 shadow-blue-500/20" : "bg-neutral-900/50"
+                            )}>
+                                {selectedContactIds.includes(contact.id) && (
+                                    <motion.div
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        className="w-1.5 h-1.5 bg-white rounded-full"
+                                    />
+                                )}
+                            </div>
                         </div>
+                        {!isChatOpen && (
+                            <div className="text-neutral-500 font-mono text-[10px] text-center">
+                                {contact.clientId || (contact.id ? `RY${contact.id.substring(0, 5).toUpperCase()}` : '—')}
+                            </div>
+                        )}
                         <div className="flex items-center space-x-3 overflow-hidden">
                             <div className={cn(
                                 "rounded bg-neutral-800 flex-shrink-0 flex items-center justify-center font-medium text-neutral-400 group-hover:text-blue-400 transition-colors",
@@ -89,9 +131,16 @@ export const ContactList: React.FC<ContactListProps> = ({
                                 {contact.name?.charAt(0) || '?'}
                             </div>
                             <div className="flex flex-col min-w-0">
-                                <div className="font-medium text-neutral-200 group-hover:text-white truncate text-xs">{contact.name}</div>
-                                {isChatOpen && (
-                                    <span className="text-[10px] text-neutral-500 font-mono truncate">{formatPhoneNumber(contact.phone || contact.email)}</span>
+                                <div
+                                    onClick={() => handleContactClick(contact)}
+                                    className="font-medium text-neutral-200 hover:text-blue-400 hover:underline cursor-pointer truncate text-xs transition-colors"
+                                >
+                                    {contact.name || 'Sin Nombre'}
+                                </div>
+                                {(isChatOpen || !contact.clientId) && (
+                                    <span className="text-[10px] text-neutral-500 font-mono truncate">
+                                        {contact.clientId || (contact.id ? `RY${contact.id.substring(0, 5).toUpperCase()}` : '—')}
+                                    </span>
                                 )}
                             </div>
                         </div>

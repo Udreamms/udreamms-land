@@ -38,7 +38,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-const Card = ({ card, groupId, onClick, cardColor = 'bg-neutral-800' }) => {
+const Card = ({ card, groupId, onClick, cardColor = 'bg-neutral-800', contacts = [] }: any) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
 
@@ -136,7 +136,23 @@ const Card = ({ card, groupId, onClick, cardColor = 'bg-neutral-800' }) => {
                 return <WhatsappIcon className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />;
               })()}
               <h3 className="font-medium text-[11px] text-white truncate leading-none tracking-tight">
-                {card.contactName || 'Desconocido'}
+                {(() => {
+                  const contactId = (card as any).contactId;
+                  let linkedContact: any = null;
+
+                  if (contactId) {
+                    linkedContact = (contacts as any[]).find(c => c.id === contactId);
+                  }
+
+                  if (!linkedContact && card.contactNumber) {
+                    const normalizedCardPhone = card.contactNumber.replace(/\D/g, '');
+                    if (normalizedCardPhone) {
+                      linkedContact = (contacts as any[]).find(c => (c.phone || '').replace(/\D/g, '') === normalizedCardPhone);
+                    }
+                  }
+
+                  return linkedContact?.name || `${linkedContact?.firstName || ''} ${linkedContact?.lastName || ''}`.trim() || card.contactName || 'Desconocido';
+                })()}
               </h3>
             </div>
 
@@ -214,7 +230,7 @@ const Card = ({ card, groupId, onClick, cardColor = 'bg-neutral-800' }) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </TooltipProvider>
+    </TooltipProvider >
   );
 };
 

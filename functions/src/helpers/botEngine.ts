@@ -47,12 +47,12 @@ function replaceVariables(text: string, cardData: any): string {
 
 // Calcula el tiempo de "escritura humana" en MS
 function calculateTypingDelay(text: string): number {
-    const charsPerSecond = 25;
-    const baseDelay = 1000;
+    const charsPerSecond = 50; // Faster typing speed (was 25)
+    const baseDelay = 100;    // Minimize base latency (was 1000)
     let typingTime = (text.length / charsPerSecond) * 1000;
 
-    if (typingTime < 1500) typingTime = 1500;
-    if (typingTime > 6000) typingTime = 6000;
+    if (typingTime < 500) typingTime = 500;   // Min 0.5s (was 1.5s)
+    if (typingTime > 2000) typingTime = 2000; // Max 2s (was 6s)
 
     return baseDelay + typingTime;
 }
@@ -90,6 +90,52 @@ function sanitizeButtonsData(buttons: any[]): any[] {
     return buttons.filter(b => b && b.title && b.title !== 'undefined' && b.title.trim() !== '');
 }
 
+// Helper for Name Extraction
+function extractName(input: string): string {
+    const cleanInput = input.trim();
+    // Regex for common introduction phrases (Case insensitive) - Multi-language support
+    const patterns = [
+        // Spanish
+        /\b(?:me llamo|mi nombre es|yo soy|soy)\s+(.+)/i,
+        /\b(?:mucho gusto,?)\s*(?:me llamo|soy)\s+(.+)/i,
+        /\b(?:hola,?)?\s*(?:me llamo|soy)\s+(.+)/i,
+
+        // English
+        /\b(?:my name is|i am|i'm|this is)\s+(.+)/i,
+        /\b(?:hello,?)?\s*(?:i am|i'm|my name is)\s+(.+)/i,
+        /\b(?:nice to meet you,?)\s*(?:i am|i'm|my name is)\s+(.+)/i,
+
+        // Portuguese (Basic)
+        /\b(?:meu nome (?:é|e)|eu sou)\s+(.+)/i
+    ];
+
+    for (const pattern of patterns) {
+        const match = cleanInput.match(pattern);
+        if (match && match[1]) {
+            // Remove lingering punctuation
+            return match[1].replace(/[.!]+$/, '').trim();
+        }
+    }
+
+    // Fallback Strategies:
+
+    // 1. Short Answer (Likely just the name)
+    // If input is 1-3 words, assume it is the name.
+    const words = cleanInput.split(/\s+/);
+    if (words.length <= 3) {
+        return cleanInput.replace(/[.!]+$/, '');
+    }
+
+    // 2. Long Answer without introduction phrase
+    // Try to find capitalized words (heuristic for proper nouns) if input is reasonably short (< 50 chars)
+    // Otherwise, better to truncate to avoid saving a paragraph.
+    if (cleanInput.length > 50) {
+        return cleanInput.substring(0, 50) + '...';
+    }
+
+    return cleanInput;
+}
+
 // --- MAIN ENGINE ---
 
 export async function executeBotFlow(bot: any, to: string, cardData: any, userMessage: string): Promise<void> {
@@ -103,38 +149,46 @@ export async function executeBotFlow(bot: any, to: string, cardData: any, userMe
 
     // --- PROCESAR INPUT USUARIO ---
     if (currentNodeId) {
+        functions.logger.info(`[executeBotFlow] Processing Input for Node: ${currentNodeId}`);
         const currentNode = bot.flow.nodes.find((n: any) => String(n.id) === String(currentNodeId));
-        if (!currentNode) return;
+        if (!currentNode) {
+            functions.logger.warn(`[executeBotFlow] Node ${currentNodeId} not found in flow.`);
+            return;
+        }
 
-        await markAsRead(userMessage);
+        try {
+            // markAsRead might fail if userMessage is not a valid ID, we wrap it
+            await markAsRead(userMessage).catch(e => functions.logger.warn('markAsRead failed (non-critical):', e.message));
+        } catch (e) { }
+
         await delay(500);
 
         if (currentNode.type === 'captureInputNode') {
-            const validation = validateInput(userMessage, currentNode.data);
+            const validation = validateInput(userMessage, currentNode.data || {});
             if (!validation.isValid) {
+                functions.logger.info(`[executeBotFlow] Input validation failed for ${to}: ${validation.errorMessage}`);
                 await sendMessage(to, validation.errorMessage || "Respuesta inválida.");
                 return;
             }
-            let varName = currentNode.data.variableName;
+
+            let varName = currentNode.data?.variableName;
             if (!varName || varName === 'undefined') {
-                const text = (currentNode.data.text || '').toLowerCase();
+                const text = (currentNode.data?.text || '').toLowerCase();
                 if (text.includes('nombre') || text.includes('name')) varName = 'nombre';
                 else varName = `captured_${currentNode.id}`;
             }
+
             if (varName) {
-                // Validación de seguridad para nombres: Si el usuario escribe mucho (frase), 
-                // probablemente no es SOLO su nombre. Intentamos extraerlo o ignorar capturas absurdas.
                 let valueToSave = userMessage.trim();
 
-                if (['nombre', 'name'].includes(varName) && valueToSave.length > 30) {
-                    // Si el nombre es muy largo, podría ser una frase. 
-                    // Intentamos tomar la última palabra o algo simple, o dejamos el anterior.
-                    functions.logger.info(`Name capture too long, might be a sentence: ${valueToSave}`);
-                    // Por ahora solo lo truncamos o lo guardamos pero limitamos el daño en la UI
-                    valueToSave = valueToSave.split(' ').slice(-2).join(' '); // Tomar un intento de nombre/apellido
+                // IMPROVED NAME EXTRACTION
+                if (['nombre', 'name'].includes(varName)) {
+                    valueToSave = extractName(valueToSave);
                 }
 
-                await saveVariable(to, varName, valueToSave);
+                functions.logger.info(`[executeBotFlow] Saving variable ${varName} = ${valueToSave}`);
+                await saveVariable(to, varName, valueToSave, cardData.id, cardData.groupId);
+
                 if (!cardData.customFields) cardData.customFields = {};
                 cardData.customFields[varName] = valueToSave;
                 if (['nombre', 'name'].includes(varName)) cardData.contactName = valueToSave;
@@ -179,7 +233,7 @@ export async function executeBotFlow(bot: any, to: string, cardData: any, userMe
             }
             if (selectedEdge) nextNodeId = selectedEdge.target;
         } else {
-            await updateBotState(to, { status: 'completed', currentNodeId: null });
+            await updateBotState(to, { status: 'completed', currentNodeId: null }, cardData.id, cardData.groupId);
             return;
         }
     } else {
@@ -195,15 +249,15 @@ export async function executeBotFlow(bot: any, to: string, cardData: any, userMe
         const nextNode = bot.flow.nodes.find((n: any) => String(n.id) === String(nextNodeId));
         if (!nextNode) { shouldContinue = false; break; }
 
-        await updateBotState(to, { status: 'active', currentNodeId: nextNodeId, lastInteraction: new Date() });
+        await updateBotState(to, { status: 'active', currentNodeId: nextNodeId, lastInteraction: new Date() }, cardData.id, cardData.groupId);
 
         // Simulación Humana (Typing Delay) - CONTROLADO POR UI
         if (['textMessageNode', 'mediaMessageNode', 'quickReplyNode', 'listMessageNode'].includes(nextNode.type)) {
             // Por defecto es TRUE (Humano) a menos que se desactive explícitamente en el editor
-            const simulateTyping = nextNode.data.typingSimulation !== false;
+            const simulateTyping = nextNode.data?.typingSimulation !== false;
 
             if (simulateTyping) {
-                const content = nextNode.data.content || nextNode.data.text || nextNode.data.caption || '';
+                const content = nextNode.data?.content || nextNode.data?.text || nextNode.data?.caption || '';
                 const humanDelay = calculateTypingDelay(content);
                 await delay(humanDelay);
             }
@@ -214,7 +268,7 @@ export async function executeBotFlow(bot: any, to: string, cardData: any, userMe
                 const txt = replaceVariables(nextNode.data.content || nextNode.data.text || '', cardData);
                 if (txt) {
                     await sendMessage(to, txt);
-                    await logBotMessage(to, txt);
+                    await logBotMessage(to, txt, cardData.id, cardData.groupId);
                 }
                 nextNodeId = getNextNodeId(bot, nextNodeId);
                 break;
@@ -227,7 +281,7 @@ export async function executeBotFlow(bot: any, to: string, cardData: any, userMe
                 const caption = replaceVariables(nextNode.data.caption || '', cardData);
                 if (nextNode.data.url) {
                     await sendMediaMessage(to, nextNode.data.url, caption, nextNode.data.filename);
-                    await logBotMessage(to, `[Archivo] ${caption}`);
+                    await logBotMessage(to, `[Archivo] ${caption}`, cardData.id, cardData.groupId);
                 }
                 nextNodeId = getNextNodeId(bot, nextNodeId);
                 break;
@@ -237,7 +291,7 @@ export async function executeBotFlow(bot: any, to: string, cardData: any, userMe
                 const buttons = sanitizeButtonsData(nextNode.data.buttons || []);
                 if (buttons.length > 0) {
                     await sendButtonMessage(to, qrText, buttons);
-                    await logBotMessage(to, `[Botones] ${qrText}`);
+                    await logBotMessage(to, `[Botones] ${qrText}`, cardData.id, cardData.groupId);
                     shouldContinue = false;
                 } else {
                     await sendMessage(to, qrText);
@@ -251,7 +305,7 @@ export async function executeBotFlow(bot: any, to: string, cardData: any, userMe
                 const cleanSections = sanitizeListData(nextNode.data);
                 if (cleanSections.length > 0) {
                     await sendListMessage(to, listBody, btnLabel, cleanSections);
-                    await logBotMessage(to, `[Lista] ${listBody}`);
+                    await logBotMessage(to, `[Lista] ${listBody}`, cardData.id, cardData.groupId);
                     shouldContinue = false;
                 } else {
                     await sendMessage(to, listBody);
@@ -300,30 +354,100 @@ function validateInput(input: string, config: any): { isValid: boolean, errorMes
     return { isValid: true };
 }
 
-async function saveVariable(contactNumber: string, variable: string, value: string) {
+async function saveVariable(contactNumber: string, variable: string, value: string, cardId?: string, groupId?: string) {
     if (!variable) return;
-    const cardsRef = db.collectionGroup('cards').where('contactNumber', '==', contactNumber);
-    const snapshot = await cardsRef.get();
 
-    const updateData: any = {};
-    updateData[`customFields.${variable}`] = value;
-    if (['nombre', 'name', 'fullname'].includes(variable.toLowerCase())) {
-        updateData['contactName'] = value;
+    let docRef: FirebaseFirestore.DocumentReference | null = null;
+
+    if (cardId && groupId) {
+        docRef = db.collection('kanban-groups').doc(groupId).collection('cards').doc(cardId);
+    } else if (cardId) {
+        // Direct update by ID - Searching in all groups
+        const groups = await db.collection('kanban-groups').get();
+        for (const group of groups.docs) {
+            const ref = group.ref.collection('cards').doc(cardId);
+            const snap = await ref.get();
+            if (snap.exists) {
+                docRef = ref;
+                break;
+            }
+        }
     }
 
-    if (!snapshot.empty) {
-        await snapshot.docs[0].ref.update(updateData);
+    if (!docRef) {
+        // Fallback to query
+        const cardsRef = db.collectionGroup('cards').where('contactNumber', '==', contactNumber);
+        const snapshot = await cardsRef.get();
+        if (!snapshot.empty) docRef = snapshot.docs[0].ref;
+    }
+
+    if (docRef) {
+        const updateData: any = {};
+        updateData[`customFields.${variable}`] = value;
+        if (['nombre', 'name', 'fullname'].includes(variable.toLowerCase())) {
+            updateData['contactName'] = value;
+        }
+        await docRef.update(updateData);
     }
 }
 
-async function updateBotState(contactNumber: string, state: any) {
-    const cardsRef = db.collectionGroup('cards').where('contactNumber', '==', contactNumber);
-    const snapshot = await cardsRef.get();
-    if (!snapshot.empty) await snapshot.docs[0].ref.update({ botState: state, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+async function updateBotState(contactNumber: string, state: any, cardId?: string, groupId?: string) {
+    let docRef: FirebaseFirestore.DocumentReference | null = null;
+
+    if (cardId && groupId) {
+        docRef = db.collection('kanban-groups').doc(groupId).collection('cards').doc(cardId);
+    } else if (cardId) {
+        const groups = await db.collection('kanban-groups').get();
+        for (const group of groups.docs) {
+            const ref = group.ref.collection('cards').doc(cardId);
+            const snap = await ref.get();
+            if (snap.exists) {
+                docRef = ref;
+                break;
+            }
+        }
+    }
+
+    if (!docRef) {
+        const cardsRef = db.collectionGroup('cards').where('contactNumber', '==', contactNumber);
+        const snapshot = await cardsRef.get();
+        if (!snapshot.empty) docRef = snapshot.docs[0].ref;
+    }
+
+    if (docRef) {
+        await docRef.update({ botState: state, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+    }
 }
 
-async function logBotMessage(contactNumber: string, message: string) {
-    const cardsRef = db.collectionGroup('cards').where('contactNumber', '==', contactNumber);
-    const snapshot = await cardsRef.get();
-    if (!snapshot.empty) await snapshot.docs[0].ref.update({ lastMessage: message, messages: admin.firestore.FieldValue.arrayUnion({ sender: 'agent', text: message, timestamp: new Date() }) });
+async function logBotMessage(contactNumber: string, message: string, cardId?: string, groupId?: string) {
+    let docRef: FirebaseFirestore.DocumentReference | null = null;
+
+    if (cardId && groupId) {
+        docRef = db.collection('kanban-groups').doc(groupId).collection('cards').doc(cardId);
+    } else if (cardId) {
+        const groups = await db.collection('kanban-groups').get();
+        for (const group of groups.docs) {
+            const ref = group.ref.collection('cards').doc(cardId);
+            // We don't check existence to speed up, assuming it exists if passed. 
+            // But collectionGroup is tricky without knowing group ID.
+            // Wait, without group ID we cannot construct ref directly.
+            // We MUST search or pass groupId.
+            // Since we don't pass groupId, we still have to find it.
+            const snap = await ref.get();
+            if (snap.exists) {
+                docRef = ref;
+                break;
+            }
+        }
+    }
+
+    if (!docRef) {
+        const cardsRef = db.collectionGroup('cards').where('contactNumber', '==', contactNumber);
+        const snapshot = await cardsRef.get();
+        if (!snapshot.empty) docRef = snapshot.docs[0].ref;
+    }
+
+    if (docRef) {
+        await docRef.update({ lastMessage: message, messages: admin.firestore.FieldValue.arrayUnion({ sender: 'agent', text: message, timestamp: new Date() }) });
+    }
 }

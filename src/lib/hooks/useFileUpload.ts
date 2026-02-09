@@ -77,7 +77,14 @@ export const useFileUpload = () => {
                         };
 
                         await updateDoc(doc(db, 'kanban-groups', groupId, 'cards', cardId), {
-                            documents: arrayUnion(fileData)
+                            documents: arrayUnion(fileData),
+                            history: arrayUnion({
+                                id: `hist_${Date.now()}`,
+                                type: 'file',
+                                content: `Archivo enviado: ${file.name}`,
+                                timestamp: Timestamp.now(),
+                                author: 'Agente'
+                            })
                         });
 
                         setUploading(false);

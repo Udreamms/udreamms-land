@@ -51,7 +51,7 @@ export default function ConversationModal(props: ConversationModalProps) {
 
   const floatingStyle: React.CSSProperties = {
     position: 'fixed',
-    left: isCollapsed ? '80px' : '176px',
+    left: isCollapsed ? '96px' : '280px',
     right: '0px',
     top: '84px',
     bottom: '0px',
@@ -313,6 +313,8 @@ export default function ConversationModal(props: ConversationModalProps) {
                 onEmojiClick={logic.onEmojiClick}
                 onClose={props.onClose}
                 chatSearchTerm={chatSearchTerm}
+                isWithin24Hours={logic.isWithin24Hours}
+                sendTemplateMessage={logic.sendTemplateMessage}
               />
             </div>
 
@@ -334,7 +336,7 @@ export default function ConversationModal(props: ConversationModalProps) {
                       liveCardData={logic.liveCardData}
                       contactInfo={logic.contactInfo}
                       handleInfoChange={logic.handleInfoChange}
-                      handleInfoSave={logic.handleInfoSave}
+                      handleInfoSave={async () => { await logic.handleInfoSave(); }}
                       setContactInfo={logic.setContactInfo}
                       currentGroupName={logic.currentGroupName}
                       toggleChecklistItem={logic.toggleChecklistItem}
@@ -367,6 +369,10 @@ export default function ConversationModal(props: ConversationModalProps) {
                       handleEditNote={logic.handleEditNote}
                       handleDeleteNote={logic.handleDeleteNote}
                       handleSaveEditedNote={logic.handleSaveEditedNote}
+                      newHistoryComment={logic.newHistoryComment}
+                      setNewHistoryComment={logic.setNewHistoryComment}
+                      handleSaveHistoryComment={logic.handleSaveHistoryComment}
+                      crmId={logic.crmId}
                     />
                   </div>
                 </motion.div>

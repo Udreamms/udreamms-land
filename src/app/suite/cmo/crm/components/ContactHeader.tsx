@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { RefreshCw, UserPlus } from 'lucide-react';
+import { RefreshCw, UserPlus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -73,7 +73,7 @@ export const ContactHeader: React.FC<ContactHeaderProps> = ({
                     className="h-10 bg-neutral-900 border-neutral-800 hover:border-neutral-700 hover:bg-neutral-800 text-white rounded-md px-4 text-xs font-medium transition-all disabled:opacity-50 uppercase tracking-wider"
                 >
                     <RefreshCw className={`w-3 h-3 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
-                    {isSyncing ? 'Syncing...' : 'Sync WhatsApp'}
+                    {isSyncing ? 'Syncing...' : 'Sync'}
                 </Button>
 
                 <ImportDialog
@@ -89,13 +89,13 @@ export const ContactHeader: React.FC<ContactHeaderProps> = ({
                             Create Profile
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="bg-neutral-950 border-neutral-800 text-white sm:max-w-4xl rounded-3xl p-8 backdrop-blur-3xl max-h-[90vh] overflow-y-auto">
+                    <DialogContent className="bg-neutral-950 border-neutral-800 text-white sm:max-w-6xl rounded-3xl p-8 backdrop-blur-3xl max-h-[90vh] overflow-y-auto">
                         <DialogHeader>
                             <DialogTitle className="text-2xl font-medium tracking-tight uppercase">Create Profile</DialogTitle>
                             <DialogDescription className="text-neutral-300 font-medium">Add a comprehensive contact profile to your ecosystem.</DialogDescription>
                         </DialogHeader>
                         <div className="py-6">
-                            <EnhancedContactForm contact={newContact} onChange={setNewContact} />
+                            <EnhancedContactForm contact={newContact} onChange={setNewContact} isEditing={true} />
                         </div>
                         <DialogFooter>
                             <Button variant="ghost" onClick={() => setIsAddModalOpen(false)} className="text-neutral-300 font-medium hover:text-white rounded-xl px-6">Cancel</Button>

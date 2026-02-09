@@ -7,11 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 interface TabPassportProps {
     contact: any;
     updateField: (field: string, value: any) => void;
+    isEditing?: boolean;
 }
 
-export const TabPassport: React.FC<TabPassportProps> = ({ contact, updateField }) => {
+export const TabPassport: React.FC<TabPassportProps> = ({ contact, updateField, isEditing = false }) => {
     return (
-        <div className="space-y-6">
+        <fieldset disabled={!isEditing} className="space-y-6 block border-0 p-0 m-0 min-w-0">
             <Card className="bg-neutral-900 border-neutral-800">
                 <CardHeader>
                     <CardTitle className="text-sm font-medium text-white uppercase tracking-wider">Información del Pasaporte</CardTitle>
@@ -96,6 +97,6 @@ export const TabPassport: React.FC<TabPassportProps> = ({ contact, updateField }
                     )}
                 </CardContent>
             </Card>
-        </div>
+        </fieldset>
     );
 };

@@ -44,21 +44,21 @@ async function recursiveDelete(
   docRef: admin.firestore.DocumentReference,
   batch: admin.firestore.WriteBatch
 ): Promise<void> {
-    const collections = await docRef.listCollections();
-    for (const collection of collections) {
-        const docs = await collection.get();
-        for (const doc of docs.docs) {
-            // Important: Await the recursive call for each sub-document
-            await recursiveDelete(doc.ref, batch);
-        }
+  const collections = await docRef.listCollections();
+  for (const collection of collections) {
+    const docs = await collection.get();
+    for (const doc of docs.docs) {
+      // Important: Await the recursive call for each sub-document
+      await recursiveDelete(doc.ref, batch);
     }
-    batch.delete(docRef);
+  }
+  batch.delete(docRef);
 }
 
 /**
  * A callable function to move a card and its subcollections from one group to another.
  */
-export const moveCard = functions.https.onCall(async (data, context) => {
+export const moveCard = functions.https.onCall(async (data: any, context: functions.https.CallableContext) => {
   // 1. **Security:** Authentication is now required.
   if (!context.auth) {
     throw new functions.https.HttpsError(
@@ -88,7 +88,7 @@ export const moveCard = functions.https.onCall(async (data, context) => {
     // 3. **Execution:** Copy, then delete, within a single atomic batch.
     await recursiveCopy(sourceCardRef, destCardRef, batch);
     await recursiveDelete(sourceCardRef, batch);
-    
+
     // 4. **Commit:** Execute all operations at once.
     await batch.commit();
 

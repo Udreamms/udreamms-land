@@ -1,5 +1,5 @@
 import React from 'react';
-import { Instagram, Facebook, Linkedin, Youtube, Twitter, Globe2, FileSpreadsheet, ChevronDown, CheckCheck, Paperclip, ImageIcon, FileText, Smile, Send, Loader2, X, ChevronRight } from 'lucide-react';
+import { Instagram, Facebook, Linkedin, Youtube, Twitter, Globe2, FileSpreadsheet, ChevronDown, CheckCheck, Paperclip, ImageIcon, FileText, Smile, Send, Loader2, X, ChevronRight, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
@@ -37,6 +37,8 @@ interface ChatSectionProps {
     onEmojiClick: (emojiData: any) => void;
     onClose: () => void;
     chatSearchTerm?: string;
+    isWithin24Hours?: boolean;
+    sendTemplateMessage: (name?: string) => Promise<void>;
 }
 
 export const ChatSection: React.FC<ChatSectionProps> = ({
@@ -65,7 +67,9 @@ export const ChatSection: React.FC<ChatSectionProps> = ({
     open,
     onEmojiClick,
     onClose,
-    chatSearchTerm = ''
+    chatSearchTerm = '',
+    isWithin24Hours = true,
+    sendTemplateMessage // Destructure new prop
 }) => {
 
     // Helper functionality for search highlighting
@@ -265,8 +269,8 @@ export const ChatSection: React.FC<ChatSectionProps> = ({
                                         handleSendMessage();
                                     }
                                 }}
-                                placeholder="Escribe un mensaje..."
-                                className="bg-transparent border-none text-[11px] h-7 min-h-0 resize-none py-1.5 px-2 focus-visible:ring-0 placeholder:text-neutral-600 font-medium"
+                                placeholder={!isWithin24Hours ? "Escribe un mensaje de reapertura..." : "Escribe un mensaje..."}
+                                className="bg-transparent border-none text-[11px] h-7 min-h-0 resize-none py-1.5 px-2 focus-visible:ring-0 placeholder:text-neutral-600 font-medium disabled:opacity-50"
                                 rows={1}
                             />
 

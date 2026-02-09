@@ -36,6 +36,8 @@ interface ContactFiltersProps {
     selectedTags: string[];
     setSelectedTags: (tags: string[] | ((prev: string[]) => string[])) => void;
     filteredCount: number;
+    selectedCount: number;
+    handleBulkDelete: () => void;
 }
 
 export const ContactFilters: React.FC<ContactFiltersProps> = ({
@@ -57,7 +59,9 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
     availableTags,
     selectedTags,
     setSelectedTags,
-    filteredCount
+    filteredCount,
+    selectedCount,
+    handleBulkDelete
 }) => {
     return (
         <motion.div
@@ -246,9 +250,17 @@ export const ContactFilters: React.FC<ContactFiltersProps> = ({
                         </DialogContent>
                     </Dialog>
 
-                    <Button variant="ghost" size="icon" className="text-neutral-400 hover:text-red-500 h-10 w-10">
-                        <Trash2 className="w-5 h-5" />
-                    </Button>
+                    {selectedCount > 0 && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={handleBulkDelete}
+                            className="text-white hover:text-white h-10 px-3 w-auto bg-red-600 hover:bg-red-700 rounded-md flex gap-2 items-center transition-all animate-in fade-in zoom-in duration-200"
+                        >
+                            <Trash2 className="w-4 h-4" />
+                            <span className="text-[10px] font-bold uppercase tracking-wider">Delete ({selectedCount})</span>
+                        </Button>
+                    )}
                 </div>
             )}
         </motion.div>

@@ -22,7 +22,7 @@ async function logMessageInCard(groupId: string, cardId: string, text: string, w
 }
 
 // Function to handle sending TEXT messages
-export const sendWhatsappMessage = functions.https.onCall(async (data, context) => {
+export const sendWhatsappMessage = functions.https.onCall(async (data: any, context: functions.https.CallableContext) => {
     if (!context.auth) {
         throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
     }
@@ -45,7 +45,7 @@ export const sendWhatsappMessage = functions.https.onCall(async (data, context) 
 });
 
 // Function to handle sending MEDIA messages (images, documents, etc.)
-export const sendWhatsappMediaMessage = functions.https.onCall(async (data, context) => {
+export const sendWhatsappMediaMessage = functions.https.onCall(async (data: any, context: functions.https.CallableContext) => {
     if (!context.auth) {
         throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
     }
