@@ -9,7 +9,7 @@ import {
 
 export default function ValuePropsSection() {
     return (
-        <div className="relative z-30 pt-24 pb-20 px-6 bg-white translate-y-[-100px] rounded-t-[3rem]">
+        <div className="relative z-30 pt-24 pb-0 px-6 bg-white translate-y-[-100px] rounded-t-[3rem]">
             <div className="container mx-auto">
                 {/* Floating Icons adapted for FIFA */}
                 <FadeIn>
@@ -31,7 +31,7 @@ export default function ValuePropsSection() {
                             return (
                                 <motion.div
                                     key={index}
-                                    className="w-16 h-16 md:w-20 md:h-20 bg-slate-50 rounded-2xl md:rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-center text-slate-800 hover:text-orange-600 hover:bg-white cursor-pointer border border-slate-100"
+                                    className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-2xl md:rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-center text-red-600 hover:text-white hover:bg-black cursor-pointer border border-slate-100 transition-colors duration-300"
                                     animate={{
                                         y: [0, -yRange, 0],
                                     }}
@@ -49,6 +49,16 @@ export default function ValuePropsSection() {
                         })}
                     </div>
                 </FadeIn>
+
+                {/* Introductory Phrase */}
+                <div className="mt-20 mb-0 text-center max-w-4xl mx-auto">
+                    <FadeIn delay={0.5}>
+                        <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-[#1a2b3b] leading-tight">
+                            Que tu trámite no te <br />
+                            <span className="text-slate-500">deje fuera del Estadio</span>
+                        </h2>
+                    </FadeIn>
+                </div>
             </div>
         </div>
     );

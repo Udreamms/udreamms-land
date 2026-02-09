@@ -185,7 +185,7 @@ export default function PlansSection() {
                                             return (
                                                 <div key={i} className="flex items-start gap-3 text-slate-700">
                                                     {/* Icons kept colorful (google gradient) */}
-                                                    <div className="mt-0.5 p-1.5 rounded-full flex-shrink-0 bg-green-50 shadow-sm border border-green-100">
+                                                    <div className="mt-0.5 p-1.5 rounded-full flex-shrink-0 bg-slate-50 border border-slate-100">
                                                         <Icon size={20} stroke="url(#google-gradient)" strokeWidth={2.5} />
                                                     </div>
                                                     <span className="text-sm font-medium leading-[1.5] pt-0.5">

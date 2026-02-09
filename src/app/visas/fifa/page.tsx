@@ -3,18 +3,20 @@
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import HeroSection from "./_components/HeroSection";
+import StadiumsShowcase from "./_components/StadiumsShowcase";
+import FifaRequirementsSection from "./_components/FifaRequirementsSection";
 import ValuePropsSection from "./_components/ValuePropsSection";
-import SystemGapSection from "./_components/SystemGapSection";
-import BenefitsSection from "./_components/BenefitsSection";
-import AgitationSection from "./_components/AgitationSection";
 import SuccessVideoSection from "./_components/SuccessVideoSection";
-import SolutionSection from "./_components/SolutionSection";
-import SocialProofSection from "./_components/SocialProofSection";
-import GuaranteeSection from "./_components/GuaranteeSection";
-import FAQSection from "./_components/FAQSection";
+import FifaWhyChooseUs from "./_components/FifaWhyChooseUs";
+import FifaSuccessStories from "./_components/FifaSuccessStories";
+import FifaYouTubeSocial from "./_components/FifaYouTubeSocial";
+import FifaBuyCta from "./_components/FifaBuyCta";
 import ScarcitySection from "./_components/ScarcitySection";
-import QuizSection from "./_components/QuizSection";
 import PlansSection from "./_components/PlansSection";
+import FanPassShowcase from "./_components/FanPassShowcase";
+import FanFollowShowcase from "./_components/FanFollowShowcase";
+import WorldCupEliteShowcase from "./_components/WorldCupEliteShowcase";
+import StatsBar from "./_components/StatsBar";
 
 export default function FifaVisaPage() {
   return (
@@ -23,16 +25,18 @@ export default function FifaVisaPage() {
       <HeroSection />
       <PlansSection />
       <ValuePropsSection />
-      <SystemGapSection />
-      <BenefitsSection />
-      <AgitationSection />
+      <FanPassShowcase />
+      <FanFollowShowcase />
+      <WorldCupEliteShowcase />
+      <StatsBar />
+      <StadiumsShowcase />
+      <FifaRequirementsSection />
       <SuccessVideoSection />
-      <SolutionSection />
-      <SocialProofSection />
-      <GuaranteeSection />
-      <FAQSection />
+      <FifaWhyChooseUs />
+      <FifaSuccessStories />
+      <FifaYouTubeSocial />
+      <FifaBuyCta />
       <ScarcitySection />
-      <QuizSection />
       <Footer />
     </div>
   );

@@ -1,46 +1,45 @@
 "use client";
 
-import { Smartphone } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Volume2, VolumeX } from "lucide-react";
+import { useState } from "react";
 
 export default function AppSection() {
-  return (
-    <section id="app-section" className="bg-[#D1113D] py-24 relative overflow-hidden">
-      {/* Background patterns can be added here later if needed */}
-      <div className="container px-6 mx-auto relative z-10">
-        <div className="flex flex-col items-center text-center">
+  const [isMuted, setIsMuted] = useState(true);
+  const videoId = "4tiRi0L9ciw";
 
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 mb-8">
-            <h2 className="text-5xl md:text-8xl font-medium tracking-tighter text-white">
-              Descarga
-            </h2>
-            <div className="w-20 h-20 md:w-32 md:h-32 bg-white rounded-3xl flex items-center justify-center shadow-2xl">
-              <img
-                src="/assets/logo-icon.png"
-                alt="Udreamms Logo"
-                className="w-12 h-12 md:w-20 md:h-20 object-contain"
-                onError={(e) => {
-                  e.currentTarget.src = "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2Flogo_white.png?alt=media";
-                }}
-              />
+  return (
+    <section id="app-section" className="py-12 bg-white relative overflow-hidden">
+      <div className="w-full px-0 mx-auto">
+        {/* Larger video container - No border, increased height */}
+        <div className="relative aspect-video md:aspect-[16/7] bg-slate-900 overflow-hidden shadow-2xl group cursor-pointer transition-all">
+
+          {/* Video Background */}
+          <iframe
+            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&enablejsapi=1`}
+            className="absolute inset-0 w-full h-full object-cover scale-[1.01] group-hover:scale-100 transition-transform duration-[5s]"
+            allow="autoplay; encrypted-media"
+          />
+
+          {/* Clean Overlay Mesh */}
+          <div className="absolute inset-0 bg-black/10 z-10 pointer-events-none" />
+
+          {/* Central Play Indicator - Refined for transparency and white colors */}
+          <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none transition-opacity duration-500">
+            <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 flex items-center justify-center transition-all duration-700 group-hover:scale-110">
+              <div className="w-20 h-20 md:w-28 md:h-28 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-3xl">
+                {/* Transparent white play icon */}
+                <div className="w-0 h-0 border-t-[14px] border-t-transparent border-l-[24px] border-l-white/60 border-b-[14px] border-b-transparent ml-2" />
+              </div>
             </div>
-            <h2 className="text-5xl md:text-8xl font-medium tracking-tighter text-white">
-              Udreamms
-            </h2>
           </div>
 
-          <h2 className="text-5xl md:text-8xl font-medium tracking-tighter text-white mb-10">
-            para comenzar
-          </h2>
-
-          <p className="text-xl md:text-2xl text-white/90 font-medium mb-12 max-w-2xl">
-            Utilizada por cientos de estudiantes en Estados Unidos
-          </p>
-
-          <Button className="rounded-full bg-white text-slate-900 hover:bg-white/90 font-medium px-12 py-8 text-xl shadow-2xl transition-all border-none flex items-center gap-3">
-            <Smartphone className="w-6 h-6" />
-            Descargar Udreamms App
-          </Button>
+          {/* Audio Toggle Button - Minimalist Style */}
+          <button
+            onClick={() => setIsMuted(!isMuted)}
+            className="absolute bottom-8 right-8 z-30 w-14 h-14 md:w-16 md:h-16 rounded-full bg-black/20 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-black/40 transition-all active:scale-90 shadow-xl"
+          >
+            {isMuted ? <VolumeX className="w-5 h-5 md:w-6 md:h-6" /> : <Volume2 className="w-5 h-5 md:w-6 md:h-6" />}
+          </button>
         </div>
       </div>
     </section>

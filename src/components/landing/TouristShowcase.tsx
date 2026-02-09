@@ -9,28 +9,28 @@ import { Button } from "@/components/ui/button";
 const features = [
     {
         id: "ds160",
-        title: "Formulario DS-160",
-        description: "Llenado profesional del Formulario DS-160 para evitar errores críticos que podrían causar el rechazo de tu visa.",
+        title: "Aplicación y Gestión de Visa de Turista",
+        description: "Gestionamos todo tu proceso migratorio para que obtengas tu visa de turista B1/B2: preparación profesional de documentos, seguimiento personalizado y simulaciones de entrevista consular.",
         image: "/assets/generated/tourist_showcase_disney.png",
         video: "https://www.youtube.com/embed/ksaKUwErSGw"
     },
     {
         id: "entrevista",
-        title: "Entrevista Consular",
-        description: "Simulacros individuales con expertos para garantizar tu confianza y preparación ante las preguntas del oficial consular.",
+        title: "Planes de Viaje y Itinerarios Personalizados",
+        description: "Te ayudamos a diseñar tu viaje a Estados Unidos con itinerarios a medida, recomendaciones de destinos, rutas turísticas y actividades adaptadas a tus intereses.",
         image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=1000&auto=format&fit=crop",
+    },
+    {
+        id: "itinerario",
+        title: "Servicios de Alojamiento y Logística",
+        description: "Asistencia para encontrar alojamiento seguro, transporte y servicios esenciales durante tu estadía, garantizando una experiencia cómoda y sin contratiempos.",
+        image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=1000&auto=format&fit=crop",
     },
     {
         id: "citas",
         title: "Citas Prioritarias",
         description: "Monitoreo constante del sistema para obtener tu cita en el menor tiempo posible, adelantando meses de espera.",
         image: "https://images.unsplash.com/photo-1506784917876-491d607bd931?q=80&w=1000&auto=format&fit=crop",
-    },
-    {
-        id: "itinerario",
-        title: "Itinerario y Alojamiento",
-        description: "Planificación personalizada de tu viaje a los mejores destinos de EE. UU., asegurando una experiencia vacacional completa.",
-        image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=1000&auto=format&fit=crop",
     },
 ];
 
