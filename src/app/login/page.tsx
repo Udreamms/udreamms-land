@@ -29,7 +29,7 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       toast.success('Sesión iniciada correctamente');
-      router.push('/cso/whatsapp');
+      router.push('/suite');
     } catch (error: any) {
       toast.error('Error al iniciar sesión: ' + error.message);
     } finally {
@@ -42,7 +42,7 @@ export default function LoginPage() {
     try {
       await signInWithPopup(auth, provider);
       toast.success('Sesión iniciada con Google');
-      router.push('/cso/whatsapp');
+      router.push('/suite');
     } catch (error: any) {
       toast.error('Error con Google: ' + error.message);
     }
