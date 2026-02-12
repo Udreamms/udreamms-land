@@ -1,5 +1,5 @@
 {
-  "name": "udreamms-platform",
+  "name": "web-udreamms",
   "version": "1.0.0",
   "description": "Plataforma de desarrollo de software impulsada por IA para crear, desplegar y gestionar aplicaciones full-stack.",
   "main": "index.js",
