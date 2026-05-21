@@ -129,14 +129,14 @@ export default function StageDetails() {
         </div>
 
         {/* Footer Call to Action - Now White background with Black button */}
-        <div className="mt-12 flex flex-col md:flex-row items-center justify-between p-10 bg-white border border-slate-100 rounded-[3rem] text-slate-950 gap-8 shadow-2xl shadow-slate-200/50">
+        <div className="mt-12 flex flex-col md:flex-row items-center justify-between p-6 md:p-10 bg-white border border-slate-100 rounded-[3rem] text-slate-950 gap-6 md:gap-8 shadow-2xl shadow-slate-200/50">
           <div className="max-w-xl text-center md:text-left">
             <h3 className="text-2xl md:text-3xl font-medium tracking-tight mb-2 text-slate-950">¿Ya identificaste tu fase?</h3>
             <p className="text-slate-500 font-medium">Nuestros expertos están listos para impulsarte al siguiente nivel sin importar dónde empieces.</p>
           </div>
           <Button
             size="lg"
-            className="rounded-full px-10 py-8 bg-slate-950 text-white hover:bg-slate-900 font-bold text-xl shadow-xl transition-all hover:-translate-y-1 active:scale-95 shrink-0"
+            className="rounded-full px-6 py-6 md:px-10 md:py-8 w-full md:w-auto bg-slate-950 text-white hover:bg-slate-900 font-bold text-lg md:text-xl shadow-xl transition-all hover:-translate-y-1 active:scale-95 shrink-0"
             onClick={() => document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' })}
           >
             Comienza Ahora

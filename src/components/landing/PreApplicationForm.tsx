@@ -110,7 +110,7 @@ const PreApplicationForm = ({ onClose }: PreApplicationFormProps) => {
           <X className="w-6 h-6" />
         </button>
 
-        <div className="p-8 md:p-10">
+        <div className="p-6 md:p-10">
           <div className="text-center mb-10">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
               <Send className="w-8 h-8 text-primary" />
@@ -351,7 +351,7 @@ const PreApplicationForm = ({ onClose }: PreApplicationFormProps) => {
               </div>
 
               {/* Botones de acción */}
-              <div className="flex gap-4 pt-6 mt-4 border-t border-gray-100 dark:border-gray-800">
+              <div className="flex flex-col-reverse md:flex-row gap-4 pt-6 mt-4 border-t border-gray-100 dark:border-gray-800">
                 <Button
                   type="button"
                   variant="outline"

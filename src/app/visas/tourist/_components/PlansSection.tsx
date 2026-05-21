@@ -88,7 +88,7 @@ export default function PlansSection() {
                 </div>
 
                 {/* Main White Container wrapping all plans */}
-                <div className="max-w-[1200px] mx-auto bg-slate-200 rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-300 relative overflow-hidden">
+                <div className="max-w-[1200px] mx-auto bg-slate-200 rounded-[2.5rem] p-4 md:p-8 shadow-md border border-slate-300 relative overflow-hidden">
 
                     {/* Limited Time Badge - Animated Gradient */}
                     <div className="absolute top-0 right-0 bg-gradient-to-r from-orange-600 to-red-600 text-white text-[10px] font-medium uppercase tracking-widest px-6 py-2 rounded-bl-3xl shadow-lg z-20 animate-pulse">

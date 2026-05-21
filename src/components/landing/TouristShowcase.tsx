@@ -8,9 +8,9 @@ export default function TouristShowcase() {
     const isInView = useInView(ref, { margin: "-20% 0px -20% 0px" });
 
     return (
-        <section className="py-24 lg:py-32 bg-white text-black overflow-hidden font-sans">
+        <section className="py-16 lg:py-32 bg-white text-black overflow-hidden font-sans">
             <div className="container mx-auto px-6 max-w-[1500px]">
-                <div className="flex flex-col lg:flex-row gap-12 lg:gap-24 items-center lg:items-center">
+                <div className="flex flex-col lg:flex-row gap-8 lg:gap-24 items-center lg:items-center">
                     
                     {/* Left Column: Text */}
                     <div className="w-full lg:w-[35%] flex flex-col pt-2 lg:pt-10 pr-0 lg:pr-8">

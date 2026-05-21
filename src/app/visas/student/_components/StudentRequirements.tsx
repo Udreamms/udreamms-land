@@ -138,7 +138,7 @@ export default function StudentRequirements() {
                                     whileInView={{ opacity: 1, scale: 1 }}
                                     viewport={{ once: true }}
                                     transition={{ duration: 0.8, delay: index * 0.15 }}
-                                    className={`group flex-shrink-0 w-[300px] md:w-[380px] aspect-square p-12 snap-center transition-all duration-700 ${shape} hover:scale-[1.05] shadow-xl hover:shadow-2xl bg-white border-2 border-slate-200 flex flex-col justify-center items-center text-center`}
+                                    className={`group flex-shrink-0 w-[300px] md:w-[380px] aspect-square p-6 md:p-12 snap-center transition-all duration-700 ${shape} hover:scale-[1.05] shadow-xl hover:shadow-2xl bg-white border-2 border-slate-200 flex flex-col justify-center items-center text-center`}
                                 >
                                     <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-8 border border-slate-100 group-hover:bg-slate-100 transition-colors duration-500">
                                         <Icon size={36} strokeWidth={1.5} className="text-black" />
@@ -195,7 +195,7 @@ export default function StudentRequirements() {
                 </div>
 
                 {/* Call to Action Box - Centered and clean */}
-                <div className="mt-16 bg-white rounded-[2.5rem] p-8 md:p-12 border border-slate-100 shadow-2xl flex flex-col items-center justify-center text-center relative overflow-hidden">
+                <div className="mt-16 bg-white rounded-[2.5rem] p-6 md:p-12 border border-slate-100 shadow-2xl flex flex-col items-center justify-center text-center relative overflow-hidden">
                     <div className="relative z-10">
                         <h4 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2 tracking-tight">¿Dudas con los documentos?</h4>
                         <p className="text-slate-500 font-medium max-w-2xl">Nuestros expertos revisan cada archivo para garantizar tu aprobación.</p>

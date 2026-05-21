@@ -128,10 +128,10 @@ export default function Header() {
           }`}
         onMouseLeave={handleMouseLeave}
       >
-        <div className="w-full px-6 md:px-12 h-14 flex items-center justify-between relative">
+        <div className="w-full px-4 md:px-8 lg:px-12 h-14 flex items-center justify-between relative">
 
           {/* GRUPO IZQUIERDA: LOGO + NAV */}
-          <div className="flex items-center gap-12 h-full">
+          <div className="flex items-center gap-4 lg:gap-12 h-full">
             <Link href="/" className="flex items-center gap-2 z-50 shrink-0 group">
               <div className="w-7 h-7 relative transition-transform duration-300 group-hover:scale-110">
                 <img src="/icons/new-icon-udreamms.png" alt="Udreamms" className="object-contain w-full h-full drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" />

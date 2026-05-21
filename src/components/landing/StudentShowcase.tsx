@@ -20,9 +20,9 @@ export default function StudentShowcase() {
     }, [isInView]);
 
     return (
-        <section className="py-24 lg:py-32 bg-white text-black overflow-hidden font-sans">
+        <section className="py-16 lg:py-32 bg-white text-black overflow-hidden font-sans">
             <div className="container mx-auto px-6 max-w-[1500px]">
-                <div className="flex flex-col lg:flex-row-reverse gap-12 lg:gap-24 items-center lg:items-center">
+                <div className="flex flex-col lg:flex-row-reverse gap-8 lg:gap-24 items-center lg:items-center">
                     
                     {/* Left Column: Text (Visually on Right) */}
                     <div className="w-full lg:w-[35%] flex flex-col pt-2 lg:pt-10 pl-0 lg:pl-8">

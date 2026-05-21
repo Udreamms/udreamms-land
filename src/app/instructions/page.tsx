@@ -15,7 +15,7 @@ const planDetails: Record<PlanId, { normal: string, crypto: string, title: strin
     vip: { normal: "$6,500", crypto: "$4,990", title: "Experiencia VIP", icon: Trophy, color: "text-amber-500", activeClass: "border-amber-500 ring-2 ring-amber-500 bg-amber-50/50", stripeLink: "https://buy.stripe.com/bJe3cvfx1cnoeC6fujenS0z" },
 };
 
-const fadeInUp = {
+const fadeInUp: any = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
 };
@@ -107,7 +107,7 @@ export default function InstructionsPage() {
                                         whileHover={{ y: -4, scale: 1.01 }}
                                         whileTap={{ scale: 0.98 }}
                                         onClick={() => setPaymentMethod('crypto')}
-                                        className={`relative overflow-hidden p-8 rounded-3xl text-left transition-all duration-300 border-2
+                                        className={`relative overflow-hidden p-6 md:p-8 rounded-3xl text-left transition-all duration-300 border-2
                                             ${paymentMethod === 'crypto' ? 'border-blue-400 ring-4 ring-blue-400/20' : 'border-transparent'}
                                             bg-[#0B1120] text-white shadow-2xl hover:shadow-blue-500/10`}
                                     >
@@ -139,7 +139,7 @@ export default function InstructionsPage() {
                                         whileHover={{ y: -4, scale: 1.01 }}
                                         whileTap={{ scale: 0.98 }}
                                         onClick={() => setPaymentMethod('card')}
-                                        className={`relative overflow-hidden p-8 rounded-3xl text-left transition-all duration-300 border-2
+                                        className={`relative overflow-hidden p-6 md:p-8 rounded-3xl text-left transition-all duration-300 border-2
                                             ${paymentMethod === 'card' ? 'border-indigo-400 ring-4 ring-indigo-400/20' : 'border-transparent'}
                                             bg-gradient-to-br from-indigo-600 to-purple-700 text-white shadow-2xl hover:shadow-indigo-500/20`}
                                     >
@@ -185,7 +185,7 @@ export default function InstructionsPage() {
                                     <h2 className="text-2xl font-bold text-slate-800">Sigue estas instrucciones</h2>
                                 </div>
 
-                                <div className="bg-white p-8 md:p-12 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden">
+                                <div className="bg-white p-6 md:p-12 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden">
                                     {/* Decorative background shape */}
                                     <div className={`absolute -top-24 -right-24 w-64 h-64 rounded-full blur-3xl opacity-20 ${paymentMethod === 'crypto' ? 'bg-blue-400' : 'bg-indigo-500'}`}></div>
                                     
