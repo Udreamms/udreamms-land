@@ -1,7 +1,7 @@
 "use client";
 
 import { Instagram, ChevronLeft, ChevronRight, Play } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 const studentVideos = [
@@ -51,6 +51,7 @@ const studentVideos = [
 
 export default function JoinOurStudents() {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [hoveredCardId, setHoveredCardId] = useState<number | null>(null);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
@@ -70,8 +71,7 @@ export default function JoinOurStudents() {
         <div className="mb-12 flex flex-col md:flex-row justify-between items-end gap-8">
           <div className="max-w-3xl">
             <h2 className="text-4xl md:text-6xl font-medium tracking-tight mb-4 text-black">
-              Historias de Éxito <br className="hidden md:block" />
-              <span className="text-black font-medium">Reales.</span>
+              Historias de Éxito Reales
             </h2>
             <p className="text-xl text-black font-normal leading-relaxed">
               Descubre por qué cientos de estudiantes confían en nosotros para su futuro.
@@ -107,18 +107,40 @@ export default function JoinOurStudents() {
           {studentVideos.map((story) => (
             <div
               key={story.id}
-              className="relative shrink-0 snap-center w-[280px] md:w-[320px] aspect-[9/16] rounded-[2rem] overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500"
+              onMouseEnter={() => setHoveredCardId(story.id)}
+              onMouseLeave={() => setHoveredCardId(null)}
+              className="relative shrink-0 snap-center w-[220px] md:w-[260px] aspect-[9/16] rounded-[2rem] overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500 bg-black"
             >
-              {/* Background Image */}
+              {/* Background Image / Video */}
               <div className="absolute inset-0">
-                <img
-                  src={story.thumb}
-                  alt={story.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
+                {hoveredCardId === story.id ? (
+                  <video
+                    src={story.video}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover transition-opacity duration-500 opacity-100"
+                  />
+                ) : (
+                  <img
+                    src={story.thumb}
+                    alt={story.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+                  />
+                )}
                 {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
               </div>
+
+              {/* Play Icon overlay when not playing */}
+              {hoveredCardId !== story.id && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 text-white shadow-xl transition-all group-hover:scale-110 group-hover:bg-white/35">
+                    <Play className="w-6 h-6 fill-white text-white ml-1" />
+                  </div>
+                </div>
+              )}
 
               {/* Content Overlay */}
               <div className="absolute bottom-0 left-0 right-0 p-6 text-white translate-y-2 group-hover:translate-y-0 transition-transform duration-300">

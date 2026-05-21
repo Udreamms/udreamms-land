@@ -62,6 +62,8 @@ export default function JoinOurStudents() {
   const scrollRef = useRef<HTMLDivElement>(null);
   // Track which video is currently unmuted (active). Null means all are muted.
   const [activeVideoId, setActiveVideoId] = useState<number | null>(null);
+  // Track which video card is currently hovered
+  const [hoveredCardId, setHoveredCardId] = useState<number | null>(null);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
@@ -104,8 +106,7 @@ export default function JoinOurStudents() {
         <div className="mb-12 flex flex-col md:flex-row justify-between items-end gap-8">
           <div className="max-w-3xl">
             <h2 className="text-3xl md:text-5xl font-medium tracking-tight mb-4 text-black">
-              Historias de Éxito <br className="hidden md:block" />
-              <span className="text-black font-medium">Reales.</span>
+              Historias de Éxito Reales
             </h2>
             <p className="text-lg text-black font-normal leading-relaxed">
               Descubre por qué cientos de estudiantes confían en nosotros para su futuro.
@@ -145,22 +146,40 @@ export default function JoinOurStudents() {
               <div
                 key={story.id}
                 onClick={() => toggleAudio(story.id)}
-                className="relative shrink-0 snap-center w-[280px] md:w-[320px] aspect-[9/16] rounded-[2rem] overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500 bg-black"
+                onMouseEnter={() => setHoveredCardId(story.id)}
+                onMouseLeave={() => setHoveredCardId(null)}
+                className="relative shrink-0 snap-center w-[220px] md:w-[260px] aspect-[9/16] rounded-[2rem] overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500 bg-black"
               >
-                {/* YouTube Embed as Background */}
+                {/* YouTube Embed / Thumbnail Image */}
                 <div className="absolute inset-0 bg-black pointer-events-none">
-                  {/* Key is crucial here to force React to re-mount the iframe when mute state changes, ensuring the video reloads with new mute param */}
-                  <iframe
-                    key={`${story.id}-${isUnmuted ? 'sound' : 'muted'}`}
-                    src={getEmbedUrl(story.videoId, isUnmuted)}
-                    className="w-[300%] h-full -ml-[100%] object-cover pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity duration-500"
-                    title={`YouTube Short ${story.id}`}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    frameBorder="0"
-                  />
+                  {hoveredCardId === story.id ? (
+                    <iframe
+                      key={`${story.id}-${isUnmuted ? 'sound' : 'muted'}`}
+                      src={getEmbedUrl(story.videoId, isUnmuted)}
+                      className="w-[300%] h-full -ml-[100%] object-cover pointer-events-none opacity-100 transition-opacity duration-500"
+                      title={`YouTube Short ${story.id}`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      frameBorder="0"
+                    />
+                  ) : (
+                    <img
+                      src={`https://img.youtube.com/vi/${story.videoId}/hqdefault.jpg`}
+                      alt={story.title}
+                      className="w-full h-full object-cover opacity-85 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100"
+                    />
+                  )}
                   {/* Gradient Overlay for Text Visibility */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent pointer-events-none" />
                 </div>
+
+                {/* Play Icon overlay when not playing */}
+                {hoveredCardId !== story.id && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 text-white shadow-xl transition-all group-hover:scale-110 group-hover:bg-white/35">
+                      <Play className="w-6 h-6 fill-white text-white ml-1" />
+                    </div>
+                  </div>
+                )}
 
                 {/* Volume Control Icon (Visual Cue) */}
                 <div className="absolute top-6 right-6 flex items-center justify-center z-10 transition-transform duration-300 transform scale-0 group-hover:scale-100 mobile-visible">
@@ -176,7 +195,11 @@ export default function JoinOurStudents() {
                 {/* Content Overlay */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white translate-y-2 group-hover:translate-y-0 transition-transform duration-300 pointer-events-none">
                   <div className="flex items-center gap-2 mb-3">
-                    <Youtube className="w-5 h-5 text-red-500 fill-current" />
+                    <img
+                      src="/icons/new-icon-udreamms.png"
+                      alt="Udreamms Logo"
+                      className="w-5 h-5 object-contain"
+                    />
                     <span className="font-medium text-sm tracking-wide">{story.handle}</span>
                   </div>
 
@@ -209,7 +232,7 @@ export default function JoinOurStudents() {
         <div className="flex justify-center">
           <Button
             className="rounded-full bg-gradient-to-r from-purple-600 to-orange-500 hover:from-purple-700 hover:to-orange-600 text-white font-medium px-8 py-5 text-base shadow-xl shadow-orange-500/20 transition-all hover:scale-105 flex items-center gap-2"
-            onClick={() => window.open('https://www.instagram.com/udreamms/?hl=en', '_blank')}
+            onClick={() => window.open('https://www.instagram.com/_udreamms/', '_blank')}
           >
             Ver más en Instagram
             <Instagram className="w-5 h-5" />

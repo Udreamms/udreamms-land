@@ -87,26 +87,26 @@ export default function ExperienceSection() {
 
                 {/* New App Download CTA (Transferred from AppSection) */}
                 <div className="flex flex-col items-center text-center mb-32 group">
-                    <p className="text-purple-500 font-medium mb-6 tracking-tight uppercase text-sm md:text-base">
+                    <p className="text-white font-medium mb-6 tracking-tight uppercase text-sm md:text-base">
                         Esta aplicación solo está disponible para estudiantes en USA
                     </p>
                     <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 mb-8">
-                        <h2 className="text-4xl md:text-6xl font-medium tracking-tighter text-white">
+                        <h2 className="text-5xl md:text-7xl font-medium tracking-tighter text-white leading-none">
                             Descarga
                         </h2>
-                        <div className="w-20 h-20 md:w-32 md:h-32 rounded-3xl flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform duration-500 overflow-hidden">
+                        <div className="w-16 h-16 md:w-24 md:h-24 rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform duration-500 overflow-hidden shrink-0">
                             <img
-                                src="/icons/udreamms-app-.png"
+                                src="/icons/new-icon-udreamms.png"
                                 alt="Udreamms App Logo"
                                 className="w-full h-full object-cover"
                             />
                         </div>
-                        <h2 className="text-4xl md:text-6xl font-medium tracking-tighter text-white">
+                        <h2 className="text-5xl md:text-7xl font-medium tracking-tighter text-white leading-none">
                             Udreamms
                         </h2>
                     </div>
 
-                    <h2 className="text-4xl md:text-6xl font-medium tracking-tighter text-white mb-10">
+                    <h2 className="text-5xl md:text-7xl font-medium tracking-tighter text-white mb-10 leading-none">
                         para comenzar
                     </h2>
 
@@ -114,10 +114,15 @@ export default function ExperienceSection() {
                         Utilizada por cientos de estudiantes en Estados Unidos
                     </p>
 
-                    <Button className="rounded-full bg-white text-black hover:bg-white/90 font-medium px-12 py-8 text-xl shadow-2xl transition-all border-none flex items-center gap-3">
-                        <Smartphone className="w-6 h-6" />
-                        Descargar Udreamms App
-                    </Button>
+                    <div className="relative">
+                        <Button className="rounded-full bg-white text-black hover:bg-white/90 font-medium px-12 py-8 text-xl shadow-2xl transition-all border-none flex items-center gap-3">
+                            <Smartphone className="w-6 h-6" />
+                            Descargar Udreamms App
+                        </Button>
+                        <span className="absolute -top-3 -right-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg border border-white/20 select-none animate-pulse">
+                            Próximamente
+                        </span>
+                    </div>
                 </div>
 
                 <div className="w-full h-px bg-white/10 mb-32" />
@@ -156,7 +161,7 @@ export default function ExperienceSection() {
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen
                             ></iframe>
-                            {/* Overlay - removed shadow to allow better visibility of controls if needed, or keeping it but ensuring it doesn't block interaction */}
+                            {/* Overlay */}
                             <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]"></div>
                         </div>
                     </div>

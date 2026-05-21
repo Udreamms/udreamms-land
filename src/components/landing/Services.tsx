@@ -77,7 +77,7 @@ export default function Services({ onStartQuote, onAppClick }: ServicesProps) {
           <div className="max-w-4xl">
             <h2 className="text-3xl md:text-5xl font-medium tracking-tighter mb-4 text-black">
               Todo lo que necesitas para <br />
-              triunfar en USA.
+              triunfar en USA
             </h2>
             <p className="text-lg text-black font-normal leading-relaxed w-full">
               Un ecosistema de servicios diseñado para acompañarte en cada etapa de tu viaje.
@@ -112,7 +112,7 @@ export default function Services({ onStartQuote, onAppClick }: ServicesProps) {
               key={index}
               className="group snap-center shrink-0 w-[85vw] md:w-[450px] relative"
             >
-              <div className="relative h-[600px] w-full rounded-[3rem] overflow-hidden bg-black shadow-2xl transition-transform duration-500 group-hover:scale-[0.98]">
+              <div className="relative h-[600px] w-full rounded-[3rem] overflow-hidden bg-black shadow-2xl">
                 {/* Image Background */}
                 <div
                   className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-110"

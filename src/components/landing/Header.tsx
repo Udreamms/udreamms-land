@@ -136,7 +136,7 @@ export default function Header() {
               <div className="w-7 h-7 relative transition-transform duration-300 group-hover:scale-110">
                 <img src="/icons/new-icon-udreamms.png" alt="Udreamms" className="object-contain w-full h-full drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
               </div>
-              <span className="text-lg font-medium tracking-tight text-white group-hover:text-primary transition-colors">Udreamms</span>
+              <span className="text-lg font-medium tracking-tight text-white group-hover:text-white transition-colors">Udreamms</span>
             </Link>
 
             {/* DESKTOP NAV - Ocultar en landings de visa */}
@@ -278,7 +278,7 @@ export default function Header() {
                                   <subItem.icon className={`${item.label === 'Visas' ? 'w-5 h-5' : 'w-6 h-6'}`} strokeWidth={2} />
                                 </div>
                                 <div className="flex flex-col">
-                                  <div className={`text-white font-medium ${item.label === 'Visas' ? 'text-sm mb-0.5' : 'text-lg mb-1'} group-hover:text-primary transition-colors flex items-center gap-2`}>
+                                  <div className={`text-white font-medium ${item.label === 'Visas' ? 'text-sm mb-0.5' : 'text-lg mb-1'} group-hover:text-white transition-colors flex items-center gap-2`}>
                                     {subItem.title}
                                   </div>
                                   <p className={`text-gray-500 font-medium leading-tight group-hover:text-gray-400 ${item.label === 'Visas' ? 'text-xs' : 'text-sm leading-normal'}`}>

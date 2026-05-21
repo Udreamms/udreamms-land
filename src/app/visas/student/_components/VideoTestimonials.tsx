@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef } from "react";
-import { ChevronLeft, ChevronRight, Instagram } from "lucide-react";
+import { useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, Instagram, Play } from "lucide-react";
 import { motion } from "framer-motion";
 
 const testimonials = [
@@ -33,6 +33,7 @@ const testimonials = [
 
 export default function VideoTestimonials() {
     const scrollRef = useRef<HTMLDivElement>(null);
+    const [hoveredCardId, setHoveredCardId] = useState<number | null>(null);
 
     const scroll = (direction: 'left' | 'right') => {
         if (scrollRef.current) {
@@ -50,8 +51,7 @@ export default function VideoTestimonials() {
                 <div className="mb-12 flex flex-col md:flex-row justify-between items-end gap-6">
                     <div className="max-w-4xl">
                         <h2 className="text-4xl md:text-6xl font-medium tracking-tight mb-4 text-black">
-                            Historias de Éxito <br />
-                            <span className="text-red-600">Reales.</span>
+                            Historias de Éxito <span className="text-red-600">Reales</span>
                         </h2>
                         <p className="text-xl text-gray-500 font-medium leading-relaxed">
                             Descubre por qué cientos de estudiantes confían en nosotros para su futuro.
@@ -81,17 +81,34 @@ export default function VideoTestimonials() {
                     {testimonials.map((test) => (
                         <div
                             key={test.id}
-                            className="relative shrink-0 snap-center w-[280px] md:w-[320px] aspect-[9/16] bg-black rounded-[2.5rem] overflow-hidden group shadow-2xl"
+                            onMouseEnter={() => setHoveredCardId(test.id)}
+                            onMouseLeave={() => setHoveredCardId(null)}
+                            className="relative shrink-0 snap-center w-[220px] md:w-[260px] aspect-[9/16] bg-black rounded-[2rem] overflow-hidden group shadow-2xl"
                         >
-                            <video
-                                src={test.videoUrl}
-                                autoPlay
-                                loop
-                                muted
-                                playsInline
-                                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-100 transition-opacity" />
+                            {hoveredCardId === test.id ? (
+                                <video
+                                    src={test.videoUrl}
+                                    autoPlay
+                                    loop
+                                    muted
+                                    playsInline
+                                    className="w-full h-full object-cover opacity-100 transition-opacity duration-300"
+                                />
+                            ) : (
+                                <div className="w-full h-full bg-slate-900 flex items-center justify-center relative">
+                                    <div className="absolute inset-0 bg-cover bg-center opacity-40 filter blur-[1px]" style={{ backgroundImage: `url('/assets/hero-campus.jpg')` }} />
+                                    {/* Gradient overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-transparent to-transparent pointer-events-none" />
+                                </div>
+                            )}
+
+                            {hoveredCardId !== test.id && (
+                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 text-white shadow-xl transition-all group-hover:scale-110 group-hover:bg-white/35">
+                                        <Play className="w-6 h-6 fill-white text-white ml-1" />
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="absolute bottom-0 left-0 right-0 p-8 flex flex-col gap-2">
                                 <a
