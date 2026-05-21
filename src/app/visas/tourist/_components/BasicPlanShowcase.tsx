@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileText, Users, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 const features = [
     {
@@ -34,81 +35,89 @@ const features = [
 
 export default function BasicPlanShowcase() {
     const [activeTab, setActiveTab] = useState(features[0]);
+    const router = useRouter();
 
     return (
-        <section className="py-24 bg-white text-black overflow-hidden" id="plan-basico">
+        <section className="py-16 bg-white text-black overflow-hidden" id="plan-basico">
             <div className="container mx-auto px-6">
 
-                {/* Header: Title + Button */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-6">
-                    <div>
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 text-slate-600 font-medium text-xs uppercase tracking-widest mb-4">
-                            Opción Esencial
+                <div className="flex flex-col lg:flex-row gap-16 items-stretch relative pt-8">
+
+                    {/* Left Column: Content + Interactive List */}
+                    <div className="w-full lg:w-1/3 flex flex-col relative z-10">
+                        {/* Decorative circle based on image */}
+                        <svg className="absolute -top-16 -left-12 w-40 h-40 text-gray-800 -z-10 opacity-30" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M 50,0 A 50,50 0 0,0 0,50" stroke="currentColor" strokeWidth="0.5" strokeDasharray="2 2" />
+                        </svg>
+
+                        {/* Text Content */}
+                        <div className="mb-8">
+                            <div className="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-slate-100 text-slate-600 font-medium text-[9px] uppercase tracking-widest mb-4">
+                                Opción Esencial
+                            </div>
+                            <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium tracking-tighter text-black leading-[1.1]">
+                                Empieza con el pie derecho<br />
+                                <span className="text-black">Plan Básico</span>
+                            </h2>
+                            <p className="mt-4 text-sm text-black font-normal leading-relaxed max-w-sm">
+                                Nuestra gestión incluye auditoría, llenado de formularios y preparación para la entrevista consular con acompañamiento 1 a 1.
+                            </p>
                         </div>
-                        <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-black leading-[1.1]">
-                            Empieza con el pie derecho<br />
-                            <span className="text-black">Plan Básico</span>
-                        </h2>
-                        <p className="mt-6 text-xl text-black font-normal leading-relaxed max-w-xl">
-                            Nuestra gestión incluye auditoría, llenado de formularios y preparación para la entrevista consular con acompañamiento 1 a 1.
-                        </p>
-                    </div>
-                    <Button
-                        size="lg"
-                        className="rounded-full px-10 py-7 bg-black hover:bg-black/90 text-white font-medium text-lg shadow-xl transition-all"
-                        onClick={() => document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' })}
-                    >
-                        Elegir Plan Básico
-                    </Button>
-                </div>
 
-                <div className="flex flex-col lg:flex-row gap-16 items-start">
+                        {/* Interactive List */}
+                        <div className="flex flex-col mt-4">
+                            {features.map((feature) => {
+                                const isActive = activeTab.id === feature.id;
+                                const Icon = feature.icon;
 
-                    {/* Left Column: Interactive List */}
-                    <div className="w-full lg:w-1/3 flex flex-col">
-                        {features.map((feature) => {
-                            const isActive = activeTab.id === feature.id;
-                            const Icon = feature.icon;
-
-                            return (
-                                <div
-                                    key={feature.id}
-                                    className="group cursor-pointer"
-                                    onClick={() => setActiveTab(feature)}
-                                >
-                                    <div className="py-6 border-b border-gray-100 last:border-0">
-                                        <div className="flex items-center gap-4 mb-2">
-                                            <div className={`p-2 rounded-lg transition-colors duration-300 bg-white ${isActive ? "text-black" : "text-black group-hover:bg-gray-50"}`}>
-                                                <Icon size={20} strokeWidth={2.5} />
+                                return (
+                                    <div
+                                        key={feature.id}
+                                        className="group cursor-pointer"
+                                        onClick={() => setActiveTab(feature)}
+                                    >
+                                        <div className="py-4 border-b border-gray-100 last:border-0">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <div className={`p-1 rounded-lg transition-colors duration-300 bg-white ${isActive ? "text-black" : "text-black group-hover:bg-gray-50"}`}>
+                                                    <Icon size={16} strokeWidth={2.5} />
+                                                </div>
+                                                <h4 className={`text-base transition-colors duration-300 ${isActive ? 'font-medium text-black' : 'font-medium text-black group-hover:text-black'}`}>
+                                                    {feature.title}
+                                                </h4>
                                             </div>
-                                            <h4 className={`text-xl transition-colors duration-300 ${isActive ? 'font-medium text-black' : 'font-medium text-black group-hover:text-black'}`}>
-                                                {feature.title}
-                                            </h4>
-                                        </div>
 
-                                        <AnimatePresence>
-                                            {isActive && (
-                                                <motion.div
-                                                    initial={{ height: 0, opacity: 0 }}
-                                                    animate={{ height: "auto", opacity: 1 }}
-                                                    exit={{ height: 0, opacity: 0 }}
-                                                    transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
-                                                    className="overflow-hidden pl-[3.25rem]"
-                                                >
-                                                    <p className="pt-2 text-black leading-relaxed font-normal text-lg">
-                                                        {feature.description}
-                                                    </p>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
+                                            <AnimatePresence>
+                                                {isActive && (
+                                                    <motion.div
+                                                        initial={{ height: 0, opacity: 0 }}
+                                                        animate={{ height: "auto", opacity: 1 }}
+                                                        exit={{ height: 0, opacity: 0 }}
+                                                        transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
+                                                        className="overflow-hidden pl-[2rem]"
+                                                    >
+                                                        <p className="pt-1 text-black leading-relaxed font-normal text-xs pr-4">
+                                                            {feature.description}
+                                                        </p>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
                                     </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
+                        </div>
+                        
+                        {/* Button moved to the bottom */}
+                        <Button
+                            className="mt-6 lg:mt-auto rounded-full px-6 py-4 bg-black hover:bg-black/90 text-white font-medium text-sm shadow-xl transition-all self-start"
+                            onClick={() => router.push('/instructions')}
+                        >
+                            Elegir Plan Básico
+                        </Button>
                     </div>
 
                     {/* Right Column: Dynamic Visual */}
-                    <div className="w-full lg:w-2/3 h-full min-h-[500px] relative">
+                    <div className="w-full lg:w-2/3 h-[400px] lg:h-auto relative">
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={activeTab.id}
@@ -116,7 +125,7 @@ export default function BasicPlanShowcase() {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
                                 transition={{ duration: 0.5, ease: "easeInOut" }}
-                                className="w-full h-full relative aspect-[4/3] lg:aspect-video rounded-[2.5rem] overflow-hidden bg-white shadow-2xl"
+                                className="absolute inset-0 w-full h-full rounded-[2.5rem] overflow-hidden bg-white shadow-2xl"
                             >
                                 <img
                                     src={activeTab.image}

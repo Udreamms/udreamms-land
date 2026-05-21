@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, ChevronRight, Play, Volume2, VolumeX } from "lucide-react";
 
@@ -10,7 +10,7 @@ const destinations = [
         title: "New York City",
         location: "La Gran Manzana",
         description: "Visita la Estatua de la Libertad, pasea por Central Park y vive la magia de Times Square en la ciudad que nunca duerme.",
-        videoId: "DVwX0u534gw",
+        videoId: "TrWV7bq3FoY",
         thumbnail: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=200&h=150&auto=format&fit=crop"
     },
     {
@@ -18,7 +18,7 @@ const destinations = [
         title: "Orlando, Florida",
         location: "Capital de la Diversión",
         description: "El hogar de Walt Disney World y Universal Studios. El destino perfecto para la aventura familiar definitiva.",
-        videoId: "DVwX0u534gw",
+        videoId: "G2MxoXw1Djo",
         thumbnail: "https://images.unsplash.com/photo-1597466765990-64ad1c35dafc?q=80&w=200&h=150&auto=format&fit=crop"
     },
     {
@@ -26,7 +26,7 @@ const destinations = [
         title: "Miami, Florida",
         location: "La Puerta de las Américas",
         description: "Disfruta de las playas cristalinas de South Beach, el sabor de Little Havana y el lujo de Brickell.",
-        videoId: "DVwX0u534gw",
+        videoId: "qrm0y1ehBdQ",
         thumbnail: "https://images.unsplash.com/photo-1514214246283-d427a95c5d2f?q=80&w=200&h=150&auto=format&fit=crop"
     },
     {
@@ -34,7 +34,7 @@ const destinations = [
         title: "Las Vegas, Nevada",
         location: "Luces y Espectáculos",
         description: "Experimenta la vibrante energía del Strip, los espectáculos de clase mundial y la arquitectura icónica en el desierto.",
-        videoId: "DVwX0u534gw",
+        videoId: "_3Wqwc0hRak",
         thumbnail: "https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=200&h=150&auto=format&fit=crop"
     },
     {
@@ -42,7 +42,7 @@ const destinations = [
         title: "Los Angeles, California",
         location: "Cuna del Entretenimiento",
         description: "Descubre Hollywood, relájate en las playas de Santa Mónica y disfruta del estilo de vida icónico de la costa oeste.",
-        videoId: "DVwX0u534gw",
+        videoId: "dyBKJuQ6NW0",
         thumbnail: "https://images.unsplash.com/photo-1534190760961-74e8c1c5c3da?q=80&w=200&h=150&auto=format&fit=crop"
     },
     {
@@ -50,7 +50,7 @@ const destinations = [
         title: "San Francisco, California",
         location: "La Ciudad de la Bahía",
         description: "Cruza el Golden Gate, explora Alcatraz y disfruta de la gastronomía única del Pier 39.",
-        videoId: "DVwX0u534gw",
+        videoId: "k6rG1vQO268",
         thumbnail: "https://images.unsplash.com/photo-1501594907352-04cda386c24b?q=80&w=200&h=150&auto=format&fit=crop"
     },
     {
@@ -58,7 +58,7 @@ const destinations = [
         title: "Chicago, Illinois",
         location: "La Ciudad de los Vientos",
         description: "Admira la arquitectura frente al lago, visita el Millennium Park y prueba la famosa pizza deep-dish.",
-        videoId: "DVwX0u534gw",
+        videoId: "IZPMlfgx0hc",
         thumbnail: "https://images.unsplash.com/photo-1494522855154-9297ac14b55f?q=80&w=200&h=150&auto=format&fit=crop"
     },
     {
@@ -66,7 +66,7 @@ const destinations = [
         title: "Washington D.C.",
         location: "El Corazón de la Nación",
         description: "Recorre la historia en el National Mall, visita el Capitolio y los museos más importantes del mundo.",
-        videoId: "DVwX0u534gw",
+        videoId: "07DvPTHNA1c",
         thumbnail: "https://images.unsplash.com/photo-1501436513145-30f24e19fcc8?q=80&w=200&h=150&auto=format&fit=crop"
     },
 ];
@@ -75,9 +75,21 @@ export default function DestinationsShowcase() {
     const [activeDest, setActiveDest] = useState(destinations[0]);
     const [isMuted, setIsMuted] = useState(true);
 
+    const iframeRef = useRef<HTMLIFrameElement>(null);
+
+    const toggleMute = () => {
+        const nextMute = !isMuted;
+        setIsMuted(nextMute);
+        if (iframeRef.current && iframeRef.current.contentWindow) {
+            iframeRef.current.contentWindow.postMessage(
+                JSON.stringify({ event: 'command', func: nextMute ? 'mute' : 'unMute', args: [] }),
+                '*'
+            );
+        }
+    };
+
     const getEmbedUrl = (videoId: string) => {
-        let params = `autoplay=1&loop=1&playlist=${videoId}&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&playsinline=1&controls=0`;
-        params += isMuted ? `&mute=1` : `&mute=0`;
+        let params = `autoplay=1&loop=1&playlist=${videoId}&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&playsinline=1&controls=0&mute=1&enablejsapi=1`;
         return `https://www.youtube.com/embed/${videoId}?${params}`;
     };
 
@@ -85,7 +97,6 @@ export default function DestinationsShowcase() {
         <section className="py-24 bg-white text-black overflow-hidden border-t border-gray-100">
             <div className="container mx-auto px-6">
 
-                {/* Header Section */}
                 <div className="flex justify-between items-end mb-16">
                     <div className="max-w-2xl">
                         <span className="text-sm font-medium uppercase tracking-[0.2em] text-gray-400 mb-4 block">
@@ -93,7 +104,7 @@ export default function DestinationsShowcase() {
                         </span>
                         <h2 className="text-4xl md:text-6xl font-medium tracking-tighter leading-[1.1]">
                             Explora lo Mejor de USA<br />
-                            <span className="text-gray-400">Tu Ruta Personalizada.</span>
+                            <span className="text-gray-400">Tu Ruta Personalizada</span>
                         </h2>
                     </div>
                 </div>
@@ -159,7 +170,13 @@ export default function DestinationsShowcase() {
                                 className="relative aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.12)] border-8 border-white bg-slate-100 group cursor-pointer"
                             >
                                 <iframe
-                                    key={`${activeDest.id}-${isMuted}`}
+                                    ref={iframeRef}
+                                    key={activeDest.id}
+                                    onLoad={() => {
+                                        if (!isMuted && iframeRef.current?.contentWindow) {
+                                            iframeRef.current.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'unMute', args: [] }), '*');
+                                        }
+                                    }}
                                     src={getEmbedUrl(activeDest.videoId)}
                                     className="absolute inset-0 w-full h-full border-0 grayscale-[0.2] hover:grayscale-0 transition-all duration-700 pointer-events-none"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -168,7 +185,7 @@ export default function DestinationsShowcase() {
                                 {/* Overlay for Sound Toggle */}
                                 <div
                                     className="absolute inset-0 z-20 cursor-pointer"
-                                    onClick={() => setIsMuted(!isMuted)}
+                                    onClick={toggleMute}
                                 />
 
                                 {/* Sound Button */}

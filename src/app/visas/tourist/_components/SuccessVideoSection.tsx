@@ -1,16 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { FadeIn } from "./Animations";
 import { Volume2, VolumeX } from "lucide-react";
 
 export default function SuccessVideoSection() {
     const [isMuted, setIsMuted] = useState(true);
-    const videoId = "DVwX0u534gw";
+    const videoId = "fzrRzLDcm0c";
+
+    const iframeRef = useRef<HTMLIFrameElement>(null);
+
+    const toggleMute = () => {
+        const nextMute = !isMuted;
+        setIsMuted(nextMute);
+        if (iframeRef.current && iframeRef.current.contentWindow) {
+            iframeRef.current.contentWindow.postMessage(
+                JSON.stringify({ event: 'command', func: nextMute ? 'mute' : 'unMute', args: [] }),
+                '*'
+            );
+        }
+    };
 
     const getEmbedUrl = () => {
-        let params = `autoplay=1&loop=1&playlist=${videoId}&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&playsinline=1&controls=0`;
-        params += isMuted ? `&mute=1` : `&mute=0`;
+        let params = `autoplay=1&loop=1&playlist=${videoId}&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&playsinline=1&controls=0&mute=1&enablejsapi=1`;
         return `https://www.youtube.com/embed/${videoId}?${params}`;
     };
 
@@ -19,7 +31,13 @@ export default function SuccessVideoSection() {
             <FadeIn className="max-w-[calc(100%-150px)] mx-auto relative overflow-hidden rounded-[2.5rem] shadow-2xl bg-black aspect-video group cursor-pointer">
                 {/* YouTube Embed */}
                 <iframe
-                    key={isMuted ? "muted" : "unmuted"}
+                    ref={iframeRef}
+                    key="success-video"
+                    onLoad={() => {
+                        if (!isMuted && iframeRef.current?.contentWindow) {
+                            iframeRef.current.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'unMute', args: [] }), '*');
+                        }
+                    }}
                     src={getEmbedUrl()}
                     className="w-full h-full block"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -29,7 +47,7 @@ export default function SuccessVideoSection() {
                 {/* Overlay for Toggling Sound */}
                 <div
                     className="absolute inset-0 bg-transparent z-10"
-                    onClick={() => setIsMuted(!isMuted)}
+                    onClick={toggleMute}
                 />
 
                 {/* Sound Indicator Icon */}

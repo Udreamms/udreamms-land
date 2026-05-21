@@ -9,20 +9,20 @@ const YouTubeIcon = ({ className }: { className?: string }) => (
 
 export default function YouTubeSocialSection() {
     return (
-        <section className="py-24 bg-gradient-to-br from-red-600 via-red-500 to-red-700 overflow-hidden relative">
+        <section className="py-12 md:py-16 bg-gradient-to-br from-red-600 via-red-500 to-red-700 overflow-hidden relative">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.1),transparent_50%)]" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(255,255,255,0.05),transparent_50%)]" />
 
             <div className="container px-4 relative z-10 mx-auto">
                 <div className="max-w-4xl mx-auto text-center">
-                    <div className="mb-8 flex flex-col items-center">
-                        <div className="inline-flex items-center justify-center w-24 h-24 bg-white rounded-full mb-8 shadow-2xl animate-bounce">
-                            <YouTubeIcon className="w-14 h-14 text-red-600" />
+                    <div className="mb-6 flex flex-col items-center">
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full mb-6 shadow-2xl animate-bounce">
+                            <YouTubeIcon className="w-8 h-8 text-red-600" />
                         </div>
-                        <h2 className="text-4xl md:text-7xl font-bold text-white mb-6 tracking-tighter">
+                        <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tighter">
                             ¡Síguenos en YouTube!
                         </h2>
-                        <p className="text-xl md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto font-medium leading-relaxed">
+                        <p className="text-base md:text-lg text-white/90 mb-8 max-w-xl mx-auto font-medium leading-relaxed">
                             Descubre consejos, testimonios y guías completas sobre cómo obtener tu visa y vivir el sueño americano.
                             ¡Dí adiós a las dudas!
                         </p>
@@ -32,24 +32,24 @@ export default function YouTubeSocialSection() {
                         href="https://www.youtube.com/@udreamms"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center px-12 py-6 text-xl font-bold bg-white text-red-600 rounded-2xl shadow-2xl hover:scale-105 transition-all hover:bg-gray-50 group"
+                        className="inline-flex items-center justify-center px-8 py-4 text-base font-bold bg-white text-red-600 rounded-full shadow-2xl hover:scale-105 transition-all hover:bg-gray-50 group"
                     >
-                        <YouTubeIcon className="w-8 h-8 mr-4 group-hover:scale-110 transition-transform" />
+                        <YouTubeIcon className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
                         Suscríbete Ahora
                     </a>
 
-                    <div className="mt-12 flex flex-wrap items-center justify-center gap-10 text-white">
-                        <div className="flex items-center gap-3">
-                            <div className="w-3 h-3 bg-white rounded-full animate-pulse" />
-                            <span className="text-base font-bold uppercase tracking-widest">Tips de Visa</span>
+                    <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-white">
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                            <span className="text-xs font-bold uppercase tracking-widest">Tips de Visa</span>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <div className="w-3 h-3 bg-white rounded-full animate-pulse [animation-delay:0.3s]" />
-                            <span className="text-base font-bold uppercase tracking-widest">Testimonios</span>
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-white rounded-full animate-pulse [animation-delay:0.3s]" />
+                            <span className="text-xs font-bold uppercase tracking-widest">Testimonios</span>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <div className="w-3 h-3 bg-white rounded-full animate-pulse [animation-delay:0.6s]" />
-                            <span className="text-base font-bold uppercase tracking-widest">Guías VIP</span>
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-white rounded-full animate-pulse [animation-delay:0.6s]" />
+                            <span className="text-xs font-bold uppercase tracking-widest">Guías VIP</span>
                         </div>
                     </div>
                 </div>

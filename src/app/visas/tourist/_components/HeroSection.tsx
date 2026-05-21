@@ -1,103 +1,173 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "./Animations";
 
-const HERO_VIDEOS = [
-    "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2F20.mp4?alt=media&token=ba0c3197-3ef0-43bd-a46a-0a841ca6a04a",
-    "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2F21.mp4?alt=media&token=3bfb665b-bef2-4ddc-a692-a1c8662d9c4f",
-    "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2F22.mp4?alt=media&token=a4b320b2-2a8e-4acb-8898-7bdad562cefa",
-    "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2F23.mp4?alt=media&token=d1ae89c2-73a2-483f-a9a2-f5da5362c424",
-    "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2F24.mp4?alt=media&token=3cf7bf09-4f9b-4bdd-bbc2-34909e0a8308",
-    "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2F25.mp4?alt=media&token=bc32055e-898d-4bc3-a373-85e5117672a3",
-    "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2F26.mp4?alt=media&token=9edd3d3b-7d95-483f-b246-60b71fc02af0",
-    "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2F27.mp4?alt=media&token=23f9017e-15a7-4bff-91d6-d028a7c16924",
-    "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2F28.mp4?alt=media&token=7ff6289e-3870-4379-81e0-a1e66e14b50a",
-    "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2F29.mp4?alt=media&token=c82af0b0-8061-432d-b6fb-2361329ba2bd",
-    "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2F30.mp4?alt=media&token=1bf191b8-484c-42b2-8dfa-535c31f71c47",
-    "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2F31.mp4?alt=media&token=1a066efa-8c92-4f04-9f75-dd8c3df820e7",
-    "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2F32.mp4?alt=media&token=e5c96470-d36d-4877-9305-5ea8425b933f",
-    "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2F33.mp4?alt=media&token=cb35e854-dbf9-4f40-a449-471a15cd4eb8",
-    "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2F34.mp4?alt=media&token=d1e84fdf-8545-4230-b886-f4f39286223c",
-    "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2F35.mp4?alt=media&token=d1e4c2b4-5f31-4e7d-8c5a-c3a9c4817359",
-    "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2F36.mp4?alt=media&token=636a495c-e489-4953-a250-54089df8f1bf",
-    "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2F37.mp4?alt=media&token=2b3c6db8-5b74-4770-a4b1-94a2c924fdae"
+const videoLinks = [
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F1.mp4?alt=media&token=cc87cead-407d-4e4f-a643-6152d31eff1a",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F2.mp4?alt=media&token=da7a9e8f-b6c0-417a-9da6-dc8acc7a803f",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F3.mp4?alt=media&token=6b93ebfb-bff7-4fdd-b7f1-3a6f031dc7cd",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F4.mp4?alt=media&token=d43f4e35-bc28-40e0-b7db-3871c7b02d6a",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F5.mp4?alt=media&token=86eaddf6-c81d-477f-89b5-a8b2231d48dd",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F6.mp4?alt=media&token=276e7bbf-68ba-4cea-9218-ca2a07264974",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F7.mp4?alt=media&token=2635fd2d-9f24-4c54-a131-89161e9c503f",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F8.mp4?alt=media&token=0ac07147-6951-4a47-9e7a-f9d62a5c4c73",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F9.mp4?alt=media&token=bc0245ae-674a-429c-9f42-9d10ac01afe5",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F10.mp4?alt=media&token=4b2d3aff-79e1-4329-8b40-dbc0e94d32f2",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F11.mp4?alt=media&token=0586a415-4b0c-43d6-ab11-43fe62be8219",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F12.mp4?alt=media&token=e270d359-9f26-431a-a225-9048b1c15623",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F13.mp4?alt=media&token=53ddafbb-a7b0-419b-8c03-4312fed79fbc",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F14.mp4?alt=media&token=5fae2483-07a7-488e-ae3c-eca50662e59e",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F15.mp4?alt=media&token=97ba5129-e641-43ec-904c-9d748026bc4b",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F16.mp4?alt=media&token=691ecdde-3fab-4ee8-9519-edab33191b70",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F17.mp4?alt=media&token=54d31a5f-740b-4dc4-88da-1c9211e33a50",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F18.mp4?alt=media&token=00edcb39-3840-45fd-843b-c2df200236f9",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F19.mp4?alt=media&token=2be2fb6a-994d-481a-b595-40ab95f9bd6e",
+  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F20.mp4?alt=media&token=16c8c2bf-d460-4d38-bea0-f6e78e797f88"
 ];
 
 export default function HeroSection() {
-    const [videoSrc, setVideoSrc] = useState<string>("");
+    const [activeVideo, setActiveVideo] = useState<0 | 1>(0);
+    const [index0, setIndex0] = useState(0);
+    const [index1, setIndex1] = useState(1);
+
+    const video0Ref = useRef<HTMLVideoElement>(null);
+    const video1Ref = useRef<HTMLVideoElement>(null);
 
     useEffect(() => {
-        // Hydration mismatch avoidance: pick random video only on client
-        const randomVideo = HERO_VIDEOS[Math.floor(Math.random() * HERO_VIDEOS.length)];
-        setVideoSrc(randomVideo);
+        if (video0Ref.current) {
+            video0Ref.current.play().catch(e => console.log("Autoplay prevent:", e));
+        }
     }, []);
+
+    const handleTimeUpdate = (videoNum: 0 | 1) => {
+        const currentRef = videoNum === 0 ? video0Ref.current : video1Ref.current;
+        if (!currentRef) return;
+
+        const { currentTime, duration } = currentRef;
+        
+        if (duration > 0 && duration - currentTime <= 1) {
+            if (videoNum === activeVideo) {
+                const nextVideo = videoNum === 0 ? 1 : 0;
+                const nextRef = nextVideo === 0 ? video0Ref.current : video1Ref.current;
+                
+                if (nextRef) {
+                    nextRef.currentTime = 0;
+                    nextRef.play().catch(e => console.log("Play error:", e));
+                }
+                
+                setActiveVideo(nextVideo);
+                
+                setTimeout(() => {
+                    if (videoNum === 0) {
+                        setIndex0((index1 + 1) % videoLinks.length);
+                    } else {
+                        setIndex1((index0 + 1) % videoLinks.length);
+                    }
+                }, 1000);
+            }
+        }
+    };
+
+    const handleEnded = (videoNum: 0 | 1) => {
+        if (videoNum === activeVideo) {
+            const nextVideo = videoNum === 0 ? 1 : 0;
+            const nextRef = nextVideo === 0 ? video0Ref.current : video1Ref.current;
+            
+            if (nextRef) {
+                nextRef.play().catch(e => console.log("Play error:", e));
+            }
+            setActiveVideo(nextVideo);
+            
+            if (videoNum === 0) {
+                setIndex0((index1 + 1) % videoLinks.length);
+            } else {
+                setIndex1((index0 + 1) % videoLinks.length);
+            }
+        }
+    };
 
     return (
         <div className="w-full bg-black relative h-screen overflow-hidden group">
 
             {/* Background Random Video */}
             <div className="absolute inset-0 w-full h-full">
-                {videoSrc && (
-                    <video
-                        key={videoSrc} // Force re-render on source change if needed, though mostly 1 per session
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className="w-full h-full object-cover"
-                    >
-                        <source src={videoSrc} type="video/mp4" />
-                    </video>
-                )}
+                <video
+                    ref={video0Ref}
+                    className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                        activeVideo === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                    }`}
+                    muted
+                    playsInline
+                    onTimeUpdate={() => handleTimeUpdate(0)}
+                    onEnded={() => handleEnded(0)}
+                    src={videoLinks[index0]}
+                />
+
+                <video
+                    ref={video1Ref}
+                    className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                        activeVideo === 1 ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                    }`}
+                    muted
+                    playsInline
+                    onTimeUpdate={() => handleTimeUpdate(1)}
+                    onEnded={() => handleEnded(1)}
+                    src={videoLinks[index1]}
+                />
+                
                 {/* Fallback overlay color while loading or if fails */}
-                <div className="absolute inset-0 bg-black/40" />
+                <div className="absolute inset-0 bg-black/40 z-20 pointer-events-none" />
             </div>
 
             {/* Overlay Content (Static) */}
-            <div className="absolute inset-0 flex flex-col justify-end pb-32 items-start z-20 text-left px-6 md:pl-[7rem] pointer-events-none">
-                {/* Badge/Eyebrow */}
-                <FadeIn delay={0.1}>
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-600/20 backdrop-blur-md border border-blue-400/30 text-white font-medium text-xs uppercase tracking-widest mb-6 pointer-events-auto">
-                        <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-                        Gestionamos tu proceso migratorio y tus vacaciones soñadas
+            <div className="absolute inset-0 flex flex-col justify-end pb-32 z-30 px-6 md:px-12 lg:px-[7rem] pointer-events-none">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 w-full">
+                    <div className="text-left">
+                        {/* Badge/Eyebrow */}
+                        <FadeIn delay={0.1}>
+                            <p className="text-white font-medium text-xs uppercase tracking-widest mb-4">
+                                Gestionamos tu proceso migratorio y tus vacaciones soñadas
+                            </p>
+                        </FadeIn>
+
+                        {/* H1: The Big Promise */}
+                        <motion.h1
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.2 }}
+                            className="text-white text-2xl md:text-4xl lg:text-5xl font-medium font-sans drop-shadow-xl tracking-tighter mb-4 leading-[0.9]"
+                        >
+                            Explora USA <br />
+                            <span className="text-white">con total confianza</span>
+                        </motion.h1>
+
+                        {/* H2: The How/Credibility */}
+                        <FadeIn delay={0.4}>
+                            <p className="text-white text-sm md:text-base max-w-2xl drop-shadow-md leading-relaxed font-medium">
+                                Gestionamos tu visa de turista y planificamos tu viaje a Estados Unidos.
+                            </p>
+                        </FadeIn>
                     </div>
-                </FadeIn>
 
-                {/* H1: The Big Promise */}
-                <motion.h1
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                    className="text-white text-4xl md:text-7xl lg:text-8xl font-medium font-sans drop-shadow-xl tracking-tighter mb-6 leading-[0.9]"
-                >
-                    Explora USA <br />
-                    <span className="text-blue-500">con total confianza.</span>
-                </motion.h1>
-
-                {/* H2: The How/Credibility */}
-                <FadeIn delay={0.4}>
-                    <p className="text-cloud/90 text-lg md:text-2xl max-w-2xl mb-10 drop-shadow-md leading-relaxed font-medium">
-                        Gestionamos tu visa de turista y planificamos tu viaje a Estados Unidos.
-                    </p>
-                </FadeIn>
-
-                <Button
-                    size="lg"
-                    className="bg-blue-600 hover:bg-blue-700 text-white text-xl px-12 py-8 rounded-full shadow-[0_10px_40px_rgba(37,99,235,0.4)] transition-all hover:scale-105 font-medium uppercase tracking-tight group"
-                    onClick={() => document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                    Ver Planes
-                    <motion.span
-                        animate={{ x: [0, 5, 0] }}
-                        transition={{ repeat: Infinity, duration: 1.5 }}
-                        className="ml-3"
-                    >
-                        →
-                    </motion.span>
-                </Button>
+                    <div className="pointer-events-auto shrink-0 mb-2">
+                        <Button
+                            className="bg-transparent border border-white/50 hover:bg-white/10 text-white text-sm px-6 py-3 h-auto rounded-full transition-all hover:scale-105 font-medium uppercase tracking-tight group backdrop-blur-sm"
+                            onClick={() => document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' })}
+                        >
+                            Ver Planes
+                            <motion.span
+                                animate={{ x: [0, 5, 0] }}
+                                transition={{ repeat: Infinity, duration: 1.5 }}
+                                className="ml-2"
+                            >
+                                →
+                            </motion.span>
+                        </Button>
+                    </div>
+                </div>
             </div>
 
 

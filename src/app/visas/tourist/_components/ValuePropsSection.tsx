@@ -32,8 +32,8 @@ export default function ValuePropsSection() {
                             return (
                                 <motion.div
                                     key={index}
-                                    // Changed default color to text-primary as requested
-                                    className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-center text-primary hover:text-abyss cursor-pointer border border-slate-50"
+                                    // Changed default color to text-black as requested
+                                    className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-center text-black cursor-pointer border border-slate-50"
                                     animate={{
                                         y: [0, -yRange, 0],
                                     }}

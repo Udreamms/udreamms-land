@@ -15,7 +15,7 @@ import VipPlanShowcase from "./_components/VipPlanShowcase";
 import StatsSection from "./_components/StatsSection";
 import DestinationsShowcase from "./_components/DestinationsShowcase";
 import WhyUdreammsSection from "./_components/WhyUdreammsSection";
-import SuccessStoriesSection from "./_components/SuccessStoriesSection";
+
 import YouTubeSocialSection from "./_components/YouTubeSocialSection";
 import PlansSection from "./_components/PlansSection";
 
@@ -42,7 +42,7 @@ export default function TouristVisaPage() {
       {/* 5. Social Proof & Evidence */}
       <SuccessVideoSection />
       <WhyUdreammsSection />
-      <SuccessStoriesSection />
+
       <YouTubeSocialSection />
 
       {/* 7. Direct Purchase CTA */}
