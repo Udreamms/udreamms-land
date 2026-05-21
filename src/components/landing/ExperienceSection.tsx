@@ -87,7 +87,7 @@ export default function ExperienceSection() {
 
                 {/* New App Download CTA (Transferred from AppSection) */}
                 <div className="flex flex-col items-center text-center mb-32 group">
-                    <p className="text-red-500 font-medium mb-6 tracking-tight uppercase text-sm md:text-base">
+                    <p className="text-purple-500 font-medium mb-6 tracking-tight uppercase text-sm md:text-base">
                         Esta aplicación solo está disponible para estudiantes en USA
                     </p>
                     <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 mb-8">
