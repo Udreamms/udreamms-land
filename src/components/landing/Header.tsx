@@ -188,14 +188,23 @@ export default function Header() {
             </Button>
           </div>
 
-          {/* MOBILE TOGGLE - Ocultar en landings de visa si quieres evitar menu movil completo */}
+          {/* MOBILE TOGGLE AND CTA */}
           {!isVisaLandingPage && (
-            <button
-              className="lg:hidden text-white p-2"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              {isMobileMenuOpen ? <X /> : <Menu />}
-            </button>
+            <div className="lg:hidden flex items-center gap-2">
+              <Button
+                onClick={handleApplyClick}
+                size="sm"
+                className="bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] text-white hover:brightness-125 hover:scale-105 transition-all duration-300 rounded-full text-[11px] h-8 px-4"
+              >
+                Aplica Ahora
+              </Button>
+              <button
+                className="text-white p-2"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                {isMobileMenuOpen ? <X /> : <Menu />}
+              </button>
+            </div>
           )}
 
           {/* En móvil si es landing de visa, igual mostramos portal y aplica ahora si no hay menu de hamburguesa? O simplemente dejamos el logo y botones? */}

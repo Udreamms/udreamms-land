@@ -96,7 +96,7 @@ export default function ChooseYourPath() {
               <div className={`absolute -inset-2 ${path.glowColor} rounded-[2.5rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
 
               {/* Card Content */}
-              <div className="relative flex-1 bg-black border border-white/10 rounded-[2.5rem] p-10 flex flex-col ring-1 ring-white/5 shadow-2xl overflow-hidden hover:bg-black transition-colors duration-300">
+              <div className="relative flex-1 bg-black border border-white/10 rounded-[2.5rem] p-6 md:p-10 flex flex-col ring-1 ring-white/5 shadow-2xl overflow-hidden hover:bg-black transition-colors duration-300">
 
                 {/* Visual Accent */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-3xl" />
@@ -108,9 +108,9 @@ export default function ChooseYourPath() {
                   </div>
                 )}
 
-                <div className="flex flex-col items-center text-center mb-10">
-                  <h3 className="text-4xl md:text-5xl font-normal text-white tracking-tight mb-4 leading-tight">{path.title}</h3>
-                  <p className="text-slate-400 text-lg font-light leading-relaxed">{path.subtitle}</p>
+                <div className="flex flex-col items-center text-center mb-8 md:mb-10">
+                  <h3 className="text-3xl md:text-5xl font-normal text-white tracking-tight mb-3 md:mb-4 leading-tight">{path.title}</h3>
+                  <p className="text-slate-400 text-base md:text-lg font-light leading-relaxed">{path.subtitle}</p>
                 </div>
 
                 {/* Price/Description removed as requested */}
@@ -129,7 +129,7 @@ export default function ChooseYourPath() {
                       <div className="mt-1.5 transition-transform group-hover/item:scale-110 shrink-0">
                         <feature.icon className="w-6 h-6 text-white" strokeWidth={1.5} />
                       </div>
-                      <span className="text-lg font-normal text-slate-100 group-hover/item:text-white transition-colors">
+                      <span className="text-base md:text-lg font-normal text-slate-100 group-hover/item:text-white transition-colors">
                         {feature.text}
                       </span>
                     </li>

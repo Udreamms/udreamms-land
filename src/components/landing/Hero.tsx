@@ -128,11 +128,11 @@ export default function Hero({ onStartQuote }: HeroProps) {
         <div className="absolute inset-0 z-20 bg-gradient-to-t from-[#050507] via-transparent to-transparent pointer-events-none" />
       </div>
 
-      {/* Contenido con márgenes de 3cm */}
-      <div className="relative z-30 w-full pb-[3cm] px-[3cm]">
+      {/* Contenido con márgenes de 3cm en desktop, adaptado en movil */}
+      <div className="relative z-30 w-full pb-12 md:pb-24 lg:pb-[3cm] px-6 md:px-12 lg:px-[3cm]">
         <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8 w-full">
 
-          <div className="max-w-[70%] text-left space-y-3">
+          <div className="w-full md:max-w-[80%] lg:max-w-[70%] text-left space-y-3">
             {/* Texto superior (Eyebrow) */}
             <p className="text-gray-300 text-sm md:text-base font-medium tracking-[0.2em] uppercase">
               ESTUDIA | VIAJA | DISFRUTA
