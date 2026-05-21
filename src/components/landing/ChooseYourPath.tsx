@@ -69,7 +69,7 @@ export default function ChooseYourPath() {
   const commonGradient = "from-blue-600 to-cyan-600";
 
   return (
-    <section className="pt-24 pb-40 bg-[#050507] relative overflow-hidden font-sans">
+    <section id="planes" className="pt-24 pb-40 bg-[#050507] relative overflow-hidden font-sans">
       {/* Sutil efecto de cuadrícula de fondo */}
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px]" />
 

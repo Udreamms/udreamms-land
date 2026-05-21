@@ -1,130 +1,44 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Play } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-
-const features = [
-    {
-        id: "ds160",
-        title: "Aplicación y Gestión de Visa de Turista",
-        description: "Gestionamos todo tu proceso migratorio para que obtengas tu visa de turista B1/B2: preparación profesional de documentos, seguimiento personalizado y simulaciones de entrevista consular.",
-        image: "/assets/generated/tourist_showcase_disney.png",
-        video: "https://www.youtube.com/embed/ksaKUwErSGw"
-    },
-    {
-        id: "entrevista",
-        title: "Planes de Viaje y Itinerarios Personalizados",
-        description: "Te ayudamos a diseñar tu viaje a Estados Unidos con itinerarios a medida, recomendaciones de destinos, rutas turísticas y actividades adaptadas a tus intereses.",
-        image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=1000&auto=format&fit=crop",
-    },
-    {
-        id: "itinerario",
-        title: "Servicios de Alojamiento y Logística",
-        description: "Asistencia para encontrar alojamiento seguro, transporte y servicios esenciales durante tu estadía, garantizando una experiencia cómoda y sin contratiempos.",
-        image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=1000&auto=format&fit=crop",
-    },
-    {
-        id: "citas",
-        title: "Citas Prioritarias",
-        description: "Monitoreo constante del sistema para obtener tu cita en el menor tiempo posible, adelantando meses de espera.",
-        image: "https://images.unsplash.com/photo-1506784917876-491d607bd931?q=80&w=1000&auto=format&fit=crop",
-    },
-];
+import { useRef } from "react";
+import { useInView } from "framer-motion";
 
 export default function TouristShowcase() {
-    const [activeTab, setActiveTab] = useState(features[0]);
+    const ref = useRef(null);
+    const isInView = useInView(ref, { margin: "-20% 0px -20% 0px" });
 
     return (
-        <section className="py-24 bg-white text-black overflow-hidden">
-            <div className="container mx-auto px-6">
-
-                {/* Header: Title + Learn More Pill */}
-                <div className="flex justify-between items-center mb-16">
-                    <div>
-                        <h3 className="text-lg md:text-xl font-medium tracking-tight text-black">Visa de Turismo</h3>
-                        <h2 className="text-3xl md:text-4xl font-medium tracking-tighter text-black mt-1">
-                            Tu puerta de entrada a USA
+        <section className="py-24 lg:py-32 bg-white text-black overflow-hidden font-sans">
+            <div className="container mx-auto px-6 max-w-[1500px]">
+                <div className="flex flex-col lg:flex-row gap-12 lg:gap-24 items-center lg:items-center">
+                    
+                    {/* Left Column: Text */}
+                    <div className="w-full lg:w-[35%] flex flex-col pt-2 lg:pt-10 pr-0 lg:pr-8">
+                        <h2 className="font-normal tracking-tight text-black mb-6 leading-[1.1]">
+                            <span className="text-3xl md:text-4xl lg:text-5xl block mb-2">Visa de Turismo</span>
+                            <span className="text-gray-500 text-xl md:text-2xl lg:text-3xl font-light">Tu puerta de entrada a USA</span>
                         </h2>
-                    </div>
-                    <Link
-                        href="https://travel.state.gov/content/travel/en/us-visas/tourism-visit.html"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        <Button className="rounded-full px-10 py-7 bg-black hover:bg-black/90 text-white font-medium text-lg shadow-xl transition-all">
-                            Saber más
-                        </Button>
-                    </Link>
-                </div>
-
-                <div className="flex flex-col lg:flex-row gap-16 items-start">
-
-                    {/* Left Column: Interactive List */}
-                    <div className="w-full lg:w-1/3 flex flex-col">
-                        {features.map((feature) => {
-                            const isActive = activeTab.id === feature.id;
-                            return (
-                                <div
-                                    key={feature.id}
-                                    className="group cursor-pointer"
-                                    onClick={() => setActiveTab(feature)}
-                                >
-                                    <div className="py-4">
-                                        <h4 className={`text-lg md:text-xl transition-colors duration-300 ${isActive ? 'font-medium text-black' : 'font-medium text-black group-hover:underline underline-offset-8'}`}>
-                                            {feature.title}
-                                        </h4>
-
-                                        <AnimatePresence>
-                                            {isActive && (
-                                                <motion.div
-                                                    initial={{ height: 0, opacity: 0 }}
-                                                    animate={{ height: "auto", opacity: 1 }}
-                                                    exit={{ height: 0, opacity: 0 }}
-                                                    transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
-                                                    className="overflow-hidden"
-                                                >
-                                                    <p className="pt-4 text-black leading-relaxed font-normal text-base">
-                                                        {feature.description}
-                                                    </p>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                        <p className="text-gray-600 text-base leading-[1.7] font-light">
+                            Gestionamos todo tu proceso migratorio para que obtengas tu visa de turista B1/B2: preparación profesional de documentos, seguimiento personalizado y simulaciones de entrevista consular.<br /><br /> Diseñamos tu viaje a Estados Unidos con itinerarios a medida para una experiencia sin contratiempos.
+                        </p>
                     </div>
 
-                    {/* Right Column: Dynamic Visual */}
-                    <div className="w-full lg:w-2/3 h-full min-h-[500px] relative">
-                        <AnimatePresence mode="wait">
-                            <motion.div
-                                key={activeTab.id}
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                transition={{ duration: 0.5, ease: "easeInOut" }}
-                                className="w-full h-full relative aspect-video lg:aspect-auto lg:h-[600px] rounded-[2.5rem] overflow-hidden bg-white shadow-2xl"
-                            >
-                                {activeTab.video ? (
-                                    <iframe
-                                        src={activeTab.video}
-                                        className="w-full h-full border-0"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowFullScreen
-                                    />
-                                ) : (
-                                    <img
-                                        src={activeTab.image}
-                                        alt={activeTab.title}
-                                        className="w-full h-full object-cover"
-                                    />
-                                )}
-                            </motion.div>
-                        </AnimatePresence>
+                    {/* Right Column: Video/Media */}
+                    <div ref={ref} className="w-full lg:w-2/3 relative h-[400px] lg:h-[650px] bg-[#0a0a0a] rounded-3xl overflow-hidden flex items-center justify-center shadow-2xl">
+                        {isInView ? (
+                            <iframe
+                                src="https://www.youtube.com/embed/ksaKUwErSGw?autoplay=1&mute=1&loop=1&playlist=ksaKUwErSGw"
+                                className="w-full h-full border-0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                            />
+                        ) : (
+                            <img 
+                                src="/assets/generated/tourist_showcase_disney.png" 
+                                alt="Visa Turismo" 
+                                className="absolute inset-0 w-full h-full object-cover opacity-40 transition-all duration-700" 
+                            />
+                        )}
                     </div>
 
                 </div>

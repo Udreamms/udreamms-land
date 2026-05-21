@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import PreApplicationForm from "./PreApplicationForm";
 
 // --- TIPOS DE DATOS ---
 type SubItem = {
@@ -87,7 +86,6 @@ export default function Header() {
   const pathname = usePathname();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showPreApplication, setShowPreApplication] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   // Determinar si es una página de "landing de visa"
@@ -114,7 +112,11 @@ export default function Header() {
   };
 
   const handleApplyClick = () => {
-    setShowPreApplication(true);
+    if (pathname === '/') {
+      document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.location.href = '/#planes';
+    }
     setIsMobileMenuOpen(false);
   };
 
@@ -402,9 +404,6 @@ export default function Header() {
         )}
       </AnimatePresence>
 
-      {showPreApplication && (
-        <PreApplicationForm onClose={() => setShowPreApplication(false)} />
-      )}
     </>
   );
 }
