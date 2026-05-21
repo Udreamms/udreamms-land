@@ -62,24 +62,6 @@ const paths = [
     glowColor: "bg-white/20",
     tag: "¡Cupos Limitados!",
     tagColor: "bg-gradient-to-r from-orange-600 to-red-600"
-  },
-  {
-    title: "FIFA Fan Pass 2026",
-    subtitle: "Asegura tu logística para el evento deportivo más grande del mundo.",
-    description: "Tu pasaporte VIP para vivir la Copa Mundial 2026 sin estrés.",
-    features: [
-      { text: "Ruta de Visa Prioritaria", icon: Plane, desc: "Urgencia justificada por evento FIFA." },
-      { text: "Logística Multi-Sede USA", icon: Map, desc: "Transporte optimizado entre estadios." },
-      { text: "Alertas de Fan ID & Boletos", icon: ShieldCheck, desc: "Información crítica en tiempo real." },
-      { text: "Comunidad de Fans Mundial", icon: Users, desc: "Comparte costos y experiencias." },
-      { text: "Concierge de Emergencia 24/7", icon: PhoneCall, desc: "Soporte total durante tu estadía." },
-      { text: "Guía de Supervivencia Fan", icon: Sparkles, desc: "Hoteles, Fan Zones y Seguridad." }
-    ],
-    href: "/visas/fifa",
-    buttonText: "Solicitar visa ahora",
-    glowColor: "from-white/40 to-white/5",
-    tag: "¡Cupos Limitados!",
-    tagColor: "bg-gradient-to-r from-orange-600 to-red-600"
   }
 ];
 
@@ -106,7 +88,7 @@ export default function ChooseYourPath() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 max-w-5xl gap-10 mx-auto">
           {paths.map((path, index) => (
             <div key={index} className="relative group w-full flex flex-col">
 

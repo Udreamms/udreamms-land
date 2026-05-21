@@ -30,9 +30,6 @@ const Footer = () => {
                 <Link href="/visas/tourist" className="hover:text-primary transition-colors">Visa de Turismo (B1/B2)</Link>
               </li>
               <li>
-                <Link href="/visas/fifa" className="hover:text-primary transition-colors">Experiencia FIFA 2026</Link>
-              </li>
-              <li>
                 <Link href="/courses" className="hover:text-primary transition-colors">Cursos de Inglés</Link>
               </li>
             </ul>

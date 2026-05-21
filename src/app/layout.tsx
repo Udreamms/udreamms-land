@@ -17,8 +17,8 @@ export const metadata: Metadata = {
   title: "Udreamms | Tu Sueño en USA",
   description: "Asesoría experta para visas, estudios y nueva vida en Estados Unidos. Tecnología y soporte humano en un solo lugar.",
   icons: {
-    icon: "/assets/Logo Udreamms.png",
-    apple: "/assets/Logo Udreamms.png",
+    icon: "/icons/new-icon-udreamms.png",
+    apple: "/icons/new-icon-udreamms.png",
   }
 };
 

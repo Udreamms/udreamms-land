@@ -51,8 +51,7 @@ const menuData: MenuItemData[] = [
       actionHref: "/#quiz", // Placeholder for smart quiz link
       items: [
         { title: "Visa de Estudiante", desc: "F-1: Estudia y vive en USA", href: "/visas/student", icon: GraduationCap, colorClass: "text-blue-400 bg-blue-500/10" },
-        { title: "Visa de Turismo", desc: "B1/B2: Viaja sin preocupaciones", href: "/visas/tourist", icon: Plane, colorClass: "text-sky-400 bg-sky-500/10" },
-        { title: "FIFA World Cup 2026", desc: "Paquete Fan Exclusivo", href: "/visas/fifa", icon: Trophy, colorClass: "text-yellow-400 bg-yellow-500/10" },
+        { title: "Visa de Turismo", desc: "B1/B2: Viaja sin preocupaciones", href: "/visas/tourist", icon: Plane, colorClass: "text-sky-400 bg-sky-500/10" }
       ]
     }
   },
@@ -94,8 +93,7 @@ export default function Header() {
   // Determinar si es una página de "landing de visa"
   const isVisaLandingPage = [
     "/visas/student",
-    "/visas/tourist",
-    "/visas/fifa"
+    "/visas/tourist"
   ].includes(pathname);
 
   useEffect(() => {
@@ -128,15 +126,15 @@ export default function Header() {
           }`}
         onMouseLeave={handleMouseLeave}
       >
-        <div className="w-full px-6 md:px-12 h-20 flex items-center justify-between relative">
+        <div className="w-full px-6 md:px-12 h-14 flex items-center justify-between relative">
 
           {/* GRUPO IZQUIERDA: LOGO + NAV */}
           <div className="flex items-center gap-12 h-full">
-            <Link href="/" className="flex items-center gap-3 z-50 shrink-0 group">
-              <div className="w-9 h-9 relative transition-transform duration-300 group-hover:scale-110">
-                <img src="/assets/Logo Udreamms.png" alt="Udreamms" className="object-contain w-full h-full drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
+            <Link href="/" className="flex items-center gap-2 z-50 shrink-0 group">
+              <div className="w-7 h-7 relative transition-transform duration-300 group-hover:scale-110">
+                <img src="/icons/new-icon-udreamms.png" alt="Udreamms" className="object-contain w-full h-full drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
               </div>
-              <span className="text-xl font-medium tracking-tight text-white group-hover:text-primary transition-colors">Udreamms</span>
+              <span className="text-lg font-medium tracking-tight text-white group-hover:text-primary transition-colors">Udreamms</span>
             </Link>
 
             {/* DESKTOP NAV - Ocultar en landings de visa */}
@@ -151,7 +149,7 @@ export default function Header() {
                     <Link
                       href={item.href || "#"}
                       className={`
-                        px-4 py-2 text-[13px] xl:text-[14px] font-medium tracking-wide transition-all duration-300 flex items-center gap-1.5 rounded-full hover:bg-white/5
+                        px-3 py-1.5 text-[12px] xl:text-[13px] font-medium tracking-wide transition-all duration-300 flex items-center gap-1.5 rounded-full hover:bg-white/5
                         ${activeMenu === item.label ? "text-white bg-white/5" : "text-white/80 hover:text-white"}
 
                       `}
@@ -177,14 +175,14 @@ export default function Header() {
             )}
 
             <Link href="/portal">
-              <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10 rounded-full h-9 px-4 text-sm font-medium border border-transparent hover:border-white/10 transition-all">
+              <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10 rounded-full h-8 px-3 text-xs font-medium border border-transparent hover:border-white/10 transition-all">
                 Portal de Cliente
               </Button>
             </Link>
 
             <Button
               onClick={handleApplyClick}
-              className="bg-primary text-white hover:bg-primary/90 rounded-full h-10 px-8 font-medium text-sm transition-all hover:scale-105 shadow-[0_0_20px_rgba(225,29,72,0.3)] border-none"
+              className="bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] text-white hover:brightness-125 hover:shadow-[#9b4dca]/50 rounded-full h-8 px-5 font-medium text-xs transition-all duration-300 hover:scale-105 shadow-[0_0_20px_rgba(155,77,202,0.3)] border-none"
             >
               Aplica Ahora
             </Button>
@@ -211,7 +209,7 @@ export default function Header() {
               <Button
                 onClick={handleApplyClick}
                 size="sm"
-                className="bg-primary text-white rounded-full text-xs px-4"
+                className="bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] text-white hover:brightness-125 hover:scale-105 transition-all duration-300 rounded-full text-[10px] h-7 px-3"
               >
                 Aplica
               </Button>
@@ -384,7 +382,7 @@ export default function Header() {
                   </Link>
                   <Button
                     onClick={handleApplyClick}
-                    className="w-full bg-primary text-white hover:bg-primary/90 h-16 rounded-2xl text-xl font-medium shadow-lg border-none"
+                    className="w-full bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] text-white hover:brightness-125 hover:scale-[1.02] transition-all duration-300 h-12 rounded-xl text-lg font-medium shadow-lg hover:shadow-[#9b4dca]/40 border-none"
                   >
                     Aplica Ahora
                   </Button>

@@ -11,7 +11,6 @@ import ExperienceSection from "@/components/landing/ExperienceSection";
 import WhyChooseUs from "@/components/landing/WhyChooseUs";
 import TouristShowcase from "@/components/landing/TouristShowcase";
 import StudentShowcase from "@/components/landing/StudentShowcase";
-import FifaShowcase from "@/components/landing/FifaShowcase";
 import JoinOurStudents from "@/components/landing/JoinOurStudents";
 
 export default function Home() {
@@ -34,7 +33,6 @@ export default function Home() {
       {/* Product Showcases */}
       <TouristShowcase />
       <StudentShowcase />
-      <FifaShowcase />
 
       <Stats />
 
