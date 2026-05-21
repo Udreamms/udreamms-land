@@ -155,7 +155,7 @@ export default function Hero({ onStartQuote }: HeroProps) {
           <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-4 shrink-0 mb-4">
             <button
               onClick={onStartQuote}
-              className="group relative inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white overflow-hidden rounded-full bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] hover:brightness-125 hover:scale-105 hover:shadow-xl hover:shadow-[#9b4dca]/50 transition-all duration-300 shadow-lg shadow-[#9b4dca]/30"
+              className="group relative inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white overflow-hidden rounded-full bg-transparent border border-white/40 hover:bg-blue-600 hover:border-blue-600 hover:scale-105 transition-all duration-300 shadow-lg"
             >
               Obtén tu Cotización Gratis
             </button>

@@ -182,7 +182,7 @@ export default function Header() {
 
             <Button
               onClick={handleApplyClick}
-              className="bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] text-white hover:brightness-125 hover:shadow-[#9b4dca]/50 rounded-full h-8 px-5 font-medium text-xs transition-all duration-300 hover:scale-105 shadow-[0_0_20px_rgba(155,77,202,0.3)] border-none"
+              className="bg-transparent text-white border border-white/40 hover:bg-blue-600 hover:border-blue-600 rounded-full h-8 px-5 font-medium text-xs transition-all duration-300 hover:scale-105 shadow-xl"
             >
               Aplica Ahora
             </Button>
@@ -194,7 +194,7 @@ export default function Header() {
               <Button
                 onClick={handleApplyClick}
                 size="sm"
-                className="bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] text-white hover:brightness-125 hover:scale-105 transition-all duration-300 rounded-full text-[11px] h-8 px-4"
+                className="bg-transparent text-white border border-white/40 hover:bg-blue-600 hover:border-blue-600 hover:scale-105 transition-all duration-300 rounded-full text-[11px] h-8 px-4"
               >
                 Aplica Ahora
               </Button>
@@ -218,7 +218,7 @@ export default function Header() {
               <Button
                 onClick={handleApplyClick}
                 size="sm"
-                className="bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] text-white hover:brightness-125 hover:scale-105 transition-all duration-300 rounded-full text-[10px] h-7 px-3"
+                className="bg-transparent text-white border border-white/40 hover:bg-blue-600 hover:border-blue-600 hover:scale-105 transition-all duration-300 rounded-full text-[10px] h-7 px-3"
               >
                 Aplica
               </Button>
@@ -391,7 +391,7 @@ export default function Header() {
                   </Link>
                   <Button
                     onClick={handleApplyClick}
-                    className="w-full bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] text-white hover:brightness-125 hover:scale-[1.02] transition-all duration-300 h-12 rounded-xl text-lg font-medium shadow-lg hover:shadow-[#9b4dca]/40 border-none"
+                    className="w-full bg-transparent text-white border border-white/40 hover:bg-blue-600 hover:border-blue-600 hover:scale-[1.02] transition-all duration-300 h-12 rounded-xl text-lg font-medium shadow-lg"
                   >
                     Aplica Ahora
                   </Button>
