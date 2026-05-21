@@ -4,6 +4,7 @@ node_modules/
 # Firebase
 .firebase/
 serviceAccountKey.json
+functions/service-account-key.json
 firebase-debug.log
 firestore-debug.log
 
