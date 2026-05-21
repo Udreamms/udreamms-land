@@ -99,15 +99,15 @@ export default function Stats() {
                 </div>
 
                 {/* Número Grande Minimalista */}
-                <div className="text-6xl md:text-7xl font-medium mb-4 tracking-tighter text-black">
+                <div className="text-5xl md:text-6xl font-medium mb-4 tracking-tighter text-black">
                   <CountUp end={stat.number} suffix={stat.suffix} />
                 </div>
 
                 {/* Título y Descripción en Negro Sólido */}
-                <h3 className="text-xl font-medium text-black mb-3">
+                <h3 className="text-lg font-medium text-black mb-3">
                   {stat.title}
                 </h3>
-                <p className="text-base text-black font-normal max-w-[220px] leading-relaxed">
+                <p className="text-sm text-black font-normal max-w-[220px] leading-relaxed">
                   {stat.description}
                 </p>
               </div>

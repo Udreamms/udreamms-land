@@ -75,11 +75,11 @@ export default function Services({ onStartQuote, onAppClick }: ServicesProps) {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
           <div className="max-w-4xl">
-            <h2 className="text-4xl md:text-6xl font-medium tracking-tighter mb-4 text-black">
+            <h2 className="text-3xl md:text-5xl font-medium tracking-tighter mb-4 text-black">
               Todo lo que necesitas para <br />
               triunfar en USA.
             </h2>
-            <p className="text-xl text-black font-normal leading-relaxed w-full">
+            <p className="text-lg text-black font-normal leading-relaxed w-full">
               Un ecosistema de servicios diseñado para acompañarte en cada etapa de tu viaje.
             </p>
           </div>
@@ -136,16 +136,16 @@ export default function Services({ onStartQuote, onAppClick }: ServicesProps) {
 
                   {/* Bottom Content */}
                   <div>
-                    <h3 className="text-3xl font-medium text-white mb-2 tracking-tight">
+                    <h3 className="text-2xl font-medium text-white mb-2 tracking-tight">
                       {service.title}
                     </h3>
-                    <p className="text-white/80 text-lg font-normal mb-8 leading-relaxed line-clamp-2">
+                    <p className="text-white/80 text-base font-normal mb-8 leading-relaxed line-clamp-2">
                       {service.description}
                     </p>
 
                     {/* Bottom Pill Buttons */}
                     <div className="flex gap-3">
-                      <Button className="rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 font-medium px-8 py-6 flex items-center gap-2 text-lg">
+                      <Button className="rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 font-medium px-8 py-6 flex items-center gap-2 text-base">
                         Saber más
                         <ArrowUpRight className="w-5 h-5" />
                       </Button>

@@ -93,11 +93,11 @@ export default function WhyChooseUs() {
         {/* Header */}
         <div className="mb-12 flex flex-col md:flex-row justify-between items-end gap-6">
           <div className="max-w-4xl">
-            <h2 className="text-4xl md:text-6xl font-medium tracking-tight mb-4 text-black">
+            <h2 className="text-3xl md:text-5xl font-medium tracking-tight mb-4 text-black">
               Por qué Udreamms es <br />
               <span className="text-gray-400">la mejor decisión.</span>
             </h2>
-            <p className="text-xl text-gray-500 font-normal leading-relaxed max-w-2xl">
+            <p className="text-lg text-gray-500 font-normal leading-relaxed max-w-2xl">
               Beneficios exclusivos diseñados para garantizar tu éxito en USA.
             </p>
           </div>
@@ -145,7 +145,7 @@ export default function WhyChooseUs() {
                 <span className="text-xs font-medium uppercase tracking-wider text-gray-400 mb-3 block">
                   {card.category}
                 </span>
-                <h3 className="text-3xl font-medium text-gray-900 mb-4 leading-tight">
+                <h3 className="text-2xl font-medium text-gray-900 mb-4 leading-tight">
                   {card.title}.
                 </h3>
                 <p className="text-gray-500 font-medium text-sm leading-relaxed">

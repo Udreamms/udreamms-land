@@ -103,11 +103,11 @@ export default function JoinOurStudents() {
         {/* Header */}
         <div className="mb-12 flex flex-col md:flex-row justify-between items-end gap-8">
           <div className="max-w-3xl">
-            <h2 className="text-4xl md:text-6xl font-medium tracking-tight mb-4 text-black">
+            <h2 className="text-3xl md:text-5xl font-medium tracking-tight mb-4 text-black">
               Historias de Éxito <br className="hidden md:block" />
               <span className="text-black font-medium">Reales.</span>
             </h2>
-            <p className="text-xl text-black font-normal leading-relaxed">
+            <p className="text-lg text-black font-normal leading-relaxed">
               Descubre por qué cientos de estudiantes confían en nosotros para su futuro.
             </p>
           </div>
@@ -180,7 +180,7 @@ export default function JoinOurStudents() {
                     <span className="font-medium text-sm tracking-wide">{story.handle}</span>
                   </div>
 
-                  <p className="font-medium text-lg leading-snug text-white/90">
+                  <p className="font-medium text-base leading-snug text-white/90">
                     {story.title}
                   </p>
                 </div>
@@ -208,7 +208,7 @@ export default function JoinOurStudents() {
         {/* Bottom CTA */}
         <div className="flex justify-center">
           <Button
-            className="rounded-full bg-gradient-to-r from-purple-600 to-orange-500 hover:from-purple-700 hover:to-orange-600 text-white font-medium px-10 py-6 text-lg shadow-xl shadow-orange-500/20 transition-all hover:scale-105 flex items-center gap-2"
+            className="rounded-full bg-gradient-to-r from-purple-600 to-orange-500 hover:from-purple-700 hover:to-orange-600 text-white font-medium px-8 py-5 text-base shadow-xl shadow-orange-500/20 transition-all hover:scale-105 flex items-center gap-2"
             onClick={() => window.open('https://www.instagram.com/udreamms/?hl=en', '_blank')}
           >
             Ver más en Instagram

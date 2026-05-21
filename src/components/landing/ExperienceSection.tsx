@@ -91,7 +91,7 @@ export default function ExperienceSection() {
                         Esta aplicación solo está disponible para estudiantes en USA
                     </p>
                     <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 mb-8">
-                        <h2 className="text-5xl md:text-8xl font-medium tracking-tighter text-white">
+                        <h2 className="text-4xl md:text-6xl font-medium tracking-tighter text-white">
                             Descarga
                         </h2>
                         <div className="w-20 h-20 md:w-32 md:h-32 rounded-3xl flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform duration-500 overflow-hidden">
@@ -101,16 +101,16 @@ export default function ExperienceSection() {
                                 className="w-full h-full object-cover"
                             />
                         </div>
-                        <h2 className="text-5xl md:text-8xl font-medium tracking-tighter text-white">
+                        <h2 className="text-4xl md:text-6xl font-medium tracking-tighter text-white">
                             Udreamms
                         </h2>
                     </div>
 
-                    <h2 className="text-5xl md:text-8xl font-medium tracking-tighter text-white mb-10">
+                    <h2 className="text-4xl md:text-6xl font-medium tracking-tighter text-white mb-10">
                         para comenzar
                     </h2>
 
-                    <p className="text-xl md:text-2xl text-white/60 font-medium mb-12 max-w-2xl tracking-tight">
+                    <p className="text-lg md:text-xl text-white/60 font-medium mb-12 max-w-2xl tracking-tight">
                         Utilizada por cientos de estudiantes en Estados Unidos
                     </p>
 
@@ -132,7 +132,7 @@ export default function ExperienceSection() {
 
                 {/* Header Title for Video & List */}
                 <div className="mb-12">
-                    <h3 className="text-4xl md:text-7xl font-medium tracking-tighter mb-6 leading-none text-white max-w-5xl">
+                    <h3 className="text-3xl md:text-5xl font-medium tracking-tighter mb-6 leading-none text-white max-w-5xl">
                         Udreamms Reality: <br /> Construida para ti
                     </h3>
                     <div className="flex items-center gap-6 text-gray-400 text-sm">
@@ -172,7 +172,7 @@ export default function ExperienceSection() {
                                 <div key={index} className="group cursor-pointer border-t border-white/10 py-5 first:border-0 snap-start shrink-0">
                                     <div className="flex gap-8 items-start">
                                         <div className="flex-1">
-                                            <h4 className="text-lg font-medium mb-2 group-hover:text-red-500 transition-colors leading-tight tracking-tight">
+                                            <h4 className="text-base font-medium mb-2 group-hover:text-red-500 transition-colors leading-tight tracking-tight">
                                                 {exp.title}
                                             </h4>
                                             <div className="flex items-center gap-4 text-gray-400 text-xs">

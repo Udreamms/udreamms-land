@@ -45,8 +45,8 @@ export default function StudentShowcase() {
         {/* Header: Title + Learn More Pill */}
         <div className="flex justify-between items-center mb-16">
           <div>
-            <h3 className="text-2xl font-medium tracking-tight text-black">Visa de Estudiante</h3>
-            <h2 className="text-4xl md:text-5xl font-medium tracking-tighter text-black mt-1">
+            <h3 className="text-lg md:text-xl font-medium tracking-tight text-black">Visa de Estudiante</h3>
+            <h2 className="text-3xl md:text-4xl font-medium tracking-tighter text-black mt-1">
               Tu futuro académico empieza aquí
             </h2>
           </div>
@@ -74,7 +74,7 @@ export default function StudentShowcase() {
                   onClick={() => setActiveTab(feature)}
                 >
                   <div className="py-4">
-                    <h4 className={`text-xl transition-colors duration-300 ${isActive ? 'font-medium text-black' : 'font-medium text-black group-hover:underline underline-offset-8'}`}>
+                    <h4 className={`text-lg md:text-xl transition-colors duration-300 ${isActive ? 'font-medium text-black' : 'font-medium text-black group-hover:underline underline-offset-8'}`}>
                       {feature.title}
                     </h4>
 
@@ -87,7 +87,7 @@ export default function StudentShowcase() {
                           transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
                           className="overflow-hidden"
                         >
-                          <p className="pt-4 text-black leading-relaxed font-normal text-lg">
+                          <p className="pt-4 text-black leading-relaxed font-normal text-base">
                             {feature.description}
                           </p>
                         </motion.div>

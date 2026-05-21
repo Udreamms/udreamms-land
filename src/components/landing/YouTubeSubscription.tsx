@@ -14,10 +14,10 @@ export default function YouTubeSubscription() {
                 <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
               </svg>
             </div>
-            <h2 className="text-4xl md:text-5xl font-medium text-white mb-4">
+            <h2 className="text-3xl md:text-4xl font-medium text-white mb-4">
               ¡Síguenos en YouTube!
             </h2>
-            <p className="text-xl text-white mb-8 max-w-2xl mx-auto">
+            <p className="text-lg text-white mb-8 max-w-2xl mx-auto">
               Descubre consejos, testimonios y guías completas sobre cómo estudiar y vivir en Estados Unidos.
               ¡No te pierdas ningún video!
             </p>
@@ -27,7 +27,7 @@ export default function YouTubeSubscription() {
             href="https://www.youtube.com/@udreamms"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center px-10 py-5 text-lg font-medium bg-white text-primary rounded-lg shadow-2xl hover:scale-105 transition-all hover:shadow-[0_20px_60px_-10px_rgba(255,255,255,0.5)] group"
+            className="inline-flex items-center justify-center px-8 py-4 text-base font-medium bg-white text-primary rounded-lg shadow-2xl hover:scale-105 transition-all hover:shadow-[0_20px_60px_-10px_rgba(255,255,255,0.5)] group"
           >
             <svg className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
               <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
