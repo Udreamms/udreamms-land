@@ -1,6 +1,30 @@
 {
   "indexes": [
     {
+      "collectionGroup": "visaCryptoComprobantes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "billingEmail",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "paidAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "visaCryptoComprobantes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "paidAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "chatbots",
       "queryScope": "COLLECTION",
       "fields": [
