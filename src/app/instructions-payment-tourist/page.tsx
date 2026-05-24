@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useCallback, useMemo, useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
-import { CheckCircle2, CreditCard, Wallet, Plane, Star, Trophy, ArrowRight, ShieldCheck, MessageCircle, Mail, Smartphone, Monitor } from "lucide-react";
+import CryptoCheckoutPanel from "@/components/payments/CryptoCheckoutPanel";
+import type { VisaPlanId } from "@/components/payments/CryptoCheckoutModal";
+import { CheckCircle2, CreditCard, Wallet, Plane, Star, Trophy, ArrowRight, ArrowDown, ShieldCheck, MessageCircle, Mail, Smartphone, Monitor } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type PlanId = 'basico' | 'premium' | 'vip';
@@ -16,6 +18,13 @@ const planDetails: Record<PlanId, { normal: string, crypto: string, title: strin
     vip: { normal: "$6,500", crypto: "$4,990", title: "Experiencia VIP", icon: Trophy, color: "text-amber-500", activeClass: "border-amber-500 ring-2 ring-amber-500 bg-amber-50/50", stripeLink: "https://buy.stripe.com/bJe3cvfx1cnoeC6fujenS0z" },
 };
 
+function createCheckoutSessionId() {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
+    return `session_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+}
+
 const fadeInUp: any = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
@@ -25,6 +34,10 @@ function InstructionsContent() {
     const searchParams = useSearchParams();
     const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(null);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(null);
+    const [cryptoCheckoutExpanded, setCryptoCheckoutExpanded] = useState(false);
+    const [checkoutSessionId, setCheckoutSessionId] = useState<string | null>(null);
+    const [paymentApproved, setPaymentApproved] = useState(false);
+    const [approvedOrder, setApprovedOrder] = useState<{ requestId: string; email: string } | null>(null);
 
     const planParam = searchParams.get("plan") || "";
 
@@ -37,8 +50,31 @@ function InstructionsContent() {
 
     const handlePlanSelect = (plan: PlanId) => {
         setSelectedPlan(plan);
-        setPaymentMethod(null); // Reset payment method when changing plan
+        setPaymentMethod(null);
+        setCryptoCheckoutExpanded(false);
+        setCheckoutSessionId(null);
+        setPaymentApproved(false);
+        setApprovedOrder(null);
     };
+
+    const toggleCryptoCheckout = useCallback(() => {
+        if (!selectedPlan) return;
+        setCryptoCheckoutExpanded((open) => {
+            const willOpen = !open;
+            if (willOpen && !checkoutSessionId) {
+                setCheckoutSessionId(createCheckoutSessionId());
+            }
+            return willOpen;
+        });
+    }, [selectedPlan, checkoutSessionId]);
+
+    const handleCryptoPaymentSuccess = useCallback((details: { requestId: string; email: string }) => {
+        setCryptoCheckoutExpanded(false);
+        setPaymentApproved(true);
+        setApprovedOrder(details);
+    }, []);
+
+    const checkoutPlanId = useMemo(() => selectedPlan as VisaPlanId | null, [selectedPlan]);
 
     return (
         <div className="min-h-screen bg-white font-sans text-slate-900 flex flex-col selection:bg-blue-100">
@@ -117,7 +153,7 @@ function InstructionsContent() {
                                     <motion.button
                                         whileHover={{ y: -4, scale: 1.01 }}
                                         whileTap={{ scale: 0.98 }}
-                                        onClick={() => setPaymentMethod('crypto')}
+                                        onClick={() => { setPaymentMethod('crypto'); setPaymentApproved(false); setApprovedOrder(null); }}
                                         className={`relative overflow-hidden p-6 md:p-8 rounded-3xl text-left transition-all duration-300 border-2
                                             ${paymentMethod === 'crypto' ? 'border-blue-400 ring-4 ring-blue-400/20' : 'border-transparent'}
                                             bg-[#0B1120] text-white shadow-2xl hover:shadow-blue-500/10`}
@@ -149,7 +185,7 @@ function InstructionsContent() {
                                     <motion.button
                                         whileHover={{ y: -4, scale: 1.01 }}
                                         whileTap={{ scale: 0.98 }}
-                                        onClick={() => setPaymentMethod('card')}
+                                        onClick={() => { setPaymentMethod('card'); setPaymentApproved(false); setApprovedOrder(null); }}
                                         className={`relative overflow-hidden p-6 md:p-8 rounded-3xl text-left transition-all duration-300 border-2
                                             ${paymentMethod === 'card' ? 'border-indigo-400 ring-4 ring-indigo-400/20' : 'border-transparent'}
                                             bg-gradient-to-br from-indigo-600 to-purple-700 text-white shadow-2xl hover:shadow-indigo-500/20`}
@@ -181,9 +217,51 @@ function InstructionsContent() {
                         )}
                     </AnimatePresence>
 
+                    {/* Payment approved — success screen */}
+                    <AnimatePresence mode="wait">
+                        {paymentApproved && selectedPlan && approvedOrder && (
+                            <motion.div
+                                key="payment-success"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 20 }}
+                                className="mb-16"
+                            >
+                                <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-[2.5rem] p-8 md:p-14 text-center shadow-xl shadow-green-100/50">
+                                    <div className="inline-flex items-center justify-center p-4 bg-green-500 text-white rounded-full mb-6 shadow-lg shadow-green-500/30">
+                                        <CheckCircle2 className="w-12 h-12" strokeWidth={2.5} />
+                                    </div>
+                                    <h2 className="text-3xl md:text-4xl font-black text-green-800 mb-4">
+                                        ¡Pago Aprobado!
+                                    </h2>
+                                    <p className="text-lg text-green-700/90 max-w-xl mx-auto mb-6 font-medium">
+                                        Tu transacción en Solana fue confirmada. Hemos registrado tu solicitud para el {planDetails[selectedPlan].title}.
+                                    </p>
+                                    <div className="inline-block bg-white/80 border border-green-200 rounded-2xl px-6 py-4 mb-8">
+                                        <p className="text-xs font-bold uppercase tracking-wider text-green-600 mb-1">Número de orden</p>
+                                        <p className="text-sm font-mono text-slate-800 break-all">{approvedOrder.requestId}</p>
+                                        {approvedOrder.email ? (
+                                            <p className="text-sm text-slate-600 mt-2">Comprobante enviado a: {approvedOrder.email}</p>
+                                        ) : null}
+                                    </div>
+                                    <div className="text-left max-w-lg mx-auto space-y-4 text-slate-700">
+                                        <p className="flex items-start gap-3">
+                                            <Mail className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+                                            Revisa tu correo electrónico para el comprobante digital oficial de Udreamms.
+                                        </p>
+                                        <p className="flex items-start gap-3">
+                                            <MessageCircle className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+                                            Un asesor VIP se comunicará contigo en menos de 24 horas para comenzar la auditoría.
+                                        </p>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
                     {/* Step 3: Instructions (Dynamic) */}
                     <AnimatePresence mode="wait">
-                        {paymentMethod && selectedPlan && (
+                        {paymentMethod && selectedPlan && !paymentApproved && (
                             <motion.div
                                 key="instructions-step"
                                 initial={{ opacity: 0, y: 20 }}
@@ -202,7 +280,7 @@ function InstructionsContent() {
                                     
                                     <div className="relative z-10">
                                         <div className="flex items-center gap-4 mb-10 pb-6 border-b border-slate-100">
-                                            <div className={`p-4 rounded-2xl ${paymentMethod === 'crypto' ? 'bg-[#0B1120] text-blue-400' : 'bg-indigo-50 text-indigo-600'}`}>
+                                            <div className={`p-4 rounded-2xl ${paymentMethod === 'crypto' ? 'bg-blue-50 text-blue-600' : 'bg-indigo-50 text-indigo-600'}`}>
                                                 {paymentMethod === 'crypto' ? <Wallet className="w-8 h-8" /> : <CreditCard className="w-8 h-8" />}
                                             </div>
                                             <div>
@@ -226,8 +304,37 @@ function InstructionsContent() {
                                                 <div className="pt-6 border-t border-slate-100">
                                                     <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2"><Monitor className="w-5 h-5 text-blue-500" /> 2. En esta Página</h4>
                                                     <ol className="space-y-6">
-                                                        <StepItem number="3" title="Genera tu Código QR" description={<>Haz clic en el botón de abajo <strong>"Proceder al Pago Seguramente"</strong>. Llena tus datos, elige la moneda con la que vas a pagar y se generará un código QR.</>} />
+                                                        <StepItem number="3" title="Genera tu Código QR" description={<>Haz clic en <strong>"Proceder al Pago Seguramente"</strong> para desplegar el checkout. Completa tus datos, elige USDC, USDT, SOL o LXR y se generará tu código QR.</>} />
                                                     </ol>
+                                                    <div className="mt-8 flex flex-col items-center gap-4">
+                                                        <button
+                                                            type="button"
+                                                            onClick={toggleCryptoCheckout}
+                                                            className="inline-flex items-center gap-3 px-8 py-4 rounded-full text-base font-bold text-white shadow-lg hover:scale-[1.02] transition-all bg-blue-600 hover:bg-blue-700 shadow-blue-600/25"
+                                                        >
+                                                            {cryptoCheckoutExpanded ? 'Ocultar checkout' : 'Proceder al Pago Seguramente'}
+                                                            {cryptoCheckoutExpanded ? <ArrowDown className="w-5 h-5 rotate-180" /> : <ArrowRight className="w-5 h-5" />}
+                                                        </button>
+                                                        <AnimatePresence>
+                                                            {cryptoCheckoutExpanded && checkoutPlanId && checkoutSessionId ? (
+                                                                <motion.div
+                                                                    key="inline-crypto-checkout"
+                                                                    initial={{ opacity: 0, height: 0 }}
+                                                                    animate={{ opacity: 1, height: 'auto' }}
+                                                                    exit={{ opacity: 0, height: 0 }}
+                                                                    transition={{ duration: 0.35, ease: 'easeInOut' }}
+                                                                    className="w-full overflow-hidden"
+                                                                >
+                                                                    <CryptoCheckoutPanel
+                                                                        planId={checkoutPlanId}
+                                                                        sessionId={checkoutSessionId}
+                                                                        onSuccess={handleCryptoPaymentSuccess}
+                                                                        className="w-full"
+                                                                    />
+                                                                </motion.div>
+                                                            ) : null}
+                                                        </AnimatePresence>
+                                                    </div>
                                                 </div>
 
                                                 <div className="pt-6 border-t border-slate-100">
@@ -278,8 +385,13 @@ function InstructionsContent() {
                                                     Proceder al Pago Seguramente <ArrowRight className="w-5 h-5" />
                                                 </a>
                                             ) : (
-                                                <button className="inline-flex items-center gap-3 px-10 py-5 rounded-full text-lg font-bold text-white shadow-xl hover:scale-105 transition-all bg-blue-600 hover:bg-blue-700 shadow-blue-600/25">
-                                                    Generar Código QR <ArrowRight className="w-5 h-5" />
+                                                <button
+                                                    type="button"
+                                                    onClick={toggleCryptoCheckout}
+                                                    className="inline-flex items-center gap-3 px-10 py-5 rounded-full text-lg font-bold text-white shadow-xl hover:scale-105 transition-all bg-blue-600 hover:bg-blue-700 shadow-blue-600/25"
+                                                >
+                                                    {cryptoCheckoutExpanded ? 'Ocultar checkout' : 'Generar Código QR'}
+                                                    <ArrowRight className={`w-5 h-5 transition-transform ${cryptoCheckoutExpanded ? 'rotate-90' : ''}`} />
                                                 </button>
                                             )}
                                         </div>
@@ -308,6 +420,7 @@ function InstructionsContent() {
                 </div>
             </main>
             <Footer />
+
         </div>
     );
 }
