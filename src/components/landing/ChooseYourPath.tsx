@@ -118,7 +118,9 @@ export default function ChooseYourPath() {
 
 
                 <div className="flex flex-col items-center gap-3 mt-2 mb-5 md:mb-8 w-full">
-                  <button className={`w-full py-2.5 md:py-3 rounded-full bg-transparent text-white font-normal text-base shadow-2xl hover:scale-[1.03] active:scale-95 transition-all duration-300 border border-white/40 hover:bg-blue-600 hover:border-blue-600`}>{path.buttonText}</button>
+                  <Link href={path.href} className={`w-full py-2.5 md:py-3 rounded-full bg-transparent text-white font-normal text-base shadow-2xl hover:scale-[1.03] active:scale-95 transition-all duration-300 border border-white/40 hover:bg-blue-600 hover:border-blue-600 text-center`} aria-label={`Ir a ${path.title}`}>
+                    {path.buttonText}
+                  </Link>
                 </div>
 
                 <div className="space-y-4 md:space-y-5 flex-1">
