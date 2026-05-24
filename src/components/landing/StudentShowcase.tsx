@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from "react";
 import { useInView } from "framer-motion";
 import { Volume2, VolumeX } from "lucide-react";
+import { Button } from '@/components/ui/button';
 
 export default function StudentShowcase() {
     const containerRef = useRef(null);
@@ -33,6 +34,7 @@ export default function StudentShowcase() {
                         <p className="text-gray-600 text-base leading-[1.7] font-light">
                             Gestionamos todo tu proceso migratorio para que obtengas tu visa F-1: preparación profesional de documentos, seguimiento personalizado y simulaciones de entrevista consular.<br /><br />
                             Acceso a instituciones reconocidas en Estados Unidos con programas de inglés ESL, TOEFL, inglés de negocios y preparación académica. Te ayudamos a elegir el programa ideal que se adapte a tus objetivos.
+                <Button className="mt-4 px-8 py-4 bg-black text-white rounded-full hover:bg-gray-800 transition text-lg">Saber más</Button>
                         </p>
                     </div>
 

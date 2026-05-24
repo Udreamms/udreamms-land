@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { Button } from '@/components/ui/button';
 import Link from "next/link";
 import { useInView } from "framer-motion";
 
@@ -29,6 +30,7 @@ export default function FreeTrainingShowcase() {
                             Accede de forma inmediata a nuestra biblioteca digital de recursos gratuitos de primer nivel. Descarga guías prácticas paso a paso, audiolibros esenciales sobre desarrollo personal y finanzas, y masterclasses completas en video para preparar tu camino hacia el éxito.<br /><br />
                             Una recopilación estratégica de herramientas premium diseñadas para que tomes decisiones inteligentes, minimices riesgos y comiences a estructurar tu futuro en Estados Unidos hoy mismo.
                         </p>
+                <Button className="mt-4 w-fit px-4 py-1.5 bg-black text-white rounded-full hover:bg-gray-800 transition text-sm">Saber más</Button>
                     </div>
 
                     {/* Right Column: Video/Media */}

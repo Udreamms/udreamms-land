@@ -28,7 +28,7 @@ const paths = [
   {
     title: "Visa de Estudiante F-1",
     subtitle: "Lanza tu carrera profesional en universidades americanas.",
-    description: "Un plan 360° para estudiar, trabajar legalmente y establecerte en USA.",
+    description: "",
     features: [
       { text: "Diagnóstico de Perfil 360°", icon: Activity, desc: "Evaluación de probabilidades reales." },
       { text: "Gestión de Admisión I-20", icon: FileCheck, desc: "Tramitación directa con la universidad." },
@@ -48,7 +48,7 @@ const paths = [
   {
     title: "Visa de Turismo B1/B2",
     subtitle: "Viajes de placer, negocios o salud sin fronteras.",
-    description: "Estrategia técnica para asegurar tu aprobación en tiempo récord.",
+    description: "",
     features: [
       { text: "Auditoría de Perfil de Riesgo", icon: Search, desc: "Detectamos debilidades antes de aplicar." },
       { text: "Optimización DS-160", icon: FileCheck, desc: "Redacción estratégica sin errores." },
@@ -88,15 +88,15 @@ export default function ChooseYourPath() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 max-w-6xl gap-8 lg:gap-10 mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 max-w-5xl gap-6 lg:gap-8 mx-auto">
           {paths.map((path, index) => (
             <div key={index} className="relative group w-full flex flex-col">
 
               {/* Glow Effect Background */}
-              <div className={`absolute -inset-2 ${path.glowColor} rounded-[2.5rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+              <div className={`absolute -inset-2 ${path.glowColor} rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
 
               {/* Card Content */}
-              <div className="relative flex-1 bg-black border border-white/10 rounded-[2.5rem] p-5 md:p-8 flex flex-col ring-1 ring-white/5 shadow-2xl overflow-hidden hover:bg-black transition-colors duration-300">
+              <div className="relative flex-1 bg-black border border-white/10 rounded-[2rem] p-6 md:p-8 flex flex-col ring-1 ring-white/5 shadow-2xl overflow-hidden hover:bg-black transition-colors duration-300">
 
                 {/* Visual Accent */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-3xl" />
@@ -109,27 +109,22 @@ export default function ChooseYourPath() {
                 )}
 
                 <div className="flex flex-col items-center text-center mb-6 md:mb-8">
-                  <h3 className="text-2xl md:text-3xl font-normal text-white tracking-tight mb-3 md:mb-4 leading-tight">{path.title}</h3>
-                  <p className="text-slate-400 text-sm font-light leading-relaxed">{path.subtitle}</p>
+                  <h3 className="text-xl md:text-2xl font-normal text-white tracking-tight mb-3 md:mb-4 leading-relaxed">{path.title}</h3>
+                  <p className="text-slate-400 text-sm font-light leading-loose">{path.subtitle}</p>
                 </div>
 
                 {/* Price/Description removed as requested */}
                 <div className="mb-0"></div>
 
-                <p className="text-slate-400 text-sm font-light leading-relaxed mb-4">{path.description}</p>
-                <div className="flex gap-4 mt-2">
-                  <Link href={path.href}>
-                    <button className="px-4 py-2 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition">Saber más</button>
-                  </Link>
-                  <Link href={path.href}>
-                    <button className={`w-full py-3 rounded-full bg-transparent text-white font-normal text-base shadow-2xl hover:scale-[1.03] active:scale-95 transition-all duration-300 border border-white/40 hover:bg-blue-600 hover:border-blue-600`}>{path.buttonText}</button>
-                  </Link>
+
+                <div className="flex flex-col items-center gap-3 mt-2 mb-8 w-full">
+                  <button className={`w-full py-3 rounded-full bg-transparent text-white font-normal text-base shadow-2xl hover:scale-[1.03] active:scale-95 transition-all duration-300 border border-white/40 hover:bg-blue-600 hover:border-blue-600`}>{path.buttonText}</button>
                 </div>
 
-                <div className="space-y-4 flex-1">
-                  <p className="text-white font-normal text-xs uppercase tracking-widest opacity-50 mb-4 text-center">¿Qué incluye el paquete?</p>
+                <div className="space-y-5 flex-1">
+                  <p className="text-white font-normal text-xs uppercase tracking-widest opacity-50 mb-5 text-center">¿Qué incluye el paquete?</p>
                   {path.features.map((feature, fIndex) => (
-                    <li key={fIndex} className="flex items-start gap-4 text-slate-300 group/item cursor-default leading-relaxed">
+                    <li key={fIndex} className="flex items-start gap-3 text-slate-300 group/item cursor-default leading-loose">
                       <div className="mt-1.5 transition-transform group-hover/item:scale-110 shrink-0">
                         <feature.icon className="w-5 h-5 text-white" strokeWidth={1.5} />
                       </div>
