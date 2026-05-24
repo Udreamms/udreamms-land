@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
+import Link from "next/link";
 import { useInView } from "framer-motion";
 import { Volume2, VolumeX } from "lucide-react";
 
@@ -30,10 +31,13 @@ export default function MentorshipShowcase() {
                             <span className="text-3xl md:text-3xl lg:text-4xl xl:text-5xl block mb-2 font-medium">Mentorías Premium</span>
                             <span className="text-gray-500 text-xl md:text-2xl lg:text-3xl font-light">Acompañamiento por quienes ya lo lograron</span>
                         </h2>
-                        <p className="text-gray-600 text-base leading-[1.7] font-light">
+                        <p className="text-gray-600 text-base leading-[1.7] font-light mb-8">
                             Acelera tu integración y triunfa en Estados Unidos con el acompañamiento personalizado de mentores experimentados. Aprende sobre planificación financiera, inserción en el mercado laboral estadounidense, cultura de negocios y desarrollo de carrera directo de profesionales que ya recorrieron el camino y alcanzaron el éxito.<br /><br />
                             Diseñamos sesiones individuales y grupales 1 a 1 adaptadas a tus objetivos específicos para que evites errores comunes, ahorres miles de dólares y multipliques tus oportunidades desde el primer día.
                         </p>
+                        <Link href="/mentorship">
+                           <button className="px-6 py-3 rounded-full bg-black text-white hover:bg-gray-800 transition">Saber más</button>
+                        </Link>
                     </div>
 
                     {/* Right Column: Video/Media (Visually on Left on Desktop) */}

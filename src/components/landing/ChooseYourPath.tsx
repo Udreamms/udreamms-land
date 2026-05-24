@@ -116,11 +116,15 @@ export default function ChooseYourPath() {
                 {/* Price/Description removed as requested */}
                 <div className="mb-0"></div>
 
-                <Link href={path.href} className="w-full mb-10">
-                  <button className={`w-full py-3 rounded-full bg-transparent text-white font-normal text-base shadow-2xl hover:scale-[1.03] active:scale-95 transition-all duration-300 border border-white/40 hover:bg-blue-600 hover:border-blue-600`}>
-                    {path.buttonText}
-                  </button>
-                </Link>
+                <p className="text-slate-400 text-sm font-light leading-relaxed mb-4">{path.description}</p>
+                <div className="flex gap-4 mt-2">
+                  <Link href={path.href}>
+                    <button className="px-4 py-2 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition">Saber más</button>
+                  </Link>
+                  <Link href={path.href}>
+                    <button className={`w-full py-3 rounded-full bg-transparent text-white font-normal text-base shadow-2xl hover:scale-[1.03] active:scale-95 transition-all duration-300 border border-white/40 hover:bg-blue-600 hover:border-blue-600`}>{path.buttonText}</button>
+                  </Link>
+                </div>
 
                 <div className="space-y-4 flex-1">
                   <p className="text-white font-normal text-xs uppercase tracking-widest opacity-50 mb-4 text-center">¿Qué incluye el paquete?</p>
