@@ -119,7 +119,7 @@ export default function PremiumPlanShowcase() {
                         {/* Button moved to the bottom */}
                         <Button
                             className="mt-6 lg:mt-auto rounded-full px-6 py-4 bg-black hover:bg-black/90 text-white font-medium text-sm shadow-xl transition-all self-start"
-                            onClick={() => router.push('/instructions')}
+                            onClick={() => router.push('/instructions-payment-tourist?plan=premium')}
                         >
                             Elegir Plan Premium
                         </Button>

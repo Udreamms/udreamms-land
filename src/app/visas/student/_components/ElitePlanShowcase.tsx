@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import {
     CheckCircle2,
     School,
@@ -155,13 +156,14 @@ export default function ElitePlanShowcase() {
                         El Plan Elite está diseñado para quienes no aceptan menos que la perfección.
                         Cada detalle de tu llegada y asentamiento en Estados Unidos está cubierto.
                     </p>
-                    <Button
-                        size="lg"
-                        className="rounded-full px-10 py-8 bg-black hover:bg-black/90 text-white font-medium text-xl shadow-2xl transition-all hover:-translate-y-1 active:scale-95 shrink-0"
-                        onClick={() => document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' })}
-                    >
-                        Elegir Plan Elite
-                    </Button>
+                    <Link href="/instructions-payment-student?plan=elite">
+                        <Button
+                            size="lg"
+                            className="rounded-full px-10 py-8 bg-black hover:bg-black/90 text-white font-medium text-xl shadow-2xl transition-all hover:-translate-y-1 active:scale-95 shrink-0"
+                        >
+                            Elegir Plan Elite
+                        </Button>
+                    </Link>
                 </div>
             </div>
 

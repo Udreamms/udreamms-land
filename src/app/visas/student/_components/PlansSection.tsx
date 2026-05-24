@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { FadeIn, ScaleIn } from "./Animations";
 import { Button } from "@/components/ui/button";
 import {
@@ -192,11 +193,16 @@ export default function PlansSection() {
                                         <p className="text-slate-500 text-base leading-snug">{plan.description}</p>
                                     </div>
 
-                                    <Button
-                                        className="w-full mb-8 rounded-full py-6 font-medium text-lg shadow-sm transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900"
+                                    <Link 
+                                        href={`/instructions-payment-student?plan=${plan.name.toLowerCase().split(":")[1]?.trim().replace(" ", "-") || "esencial"}`} 
+                                        className="w-full"
                                     >
-                                        Elegir Plan
-                                    </Button>
+                                        <Button
+                                            className="w-full mb-8 rounded-full py-6 font-medium text-lg shadow-sm transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900"
+                                        >
+                                            Elegir Plan
+                                        </Button>
+                                    </Link>
 
                                     <div className="space-y-4 flex-grow">
                                         <p className="font-medium text-xs text-slate-400 mb-4 uppercase tracking-wider border-b border-gray-200 pb-2">

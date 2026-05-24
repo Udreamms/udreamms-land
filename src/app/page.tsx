@@ -9,8 +9,13 @@ import Services from "@/components/landing/Services";
 import YouTubeSubscription from "@/components/landing/YouTubeSubscription";
 import ExperienceSection from "@/components/landing/ExperienceSection";
 import WhyChooseUs from "@/components/landing/WhyChooseUs";
+import UdreammsAppShowcase from "@/components/landing/UdreammsAppShowcase";
+import FAQsSection from "@/components/landing/FAQsSection";
 import TouristShowcase from "@/components/landing/TouristShowcase";
 import StudentShowcase from "@/components/landing/StudentShowcase";
+import MentorshipShowcase from "@/components/landing/MentorshipShowcase";
+import FreeTrainingShowcase from "@/components/landing/FreeTrainingShowcase";
+import UdreammsTVShowcase from "@/components/landing/UdreammsTVShowcase";
 import JoinOurStudents from "@/components/landing/JoinOurStudents";
 
 export default function Home() {
@@ -31,22 +36,27 @@ export default function Home() {
       <ChooseYourPath />
 
       {/* Product Showcases */}
-      <TouristShowcase />
       <StudentShowcase />
+      <TouristShowcase />
+      <MentorshipShowcase />
+      <FreeTrainingShowcase />
+      <UdreammsTVShowcase />
 
       <Stats />
 
-      {/* Flujo Principal: Qué hacemos -> Cómo lo hacemos */}
-      <Services onStartQuote={handleStartQuote} onAppClick={handleAppClick} />
+      {/* Flujo Principal: Qué hacemos -> Cómo lo hacemos (Ocultado temporalmente) */}
+      {/* <Services onStartQuote={handleStartQuote} onAppClick={handleAppClick} /> */}
 
-      {/* Herramientas y Valor Diferencial */}
-      <ExperienceSection />
-      <WhyChooseUs />
+      {/* Herramientas y Valor Diferencial (Ocultado temporalmente) */}
+      {/* <ExperienceSection /> */}
+      <UdreammsAppShowcase />
+      <FAQsSection />
+      {/* <WhyChooseUs /> */}
 
-      <JoinOurStudents />
+      {/* <JoinOurStudents /> */}
 
       {/* Prueba Social / Comunidad (Empujón final de confianza) */}
-      <YouTubeSubscription />
+      {/* <YouTubeSubscription /> */}
 
       <Footer />
     </div>

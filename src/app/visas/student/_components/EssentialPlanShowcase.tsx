@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { FileText, School, CheckCircle2, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -58,13 +59,14 @@ export default function EssentialPlanShowcase() {
                             Todo lo que necesitas para asegurar tu admisión educativa y comenzar tu trámite consular con expertos.
                         </p>
                     </div>
-                    <Button
-                        size="lg"
-                        className="rounded-full px-10 py-7 bg-black hover:bg-black/90 text-white font-medium text-lg shadow-xl shadow-gray-200 transition-all"
-                        onClick={() => document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' })}
-                    >
-                        Elegir Plan Esencial
-                    </Button>
+                    <Link href="/instructions-payment-student?plan=esencial">
+                        <Button
+                            size="lg"
+                            className="rounded-full px-10 py-7 bg-black hover:bg-black/90 text-white font-medium text-lg shadow-xl shadow-gray-200 transition-all"
+                        >
+                            Elegir Plan Esencial
+                        </Button>
+                    </Link>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

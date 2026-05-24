@@ -139,7 +139,10 @@ export default function PlansSection() {
 
                                     <Button
                                         className="w-full mb-6 rounded-full py-2 font-medium text-sm shadow-lg transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900"
-                                        onClick={() => router.push('/instructions')}
+                                        onClick={() => {
+                                            const planId = plan.name.toLowerCase().split(" ").pop()?.normalize("NFD").replace(/[\u0300-\u036f]/g, "") || "basico";
+                                            router.push(`/instructions-payment-tourist?plan=${planId}`);
+                                        }}
                                     >
                                         Elegir Plan
                                     </Button>

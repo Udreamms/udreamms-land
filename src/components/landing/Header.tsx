@@ -78,8 +78,9 @@ const menuData: MenuItemData[] = [
       ]
     }
   },
-  { label: "FAQs", href: "/faqs" },
+  { label: "FAQs", href: "/#faqs" },
   { label: "Contáctanos", href: "/contact" },
+  { label: "Luxor | $LXR", href: "https://www.byluxor.com/es" },
 ];
 
 export default function Header() {
@@ -150,6 +151,7 @@ export default function Header() {
                   >
                     <Link
                       href={item.href || "#"}
+                      {...(item.href?.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                       className={`
                         px-3 py-1.5 text-[12px] xl:text-[13px] font-medium tracking-wide transition-all duration-300 flex items-center gap-1.5 rounded-full hover:bg-white/5
                         ${activeMenu === item.label ? "text-white bg-white/5" : "text-white/80 hover:text-white"}
@@ -349,7 +351,18 @@ export default function Header() {
               <div className="space-y-6">
                 {menuData.map((item) => (
                   <div key={item.label} className="border-b border-white/10 pb-4">
-                    <span className="text-2xl font-medium text-white mb-4 block tracking-tight">{item.label}</span>
+                    {item.href ? (
+                      <Link
+                        href={item.href}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        {...(item.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                        className="text-2xl font-medium text-white mb-4 block tracking-tight hover:text-white/80 transition-colors"
+                      >
+                        {item.label}
+                      </Link>
+                    ) : (
+                      <span className="text-2xl font-medium text-white mb-4 block tracking-tight">{item.label}</span>
+                    )}
                     {item.megaMenu && (
                       <div className="grid grid-cols-1 gap-4 pl-2">
                         {item.megaMenu.items.map((subItem, idx) => (

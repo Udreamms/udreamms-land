@@ -26,24 +26,6 @@ import { Button } from "@/components/ui/button";
 
 const paths = [
   {
-    title: "Visa de Turismo B1/B2",
-    subtitle: "Viajes de placer, negocios o salud sin fronteras.",
-    description: "Estrategia técnica para asegurar tu aprobación en tiempo récord.",
-    features: [
-      { text: "Auditoría de Perfil de Riesgo", icon: Search, desc: "Detectamos debilidades antes de aplicar." },
-      { text: "Optimización DS-160", icon: FileCheck, desc: "Redacción estratégica sin errores." },
-      { text: "Narrativa de Viaje Coherente", icon: Map, desc: "Propósito sólido y veraz ante el cónsul." },
-      { text: "Entrenamiento Anti-Trampa", icon: Mic, desc: "Respuestas seguras a preguntas críticas." },
-      { text: "Monitoreo de Citas 24/7", icon: Clock, desc: "Buscamos adelantar tu fecha de entrevista." },
-      { text: "Dossier de Evidencias Pro", icon: ClipboardCheck, desc: "Qué documentos llevar y cuáles no." }
-    ],
-    href: "/visas/tourist",
-    buttonText: "Solicitar visa ahora",
-    glowColor: "bg-white/20",
-    tag: "¡Cupos Limitados!",
-    tagColor: "bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca]"
-  },
-  {
     title: "Visa de Estudiante F-1",
     subtitle: "Lanza tu carrera profesional en universidades americanas.",
     description: "Un plan 360° para estudiar, trabajar legalmente y establecerte en USA.",
@@ -56,9 +38,27 @@ const paths = [
       { text: "Alojamiento & Vivienda Pro", icon: MapPin, desc: "Opciones seguras cerca de tu escuela." },
       { text: "Comunidad Udreamms Plus", icon: Users, desc: "Networking y eventos exclusivos." }
     ],
-    href: "/visas/student",
+    href: "/instructions-payment-student",
     buttonText: "Solicitar visa ahora",
     highlighted: true,
+    glowColor: "bg-white/20",
+    tag: "¡Cupos Limitados!",
+    tagColor: "bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca]"
+  },
+  {
+    title: "Visa de Turismo B1/B2",
+    subtitle: "Viajes de placer, negocios o salud sin fronteras.",
+    description: "Estrategia técnica para asegurar tu aprobación en tiempo récord.",
+    features: [
+      { text: "Auditoría de Perfil de Riesgo", icon: Search, desc: "Detectamos debilidades antes de aplicar." },
+      { text: "Optimización DS-160", icon: FileCheck, desc: "Redacción estratégica sin errores." },
+      { text: "Narrativa de Viaje Coherente", icon: Map, desc: "Propósito sólido y veraz ante el cónsul." },
+      { text: "Entrenamiento Anti-Trampa", icon: Mic, desc: "Respuestas seguras a preguntas críticas." },
+      { text: "Monitoreo de Citas 24/7", icon: Clock, desc: "Buscamos adelantar tu fecha de entrevista." },
+      { text: "Dossier de Evidencias Pro", icon: ClipboardCheck, desc: "Qué documentos llevar y cuáles no." }
+    ],
+    href: "/instructions-payment-tourist",
+    buttonText: "Solicitar visa ahora",
     glowColor: "bg-white/20",
     tag: "¡Cupos Limitados!",
     tagColor: "bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca]"
@@ -88,7 +88,7 @@ export default function ChooseYourPath() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 max-w-5xl gap-10 mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 max-w-6xl gap-8 lg:gap-10 mx-auto">
           {paths.map((path, index) => (
             <div key={index} className="relative group w-full flex flex-col">
 

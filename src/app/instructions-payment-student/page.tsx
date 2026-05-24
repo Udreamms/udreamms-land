@@ -1,18 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import { CheckCircle2, CreditCard, Wallet, Plane, Star, Trophy, ArrowRight, ShieldCheck, MessageCircle, Mail, Smartphone, Monitor } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-type PlanId = 'basico' | 'premium' | 'vip';
+type PlanId = 'esencial' | 'pro' | 'elite' | 'allinclusive';
 type PaymentMethod = 'crypto' | 'card' | null;
 
 const planDetails: Record<PlanId, { normal: string, crypto: string, title: string, icon: any, color: string, activeClass: string, stripeLink: string }> = {
-    basico: { normal: "$494", crypto: "$380", title: "Plan Básico", icon: Plane, color: "text-slate-600", activeClass: "border-slate-900 ring-2 ring-slate-900 bg-slate-50", stripeLink: "https://buy.stripe.com/00w4gzdoT734alQeqfenS0x" },
-    premium: { normal: "$4,550", crypto: "$3,500", title: "Plan Premium", icon: Star, color: "text-blue-600", activeClass: "border-blue-600 ring-2 ring-blue-600 bg-blue-50/50", stripeLink: "https://buy.stripe.com/00wdR93Ojafgdy2ci7enS0y" },
-    vip: { normal: "$6,500", crypto: "$4,990", title: "Experiencia VIP", icon: Trophy, color: "text-amber-500", activeClass: "border-amber-500 ring-2 ring-amber-500 bg-amber-50/50", stripeLink: "https://buy.stripe.com/bJe3cvfx1cnoeC6fujenS0z" },
+    esencial: { normal: "$494", crypto: "$380", title: "Plan Esencial", icon: Plane, color: "text-slate-600", activeClass: "border-slate-900 ring-2 ring-slate-900 bg-slate-50", stripeLink: "https://buy.stripe.com/00w4gzdoT734alQeqfenS0x" },
+    pro: { normal: "$1,700", crypto: "$850", title: "Plan Pro", icon: Star, color: "text-blue-600", activeClass: "border-blue-600 ring-2 ring-blue-600 bg-blue-50/50", stripeLink: "https://buy.stripe.com/00wdR93Ojafgdy2ci7enS0y" },
+    elite: { normal: "$3,250", crypto: "$2,500", title: "Plan Elite", icon: Trophy, color: "text-amber-500", activeClass: "border-amber-500 ring-2 ring-amber-500 bg-amber-50/50", stripeLink: "https://buy.stripe.com/bJe3cvfx1cnoeC6fujenS0z" },
+    allinclusive: { normal: "$13,000", crypto: "$10,000", title: "Plan All-Inclusive", icon: Trophy, color: "text-red-500", activeClass: "border-red-500 ring-2 ring-red-500 bg-red-50/50", stripeLink: "https://buy.stripe.com/bJe3cvfx1cnoeC6fujenS0z" }
 };
 
 const fadeInUp: any = {
@@ -20,9 +22,19 @@ const fadeInUp: any = {
     visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
 };
 
-export default function InstructionsPage() {
+function InstructionsContent() {
+    const searchParams = useSearchParams();
     const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(null);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(null);
+
+    const planParam = searchParams.get("plan") || "";
+
+    useEffect(() => {
+        const planVal = planParam.toLowerCase().replace("-", "") as PlanId;
+        if (planVal && planDetails[planVal]) {
+            setSelectedPlan(planVal);
+        }
+    }, [planParam]);
 
     const handlePlanSelect = (plan: PlanId) => {
         setSelectedPlan(plan);
@@ -47,7 +59,7 @@ export default function InstructionsPage() {
                             Tu Aventura Comienza Aquí
                         </h1>
                         <p className="text-xl text-slate-500 max-w-2xl mx-auto font-medium">
-                            Has dado el primer paso hacia tu sueño americano. Sigue las instrucciones a continuación para asegurar tu plan.
+                            Has dado el primer paso hacia tu sueño americano. Sigue las instrucciones a continuación para asegurar tu plan de visa de estudiante.
                         </p>
                     </motion.div>
 
@@ -58,7 +70,7 @@ export default function InstructionsPage() {
                             <h2 className="text-2xl font-bold text-slate-800">Confirma tu Plan</h2>
                         </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                             {(Object.entries(planDetails) as [PlanId, typeof planDetails[PlanId]][]).map(([id, plan]) => {
                                 const isSelected = selectedPlan === id;
                                 const Icon = plan.icon;
@@ -68,12 +80,12 @@ export default function InstructionsPage() {
                                         whileHover={{ y: -4 }}
                                         whileTap={{ scale: 0.98 }}
                                         onClick={() => handlePlanSelect(id)}
-                                        className={`relative p-8 rounded-3xl text-left transition-all duration-300 border-2 overflow-hidden group 
+                                        className={`relative p-8 rounded-3xl text-left transition-all duration-300 border-2 overflow-hidden group h-full flex flex-col justify-between
                                             ${isSelected ? plan.activeClass : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-lg'}`}
                                     >
-                                        <div className="relative z-10">
+                                        <div className="relative z-10 w-full">
                                             <Icon className={`w-8 h-8 mb-4 ${isSelected ? plan.color : 'text-slate-400 group-hover:text-slate-600 transition-colors'}`} />
-                                            <h3 className="text-xl font-bold mb-2">{plan.title}</h3>
+                                            <h3 className="text-xl font-bold mb-2 leading-tight">{plan.title}</h3>
                                             <p className="text-sm font-medium text-slate-500 flex items-center gap-2">
                                                 {isSelected ? 'Plan Seleccionado' : 'Seleccionar'}
                                                 {isSelected && <CheckCircle2 className="w-4 h-4 text-green-500" />}
@@ -172,7 +184,7 @@ export default function InstructionsPage() {
 
                     {/* Step 3: Instructions (Dynamic) */}
                     <AnimatePresence mode="wait">
-                        {paymentMethod && (
+                        {paymentMethod && selectedPlan && (
                             <motion.div
                                 key="instructions-step"
                                 initial={{ opacity: 0, y: 20 }}
@@ -187,7 +199,7 @@ export default function InstructionsPage() {
 
                                 <div className="bg-white p-6 md:p-12 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden">
                                     {/* Decorative background shape */}
-                                    <div className={`absolute -top-24 -right-24 w-64 h-64 rounded-full blur-3xl opacity-20 ${paymentMethod === 'crypto' ? 'bg-blue-400' : 'bg-indigo-500'}`}></div>
+                                    <div className={`absolute -top-24 -right-24 w-64 h-64 rounded-full blur-3xl opacity-20 ${paymentMethod === 'crypto' ? 'bg-blue-400' : 'bg-indigo-50'}`}></div>
                                     
                                     <div className="relative z-10">
                                         <div className="flex items-center gap-4 mb-10 pb-6 border-b border-slate-100">
@@ -312,5 +324,13 @@ function StepItem({ number, title, description }: { number: string, title: strin
                 <p className="text-slate-600 leading-relaxed">{description}</p>
             </div>
         </li>
+    );
+}
+
+export default function InstructionsPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-white" />}>
+            <InstructionsContent />
+        </Suspense>
     );
 }

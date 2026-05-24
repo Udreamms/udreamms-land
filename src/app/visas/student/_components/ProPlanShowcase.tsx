@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import {
     CheckCircle2,
     School,
@@ -76,13 +77,14 @@ export default function ProPlanShowcase() {
                             Diseñado para quienes buscan no solo la visa, sino una llegada organizada y sin complicaciones.
                         </p>
                     </div>
-                    <Button
-                        size="lg"
-                        className="rounded-full px-10 py-7 bg-black hover:bg-black/90 text-white font-medium text-lg shadow-xl shadow-gray-200 transition-all"
-                        onClick={() => document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' })}
-                    >
-                        Elegir Plan Pro
-                    </Button>
+                    <Link href="/instructions-payment-student?plan=pro">
+                        <Button
+                            size="lg"
+                            className="rounded-full px-10 py-7 bg-black hover:bg-black/90 text-white font-medium text-lg shadow-xl shadow-gray-200 transition-all"
+                        >
+                            Elegir Plan Pro
+                        </Button>
+                    </Link>
                 </div>
 
                 <div className="flex flex-col lg:flex-row gap-16 items-start max-h-[750px]">

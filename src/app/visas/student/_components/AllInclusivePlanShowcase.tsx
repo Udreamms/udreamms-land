@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Plane,
@@ -111,13 +112,14 @@ export default function AllInclusivePlanShowcase() {
                             La solución definitiva donde nosotros nos encargamos de absolutamente todo, desde tu boleto de avión hasta tu hogar en USA.
                         </p>
                     </div>
-                    <Button
-                        size="lg"
-                        className="rounded-full px-10 py-7 bg-black hover:bg-black/90 text-white font-medium text-lg shadow-xl shadow-gray-200 transition-all"
-                        onClick={() => document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' })}
-                    >
-                        Elegir All-Inclusive
-                    </Button>
+                    <Link href="/instructions-payment-student?plan=all-inclusive">
+                        <Button
+                            size="lg"
+                            className="rounded-full px-10 py-7 bg-black hover:bg-black/90 text-white font-medium text-lg shadow-xl shadow-gray-200 transition-all"
+                        >
+                            Elegir All-Inclusive
+                        </Button>
+                    </Link>
                 </div>
 
                 <div className="flex flex-col lg:flex-row gap-16 items-start">

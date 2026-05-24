@@ -9,8 +9,8 @@ import { useRouter } from "next/navigation";
 export default function BuyCtaSection() {
     const router = useRouter();
 
-    const goToInstructions = () => {
-        router.push('/instructions');
+    const goToInstructions = (plan: string) => {
+        router.push(`/instructions-payment-tourist?plan=${plan}`);
     };
 
     return (
@@ -30,21 +30,21 @@ export default function BuyCtaSection() {
                         <div className="flex flex-wrap lg:flex-nowrap items-center justify-center gap-6">
                             <Button
                                 size="lg"
-                                onClick={goToInstructions}
+                                onClick={() => goToInstructions('basico')}
                                 className="w-full sm:w-64 rounded-full py-8 font-medium text-lg shadow-lg transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900"
                             >
                                 Plan Básico
                             </Button>
                             <Button
                                 size="lg"
-                                onClick={goToInstructions}
+                                onClick={() => goToInstructions('premium')}
                                 className="w-full sm:w-64 rounded-full py-8 font-medium text-lg shadow-lg transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900"
                             >
                                 Plan Premium
                             </Button>
                             <Button
                                 size="lg"
-                                onClick={goToInstructions}
+                                onClick={() => goToInstructions('vip')}
                                 className="w-full sm:w-64 rounded-full py-8 font-medium text-lg shadow-lg transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900"
                             >
                                 Experiencia VIP
