@@ -1,31 +1,84 @@
 "use client";
 
 import { motion, useAnimation } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export default function UdreammsTVShowcase() {
     const controls = useAnimation();
 
+    const resizeTimer = useRef<number | null>(null);
+    const sectionRef = useRef<HTMLElement | null>(null);
+    const tvRef = useRef<any>(null);
+
+    // Calcula límites basados en las dimensiones reales de la sección y el TV
     const startAirHockeyBounces = () => {
+        if (typeof window === "undefined") return;
+        const sec = sectionRef.current;
+        const tv = tvRef.current;
+        if (!sec || !tv) return;
+
+        const c = sec.getBoundingClientRect();
+        const t = tv.getBoundingClientRect();
+
+        // límites para que el TV no salga del area visible de la sección
+        const minX = Math.round(c.left - t.left);
+        const maxX = Math.round(c.right - t.right);
+        const minY = Math.round(c.top - t.top);
+        const maxY = Math.round(c.bottom - t.bottom);
+
+        const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
+
+        // Generar puntos intermedios dentro de los límites con margen
+        const marginX = Math.round(Math.min(Math.abs(minX), Math.abs(maxX)) * 0.85);
+        const marginY = Math.round(Math.min(Math.abs(minY), Math.abs(maxY)) * 0.6);
+
+        const xs = [
+            0,
+            clamp(-marginX * 0.6, minX, maxX),
+            clamp(marginX * 0.5, minX, maxX),
+            clamp(-marginX * 0.3, minX, maxX),
+            clamp(marginX * 0.25, minX, maxX),
+            0
+        ];
+
+        const ys = [
+            0,
+            clamp(-marginY * 0.9, minY, maxY),
+            clamp(marginY * 0.6, minY, maxY),
+            clamp(-marginY * 0.4, minY, maxY),
+            0
+        ];
+
         controls.start({
-            x: [0, -400, -900, -500, 80, -200, -950, -800, 0],
-            y: [0, -180, 50, 180, 0, 180, -100, -180, 0],
-            rotate: [0, 360],
+            x: xs,
+            y: ys,
+            rotate: [0, 3, -2, 1, 0],
             transition: {
                 repeat: Infinity,
-                duration: 10,
-                ease: "linear"
+                duration: 30,
+                ease: "easeInOut"
             }
         });
     };
 
-    // Iniciar la animación infinita de hockey de aire al montar el componente
+    // Iniciar la animación y reiniciarla en resize (debounced)
     useEffect(() => {
         startAirHockeyBounces();
+        const onResize = () => {
+            if (resizeTimer.current) window.clearTimeout(resizeTimer.current);
+            resizeTimer.current = window.setTimeout(() => {
+                startAirHockeyBounces();
+            }, 150);
+        };
+        if (typeof window !== "undefined") window.addEventListener("resize", onResize);
+        return () => {
+            if (typeof window !== "undefined") window.removeEventListener("resize", onResize);
+            if (resizeTimer.current) window.clearTimeout(resizeTimer.current);
+        };
     }, []);
 
     return (
-        <section className="relative w-full min-h-[600px] md:min-h-[850px] lg:min-h-[950px] bg-black overflow-hidden flex items-center z-10">
+        <section ref={sectionRef} className="relative w-full min-h-[600px] md:min-h-[850px] lg:min-h-[950px] bg-black overflow-hidden flex items-center z-10">
             
             {/* Animación del Fondo de la Sección (Llega desde el lado derecho y cubre el fondo) */}
             <motion.div
@@ -60,15 +113,15 @@ export default function UdreammsTVShowcase() {
                             ease: "easeInOut"
                         }
                     }}
-                    className="w-full h-full object-contain object-center md:object-right"
+                    className="absolute inset-0 w-full h-full object-cover object-center sm:object-center md:object-right lg:object-right z-0"
                 />
                 
                 {/* Degradado suave a la izquierda para asegurar legibilidad del texto */}
-                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/60 md:from-black/80 via-black/40 to-transparent pointer-events-none" />
             </motion.div>
 
             {/* Contenido de la Sección */}
-            <div className="container max-w-[1500px] mx-auto px-6 md:px-12 py-16 md:py-24 relative z-10">
+            <div className="container max-w-[1500px] mx-auto px-6 md:px-12 py-16 md:py-24 relative z-20">
                 <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16">
                     
                     {/* Left Column: Texts */}
@@ -127,6 +180,7 @@ export default function UdreammsTVShowcase() {
                             whileInView={{ scale: 1, rotate: 0, opacity: 1, x: 0 }}
                             viewport={{ once: true }}
                             animate={controls}
+                            ref={tvRef}
                             drag
                             dragConstraints={{ left: -1000, right: 100, top: -200, bottom: 200 }}
                             dragElastic={0.2}

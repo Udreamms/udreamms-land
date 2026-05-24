@@ -23,23 +23,23 @@ export default function StudentShowcase() {
     return (
         <section className="py-16 lg:py-32 bg-white text-black overflow-hidden font-sans">
             <div className="container mx-auto px-6 max-w-[1500px]">
-                <div className="flex flex-col lg:flex-row-reverse gap-8 lg:gap-24 items-center lg:items-center">
+                <div className="flex flex-col lg:flex-row-reverse gap-6 lg:gap-24 items-center lg:items-center">
                     
                     {/* Left Column: Text (Visually on Right) */}
                     <div className="w-full lg:w-[35%] flex flex-col pt-2 lg:pt-10 pl-0 lg:pl-8">
                         <h2 className="font-normal tracking-tight text-black mb-6 leading-[1.1]">
-                            <span className="text-3xl md:text-3xl lg:text-4xl xl:text-5xl whitespace-nowrap block mb-2">Visa de Estudiante</span>
+                            <span className="text-3xl md:text-3xl lg:text-4xl xl:text-5xl block mb-2">Visa de Estudiante</span>
                             <span className="text-gray-500 text-xl md:text-2xl lg:text-3xl font-light">Tu futuro académico empieza aquí</span>
                         </h2>
                         <p className="text-gray-600 text-base leading-[1.7] font-light">
                             Gestionamos todo tu proceso migratorio para que obtengas tu visa F-1: preparación profesional de documentos, seguimiento personalizado y simulaciones de entrevista consular.<br /><br />
                             Acceso a instituciones reconocidas en Estados Unidos con programas de inglés ESL, TOEFL, inglés de negocios y preparación académica. Te ayudamos a elegir el programa ideal que se adapte a tus objetivos.
-                <Button className="mt-4 px-8 py-4 bg-black text-white rounded-full hover:bg-gray-800 transition text-lg">Saber más</Button>
                         </p>
+                        <Button className="mt-6 w-fit px-5 py-2.5 bg-black text-white rounded-full hover:bg-gray-800 transition text-sm">Saber más</Button>
                     </div>
 
                     {/* Right Column: Video/Media */}
-                    <div ref={containerRef} className="w-full lg:w-2/3 relative h-[400px] lg:h-[650px] bg-[#0a0a0a] rounded-3xl overflow-hidden flex items-center justify-center shadow-2xl">
+                    <div ref={containerRef} className="w-full lg:w-2/3 relative h-[280px] sm:h-[350px] lg:h-[650px] bg-[#0a0a0a] rounded-3xl overflow-hidden flex items-center justify-center shadow-2xl">
                         
                         <video
                             ref={videoRef}

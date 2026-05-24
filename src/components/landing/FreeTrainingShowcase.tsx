@@ -12,7 +12,7 @@ export default function FreeTrainingShowcase() {
     return (
         <section className="py-16 lg:py-32 bg-white text-black overflow-hidden font-sans">
             <div className="container mx-auto px-6 max-w-[1500px]">
-                <div className="flex flex-col lg:flex-row gap-8 lg:gap-24 items-center lg:items-center">
+                <div className="flex flex-col lg:flex-row gap-6 lg:gap-24 items-center lg:items-center">
                     
                     {/* Left Column: Text */}
                     <div className="w-full lg:w-[35%] flex flex-col pt-2 lg:pt-10 pr-0 lg:pr-8">
@@ -34,7 +34,7 @@ export default function FreeTrainingShowcase() {
                     </div>
 
                     {/* Right Column: Video/Media */}
-                    <div ref={ref} className="w-full lg:w-2/3 relative h-[400px] lg:h-[650px] bg-[#0a0a0a] rounded-3xl overflow-hidden flex items-center justify-center shadow-2xl">
+                    <div ref={ref} className="w-full lg:w-2/3 relative h-[280px] sm:h-[350px] lg:h-[650px] bg-[#0a0a0a] rounded-3xl overflow-hidden flex items-center justify-center shadow-2xl">
                         {isInView ? (
                             <iframe
                                 src="https://www.youtube.com/embed/wIh31q-3dPM?autoplay=1&mute=1&loop=1&playlist=wIh31q-3dPM"

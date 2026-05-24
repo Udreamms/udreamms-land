@@ -24,7 +24,7 @@ export default function MentorshipShowcase() {
     return (
         <section className="py-16 lg:py-32 bg-white text-black overflow-hidden font-sans">
             <div className="container mx-auto px-6 max-w-[1500px]">
-                <div className="flex flex-col lg:flex-row-reverse gap-8 lg:gap-24 items-center lg:items-center">
+                <div className="flex flex-col lg:flex-row-reverse gap-6 lg:gap-24 items-center lg:items-center">
                     
                     {/* Left Column: Text (Visually on Right on Desktop) */}
                     <div className="w-full lg:w-[35%] flex flex-col pt-2 lg:pt-10 pl-0 lg:pl-8">
@@ -37,12 +37,12 @@ export default function MentorshipShowcase() {
                             Diseñamos sesiones individuales y grupales 1 a 1 adaptadas a tus objetivos específicos para que evites errores comunes, ahorres miles de dólares y multipliques tus oportunidades desde el primer día.
                         </p>
                         <Link href="/mentorship">
-                           <Button className="mt-4 px-8 py-4 bg-black text-white rounded-full hover:bg-gray-800 transition text-lg">Saber más</Button>
+                           <Button className="mt-6 w-fit px-5 py-2.5 bg-black text-white rounded-full hover:bg-gray-800 transition text-sm">Saber más</Button>
                         </Link>
                     </div>
 
                     {/* Right Column: Video/Media (Visually on Left on Desktop) */}
-                    <div ref={containerRef} className="w-full lg:w-2/3 relative h-[400px] lg:h-[650px] bg-[#0a0a0a] rounded-3xl overflow-hidden flex items-center justify-center shadow-2xl">
+                    <div ref={containerRef} className="w-full lg:w-2/3 relative h-[280px] sm:h-[350px] lg:h-[650px] bg-[#0a0a0a] rounded-3xl overflow-hidden flex items-center justify-center shadow-2xl">
                         
                         <video
                             ref={videoRef}

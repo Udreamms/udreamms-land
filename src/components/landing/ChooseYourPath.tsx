@@ -69,7 +69,7 @@ export default function ChooseYourPath() {
   const commonGradient = "from-blue-600 to-cyan-600";
 
   return (
-    <section id="planes" className="pt-24 pb-40 bg-[#050507] relative overflow-hidden font-sans">
+    <section id="planes" className="pt-16 md:pt-24 pb-24 md:pb-40 bg-[#050507] relative overflow-hidden font-sans">
       {/* Sutil efecto de cuadrícula de fondo */}
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px]" />
 
@@ -79,7 +79,7 @@ export default function ChooseYourPath() {
       <div className="container max-w-[1500px] mx-auto px-6 relative z-10">
 
         {/* Header Centrado Simplificado - "Planes" tamaño reducido */}
-        <div className="mb-20 max-w-4xl mx-auto text-center">
+        <div className="mb-12 md:mb-20 max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-normal tracking-tight text-white leading-tight mb-4">
             Planes
           </h2>
@@ -88,7 +88,7 @@ export default function ChooseYourPath() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 max-w-5xl gap-6 lg:gap-8 mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 max-w-5xl gap-5 md:gap-6 lg:gap-8 mx-auto">
           {paths.map((path, index) => (
             <div key={index} className="relative group w-full flex flex-col">
 
@@ -96,19 +96,19 @@ export default function ChooseYourPath() {
               <div className={`absolute -inset-2 ${path.glowColor} rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
 
               {/* Card Content */}
-              <div className="relative flex-1 bg-black border border-white/10 rounded-[2rem] p-6 md:p-8 flex flex-col ring-1 ring-white/5 shadow-2xl overflow-hidden hover:bg-black transition-colors duration-300">
+              <div className="relative flex-1 bg-black border border-white/10 rounded-[2rem] p-5 md:p-6 lg:p-8 flex flex-col ring-1 ring-white/5 shadow-2xl overflow-hidden hover:bg-black transition-colors duration-300">
 
                 {/* Visual Accent */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-3xl" />
 
                 {/* Floating Tag for FIFA */}
                 {path.tag && (
-                  <div className={`absolute top-0 right-0 ${path.tagColor} text-white text-[10px] font-medium uppercase tracking-widest px-6 py-2 rounded-bl-3xl shadow-lg z-20 animate-pulse`}>
+                  <div className={`absolute top-0 right-0 ${path.tagColor} text-white text-[10px] font-medium uppercase tracking-widest px-3 py-1.5 md:px-6 md:py-2 rounded-bl-3xl shadow-lg z-20 animate-pulse`}>
                     {path.tag}
                   </div>
                 )}
 
-                <div className="flex flex-col items-center text-center mb-6 md:mb-8">
+                <div className="flex flex-col items-center text-center mb-4 md:mb-6 lg:mb-8">
                   <h3 className="text-xl md:text-2xl font-normal text-white tracking-tight mb-3 md:mb-4 leading-relaxed">{path.title}</h3>
                   <p className="text-slate-400 text-sm font-light leading-loose">{path.subtitle}</p>
                 </div>
@@ -117,12 +117,12 @@ export default function ChooseYourPath() {
                 <div className="mb-0"></div>
 
 
-                <div className="flex flex-col items-center gap-3 mt-2 mb-8 w-full">
-                  <button className={`w-full py-3 rounded-full bg-transparent text-white font-normal text-base shadow-2xl hover:scale-[1.03] active:scale-95 transition-all duration-300 border border-white/40 hover:bg-blue-600 hover:border-blue-600`}>{path.buttonText}</button>
+                <div className="flex flex-col items-center gap-3 mt-2 mb-5 md:mb-8 w-full">
+                  <button className={`w-full py-2.5 md:py-3 rounded-full bg-transparent text-white font-normal text-base shadow-2xl hover:scale-[1.03] active:scale-95 transition-all duration-300 border border-white/40 hover:bg-blue-600 hover:border-blue-600`}>{path.buttonText}</button>
                 </div>
 
-                <div className="space-y-5 flex-1">
-                  <p className="text-white font-normal text-xs uppercase tracking-widest opacity-50 mb-5 text-center">¿Qué incluye el paquete?</p>
+                <div className="space-y-4 md:space-y-5 flex-1">
+                  <p className="text-white font-normal text-xs uppercase tracking-widest opacity-50 mb-3 md:mb-5 text-center">¿Qué incluye el paquete?</p>
                   {path.features.map((feature, fIndex) => (
                     <li key={fIndex} className="flex items-start gap-3 text-slate-300 group/item cursor-default leading-loose">
                       <div className="mt-1.5 transition-transform group-hover/item:scale-110 shrink-0">
