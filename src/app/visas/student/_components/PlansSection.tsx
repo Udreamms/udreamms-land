@@ -116,117 +116,103 @@ const PLANS = [
 
 export default function PlansSection() {
     return (
-        <section className="py-24 bg-white relative overflow-hidden" id="planes">
-            <div className="w-full px-4 md:px-8">
-                <div className="text-center mb-16">
+        <section id="planes" className="pt-24 md:pt-32 pb-24 md:pb-40 bg-[#050507] relative overflow-hidden font-sans">
+            {/* Background effects */}
+            <div className="absolute inset-0 bg-white/[0.02] bg-[size:50px_50px]" />
+            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-[#050507] -translate-y-full" />
+
+            <div className="container max-w-[1600px] mx-auto px-6 relative z-10">
+                <div className="text-center mb-16 md:mb-20 max-w-4xl mx-auto">
                     <FadeIn>
-                        <h2 className="text-4xl md:text-5xl font-medium text-slate-900 mb-6 tracking-tight">
+                        <h2 className="text-3xl md:text-4xl font-normal tracking-tight text-white leading-tight mb-4">
                             Elige tu Plan Ideal
                         </h2>
-                        {/* Copy replaced with Hero subtitle as requested */}
-                        <p className="text-lg text-slate-500 max-w-2xl mx-auto">
+                        <p className="text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
                             Integramos admisión universitaria y preparación consular estratégica en un solo lugar.
                         </p>
                     </FadeIn>
                 </div>
 
-                {/* Main Container - Gray Background as requested */}
-                <div className="max-w-[1600px] mx-auto bg-slate-200 rounded-[2.5rem] p-8 md:p-12 shadow-md border border-slate-300 relative overflow-hidden">
+                {/* Grid for 4 Plans */}
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch mx-auto">
+                    {PLANS.map((plan, index) => (
+                        <ScaleIn delay={index * 0.1} key={index} className="h-full w-full">
+                            <div className="relative group w-full flex flex-col h-full">
+                                
+                                {/* Glow Effect Background */}
+                                <div className="absolute -inset-2 bg-white/20 rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                    {/* Limited Time Badge - Animated Gradient */}
-                    <div className="absolute top-0 right-0 bg-gradient-to-r from-orange-600 to-red-600 text-white text-[10px] font-medium uppercase tracking-widest px-6 py-2 rounded-bl-3xl shadow-lg z-20 animate-pulse">
-                        ¡CUPOS LIMITADOS!
-                    </div>
+                                {/* Card Content */}
+                                <div className={`relative flex-1 bg-black border rounded-[2rem] p-6 md:p-8 flex flex-col overflow-hidden transition-colors duration-300 ${plan.highlight ? 'border-slate-500 ring-1 ring-slate-500/50 shadow-2xl z-10' : 'border-white/10 ring-1 ring-white/5 shadow-2xl hover:bg-black'}`}>
+                                    
+                                    {/* Visual Accent */}
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-3xl" />
 
-                    {/* Inject Gradient Definition */}
-                    <GoogleGradient />
+                                    {/* Discount Badge */}
+                                    {plan.discount && (
+                                        <div className="absolute top-4 right-4 bg-slate-800 text-slate-200 px-3 py-1.5 rounded-md text-xs font-medium tracking-wide shadow-sm transform rotate-2 border border-slate-700">
+                                            {plan.discount}
+                                        </div>
+                                    )}
 
-                    {/* Top Left Icons Row (Google Colorful Style) */}
-                    <div className="absolute top-8 left-8 md:left-12 flex items-center gap-4">
-                        <Mail className="w-8 h-8" stroke="url(#google-gradient)" strokeWidth={3} />
-                        <Calendar className="w-8 h-8" stroke="url(#google-gradient)" strokeWidth={3} />
-                        <HardDrive className="w-8 h-8" stroke="url(#google-gradient)" strokeWidth={3} />
-                        <FileText className="w-8 h-8" stroke="url(#google-gradient)" strokeWidth={3} />
-                        <Video className="w-8 h-8" stroke="url(#google-gradient)" strokeWidth={3} />
-                    </div>
-
-                    {/* Spacing for the header icons */}
-                    <div className="mt-16"></div>
-
-                    {/* Grid for 4 Plans */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch">
-                        {PLANS.map((plan, index) => (
-                            <ScaleIn delay={index * 0.1} key={index} className="h-full">
-                                <div className={`
-                                    relative p-6 rounded-3xl border transition-all duration-300 h-full flex flex-col bg-white
-                                    ${plan.highlight
-                                        ? "border-slate-400 shadow-xl ring-1 ring-slate-400/50 z-10"
-                                        : "border-slate-200 hover:border-slate-300 hover:shadow-lg"
-                                    }
-                                `}>
-                                    {/* Discount Badge - Dynamic based on plan data */}
-                                    <div className="absolute top-6 right-6 bg-slate-200 text-slate-800 px-3 py-1.5 rounded-md text-xs font-medium tracking-wide shadow-sm transform rotate-2">
-                                        {plan.discount}
-                                    </div>
-
+                                    {/* Recommended Badge */}
                                     {plan.highlight && (
-                                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-4 py-1 rounded-full text-sm font-medium tracking-wide shadow-md">
+                                        <div className="absolute top-0 right-1/2 translate-x-1/2 bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] text-white text-[10px] font-medium uppercase tracking-widest px-6 py-1.5 rounded-b-xl shadow-lg z-20">
                                             MÁS POPULAR
                                         </div>
                                     )}
 
-                                    <div className="mb-6 mt-12">
-                                        <h3 className={`text-xl font-medium mb-2 ${plan.highlight ? "text-slate-900" : "text-slate-900"}`}>
+                                    <div className="flex flex-col items-center text-center mt-8 mb-6">
+                                        <h3 className="text-xl md:text-2xl font-normal text-white tracking-tight mb-3 leading-relaxed">
                                             {plan.name}
                                         </h3>
-
-                                        <div className="flex flex-col items-start mb-4">
-                                            {/* Original Price Strikethrough added back */}
-                                            <span className="text-slate-400 line-through text-base font-medium mb-0">
+                                        <div className="flex flex-col items-center justify-center mb-2">
+                                            <span className="text-slate-500 line-through text-sm font-medium">
                                                 {plan.originalPrice}
                                             </span>
-                                            <div className="flex items-baseline gap-1">
-                                                <span className="text-3xl font-medium text-slate-900 tracking-tighter">{plan.price}</span>
-                                            </div>
+                                            <span className="text-4xl font-medium text-white tracking-tighter">
+                                                {plan.price}
+                                            </span>
                                         </div>
-
-                                        <p className="text-slate-500 text-base leading-snug">{plan.description}</p>
+                                        <p className="text-slate-400 text-sm font-light leading-loose mt-2">
+                                            {plan.description}
+                                        </p>
                                     </div>
 
-                                    <Link 
-                                        href={`/instructions-payment-student?plan=${plan.name.toLowerCase().split(":")[1]?.trim().replace(" ", "-") || "esencial"}`} 
-                                        className="w-full"
-                                    >
-                                        <Button
-                                            className="w-full mb-8 rounded-full py-6 font-medium text-lg shadow-sm transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900"
+                                    <div className="flex flex-col items-center gap-3 mt-auto mb-6 w-full">
+                                        <Link 
+                                            href={`/instructions-payment-student?plan=${plan.name.toLowerCase().split(":")[1]?.trim().replace(" ", "-") || "esencial"}`} 
+                                            className="w-full py-3 rounded-full bg-transparent text-white font-normal text-base shadow-2xl hover:scale-[1.03] active:scale-95 transition-all duration-300 border border-white/40 hover:bg-blue-600 hover:border-blue-600 text-center"
                                         >
                                             Elegir Plan
-                                        </Button>
-                                    </Link>
+                                        </Link>
+                                    </div>
 
-                                    <div className="space-y-4 flex-grow">
-                                        <p className="font-medium text-xs text-slate-400 mb-4 uppercase tracking-wider border-b border-gray-200 pb-2">
+                                    <div className="space-y-4 md:space-y-5 flex-1">
+                                        <p className="text-white font-normal text-xs uppercase tracking-widest opacity-50 mb-3 text-center">
                                             LO QUE INCLUYE:
                                         </p>
-                                        {plan.features.map((feature, i) => {
-                                            const Icon = feature.icon;
-                                            return (
-                                                <div key={i} className="flex items-start gap-3 text-slate-600">
-                                                    {/* Icons kept colorful (google gradient) */}
-                                                    <div className="mt-0.5 p-1.5 rounded-full flex-shrink-0 bg-white shadow-sm border border-slate-100">
-                                                        <Icon size={20} stroke="url(#google-gradient)" strokeWidth={2.5} />
-                                                    </div>
-                                                    <span className="text-sm font-medium leading-[1.5] pt-0.5">
-                                                        {feature.name}
-                                                    </span>
-                                                </div>
-                                            );
-                                        })}
+                                        <ul className="space-y-4">
+                                            {plan.features.map((feature, i) => {
+                                                const Icon = feature.icon;
+                                                return (
+                                                    <li key={i} className="flex items-start gap-3 text-slate-300 group/item cursor-default leading-relaxed">
+                                                        <div className="mt-0.5 transition-transform group-hover/item:scale-110 shrink-0">
+                                                            <Icon className="w-5 h-5 text-white" strokeWidth={1.5} />
+                                                        </div>
+                                                        <span className="text-sm font-normal text-slate-100 group-hover/item:text-white transition-colors text-left">
+                                                            {feature.name}
+                                                        </span>
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
                                     </div>
+
                                 </div>
-                            </ScaleIn>
-                        ))}
-                    </div>
+                            </div>
+                        </ScaleIn>
+                    ))}
                 </div>
             </div>
         </section>

@@ -7,18 +7,13 @@ import Footer from "@/components/landing/Footer";
 import HeroSection from "./_components/HeroSection";
 import ValuePropsSection from "./_components/ValuePropsSection";
 import StageDetails from "@/components/landing/StageDetails";
-import WhyChooseUs from "./_components/WhyChooseUs";
+import Roadmap from "@/components/landing/Roadmap";
 import SuccessStoriesSection from "./_components/SuccessStoriesSection";
-import YouTubeSocialSection from "./_components/YouTubeSocialSection";
 import FinalAdventureCTA from "./_components/FinalAdventureCTA";
-import CtaSection from "./_components/CtaSection";
 import CalculatorSection from "./_components/CalculatorSection";
 import PlansSection from "./_components/PlansSection";
-import EssentialPlanShowcase from "./_components/EssentialPlanShowcase";
-import ProPlanShowcase from "./_components/ProPlanShowcase";
-import AllInclusivePlanShowcase from "./_components/AllInclusivePlanShowcase";
 import StatsBar from "./_components/StatsBar";
-import StudentRequirements from "./_components/StudentRequirements";
+import BookPromoSection from "./_components/BookPromoSection";
 import { UpsellModal } from "./_components/UpsellModal";
 
 function StudentVisaContent() {
@@ -58,24 +53,12 @@ function StudentVisaContent() {
       <HeroSection />
       <PlansSection />
       <ValuePropsSection />
-      <EssentialPlanShowcase />
-      <ProPlanShowcase />
-      <AllInclusivePlanShowcase />
-      <StatsBar />
-      <StudentRequirements />
       <StageDetails />
-      <WhyChooseUs />
+      <Roadmap />
+      <BookPromoSection />
+      <StatsBar />
       <SuccessStoriesSection />
-      <YouTubeSocialSection />
       <FinalAdventureCTA />
-
-      <div id="calculator-section">
-        {showCalculator ? (
-          <CalculatorSection onComplete={handleQuoteComplete} />
-        ) : (
-          <CtaSection onStartQuote={handleStartQuote} />
-        )}
-      </div>
 
       <Footer />
 

@@ -15,10 +15,7 @@ const studentVideos = [
     { id: 1, videoId: baseVideos[0], handle: "@udreamms", title: "Cumpliendo metas en USA 🇺🇸" },
     { id: 2, videoId: baseVideos[1], handle: "@udreamms", title: "Tu futuro empieza aquí ✨" },
     { id: 3, videoId: baseVideos[2], handle: "@udreamms", title: "Experiencias inolvidables 🎓" },
-    { id: 4, videoId: baseVideos[3], handle: "@udreamms", title: "Viviendo el sueño americano 🗽" },
-    { id: 5, videoId: baseVideos[0], handle: "@udreamms", title: "Explorando nuevas ciudades 🌆" },
-    { id: 6, videoId: baseVideos[1], handle: "@udreamms", title: "Comunidad Udreamms 🤝" },
-    { id: 7, videoId: baseVideos[2], handle: "@udreamms", title: "Historias que inspiran 🚀" }
+    { id: 4, videoId: baseVideos[3], handle: "@udreamms", title: "Viviendo el sueño americano 🗽" }
 ];
 
 export default function SuccessStoriesSection() {
@@ -48,35 +45,17 @@ export default function SuccessStoriesSection() {
 
     return (
         <section className="py-24 bg-white overflow-hidden w-full">
-            <div className="container px-6 md:px-12 mx-auto">
-                <div className="mb-12 flex flex-col md:flex-row justify-between items-end gap-8">
-                    <div className="max-w-3xl">
-                        <h2 className="text-4xl md:text-6xl font-medium tracking-tight mb-4 text-black">
-                            Historias de Éxito Reales
-                        </h2>
-                        <p className="text-xl text-black font-normal leading-relaxed">
-                            Descubre por qué cientos de personas confían en nosotros para su futuro.
-                        </p>
-                    </div>
-
-                    <div className="hidden md:flex gap-3">
-                        <button onClick={() => scroll('left')} className="w-12 h-12 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition-colors">
-                            <ChevronLeft className="w-6 h-6" />
-                        </button>
-                        <button onClick={() => scroll('right')} className="w-12 h-12 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition-colors">
-                            <ChevronRight className="w-6 h-6" />
-                        </button>
-                    </div>
+            <div className="w-full max-w-[1600px] px-6 md:px-12 mx-auto">
+                <div className="mb-16 text-center max-w-3xl mx-auto">
+                    <h2 className="text-2xl md:text-4xl font-medium tracking-tight mb-4 text-black">
+                        Historias de Éxito Reales
+                    </h2>
+                    <p className="text-base md:text-lg text-black font-normal leading-relaxed">
+                        Descubre por qué cientos de personas confían en nosotros para su futuro.
+                    </p>
                 </div>
 
-                <div
-                    ref={scrollRef}
-                    className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-4 -mx-6 px-6 md:mx-0 md:px-0 no-scrollbar"
-                    style={{
-                        scrollbarWidth: 'none',
-                        msOverflowStyle: 'none',
-                    }}
-                >
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 place-items-center w-full">
                     <style jsx>{`
                         .no-scrollbar::-webkit-scrollbar {
                             display: none;
@@ -90,7 +69,7 @@ export default function SuccessStoriesSection() {
                                 onClick={() => toggleAudio(story.id)}
                                 onMouseEnter={() => setHoveredCardId(story.id)}
                                 onMouseLeave={() => setHoveredCardId(null)}
-                                className="relative shrink-0 snap-center w-[220px] md:w-[260px] aspect-[9/16] rounded-[2rem] overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500 bg-black"
+                                className="relative w-full max-w-[400px] aspect-[9/16] rounded-[2rem] overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500 bg-black"
                             >
                                 <div className="absolute inset-0 bg-black pointer-events-none">
                                     {hoveredCardId === story.id ? (
@@ -106,19 +85,14 @@ export default function SuccessStoriesSection() {
                                         <img
                                             src={`https://img.youtube.com/vi/${story.videoId}/hqdefault.jpg`}
                                             alt={story.title}
-                                            className="w-full h-full object-cover opacity-85 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100"
+                                            className="w-full h-full object-cover opacity-85 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100 brightness-110 contrast-[1.15] saturate-[1.2]"
                                         />
                                     )}
+                                    {/* HD Overlay Enhancements */}
+                                    <div className="absolute inset-0 bg-black/10 mix-blend-overlay pointer-events-none" />
+                                    <div className="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,0,0,0.4)] pointer-events-none" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent pointer-events-none" />
                                 </div>
-
-                                {hoveredCardId !== story.id && (
-                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                        <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 text-white shadow-xl transition-all group-hover:scale-110 group-hover:bg-white/35">
-                                            <Play className="w-6 h-6 fill-white text-white ml-1" />
-                                        </div>
-                                    </div>
-                                )}
 
                                 <div className="absolute top-6 right-6 flex items-center justify-center z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                     <div className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center hover:bg-black/60">
@@ -142,7 +116,7 @@ export default function SuccessStoriesSection() {
                     })}
                 </div>
 
-                <div className="flex justify-center mt-8">
+                <div className="flex justify-center mt-32">
                     <Button
                         className="rounded-full bg-gradient-to-r from-purple-600 to-orange-500 hover:from-purple-700 hover:to-orange-600 text-white font-medium px-10 py-6 text-lg shadow-xl shadow-orange-500/20 transition-all hover:scale-105 flex items-center gap-2"
                         onClick={() => window.open('https://www.instagram.com/_udreamms/', '_blank')}

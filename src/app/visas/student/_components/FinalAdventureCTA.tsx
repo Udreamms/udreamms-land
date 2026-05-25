@@ -10,13 +10,13 @@ export default function FinalAdventureCTA() {
     };
 
     return (
-        <section className="py-32 bg-white relative overflow-hidden border-t border-slate-50">
+        <section className="py-24 bg-white relative overflow-hidden border-t border-slate-50">
             <div className="container mx-auto px-6">
                 <FadeIn>
                     <div className="max-w-6xl mx-auto text-center relative z-10">
                         <h2 className="text-4xl md:text-6xl font-medium text-slate-900 mb-8 leading-[1.1] tracking-tighter">
                             ¿Todo listo para <br />
-                            <span className="text-blue-600">tu aventura en USA?</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca]">tu aventura en USA?</span>
                         </h2>
 
                         <p className="text-slate-500 text-xl md:text-2xl mb-16 max-w-3xl mx-auto font-normal leading-relaxed">
@@ -27,28 +27,28 @@ export default function FinalAdventureCTA() {
                             <Button
                                 size="lg"
                                 onClick={scrollToPlanes}
-                                className="w-full sm:w-64 rounded-full py-8 font-medium text-lg shadow-lg transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900"
+                                className="w-full sm:w-64 rounded-full py-4 font-medium text-lg shadow-lg transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-blue-600 hover:text-white hover:border-blue-600"
                             >
                                 Plan Esencial
                             </Button>
                             <Button
                                 size="lg"
                                 onClick={scrollToPlanes}
-                                className="w-full sm:w-64 rounded-full py-8 font-medium text-lg shadow-lg transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900"
+                                className="w-full sm:w-64 rounded-full py-4 font-medium text-lg shadow-lg transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-blue-600 hover:text-white hover:border-blue-600"
                             >
                                 Plan Pro
                             </Button>
                             <Button
                                 size="lg"
                                 onClick={scrollToPlanes}
-                                className="w-full sm:w-64 rounded-full py-8 font-medium text-lg shadow-lg transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900"
+                                className="w-full sm:w-64 rounded-full py-4 font-medium text-lg shadow-lg transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-blue-600 hover:text-white hover:border-blue-600"
                             >
                                 Plan Elite
                             </Button>
                             <Button
                                 size="lg"
                                 onClick={scrollToPlanes}
-                                className="w-full sm:w-64 rounded-full py-8 font-medium text-lg shadow-lg transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900"
+                                className="w-full sm:w-64 rounded-full py-4 font-medium text-lg shadow-lg transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-blue-600 hover:text-white hover:border-blue-600"
                             >
                                 All-Inclusive
                             </Button>

@@ -9,7 +9,7 @@ import {
 
 export default function ValuePropsSection() {
     return (
-        <div className="relative z-30 pt-24 pb-20 px-6 bg-white">
+        <div className="relative z-30 pt-32 md:pt-48 pb-32 px-6 bg-white">
             <div className="container mx-auto">
                 {/* Floating Icons adapted for Students */}
                 <FadeIn>
@@ -31,7 +31,7 @@ export default function ValuePropsSection() {
                             return (
                                 <motion.div
                                     key={index}
-                                    className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-center text-primary hover:text-abyss cursor-pointer border border-slate-50"
+                                    className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-center text-[#9b4dca] hover:text-[#2d1b4e] cursor-pointer border border-slate-50"
                                     animate={{
                                         y: [0, -yRange, 0],
                                     }}
@@ -52,10 +52,10 @@ export default function ValuePropsSection() {
 
                 {/* Introductory Phrase */}
                 <FadeIn delay={0.4}>
-                    <div className="text-center mt-12 max-w-4xl mx-auto">
-                        <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-[#1a2b3b] leading-[4]">
-                            El respaldo que necesitas para <br />
-                            <span className="text-slate-500">tu futuro académico</span>
+                    <div className="text-center mt-24 md:mt-32 max-w-4xl mx-auto">
+                        <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-[#1a2b3b] leading-tight">
+                            Hacemos que tu sueño de estudiar en Estados Unidos se haga posible con <br />
+                            <span className="bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] bg-clip-text text-transparent font-semibold">Udreamms</span>
                         </h2>
                     </div>
                 </FadeIn>
