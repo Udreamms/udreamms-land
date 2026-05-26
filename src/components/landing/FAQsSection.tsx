@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, HelpCircle, MessageCircle, Sparkles, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import WhatsappIcon from "@/components/icons/WhatsappIcon";
 
 const categories = [
   {
@@ -209,11 +210,10 @@ export default function FAQsSection() {
             href="https://wa.me/16507840581"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white font-medium text-xs md:text-sm shadow-lg shadow-green-500/20 hover:shadow-green-500/30 hover:scale-105 active:scale-95 transition-all duration-300"
+            className="inline-flex items-center justify-center w-auto px-5 py-3 rounded-full bg-white/5 border border-white/10 text-white font-medium text-xs md:text-sm hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 transition-all duration-300"
           >
-            <MessageCircle className="w-4 h-4 fill-current" />
-            Chatear por WhatsApp
-            <Sparkles className="w-3.5 h-3.5" />
+            <WhatsappIcon className="w-4 h-4" />
+            <span className="ml-2">Chatear por WhatsApp</span>
           </a>
         </div>
         
