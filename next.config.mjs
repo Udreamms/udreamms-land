@@ -44,13 +44,8 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      // Canonical host: www → apex
-      {
-        source: '/:path*',
-        has: [{ type: 'host', value: 'www.udreamms.com' }],
-        destination: 'https://udreamms.com/:path*',
-        permanent: true,
-      },
+      // Canonical host (www ↔ apex): configurar SOLO en Vercel → Domains.
+      // No duplicar aquí: provoca ERR_TOO_MANY_REDIRECTS si Vercel también redirige.
       // Legacy static files (Hostinger / Apache)
       { source: '/index.html', destination: '/', permanent: true },
       { source: '/index.php', destination: '/', permanent: true },

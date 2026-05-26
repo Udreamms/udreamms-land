@@ -2,10 +2,19 @@
 
 Checklist tras desplegar en Vercel (producción en `https://udreamms.com`).
 
+## Dominio canónico en Vercel (obligatorio, una sola vez)
+
+En **Vercel → Project → Settings → Domains**:
+
+1. Añade `udreamms.com` y `www.udreamms.com` si faltan.
+2. Elige **un** dominio principal (recomendado: `udreamms.com` sin www).
+3. En el otro dominio, usa la opción de Vercel **Redirect to** el principal (no configures lo mismo en `next.config.mjs`).
+4. Si ves `ERR_TOO_MANY_REDIRECTS`, suele ser apex y www redirigiendo uno al otro: deja el redirect **solo en Vercel**, no en código.
+
 ## Verificación técnica (5 min)
 
 - [ ] `https://udreamms.com/` → 200
-- [ ] `https://www.udreamms.com/` → 301 a `https://udreamms.com/`
+- [ ] `https://www.udreamms.com/` → 301 **una vez** al dominio principal (sin bucle)
 - [ ] `https://udreamms.com/robots.txt` → incluye `Sitemap: https://udreamms.com/sitemap.xml`
 - [ ] `https://udreamms.com/sitemap.xml` → 14 URLs públicas
 - [ ] `https://udreamms.com/cso` → 301 a `/`
