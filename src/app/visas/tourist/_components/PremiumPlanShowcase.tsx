@@ -85,9 +85,9 @@ export default function PremiumPlanShowcase() {
                                         className="group cursor-pointer"
                                         onClick={() => setActiveTab(feature)}
                                     >
-                                        <div className="py-4 border-b border-white/10 last:border-0">
+                                        <div className="py-4 last:border-0">
                                             <div className="flex items-center gap-2 mb-1">
-                                                <div className={`p-1 rounded-lg transition-colors duration-300 ${isActive ? "bg-white/20 text-white" : "bg-transparent text-slate-400 group-hover:bg-white/10 group-hover:text-white"}`}>
+                                                <div className={`p-1 rounded-lg transition-colors duration-300 bg-gradient-to-r from-purple-800 to-purple-400 text-white ${isActive ? "" : ""}`}>
                                                     <Icon size={16} strokeWidth={2.5} />
                                                 </div>
                                                 <h4 className={`text-base transition-colors duration-300 ${isActive ? 'font-medium text-white' : 'font-medium text-slate-400 group-hover:text-white'}`}>

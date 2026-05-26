@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import QrTokenPayment from './QrTokenPayment';
 import BillingForm, { BillingData } from './BillingForm';
 import { VISA_PLAN_CATALOG_USD } from '@/lib/payments/payment-config';
-import type { VisaPlanId } from './CryptoCheckoutModal';
+import type { VisaPlanId } from './visa-plan-types';
 
 const PLAN_TITLES: Record<VisaPlanId, string> = {
   basico: 'Plan Básico',

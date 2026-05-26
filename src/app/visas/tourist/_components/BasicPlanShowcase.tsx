@@ -52,7 +52,7 @@ export default function BasicPlanShowcase() {
 
                         {/* Text Content */}
                         <div className="mb-8">
-                            <div className="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-white/10 text-slate-300 font-medium text-[9px] uppercase tracking-widest mb-4 border border-white/5">
+                            <div className="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-white/10 text-slate-300 font-medium text-[9px] uppercase tracking-widest mb-4">
                                 Opción Esencial
                             </div>
                             <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium tracking-tighter text-white leading-[1.1]">
@@ -76,9 +76,9 @@ export default function BasicPlanShowcase() {
                                         className="group cursor-pointer"
                                         onClick={() => setActiveTab(feature)}
                                     >
-                                        <div className="py-4 border-b border-white/10 last:border-0">
+                                        <div className="py-4 last:border-0">
                                             <div className="flex items-center gap-2 mb-1">
-                                                <div className={`p-1 rounded-lg transition-colors duration-300 ${isActive ? "bg-white/20 text-white" : "bg-transparent text-slate-400 group-hover:bg-white/10 group-hover:text-white"}`}>
+                                                <div className={`p-1 rounded-lg transition-colors duration-300 bg-gradient-to-r from-purple-800 to-purple-400 text-white ${isActive ? "" : ""}`}>
                                                     <Icon size={16} strokeWidth={2.5} />
                                                 </div>
                                                 <h4 className={`text-base transition-colors duration-300 ${isActive ? 'font-medium text-white' : 'font-medium text-slate-400 group-hover:text-white'}`}>
@@ -125,7 +125,7 @@ export default function BasicPlanShowcase() {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
                                 transition={{ duration: 0.5, ease: "easeInOut" }}
-                                className="absolute inset-0 w-full h-full rounded-[2.5rem] overflow-hidden bg-black border border-white/10 shadow-2xl"
+                                className="absolute inset-0 w-full h-full rounded-[2.5rem] overflow-hidden bg-black shadow-2xl"
                             >
                                 <img
                                     src={activeTab.image}
@@ -133,7 +133,7 @@ export default function BasicPlanShowcase() {
                                     className="w-full h-full object-cover opacity-80"
                                 />
                                 {/* Floating Badge */}
-                                <div className="absolute top-8 right-8 bg-black/80 border border-white/10 backdrop-blur-md p-6 rounded-3xl shadow-xl flex flex-col items-center">
+                                <div className="absolute top-8 right-8 bg-black/80 backdrop-blur-md p-6 rounded-3xl shadow-xl flex flex-col items-center">
                                     <span className="text-slate-400 text-xs font-medium uppercase tracking-widest mb-1">Aprobación</span>
                                     <span className="text-3xl font-medium tracking-tighter text-white">98%</span>
                                 </div>

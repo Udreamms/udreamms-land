@@ -9,7 +9,9 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "patch-package",
-    "deploy:functions": "firebase deploy --only functions"
+    "deploy:functions": "firebase deploy --only functions",
+    "deploy:firebase:rules": "firebase deploy --only firestore:rules,storage",
+    "deploy:firebase": "firebase deploy --only functions,firestore,storage"
   },
   "keywords": [
     "ia",

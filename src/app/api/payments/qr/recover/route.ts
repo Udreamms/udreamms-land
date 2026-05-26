@@ -3,7 +3,7 @@ import {
   getPaymentOrder,
   recoverSessionPaymentOrders,
   resolvePaymentOrderStatus,
-} from '@/lib/payments/qr-payment';
+} from '@/backend/payments/qr-payment';
 
 export async function POST(request: NextRequest) {
   try {

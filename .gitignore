@@ -19,6 +19,8 @@ build/
 dist/
 .next/
 out/
+.turbo/
+functions/lib/
 
 # TypeScript
 tsconfig.tsbuildinfo

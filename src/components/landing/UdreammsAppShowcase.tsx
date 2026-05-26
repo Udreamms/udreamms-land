@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export default function UdreammsAppShowcase() {
     return (
-        <section className="py-24 bg-black text-white overflow-hidden">
+        <section className="py-16 md:py-24 lg:py-28 bg-black text-white overflow-hidden">
             <div className="container px-6 md:px-12 mx-auto">
                 <div className="flex flex-col items-center text-center group">
                     <p className="text-white font-medium mb-6 tracking-tight uppercase text-sm md:text-base">

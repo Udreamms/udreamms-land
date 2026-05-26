@@ -1,0 +1,94 @@
+"use client";
+
+import { FadeIn } from "../_components/Animations";
+import { CheckCircle2, Sparkles } from "lucide-react";
+
+export default function SocialProofSection() {
+    return (
+        <section className="bg-slate-50 border-t border-slate-200">
+            {/* Testimonials (Real Chat Style) */}
+            <div className="py-24 container mx-auto px-6 max-w-6xl">
+                <FadeIn className="text-center mb-16">
+                    <h2 className="text-3xl md:text-4xl font-medium text-slate-900 mb-4 tracking-tight">No confíes en nuestra palabra...</h2>
+                    <p className="text-slate-600 font-medium">Confía en los resultados de quienes ya están viajando.</p>
+                </FadeIn>
+
+                <div className="grid md:grid-cols-3 gap-8">
+                    {/* Review 1 */}
+                    <FadeIn delay={0.1} className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.03)] border border-slate-100 flex flex-col">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-12 h-12 relative rounded-full overflow-hidden border-2 border-green-100">
+                                <img src="/assets/generated/testimonial_man.png" alt="Jose Martinez" className="w-full h-full object-cover" />
+                            </div>
+                            <div>
+                                <div className="font-medium text-sm text-slate-900">Jose Martinez</div>
+                                <div className="text-xs text-green-600 flex items-center gap-1 font-medium">
+                                    <CheckCircle2 className="w-3 h-3" /> Verificado
+                                </div>
+                            </div>
+                            <div className="ml-auto flex gap-0.5">
+                                {[1, 2, 3, 4, 5].map(i => <Sparkles key={i} className="w-4 h-4 text-gold fill-gold" />)}
+                            </div>
+                        </div>
+                        <p className="text-slate-600 text-sm flex-grow font-medium leading-relaxed">
+                            "Increíble, en 2 semanas ya tenía mi cita. Pensé que por ser joven me negarían, pero el <code className="text-slate-900 bg-slate-100 px-1 rounded">Perfil Blindado</code> hizo la diferencia."
+                        </p>
+                        <div className="mt-4 pt-4 border-t border-slate-50 text-xs text-slate-400">
+                            Hace 2 días • Visa de Turismo
+                        </div>
+                    </FadeIn>
+
+                    {/* Review 2 (WhatsApp Style) */}
+                    <FadeIn delay={0.2} className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.03)] border border-[#d4d4d4] flex flex-col relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-[#00A884]"></div>
+                        <div className="flex items-center gap-3 mb-4 mt-2">
+                            <div className="w-12 h-12 relative rounded-full overflow-hidden border-2 border-white/50">
+                                <img src="/assets/generated/testimonial_woman.png" alt="Ana Ruiz" className="w-full h-full object-cover" />
+                            </div>
+                            <div>
+                                <div className="font-medium text-sm text-slate-900">Ana Ruiz</div>
+                                <div className="text-xs text-slate-500 font-medium">En línea</div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white p-3 rounded-tr-lg rounded-br-lg rounded-bl-lg shadow-sm mb-2 self-start max-w-[90%]">
+                            <p className="text-slate-700 text-sm">
+                                ¡Chicos! ¡¡APROBADA!! 😭🇺🇸
+                            </p>
+                        </div>
+                        <div className="bg-white p-3 rounded-tr-lg rounded-br-lg rounded-bl-lg shadow-sm self-start max-w-[90%]">
+                            <p className="text-slate-700 text-sm font-medium">
+                                Me preguntaron EXACTAMENTE lo que practicamos en el simulacro. No me puse nerviosa para nada. ¡Gracias!
+                            </p>
+                            <div className="text-[10px] text-slate-400 text-right mt-1 flex items-center justify-end gap-1 font-medium">
+                                10:42 AM <div className="text-blue-500 font-medium">✓✓</div>
+                            </div>
+                        </div>
+                    </FadeIn>
+
+                    {/* Review 3 */}
+                    <FadeIn delay={0.3} className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.03)] border border-slate-100 flex flex-col">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-medium">CD</div>
+                            <div>
+                                <div className="font-medium text-sm text-slate-900">Carlos Diaz</div>
+                                <div className="text-xs text-green-600 flex items-center gap-1 font-medium">
+                                    <CheckCircle2 className="w-3 h-3" /> Verificado
+                                </div>
+                            </div>
+                            <div className="ml-auto flex gap-0.5">
+                                {[1, 2, 3, 4, 5].map(i => <Sparkles key={i} className="w-4 h-4 text-gold fill-gold" />)}
+                            </div>
+                        </div>
+                        <p className="text-slate-600 text-sm flex-grow font-medium leading-relaxed">
+                            "Había sido rechazado 2 veces antes. Con SmartVisa entendí mis errores. La inversión valió cada centavo solo por la tranquilidad."
+                        </p>
+                        <div className="mt-4 pt-4 border-t border-slate-50 text-xs text-slate-400">
+                            Hace 1 semana • Renovación
+                        </div>
+                    </FadeIn>
+                </div>
+            </div>
+        </section>
+    );
+}

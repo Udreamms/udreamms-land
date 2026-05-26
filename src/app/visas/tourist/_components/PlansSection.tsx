@@ -99,7 +99,7 @@ export default function PlansSection() {
                                 <div className="absolute -inset-2 bg-white/20 rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                                 {/* Card Content */}
-                                <div className={`relative flex-1 bg-black border rounded-[2rem] p-6 md:p-8 flex flex-col overflow-hidden transition-colors duration-300 ${plan.highlight ? 'border-slate-500 ring-1 ring-slate-500/50 shadow-2xl z-10' : 'border-white/10 ring-1 ring-white/5 shadow-2xl hover:bg-black'}`}>
+                                <div className={`relative flex-1 bg-black rounded-[2rem] p-6 md:p-8 flex flex-col overflow-hidden transition-colors duration-300 ${plan.highlight ? 'ring-1 ring-slate-500/50 shadow-2xl z-10' : 'ring-1 ring-white/5 shadow-2xl hover:bg-black'}`}>
                                     
                                     {/* Visual Accent */}
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-3xl" />
@@ -153,9 +153,7 @@ export default function PlansSection() {
                                                 const Icon = feature.icon;
                                                 return (
                                                     <li key={i} className="flex items-start gap-3 text-slate-300 group/item cursor-default leading-relaxed">
-                                                        <div className="mt-0.5 transition-transform group-hover/item:scale-110 shrink-0">
-                                                            <Icon className="w-5 h-5 text-white" strokeWidth={1.5} />
-                                                        </div>
+                                                        <Icon className="w-5 h-5 text-slate-400 mt-0.5 shrink-0 transition-transform group-hover/item:scale-110" strokeWidth={1.5} />
                                                         <span className="text-sm font-normal text-slate-100 group-hover/item:text-white transition-colors text-left">
                                                             {feature.name}
                                                         </span>

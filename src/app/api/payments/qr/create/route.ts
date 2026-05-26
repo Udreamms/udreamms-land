@@ -1,19 +1,19 @@
 import { Keypair } from '@solana/web3.js';
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/firebase-admin';
+import { db } from '@/backend/firebase/admin';
 import {
   extractBillingEmail,
   getVisaCryptoPaymentRequestPath,
   getVisaCryptoPaymentRequestsCollectionPath,
-} from '@/lib/payments/firestore-schema';
+} from '@/backend/payments/firestore-schema';
 import {
   QR_EXPIRATION_MINUTES,
   TREASURY_WALLET,
   VISA_PLAN_CATALOG_USD,
   type CryptoPaymentMethod,
-} from '@/lib/payments/payment-config';
-import { encodeSolanaPayUrl } from '@/lib/payments/solana-pay';
-import { upsertVisaCryptoSession, validatePaymentOrderPayload } from '@/lib/payments/qr-payment';
+} from '@/backend/payments/payment-config';
+import { encodeSolanaPayUrl } from '@/backend/payments/solana-pay';
+import { upsertVisaCryptoSession, validatePaymentOrderPayload } from '@/backend/payments/qr-payment';
 
 export async function POST(request: NextRequest) {
   try {

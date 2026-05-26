@@ -21,7 +21,7 @@ export default function StudentShowcase() {
     }, [isInView]);
 
     return (
-        <section className="py-16 lg:py-32 bg-white text-black overflow-hidden font-sans">
+        <section className="py-12 md:py-16 lg:py-20 bg-white text-black overflow-hidden font-sans">
             <div className="container mx-auto px-6 max-w-[1500px]">
                 <div className="flex flex-col lg:flex-row-reverse gap-6 lg:gap-24 items-center lg:items-center">
                     

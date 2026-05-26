@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPaymentOrder, resolvePaymentOrderStatus } from '@/lib/payments/qr-payment';
+import { getPaymentOrder, resolvePaymentOrderStatus } from '@/backend/payments/qr-payment';
 
 export async function GET(request: NextRequest) {
   try {

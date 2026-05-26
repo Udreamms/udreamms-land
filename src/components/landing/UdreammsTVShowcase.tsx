@@ -79,7 +79,12 @@ export default function UdreammsTVShowcase() {
 
     return (
         <section ref={sectionRef} className="relative w-full min-h-[600px] md:min-h-[850px] lg:min-h-[950px] bg-black overflow-hidden flex items-center z-10">
-            
+            {/* Transición suave hacia el bloque negro inferior */}
+            <div
+              className="pointer-events-none absolute bottom-0 left-0 right-0 z-30 h-28 md:h-40 lg:h-48 bg-gradient-to-b from-transparent via-black/80 to-black"
+              aria-hidden
+            />
+
             {/* Animación del Fondo de la Sección (Llega desde el lado derecho y cubre el fondo) */}
             <motion.div
                 initial={{ x: "100%", opacity: 0 }}

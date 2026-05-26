@@ -14,7 +14,7 @@ export default function BuyCtaSection() {
     };
 
     return (
-        <section className="py-32 bg-transparent relative overflow-hidden border-t border-white/10">
+        <section className="py-32 bg-transparent relative overflow-hidden">
             <div className="container mx-auto px-6">
                 <FadeIn>
                     <div className="max-w-6xl mx-auto text-center relative z-10">

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
-import { db, admin } from '@/lib/firebase-admin';
+import { db, admin } from '@/backend/firebase/admin';
 
 export async function POST(req: Request) {
     try {

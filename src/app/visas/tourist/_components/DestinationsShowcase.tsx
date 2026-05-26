@@ -94,7 +94,7 @@ export default function DestinationsShowcase() {
     };
 
     return (
-        <section className="py-24 bg-[#050507] text-white overflow-hidden border-t border-white/10">
+        <section className="py-24 bg-[#050507] text-white overflow-hidden">
             <div className="container mx-auto px-6">
 
                 <div className="flex justify-between items-end mb-16">
@@ -129,7 +129,7 @@ export default function DestinationsShowcase() {
                                     >
                                         <div className="flex-1 pr-6">
                                             <div className="flex items-center gap-2 mb-1">
-                                                <MapPin size={14} className={isActive ? "text-blue-400" : "text-slate-500"} />
+                                                <MapPin size={14} className={isActive ? "text-transparent bg-clip-text bg-gradient-to-r from-purple-800 to-purple-400" : "text-slate-500"} />
                                                 <span className={`text-[10px] uppercase tracking-widest font-medium ${isActive ? "text-blue-400" : "text-slate-500"}`}>
                                                     {dest.location}
                                                 </span>
@@ -149,7 +149,7 @@ export default function DestinationsShowcase() {
                                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                             />
                                             <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${isActive ? "opacity-100 bg-black/20" : "opacity-0 group-hover:opacity-100 bg-black/40"}`}>
-                                                <Play size={18} className="text-white fill-white" />
+                                                <Play size={18} className="text-transparent bg-clip-text bg-gradient-to-r from-purple-800 to-purple-400" />
                                             </div>
                                         </div>
                                     </motion.div>
@@ -167,7 +167,7 @@ export default function DestinationsShowcase() {
                                 animate={{ opacity: 1, scale: 1, x: 0 }}
                                 exit={{ opacity: 0, scale: 1.02, x: -20 }}
                                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                                className="relative aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/10 bg-black group cursor-pointer"
+                                className="relative aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-2xl bg-black group cursor-pointer"
                             >
                                 <iframe
                                     ref={iframeRef}

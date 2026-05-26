@@ -87,7 +87,7 @@ export default function FAQsSection() {
   };
 
   return (
-    <section id="faqs" className="py-24 bg-black font-sans text-white relative overflow-hidden">
+    <section id="faqs" className="py-16 md:py-24 lg:py-28 bg-black font-sans text-white relative overflow-hidden">
       <div className="container mx-auto px-6 md:px-12 max-w-5xl relative z-10">
         
         {/* Header */}

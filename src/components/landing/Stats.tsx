@@ -85,29 +85,27 @@ export default function Stats() {
   ];
 
   return (
-    <section className="py-24 bg-white relative overflow-hidden">
+    <section className="py-16 md:py-24 lg:py-28 bg-black relative overflow-hidden">
       <div className="container px-6 md:px-12 mx-auto relative z-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-16 gap-x-8">
 
           {stats.map((stat, index) => {
+            const Icon = stat.icon;
             return (
               <div key={index} className="flex flex-col items-center text-center group">
+                <Icon
+                  className="w-8 h-8 text-white mb-8 transition-transform duration-300 group-hover:scale-110"
+                  strokeWidth={1.5}
+                />
 
-                {/* Icono minimalista */}
-                <div className="mb-8 p-5 rounded-full bg-white border border-black/5 shadow-sm group-hover:scale-110 transition-transform duration-300">
-                  <stat.icon className="w-8 h-8 text-black" strokeWidth={1.5} />
-                </div>
-
-                {/* Número Grande Minimalista */}
-                <div className="text-5xl md:text-6xl font-medium mb-4 tracking-tighter text-black">
+                <div className="text-5xl md:text-6xl font-medium mb-4 tracking-tighter text-white">
                   <CountUp end={stat.number} suffix={stat.suffix} />
                 </div>
 
-                {/* Título y Descripción en Negro Sólido */}
-                <h3 className="text-lg font-medium text-black mb-3">
+                <h3 className="text-lg font-medium text-white mb-3">
                   {stat.title}
                 </h3>
-                <p className="text-sm text-black font-normal max-w-[220px] leading-relaxed">
+                <p className="text-sm text-white/80 font-normal max-w-[220px] leading-relaxed">
                   {stat.description}
                 </p>
               </div>

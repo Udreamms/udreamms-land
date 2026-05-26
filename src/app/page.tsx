@@ -5,60 +5,52 @@ import Footer from "@/components/landing/Footer";
 import Hero from "@/components/landing/Hero";
 import ChooseYourPath from "@/components/landing/ChooseYourPath";
 import Stats from "@/components/landing/Stats";
-import Services from "@/components/landing/Services";
-import YouTubeSubscription from "@/components/landing/YouTubeSubscription";
-import ExperienceSection from "@/components/landing/ExperienceSection";
-import WhyChooseUs from "@/components/landing/WhyChooseUs";
 import UdreammsAppShowcase from "@/components/landing/UdreammsAppShowcase";
+/* Secciones ocultas — importar desde @/frontend/modules/marketing/home/secciones-ocultar/ */
+// import Services from "@/frontend/modules/marketing/home/secciones-ocultar/Services";
+// import ExperienceSection from "@/frontend/modules/marketing/home/secciones-ocultar/ExperienceSection";
+// import WhyChooseUs from "@/frontend/modules/marketing/home/secciones-ocultar/WhyChooseUs";
+// import JoinOurStudents from "@/frontend/modules/marketing/home/secciones-ocultar/JoinOurStudents";
+// import YouTubeSubscription from "@/frontend/modules/marketing/home/secciones-ocultar/YouTubeSubscription";
 import FAQsSection from "@/components/landing/FAQsSection";
 import TouristShowcase from "@/components/landing/TouristShowcase";
 import StudentShowcase from "@/components/landing/StudentShowcase";
 import MentorshipShowcase from "@/components/landing/MentorshipShowcase";
 import FreeTrainingShowcase from "@/components/landing/FreeTrainingShowcase";
 import UdreammsTVShowcase from "@/components/landing/UdreammsTVShowcase";
-import JoinOurStudents from "@/components/landing/JoinOurStudents";
-
 export default function Home() {
   const handleStartQuote = () => {
     window.location.href = "/visas/student#calculator-section";
-  };
-
-  const handleAppClick = () => {
-    document.getElementById('app-section')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
     <div className="min-h-screen bg-white">
       <Header />
 
-      <Hero onStartQuote={handleStartQuote} />
+      <main>
+        <Hero onStartQuote={handleStartQuote} />
 
-      <ChooseYourPath />
+        {/* Bloque superior: espacio entre secciones en blanco */}
+        <div className="flex flex-col gap-20 md:gap-28 lg:gap-36 bg-white [&>section]:scroll-mt-28">
+          <ChooseYourPath />
+          <StudentShowcase />
+          <TouristShowcase />
+          <MentorshipShowcase />
+          <FreeTrainingShowcase />
+        </div>
 
-      {/* Product Showcases */}
-      <StudentShowcase />
-      <TouristShowcase />
-      <MentorshipShowcase />
-      <FreeTrainingShowcase />
-      <UdreammsTVShowcase />
+        {/* Desde Udreamms TV: fondo y espacios negros */}
+        <div className="flex flex-col gap-20 md:gap-28 lg:gap-36 bg-black [&>section]:scroll-mt-28">
+          <UdreammsTVShowcase />
+          <Stats />
+          <UdreammsAppShowcase />
+          <FAQsSection />
+        </div>
+      </main>
 
-      <Stats />
-
-      {/* Flujo Principal: Qué hacemos -> Cómo lo hacemos (Ocultado temporalmente) */}
-      {/* <Services onStartQuote={handleStartQuote} onAppClick={handleAppClick} /> */}
-
-      {/* Herramientas y Valor Diferencial (Ocultado temporalmente) */}
-      {/* <ExperienceSection /> */}
-      <UdreammsAppShowcase />
-      <FAQsSection />
-      {/* <WhyChooseUs /> */}
-
-      {/* <JoinOurStudents /> */}
-
-      {/* Prueba Social / Comunidad (Empujón final de confianza) */}
-      {/* <YouTubeSubscription /> */}
-
-      <Footer />
+      <div className="bg-black pt-20 md:pt-28 lg:pt-36">
+        <Footer />
+      </div>
     </div>
   );
 }
