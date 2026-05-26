@@ -5,6 +5,7 @@ import Footer from "@/components/landing/Footer";
 import HeroSection from "./_components/HeroSection";
 import ValuePropsSection from "./_components/ValuePropsSection";
 import BenefitsSection from "./_components/BenefitsSection";
+import FeaturedSuccessVideoSection from "./_components/FeaturedSuccessVideoSection";
 import SuccessVideoSection from "./_components/SuccessVideoSection";
 import BuyCtaSection from "./_components/BuyCtaSection";
 import BasicPlanShowcase from "./_components/BasicPlanShowcase";
@@ -38,6 +39,7 @@ export default function TouristVisaPage() {
       <DestinationsShowcase />
 
       {/* 5. Social Proof & Evidence */}
+      <FeaturedSuccessVideoSection />
       <SuccessVideoSection />
       <WhyUdreammsSection />
 

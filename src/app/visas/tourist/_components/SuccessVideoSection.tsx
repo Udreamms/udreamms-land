@@ -20,7 +20,7 @@ export default function SuccessVideoSection() {
   return (
     <YouTubeStoryCards
       stories={touristVideos}
-      heading="Historias de Éxito Reales"
+      heading="Más Historias de Éxito"
       subheading="Descubre por qué cientos de turistas confían en nosotros para su viaje a USA."
       theme="dark"
     />
