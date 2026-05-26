@@ -94,17 +94,17 @@ export default function DestinationsShowcase() {
     };
 
     return (
-        <section className="py-24 bg-white text-black overflow-hidden border-t border-gray-100">
+        <section className="py-24 bg-[#050507] text-white overflow-hidden border-t border-white/10">
             <div className="container mx-auto px-6">
 
                 <div className="flex justify-between items-end mb-16">
                     <div className="max-w-2xl">
-                        <span className="text-sm font-medium uppercase tracking-[0.2em] text-gray-400 mb-4 block">
+                        <span className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500 mb-4 block">
                             Tu Destino Soñado
                         </span>
-                        <h2 className="text-4xl md:text-6xl font-medium tracking-tighter leading-[1.1]">
+                        <h2 className="text-4xl md:text-6xl font-medium tracking-tighter leading-[1.1] text-white">
                             Explora lo Mejor de USA<br />
-                            <span className="text-gray-400">Tu Ruta Personalizada</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">Tu Ruta Personalizada</span>
                         </h2>
                     </div>
                 </div>
@@ -122,22 +122,22 @@ export default function DestinationsShowcase() {
                                         layout
                                         key={dest.id}
                                         onClick={() => setActiveDest(dest)}
-                                        className={`group cursor-pointer flex items-center justify-between p-4 rounded-3xl transition-all duration-500 border-2 ${isActive
-                                            ? "bg-black text-white border-black scale-[1.02]"
-                                            : "bg-white text-black border-transparent hover:border-gray-50 flex-shrink-0"
+                                        className={`group cursor-pointer flex items-center justify-between p-4 rounded-3xl transition-all duration-500 border border-transparent ${isActive
+                                            ? "bg-white/10 text-white border-white/20 scale-[1.02]"
+                                            : "bg-transparent text-slate-300 hover:bg-white/5 flex-shrink-0"
                                             }`}
                                     >
                                         <div className="flex-1 pr-6">
                                             <div className="flex items-center gap-2 mb-1">
-                                                <MapPin size={14} className={isActive ? "text-gray-300" : "text-gray-400"} />
-                                                <span className={`text-[10px] uppercase tracking-widest font-medium ${isActive ? "text-gray-300" : "text-gray-400"}`}>
+                                                <MapPin size={14} className={isActive ? "text-blue-400" : "text-slate-500"} />
+                                                <span className={`text-[10px] uppercase tracking-widest font-medium ${isActive ? "text-blue-400" : "text-slate-500"}`}>
                                                     {dest.location}
                                                 </span>
                                             </div>
-                                            <h4 className="text-xl font-medium mb-1 tracking-tight">
+                                            <h4 className={`text-xl font-medium mb-1 tracking-tight ${isActive ? "text-white" : "text-slate-200"}`}>
                                                 {dest.title}
                                             </h4>
-                                            <p className={`text-sm leading-relaxed line-clamp-2 ${isActive ? "text-gray-300" : "text-gray-500"}`}>
+                                            <p className={`text-sm leading-relaxed line-clamp-2 ${isActive ? "text-slate-300" : "text-slate-500"}`}>
                                                 {dest.description}
                                             </p>
                                         </div>
@@ -167,7 +167,7 @@ export default function DestinationsShowcase() {
                                 animate={{ opacity: 1, scale: 1, x: 0 }}
                                 exit={{ opacity: 0, scale: 1.02, x: -20 }}
                                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                                className="relative aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.12)] border-8 border-white bg-slate-100 group cursor-pointer"
+                                className="relative aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/10 bg-black group cursor-pointer"
                             >
                                 <iframe
                                     ref={iframeRef}
@@ -196,9 +196,9 @@ export default function DestinationsShowcase() {
                                 </div>
 
                                 {/* Overlay Label */}
-                                <div className="absolute bottom-6 left-6 bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl border border-gray-100 shadow-xl max-w-[80%] z-30">
-                                    <h5 className="text-lg font-medium text-black mb-1">{activeDest.title}</h5>
-                                    <p className="text-xs text-gray-500 font-medium leading-tight">Vive la experiencia real con Udreamms.</p>
+                                <div className="absolute bottom-6 left-6 bg-black/80 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/10 shadow-xl max-w-[80%] z-30">
+                                    <h5 className="text-lg font-medium text-white mb-1">{activeDest.title}</h5>
+                                    <p className="text-xs text-slate-400 font-medium leading-tight">Vive la experiencia real con Udreamms.</p>
                                 </div>
 
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none z-10" />
@@ -206,7 +206,7 @@ export default function DestinationsShowcase() {
                         </AnimatePresence>
 
                         {/* Interactive Hint */}
-                        <div className="mt-8 flex items-center justify-end gap-2 text-gray-400">
+                        <div className="mt-8 flex items-center justify-end gap-2 text-slate-500">
                             <span className="text-xs font-medium uppercase tracking-widest italic">Haz clic en la lista para cambiar el destino o en el video para el sonido</span>
                             <ChevronRight size={14} />
                         </div>

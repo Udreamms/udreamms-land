@@ -9,20 +9,20 @@ const YouTubeIcon = ({ className }: { className?: string }) => (
 
 export default function YouTubeSocialSection() {
     return (
-        <section className="py-12 md:py-16 bg-gradient-to-br from-red-600 via-red-500 to-red-700 overflow-hidden relative">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.1),transparent_50%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(255,255,255,0.05),transparent_50%)]" />
+        <section className="py-24 md:py-32 bg-transparent overflow-hidden relative">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,0,0,0.05),transparent_50%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(255,0,0,0.03),transparent_50%)]" />
 
             <div className="container px-4 relative z-10 mx-auto">
                 <div className="max-w-4xl mx-auto text-center">
                     <div className="mb-6 flex flex-col items-center">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full mb-6 shadow-2xl animate-bounce">
-                            <YouTubeIcon className="w-8 h-8 text-red-600" />
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-red-600/10 border border-red-600/20 rounded-full mb-6 shadow-2xl animate-pulse">
+                            <YouTubeIcon className="w-8 h-8 text-red-500" />
                         </div>
                         <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tighter">
                             ¡Síguenos en YouTube!
                         </h2>
-                        <p className="text-base md:text-lg text-white/90 mb-8 max-w-xl mx-auto font-medium leading-relaxed">
+                        <p className="text-base md:text-lg text-slate-300 mb-8 max-w-xl mx-auto font-medium leading-relaxed">
                             Descubre consejos, testimonios y guías completas sobre cómo obtener tu visa y vivir el sueño americano.
                             ¡Dí adiós a las dudas!
                         </p>
@@ -32,23 +32,23 @@ export default function YouTubeSocialSection() {
                         href="https://www.youtube.com/@udreamms"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center px-8 py-4 text-base font-bold bg-white text-red-600 rounded-full shadow-2xl hover:scale-105 transition-all hover:bg-gray-50 group"
+                        className="inline-flex items-center justify-center px-8 py-4 text-base font-bold bg-red-600 text-white rounded-full shadow-xl shadow-red-600/20 hover:scale-105 transition-all hover:bg-red-500 group"
                     >
                         <YouTubeIcon className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
                         Suscríbete Ahora
                     </a>
 
-                    <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-white">
+                    <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-slate-400">
                         <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                             <span className="text-xs font-bold uppercase tracking-widest">Tips de Visa</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-white rounded-full animate-pulse [animation-delay:0.3s]" />
+                            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse [animation-delay:0.3s]" />
                             <span className="text-xs font-bold uppercase tracking-widest">Testimonios</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-white rounded-full animate-pulse [animation-delay:0.6s]" />
+                            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse [animation-delay:0.6s]" />
                             <span className="text-xs font-bold uppercase tracking-widest">Guías VIP</span>
                         </div>
                     </div>

@@ -21,7 +21,7 @@ import PlansSection from "./_components/PlansSection";
 
 export default function TouristVisaPage() {
   return (
-    <div className="min-h-screen bg-cloud font-sans text-abyss">
+    <div className="min-h-screen bg-black font-sans text-white">
       <Header />
       <HeroSection />
 

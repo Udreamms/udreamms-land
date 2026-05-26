@@ -87,17 +87,17 @@ export default function WhyUdreammsSection() {
     };
 
     return (
-        <section className="py-24 bg-white overflow-hidden">
+        <section className="py-24 md:py-32 bg-transparent overflow-hidden">
             <div className="container px-6 md:px-12 mx-auto">
 
                 {/* Header */}
                 <div className="mb-12 flex flex-col md:flex-row justify-between items-end gap-6">
                     <div className="max-w-4xl">
-                        <h2 className="text-4xl md:text-6xl font-medium tracking-tight mb-4 text-black">
+                        <h2 className="text-4xl md:text-6xl font-medium tracking-tight mb-4 text-white">
                             Por qué Udreamms es <br />
-                            <span className="text-gray-400">la mejor decisión.</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca]">la mejor decisión.</span>
                         </h2>
-                        <p className="text-xl text-gray-500 font-normal leading-relaxed max-w-2xl">
+                        <p className="text-xl text-slate-300 font-normal leading-relaxed max-w-2xl">
                             Beneficios exclusivos diseñados para garantizar tu éxito en USA.
                         </p>
                     </div>
@@ -106,13 +106,13 @@ export default function WhyUdreammsSection() {
                     <div className="hidden md:flex gap-3">
                         <button
                             onClick={() => scroll('left')}
-                            className="w-12 h-12 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                            className="w-12 h-12 rounded-full bg-white/5 border border-white/10 text-slate-300 flex items-center justify-center hover:bg-white/10 transition-colors"
                         >
                             <ChevronLeft className="w-6 h-6" />
                         </button>
                         <button
                             onClick={() => scroll('right')}
-                            className="w-12 h-12 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                            className="w-12 h-12 rounded-full bg-white/5 border border-white/10 text-slate-300 flex items-center justify-center hover:bg-white/10 transition-colors"
                         >
                             <ChevronRight className="w-6 h-6" />
                         </button>
@@ -133,16 +133,16 @@ export default function WhyUdreammsSection() {
                     {reasons.map((card) => (
                         <div
                             key={card.id}
-                            className="relative shrink-0 snap-center w-[300px] md:w-[340px] h-[500px] bg-white rounded-[2.5rem] p-8 shadow-xl shadow-gray-100 border border-gray-100 flex flex-col justify-between transition-transform hover:scale-[1.02] duration-300"
+                            className="relative shrink-0 snap-center w-[300px] md:w-[340px] h-[500px] bg-black border border-white/10 rounded-[2.5rem] p-8 shadow-2xl flex flex-col justify-between transition-transform hover:scale-[1.02] duration-300"
                         >
                             <div>
-                                <span className="text-xs font-medium uppercase tracking-wider text-gray-400 mb-3 block">
+                                <span className="text-xs font-medium uppercase tracking-wider text-slate-500 mb-3 block">
                                     {card.category}
                                 </span>
-                                <h3 className="text-3xl font-medium text-gray-900 mb-4 leading-tight">
+                                <h3 className="text-3xl font-medium text-white mb-4 leading-tight">
                                     {card.title}.
                                 </h3>
-                                <p className="text-gray-500 font-medium text-sm leading-relaxed">
+                                <p className="text-slate-400 font-medium text-sm leading-relaxed">
                                     {card.description}
                                 </p>
                             </div>
@@ -158,7 +158,7 @@ export default function WhyUdreammsSection() {
                                         strokeWidth={1.5}
                                     />
                                 </div>
-                                <button className="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 transition-colors shadow-lg">
+                                <button className="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-500 transition-colors shadow-lg">
                                     <Plus className="w-5 h-5" />
                                 </button>
                             </div>
@@ -170,13 +170,13 @@ export default function WhyUdreammsSection() {
                 <div className="md:hidden flex justify-center gap-4 mt-4">
                     <button
                         onClick={() => scroll('left')}
-                        className="w-12 h-12 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                        className="w-12 h-12 rounded-full bg-white/5 border border-white/10 text-slate-300 flex items-center justify-center hover:bg-white/10 transition-colors"
                     >
                         <ChevronLeft className="w-6 h-6" />
                     </button>
                     <button
                         onClick={() => scroll('right')}
-                        className="w-12 h-12 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                        className="w-12 h-12 rounded-full bg-white/5 border border-white/10 text-slate-300 flex items-center justify-center hover:bg-white/10 transition-colors"
                     >
                         <ChevronRight className="w-6 h-6" />
                     </button>

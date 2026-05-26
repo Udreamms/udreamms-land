@@ -120,6 +120,9 @@ export default function HeroSection() {
                 
                 {/* Fallback overlay color while loading or if fails */}
                 <div className="absolute inset-0 bg-black/40 z-20 pointer-events-none" />
+                
+                {/* Smooth fade to next section */}
+                <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#050507] to-transparent z-20 pointer-events-none" />
             </div>
 
             {/* Overlay Content (Static) */}
@@ -154,7 +157,7 @@ export default function HeroSection() {
 
                     <div className="pointer-events-auto shrink-0 mb-2">
                         <Button
-                            className="bg-transparent border border-white/50 hover:bg-white/10 text-white text-sm px-6 py-3 h-auto rounded-full transition-all hover:scale-105 font-medium uppercase tracking-tight group backdrop-blur-sm"
+                            className="bg-transparent border border-white/40 hover:bg-blue-600 hover:border-blue-600 text-white text-sm px-6 py-3 h-auto rounded-full transition-all hover:scale-105 font-medium uppercase tracking-tight group backdrop-blur-sm shadow-lg pointer-events-auto"
                             onClick={() => document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' })}
                         >
                             Ver Planes

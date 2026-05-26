@@ -2,8 +2,7 @@
 
 import { motion } from "framer-motion";
 import { FadeIn, ScaleIn } from "./Animations";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
     FileText,
     Users,
@@ -12,11 +11,9 @@ import {
     ShoppingBag,
     Star,
     CheckCircle2,
-    Mail,
     Calendar,
     Video,
-    HardDrive,
-    MessageCircle
+    Plane
 } from "lucide-react";
 
 
@@ -25,6 +22,7 @@ const PLANS = [
         name: "TURISTA BÁSICO",
         price: "$380",
         originalPrice: "$494",
+        discount: "30% OFF",
         description: "Lo esencial para tu solicitud.",
         highlight: false,
         features: [
@@ -38,141 +36,139 @@ const PLANS = [
         name: "TURISTA PREMIUM",
         price: "$3,500",
         originalPrice: "$4,550",
+        discount: "30% OFF",
         description: "La experiencia completa y cómoda.",
         highlight: true,
         features: [
             { name: "Elige ciudad: FL, NY, CA, UT, NV, HI", icon: Map },
             { name: "Itinerario 8 días / 7 noches totalmente planificado", icon: Calendar },
-            { name: "Vuelos y traslados internos incluidos", icon: HardDrive }, // Using HardDrive as placeholder for Plane/Transport if Plane not imported, actually Plane is likely better but check imports. Using HardDrive as generic logic or switch to imported Plane if available or add it. Let's look at imports: Mail, Calendar, Video, HardDrive... Plane is NOT imported in the list shown (lines 6-19). I should import Plane.
+            { name: "Vuelos y traslados internos incluidos", icon: Plane },
             { name: "Hospedaje 4–5 estrellas seleccionado", icon: Hotel },
             { name: "Entradas a parques y actividades", icon: ShoppingBag },
             { name: "Experiencias: ski, hiking, naturaleza", icon: Star },
             { name: "Gestión total del viaje", icon: CheckCircle2 },
-            { name: "💡 Todo incluido: viaja sin preocupaciones" },
+            { name: "💡 Todo incluido: viaja sin preocupaciones", icon: Star },
         ]
     },
     {
         name: "EXPERIENCIA VIP",
         price: "$4,990",
         originalPrice: "$6,500",
+        discount: "30% OFF",
         description: "Lujo y atención exclusiva.",
         highlight: false,
         features: [
             { name: "Ruta Turística Multi-Estado – Todo Incluido", icon: Map },
             { name: "Itinerario personalizado 12–15 días", icon: Calendar },
-            { name: "Vuelos y traslados internos incluidos", icon: HardDrive },
+            { name: "Vuelos y traslados internos incluidos", icon: Plane },
             { name: "Hospedaje 4–5 estrellas garantizado", icon: Star },
             { name: "Entradas a parques y experiencias premium", icon: ShoppingBag },
             { name: "Actividades exclusivas: shows y aventuras", icon: Video },
             { name: "Gestión integral del viaje, todo cubierto", icon: CheckCircle2 },
-            { name: "💡 Todo incluido: solo llega y disfruta" },
+            { name: "💡 Todo incluido: solo llega y disfruta", icon: Star },
         ]
     }
 ];
 
 export default function PlansSection() {
-    const router = useRouter();
-
     return (
-        <section className="py-16 bg-white relative overflow-hidden" id="planes">
-            <div className="container mx-auto px-6">
-                <div className="text-center mb-12">
+        <section id="planes" className="pt-24 md:pt-32 pb-24 md:pb-40 bg-[#050507] relative overflow-hidden font-sans">
+            {/* Background effects */}
+            <div className="absolute inset-0 bg-white/[0.02] bg-[size:50px_50px]" />
+            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-[#050507] -translate-y-full" />
+
+            <div className="container max-w-[1200px] mx-auto px-6 relative z-10">
+                <div className="text-center mb-16 md:mb-20 max-w-4xl mx-auto">
                     <FadeIn>
-                        <h2 className="text-3xl md:text-4xl font-medium text-slate-900 mb-4 tracking-tight">
+                        <h2 className="text-3xl md:text-4xl font-normal tracking-tight text-white leading-tight mb-4">
                             Elige tu Plan Ideal
                         </h2>
-                        <p className="text-base text-slate-600 max-w-2xl mx-auto">
+                        <p className="text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
                             Tenemos opciones diseñadas para cada tipo de viajero con ofertas por tiempo limitado.
                         </p>
                     </FadeIn>
                 </div>
 
-                {/* Main White Container wrapping all plans */}
-                <div className="max-w-[1200px] mx-auto bg-slate-200 rounded-[2.5rem] p-4 md:p-8 shadow-md border border-slate-300 relative overflow-hidden">
+                {/* Grid for Plans */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch mx-auto">
+                    {PLANS.map((plan, index) => (
+                        <ScaleIn delay={index * 0.1} key={index} className="h-full w-full">
+                            <div className="relative group w-full flex flex-col h-full">
+                                
+                                {/* Glow Effect Background */}
+                                <div className="absolute -inset-2 bg-white/20 rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                    {/* Limited Time Badge - Animated Gradient */}
-                    <div className="absolute top-0 right-0 bg-gradient-to-r from-orange-600 to-red-600 text-white text-[10px] font-medium uppercase tracking-widest px-6 py-2 rounded-bl-3xl shadow-lg z-20 animate-pulse">
-                        ¡COSTOS POR TIEMPO LIMITADO!
-                    </div>
+                                {/* Card Content */}
+                                <div className={`relative flex-1 bg-black border rounded-[2rem] p-6 md:p-8 flex flex-col overflow-hidden transition-colors duration-300 ${plan.highlight ? 'border-slate-500 ring-1 ring-slate-500/50 shadow-2xl z-10' : 'border-white/10 ring-1 ring-white/5 shadow-2xl hover:bg-black'}`}>
+                                    
+                                    {/* Visual Accent */}
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-3xl" />
 
+                                    {/* Discount Badge */}
+                                    {plan.discount && (
+                                        <div className="absolute top-4 right-4 bg-slate-800 text-slate-200 px-3 py-1.5 rounded-md text-xs font-medium tracking-wide shadow-sm transform rotate-2 border border-slate-700">
+                                            {plan.discount}
+                                        </div>
+                                    )}
 
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-                        {PLANS.map((plan, index) => (
-                            <ScaleIn delay={index * 0.1} key={index} className="h-full">
-                                <div className={`
-                                    relative p-5 rounded-3xl border transition-all duration-300 h-full flex flex-col min-h-[400px] bg-white
-                                    ${plan.highlight
-                                        ? "border-slate-400 shadow-xl ring-1 ring-slate-400/50 z-10"
-                                        : "border-slate-200 hover:border-slate-300 hover:shadow-lg"
-                                    }
-                                `}>
-                                    {/* Discount Badge - Dynamic based on plan data */}
-                                    <div className="absolute top-4 right-4 bg-slate-200 text-slate-800 px-2 py-1 rounded-md text-xs font-medium tracking-wide shadow-sm transform rotate-2">
-                                        30% OFF
-                                    </div>
-
+                                    {/* Recommended Badge */}
                                     {plan.highlight && (
-                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-3 py-0.5 rounded-full text-xs font-medium tracking-wide shadow-md">
+                                        <div className="absolute top-0 right-1/2 translate-x-1/2 bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] text-white text-[10px] font-medium uppercase tracking-widest px-6 py-1.5 rounded-b-xl shadow-lg z-20">
                                             MÁS POPULAR
                                         </div>
                                     )}
 
-                                    {/* Increased top margin to separate Title from Badge */}
-                                    <div className="mb-4 mt-8">
-                                        <h3 className={`text-lg font-medium mb-1 tracking-tight ${plan.highlight ? "text-slate-900" : "text-slate-700"}`}>
+                                    <div className="flex flex-col items-center text-center mt-8 mb-6">
+                                        <h3 className="text-xl md:text-2xl font-normal text-white tracking-tight mb-3 leading-relaxed">
                                             {plan.name}
                                         </h3>
-
-                                        <div className="flex flex-col items-start mb-2">
-                                            <span className="text-slate-400 line-through text-sm font-medium mb-0">
+                                        <div className="flex flex-col items-center justify-center mb-2">
+                                            <span className="text-slate-500 line-through text-sm font-medium">
                                                 {plan.originalPrice}
                                             </span>
-                                            <div className="flex items-baseline gap-1">
-                                                <span className="text-2xl font-medium text-slate-900 tracking-tighter">{plan.price}</span>
-                                            </div>
+                                            <span className="text-4xl font-medium text-white tracking-tighter">
+                                                {plan.price}
+                                            </span>
                                         </div>
-
-                                        {/* Increased Description Size */}
-                                        <p className="text-slate-500 text-xs">{plan.description}</p>
+                                        <p className="text-slate-400 text-sm font-light leading-loose mt-2">
+                                            {plan.description}
+                                        </p>
                                     </div>
 
-                                    <Button
-                                        className="w-full mb-6 rounded-full py-2 font-medium text-sm shadow-lg transition-all duration-300 active:scale-95 border-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900"
-                                        onClick={() => {
-                                            const planId = plan.name.toLowerCase().split(" ").pop()?.normalize("NFD").replace(/[\u0300-\u036f]/g, "") || "basico";
-                                            router.push(`/instructions-payment-tourist?plan=${planId}`);
-                                        }}
-                                    >
-                                        Elegir Plan
-                                    </Button>
+                                    <div className="flex flex-col items-center gap-3 mt-auto mb-6 w-full">
+                                        <Link 
+                                            href={`/instructions-payment-tourist?plan=${plan.name.toLowerCase().split(" ").pop()?.normalize("NFD").replace(/[\u0300-\u036f]/g, "") || "basico"}`} 
+                                            className="w-full py-3 rounded-full bg-transparent text-white font-normal text-base shadow-2xl hover:scale-[1.03] active:scale-95 transition-all duration-300 border border-white/40 hover:bg-blue-600 hover:border-blue-600 text-center"
+                                        >
+                                            Elegir Plan
+                                        </Link>
+                                    </div>
 
-                                    <div className="space-y-4 flex-grow">
-                                        <p className="font-medium text-xs text-slate-900 mb-4 uppercase tracking-widest border-b border-slate-100 pb-1">
+                                    <div className="space-y-4 md:space-y-5 flex-1">
+                                        <p className="text-white font-normal text-xs uppercase tracking-widest opacity-50 mb-3 text-center">
                                             LO QUE INCLUYE:
                                         </p>
-                                        {plan.features.map((feature, i) => {
-                                            const Icon = feature.icon;
-                                            return (
-                                                <div key={i} className="flex items-start gap-2 text-slate-700">
-                                                    {/* Feature Icon Style */}
-                                                    {Icon && (
-                                                        <div className="mt-0.5 p-1 rounded-full flex-shrink-0 bg-slate-50">
-                                                            <Icon size={14} className="text-black" strokeWidth={3} />
+                                        <ul className="space-y-4">
+                                            {plan.features.map((feature, i) => {
+                                                const Icon = feature.icon;
+                                                return (
+                                                    <li key={i} className="flex items-start gap-3 text-slate-300 group/item cursor-default leading-relaxed">
+                                                        <div className="mt-0.5 transition-transform group-hover/item:scale-110 shrink-0">
+                                                            <Icon className="w-5 h-5 text-white" strokeWidth={1.5} />
                                                         </div>
-                                                    )}
-                                                    {/* Increased Feature Text Size */}
-                                                    <span className="text-xs font-medium leading-[1.4] pt-0.5">
-                                                        {feature.name}
-                                                    </span>
-                                                </div>
-                                            );
-                                        })}
+                                                        <span className="text-sm font-normal text-slate-100 group-hover/item:text-white transition-colors text-left">
+                                                            {feature.name}
+                                                        </span>
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
                                     </div>
+
                                 </div>
-                            </ScaleIn>
-                        ))}
-                    </div>
+                            </div>
+                        </ScaleIn>
+                    ))}
                 </div>
             </div>
         </section>

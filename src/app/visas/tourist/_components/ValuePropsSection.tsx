@@ -9,7 +9,7 @@ import {
 
 export default function ValuePropsSection() {
     return (
-        <div className="relative z-30 pt-12 pb-4 px-6 bg-white">
+        <div className="relative z-30 pt-32 pb-12 px-6 bg-transparent">
             <div className="container mx-auto">
                 {/* 1. Sound Wave Icons Row (First - Centered) */}
                 <FadeIn>
