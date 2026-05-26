@@ -3,6 +3,10 @@ import type { Metadata } from "next";
 export const SITE_URL = "https://udreamms.com";
 export const SITE_NAME = "Udreamms";
 
+/** URL estable del logo (Google Search favicon + schema.org). */
+export const SITE_LOGO_PATH = "/icons/new-icon-udreamms.png";
+export const SITE_LOGO_URL = `${SITE_URL}${SITE_LOGO_PATH}`;
+
 export const DEFAULT_DESCRIPTION =
   "Asesoría experta para visas, estudios y nueva vida en Estados Unidos. Tecnología y soporte humano en un solo lugar.";
 
@@ -136,7 +140,7 @@ export function pageMetadata(
       type: "website",
       images: [
         {
-          url: "/icons/new-icon-udreamms.png",
+          url: SITE_LOGO_PATH,
           width: 512,
           height: 512,
           alt: SITE_NAME,
@@ -179,7 +183,7 @@ export const rootMetadata: Metadata = {
     description: DEFAULT_DESCRIPTION,
     images: [
       {
-        url: "/icons/new-icon-udreamms.png",
+        url: SITE_LOGO_PATH,
         width: 512,
         height: 512,
         alt: SITE_NAME,
@@ -196,8 +200,14 @@ export const rootMetadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true },
   },
+  // Google Search favicon: URL estable, PNG, múltiplos de 48px (ver app/icon.png)
   icons: {
-    icon: "/icons/new-icon-udreamms.png",
-    apple: "/icons/new-icon-udreamms.png",
+    icon: [
+      { url: SITE_LOGO_PATH, type: "image/png", sizes: "48x48" },
+      { url: SITE_LOGO_PATH, type: "image/png", sizes: "192x192" },
+      { url: SITE_LOGO_PATH, type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: SITE_LOGO_PATH, type: "image/png", sizes: "180x180" }],
+    shortcut: SITE_LOGO_PATH,
   },
 };
