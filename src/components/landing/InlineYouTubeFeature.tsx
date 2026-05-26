@@ -11,6 +11,7 @@ import {
 
 type InlineYouTubeFeatureProps = {
   videoId: string;
+  startSeconds?: number;
   posterSrc?: string;
   posterAlt?: string;
   className?: string;
@@ -22,6 +23,7 @@ type InlineYouTubeFeatureProps = {
  */
 export default function InlineYouTubeFeature({
   videoId,
+  startSeconds,
   posterSrc,
   posterAlt = "Video",
   className = "",
@@ -39,7 +41,9 @@ export default function InlineYouTubeFeature({
         <>
           <iframe
             key={`inline-yt-${videoId}-${isTouch ? "touch" : "desk"}`}
-            src={youtubeEmbedUrl(videoId, isTouch ? "interactive" : "preview")}
+            src={youtubeEmbedUrl(videoId, isTouch ? "interactive" : "preview", {
+              startSeconds,
+            })}
             className={`absolute inset-0 w-full h-full border-0 ${
               isTouch ? "pointer-events-auto" : "pointer-events-none"
             }`}
@@ -49,7 +53,7 @@ export default function InlineYouTubeFeature({
           />
           {isTouch && (
             <a
-              href={youtubeWatchUrl(videoId)}
+              href={youtubeWatchUrl(videoId, startSeconds)}
               target="_blank"
               rel="noopener noreferrer"
               className="absolute top-3 right-3 z-20 flex items-center gap-1 rounded-full bg-black/70 px-3 py-1.5 text-xs font-medium text-white"

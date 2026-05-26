@@ -1,35 +1,15 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
 import Link from "next/link";
-import { useInView } from "framer-motion";
-import { Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import InlineYouTubeFeature from "@/components/landing/InlineYouTubeFeature";
 
-/** ~3.5 MB — apto para web/móvil. El .mov anterior pesaba ~1.8 GB y no cargaba. */
-const STUDENT_SHOWCASE_VIDEO =
-  "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2FVisa_Aprobada_Video_Generado.mp4?alt=media&token=5506d972-daaf-4514-8079-2b357abbddec";
-
+/** https://www.youtube.com/watch?v=t-tP6hhtCO4&t=72s */
+const STUDENT_SHOWCASE_VIDEO_ID = "t-tP6hhtCO4";
+const STUDENT_SHOWCASE_START_SECONDS = 72;
 const STUDENT_SHOWCASE_POSTER = "/assets/generated/student_showcase_campus.png";
 
 export default function StudentShowcase() {
-  const containerRef = useRef(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const isInView = useInView(containerRef, { margin: "-20% 0px -20% 0px" });
-  const [isMuted, setIsMuted] = useState(true);
-  const [videoFailed, setVideoFailed] = useState(false);
-
-  useEffect(() => {
-    if (!videoRef.current || videoFailed) return;
-    if (isInView) {
-      videoRef.current.play().catch(() => {
-        /* Autoplay bloqueado en iOS sin interacción — el poster sigue visible */
-      });
-    } else {
-      videoRef.current.pause();
-    }
-  }, [isInView, videoFailed]);
-
   return (
     <section className="py-12 md:py-16 lg:py-20 bg-white text-black overflow-hidden font-sans">
       <div className="container mx-auto px-6 max-w-[1500px]">
@@ -61,53 +41,14 @@ export default function StudentShowcase() {
             </Button>
           </div>
 
-          <div
-            ref={containerRef}
-            className="w-full lg:w-2/3 relative h-[280px] sm:h-[350px] lg:h-[650px] bg-[#0a0a0a] rounded-3xl overflow-hidden flex items-center justify-center shadow-2xl"
-          >
-            {!videoFailed ? (
-              <video
-                ref={videoRef}
-                className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 z-20"
-                poster={STUDENT_SHOWCASE_POSTER}
-                muted={isMuted}
-                loop
-                playsInline
-                preload={isInView ? "auto" : "none"}
-                onError={() => setVideoFailed(true)}
-              >
-                <source src={STUDENT_SHOWCASE_VIDEO} type="video/mp4" />
-              </video>
-            ) : (
-              <img
-                src={STUDENT_SHOWCASE_POSTER}
-                alt="Estudiantes en campus en USA"
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            )}
-
-            {!videoFailed && (
-              <button
-                type="button"
-                aria-label={isMuted ? "Activar sonido" : "Silenciar"}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const next = !isMuted;
-                  setIsMuted(next);
-                  if (videoRef.current) {
-                    videoRef.current.muted = next;
-                    void videoRef.current.play();
-                  }
-                }}
-                className="absolute bottom-6 right-6 w-12 h-12 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-md flex items-center justify-center text-white transition-all z-30"
-              >
-                {isMuted ? (
-                  <VolumeX className="w-5 h-5" />
-                ) : (
-                  <Volume2 className="w-5 h-5" />
-                )}
-              </button>
-            )}
+          <div className="w-full lg:w-2/3 relative h-[280px] sm:h-[350px] lg:h-[650px] rounded-3xl overflow-hidden shadow-2xl">
+            <InlineYouTubeFeature
+              videoId={STUDENT_SHOWCASE_VIDEO_ID}
+              startSeconds={STUDENT_SHOWCASE_START_SECONDS}
+              posterSrc={STUDENT_SHOWCASE_POSTER}
+              posterAlt="Visa de estudiante F-1"
+              className="rounded-3xl"
+            />
           </div>
         </div>
       </div>
