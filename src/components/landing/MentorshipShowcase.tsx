@@ -51,6 +51,7 @@ export default function MentorshipShowcase() {
                             muted={isMuted}
                             loop
                             playsInline
+                            preload="metadata"
                         />
                         
                         <button
