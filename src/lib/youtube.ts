@@ -14,7 +14,12 @@ type YoutubeEmbedOptions = {
 
 export function youtubeEmbedUrl(
   videoId: string,
-  mode: "preview" | "interactive" | "destinations-desktop" | "destinations-mobile",
+  mode:
+    | "preview"
+    | "player"
+    | "interactive"
+    | "destinations-desktop"
+    | "destinations-mobile",
   options?: YoutubeEmbedOptions
 ) {
   const base = `https://www.youtube-nocookie.com/embed/${videoId}`;
@@ -23,12 +28,14 @@ export function youtubeEmbedUrl(
       ? String(Math.floor(options.startSeconds))
       : undefined;
 
-  if (mode === "interactive" || mode === "destinations-mobile") {
+  /** Reproductor completo: controles, volumen, pantalla completa */
+  if (mode === "player" || mode === "interactive" || mode === "destinations-mobile") {
     const params = new URLSearchParams({
       autoplay: "1",
-      mute: mode === "destinations-mobile" ? "0" : "0",
+      mute: "1",
       playsinline: "1",
       controls: "1",
+      fs: "1",
       modestbranding: "1",
       rel: "0",
       enablejsapi: "1",

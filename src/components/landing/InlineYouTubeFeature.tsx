@@ -3,11 +3,7 @@
 import { useRef } from "react";
 import { useInView } from "framer-motion";
 import { ExternalLink } from "lucide-react";
-import { useTouchDevice } from "@/hooks/use-touch-device";
-import {
-  youtubeEmbedUrl,
-  youtubeWatchUrl,
-} from "@/lib/youtube";
+import { youtubeEmbedUrl, youtubeWatchUrl } from "@/lib/youtube";
 
 type InlineYouTubeFeatureProps = {
   videoId: string;
@@ -18,8 +14,7 @@ type InlineYouTubeFeatureProps = {
 };
 
 /**
- * Bloque video vertical (home). En táctil: controles YouTube + enlace externo.
- * En escritorio: preview silenciada al entrar en viewport.
+ * YouTube embebido con controles completos (volumen, pantalla completa, etc.).
  */
 export default function InlineYouTubeFeature({
   videoId,
@@ -30,7 +25,6 @@ export default function InlineYouTubeFeature({
 }: InlineYouTubeFeatureProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { margin: "-15% 0px -15% 0px" });
-  const isTouch = useTouchDevice();
 
   return (
     <div
@@ -40,28 +34,22 @@ export default function InlineYouTubeFeature({
       {isInView ? (
         <>
           <iframe
-            key={`inline-yt-${videoId}-${isTouch ? "touch" : "desk"}`}
-            src={youtubeEmbedUrl(videoId, isTouch ? "interactive" : "preview", {
-              startSeconds,
-            })}
-            className={`absolute inset-0 w-full h-full border-0 ${
-              isTouch ? "pointer-events-auto" : "pointer-events-none"
-            }`}
+            key={`inline-yt-${videoId}`}
+            src={youtubeEmbedUrl(videoId, "player", { startSeconds })}
+            className="absolute inset-0 w-full h-full border-0 pointer-events-auto"
             title={posterAlt}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
             allowFullScreen
           />
-          {isTouch && (
-            <a
-              href={youtubeWatchUrl(videoId, startSeconds)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="absolute top-3 right-3 z-20 flex items-center gap-1 rounded-full bg-black/70 px-3 py-1.5 text-xs font-medium text-white"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              YouTube
-            </a>
-          )}
+          <a
+            href={youtubeWatchUrl(videoId, startSeconds)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute top-3 right-3 z-20 flex items-center gap-1 rounded-full bg-black/70 px-3 py-1.5 text-xs font-medium text-white hover:bg-black/90 transition-colors"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            YouTube
+          </a>
         </>
       ) : posterSrc ? (
         <img

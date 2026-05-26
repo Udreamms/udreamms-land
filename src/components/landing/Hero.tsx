@@ -102,11 +102,13 @@ export default function Hero({ onStartQuote }: HeroProps) {
         <video
           ref={video0Ref}
           className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ${
-            activeVideo === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'
+            activeVideo === 0 ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
           }`}
           autoPlay
           muted
           playsInline
+          controls={activeVideo === 0}
+          controlsList="nodownload"
           preload="metadata"
           onTimeUpdate={() => handleTimeUpdate(0)}
           onEnded={() => handleEnded(0)}
@@ -117,19 +119,21 @@ export default function Hero({ onStartQuote }: HeroProps) {
         <video
           ref={video1Ref}
           className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ${
-            activeVideo === 1 ? 'opacity-100 z-10' : 'opacity-0 z-0'
+            activeVideo === 1 ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
           }`}
           autoPlay
           muted
           playsInline
+          controls={activeVideo === 1}
+          controlsList="nodownload"
           preload="metadata"
           onTimeUpdate={() => handleTimeUpdate(1)}
           onEnded={() => handleEnded(1)}
           src={videoLinks[index1]}
         />
 
-        {/* Overlays para legibilidad y transición suave a negro */}
-        <div className="absolute inset-0 z-20 bg-gradient-to-t from-[#050507] via-transparent to-transparent pointer-events-none" />
+        {/* Overlays para legibilidad — no cubrir la barra de controles del video */}
+        <div className="absolute inset-0 z-20 bg-gradient-to-t from-[#050507] via-transparent to-transparent pointer-events-none pb-14" />
       </div>
 
       {/* Contenido con márgenes de 3cm en desktop, adaptado en movil */}

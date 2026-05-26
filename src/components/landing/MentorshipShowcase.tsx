@@ -1,17 +1,14 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import Link from "next/link";
 import { useInView } from "framer-motion";
-import { Volume2, VolumeX } from "lucide-react";
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 
 export default function MentorshipShowcase() {
     const containerRef = useRef(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const isInView = useInView(containerRef, { margin: "-20% 0px -20% 0px" });
-    const [isMuted, setIsMuted] = useState(true);
-
     useEffect(() => {
         if (!videoRef.current) return;
         if (isInView) {
@@ -47,29 +44,14 @@ export default function MentorshipShowcase() {
                         <video
                             ref={videoRef}
                             src="https://assets.mixkit.co/videos/preview/mixkit-team-of-creative-people-working-in-office-42277-large.mp4"
-                            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 z-20 opacity-100"
-                            muted={isMuted}
+                            className="absolute inset-0 w-full h-full object-cover z-20"
+                            muted
                             loop
                             playsInline
+                            controls
+                            controlsList="nodownload"
                             preload="metadata"
                         />
-                        
-                        <button
-                            type="button"
-                            aria-label={isMuted ? "Activar sonido" : "Silenciar"}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                const next = !isMuted;
-                                setIsMuted(next);
-                                if (videoRef.current) {
-                                    videoRef.current.muted = next;
-                                    void videoRef.current.play();
-                                }
-                            }}
-                            className="absolute bottom-6 right-6 w-12 h-12 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-md flex items-center justify-center text-white transition-all z-30"
-                        >
-                            {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                        </button>
                     </div>
 
                 </div>
