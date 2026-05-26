@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarProvider } from "@/components/SidebarContext";
 import { Toaster } from "sonner";
+import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import OrganizationJsonLd from "@/components/seo/OrganizationJsonLd";
 import { rootMetadata } from "@/lib/seo";
 
@@ -24,6 +25,7 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={`${montserrat.variable} font-sans`}>
+        <GoogleAnalytics />
         <OrganizationJsonLd />
         <ThemeProvider
           attribute="class"

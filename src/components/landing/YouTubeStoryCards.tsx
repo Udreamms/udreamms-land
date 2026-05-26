@@ -1,8 +1,10 @@
 "use client";
 
 import { Instagram, Play, ExternalLink } from "lucide-react";
-import { useEffect, useState, type MouseEvent } from "react";
+import { useState, type MouseEvent } from "react";
 import { Button } from "@/components/ui/button";
+import { useTouchDevice } from "@/hooks/use-touch-device";
+import { youtubeEmbedUrl, youtubeShortsUrl } from "@/lib/youtube";
 
 export type YouTubeStory = {
   id: number;
@@ -10,53 +12,6 @@ export type YouTubeStory = {
   handle: string;
   title: string;
 };
-
-function useTouchDevice() {
-  const [isTouch, setIsTouch] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia("(hover: none) and (pointer: coarse)");
-    const update = () => setIsTouch(media.matches);
-    update();
-    media.addEventListener("change", update);
-    return () => media.removeEventListener("change", update);
-  }, []);
-
-  return isTouch;
-}
-
-function youtubeShortsUrl(videoId: string) {
-  return `https://www.youtube.com/shorts/${videoId}`;
-}
-
-/** Vista previa silenciada en desktop (hover). */
-function previewEmbedUrl(videoId: string) {
-  const params = new URLSearchParams({
-    autoplay: "1",
-    mute: "1",
-    loop: "1",
-    playlist: videoId,
-    playsinline: "1",
-    controls: "0",
-    modestbranding: "1",
-    rel: "0",
-    iv_load_policy: "3",
-  });
-  return `https://www.youtube-nocookie.com/embed/${videoId}?${params}`;
-}
-
-/** Reproducción en móvil con controles nativos de YouTube (sin recargar al tocar). */
-function interactiveEmbedUrl(videoId: string) {
-  const params = new URLSearchParams({
-    autoplay: "1",
-    mute: "0",
-    playsinline: "1",
-    controls: "1",
-    modestbranding: "1",
-    rel: "0",
-  });
-  return `https://www.youtube-nocookie.com/embed/${videoId}?${params}`;
-}
 
 type YouTubeStoryCardsProps = {
   stories: YouTubeStory[];
@@ -142,8 +97,8 @@ export default function YouTubeStoryCards({
                       key={`embed-${story.id}`}
                       src={
                         isTouch
-                          ? interactiveEmbedUrl(story.videoId)
-                          : previewEmbedUrl(story.videoId)
+                          ? youtubeEmbedUrl(story.videoId, "interactive")
+                          : youtubeEmbedUrl(story.videoId, "preview")
                       }
                       className={`w-[300%] h-full -ml-[100%] object-cover transition-opacity duration-300 ${
                         isTouch ? "pointer-events-auto" : "pointer-events-none"

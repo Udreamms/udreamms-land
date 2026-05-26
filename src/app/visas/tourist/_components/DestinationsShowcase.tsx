@@ -2,7 +2,9 @@
 
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, ChevronRight, Play, Volume2, VolumeX } from "lucide-react";
+import { MapPin, ChevronRight, Play, Volume2, VolumeX, ExternalLink } from "lucide-react";
+import { useTouchDevice } from "@/hooks/use-touch-device";
+import { youtubeEmbedUrl, youtubeWatchUrl } from "@/lib/youtube";
 
 const destinations = [
     {
@@ -74,6 +76,7 @@ const destinations = [
 export default function DestinationsShowcase() {
     const [activeDest, setActiveDest] = useState(destinations[0]);
     const [isMuted, setIsMuted] = useState(true);
+    const isTouch = useTouchDevice();
 
     const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -86,11 +89,6 @@ export default function DestinationsShowcase() {
                 '*'
             );
         }
-    };
-
-    const getEmbedUrl = (videoId: string) => {
-        let params = `autoplay=1&loop=1&playlist=${videoId}&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&playsinline=1&controls=0&mute=1&enablejsapi=1`;
-        return `https://www.youtube.com/embed/${videoId}?${params}`;
     };
 
     return (
@@ -177,19 +175,39 @@ export default function DestinationsShowcase() {
                                             iframeRef.current.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'unMute', args: [] }), '*');
                                         }
                                     }}
-                                    src={getEmbedUrl(activeDest.videoId)}
-                                    className="absolute inset-0 w-full h-full border-0 grayscale-[0.2] hover:grayscale-0 transition-all duration-700 pointer-events-none"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    src={youtubeEmbedUrl(
+                                        activeDest.videoId,
+                                        isTouch ? "destinations-mobile" : "destinations-desktop"
+                                    )}
+                                    className={`absolute inset-0 w-full h-full border-0 grayscale-[0.2] hover:grayscale-0 transition-all duration-700 ${
+                                        isTouch ? "pointer-events-auto" : "pointer-events-none"
+                                    }`}
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowFullScreen
                                 />
 
-                                {/* Overlay for Sound Toggle */}
-                                <div
-                                    className="absolute inset-0 z-20 cursor-pointer"
-                                    onClick={toggleMute}
-                                />
+                                {!isTouch && (
+                                    <div
+                                        className="absolute inset-0 z-20 cursor-pointer"
+                                        onClick={toggleMute}
+                                        aria-label="Activar o silenciar audio"
+                                    />
+                                )}
 
-                                {/* Sound Button */}
-                                <div className="absolute bottom-10 right-10 z-30 pointer-events-none">
+                                {isTouch && (
+                                    <a
+                                        href={youtubeWatchUrl(activeDest.videoId)}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="absolute top-4 right-4 z-30 flex items-center gap-1.5 rounded-full bg-black/70 backdrop-blur-md px-3 py-2 text-xs font-medium text-white"
+                                    >
+                                        <ExternalLink className="w-3.5 h-3.5" />
+                                        YouTube
+                                    </a>
+                                )}
+
+                                {/* Sound Button (desktop) */}
+                                <div className={`absolute bottom-10 right-10 z-30 ${isTouch ? "hidden" : "pointer-events-none"}`}>
                                     <div className="w-14 h-14 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white transition-all transform group-hover:scale-110">
                                         {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
                                     </div>

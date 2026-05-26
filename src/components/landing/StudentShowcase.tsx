@@ -51,9 +51,15 @@ export default function StudentShowcase() {
                         />
                         
                         <button
+                            type="button"
                             onClick={(e) => {
                                 e.stopPropagation();
-                                setIsMuted(!isMuted);
+                                const next = !isMuted;
+                                setIsMuted(next);
+                                if (videoRef.current) {
+                                    videoRef.current.muted = next;
+                                    void videoRef.current.play();
+                                }
                             }}
                             className="absolute bottom-6 right-6 w-12 h-12 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-md flex items-center justify-center text-white transition-all z-30"
                         >
