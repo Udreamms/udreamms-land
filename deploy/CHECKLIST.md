@@ -22,6 +22,7 @@ Usar antes de cada release a producción.
 - [ ] `FIREBASE_PRIVATE_KEY` con saltos de línea correctos
 - [ ] Deploy verde en la rama de producción
 - [ ] Dominio custom (si aplica) con SSL activo
+- [ ] SEO post-deploy: [deploy/SEO_LAUNCH.md](./SEO_LAUNCH.md) (`/robots.txt`, `/sitemap.xml`, GSC)
 
 ## 4. Smoke tests (producción)
 

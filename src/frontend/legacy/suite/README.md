@@ -4,4 +4,4 @@ Código **no conectado** a rutas actuales de `src/app/`. Conservado por si se re
 
 Dependencia externa: `@/components/SidebarContext` (usado por `DepartmentSidebar.tsx`).
 
-No eliminar sin revisar `next.config.mjs` (redirects `/cso` → `/suite`).
+Los redirects `/cso/*` y `/suite/*` apuntan a `/` en `next.config.mjs` (suite no desplegado).

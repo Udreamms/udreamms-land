@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google"; // Font updated to Montserrat
+import { Montserrat } from "next/font/google";
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarProvider } from "@/components/SidebarContext";
 import { Toaster } from "sonner";
-
+import { rootMetadata } from "@/lib/seo";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -13,14 +13,7 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "Udreamms | Tu Sueño en USA",
-  description: "Asesoría experta para visas, estudios y nueva vida en Estados Unidos. Tecnología y soporte humano en un solo lugar.",
-  icons: {
-    icon: "/icons/new-icon-udreamms.png",
-    apple: "/icons/new-icon-udreamms.png",
-  }
-};
+export const metadata: Metadata = rootMetadata;
 
 export default function RootLayout({
   children,

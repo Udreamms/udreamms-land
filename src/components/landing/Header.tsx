@@ -63,7 +63,7 @@ const menuData: MenuItemData[] = [
       actionText: "Unirme ahora",
       actionHref: "/contact",
       items: [
-        { title: "Udreamms App", desc: "Todo en tu bolsillo", href: "/app", icon: LayoutGrid, colorClass: "text-pink-400 bg-pink-500/10" },
+        { title: "Udreamms App", desc: "Todo en tu bolsillo", href: "/portal", icon: LayoutGrid, colorClass: "text-pink-400 bg-pink-500/10" },
         { title: "Referidos", desc: "Gana $50 por amigo", href: "/referrals", icon: Gift, colorClass: "text-emerald-400 bg-emerald-500/10" },
         { title: "Instituciones Educativas", desc: "Alianzas estratégicas", href: "/partnerships", icon: Building2, colorClass: "text-indigo-400 bg-indigo-500/10" },
         { title: "Embajadores", desc: "Representa a Udreamms", href: "/contact", icon: Users, colorClass: "text-amber-400 bg-amber-500/10" },
@@ -173,7 +173,7 @@ export default function Header() {
           <div className="hidden lg:flex items-center gap-4 z-50">
             {/* Solo mostrar Staff si NO es landing de visa, o podrías dejarlo oculto si quieres algo más limpio */}
             {!isVisaLandingPage && (
-              <Link href="/login" className="text-[10px] font-medium text-gray-400 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1.5 opacity-80 hover:opacity-100">
+              <Link href="/portal" className="text-[10px] font-medium text-gray-400 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1.5 opacity-80 hover:opacity-100">
                 <Lock className="w-3 h-3" /> Staff
               </Link>
             )}

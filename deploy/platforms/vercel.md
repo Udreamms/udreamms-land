@@ -70,7 +70,8 @@ Añadir dominio custom en Vercel y en Firebase Auth → Authorized domains.
 
 - Imágenes remotas permitidas (Unsplash, placeholders).
 - Header `Cross-Origin-Opener-Policy` para popups (pagos / OAuth).
-- Redirects legacy `/cso/*` → `/suite/*` (rutas suite no implementadas — revisar antes de marketing).
+- Redirects SEO: `www` → apex, legacy `/cso/*` y `/suite/*` → `/`, aliases en español, `/login` → `/portal`.
+- Sitemap y robots: `src/app/sitemap.ts`, `src/app/robots.ts` (ver [deploy/SEO_LAUNCH.md](../SEO_LAUNCH.md)).
 
 ## Verificación post-deploy
 

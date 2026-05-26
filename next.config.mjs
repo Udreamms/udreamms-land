@@ -3,14 +3,12 @@
 const nextConfig = {
   images: {
     remotePatterns: [
-      // From next.config.mjs
       {
         protocol: 'https',
         hostname: 'source.unsplash.com',
         port: '',
         pathname: '/random/**',
       },
-      // From next.config.ts
       {
         protocol: 'https',
         hostname: 'placehold.co',
@@ -46,17 +44,32 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      // Legacy Redirects
-      { source: '/cso', destination: '/suite', permanent: true },
-      { source: '/cso/whatsapp', destination: '/suite/coo/whatsapp', permanent: true },
-      { source: '/cso/contacts', destination: '/suite/cmo/crm', permanent: true },
-      { source: '/cso/campaigns', destination: '/suite/cmo/campaigns', permanent: true },
-      { source: '/cso/automation', destination: '/suite/cto/automation', permanent: true },
-      { source: '/cso/voice-center', destination: '/suite/cto/voice-center', permanent: true },
-      { source: '/cso/web-builder', destination: '/suite/cto/web-builder', permanent: true },
-      { source: '/cso/meet-agents', destination: '/suite/cto/meet-agents', permanent: true },
-      { source: '/cso/orchestrator', destination: '/suite/cto/orchestrator', permanent: true },
-      { source: '/cso/conexion', destination: '/suite/cto/integrations', permanent: true },
+      // Canonical host: www → apex
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.udreamms.com' }],
+        destination: 'https://udreamms.com/:path*',
+        permanent: true,
+      },
+      // Legacy static files (Hostinger / Apache)
+      { source: '/index.html', destination: '/', permanent: true },
+      { source: '/index.php', destination: '/', permanent: true },
+      // Spanish URL aliases
+      { source: '/contacto', destination: '/contact', permanent: true },
+      { source: '/servicios', destination: '/services', permanent: true },
+      { source: '/destino', destination: '/destinos', permanent: true },
+      { source: '/preguntas-frecuentes', destination: '/faqs', permanent: true },
+      { source: '/privacidad.html', destination: '/privacidad', permanent: true },
+      { source: '/terminos.html', destination: '/terminos', permanent: true },
+      // Legacy CSO product (suite routes are not deployed)
+      { source: '/cso', destination: '/', permanent: true },
+      { source: '/cso/:path*', destination: '/', permanent: true },
+      { source: '/suite', destination: '/', permanent: true },
+      { source: '/suite/:path*', destination: '/', permanent: true },
+      // Old bookmarks / broken internal links
+      { source: '/login', destination: '/portal', permanent: true },
+      { source: '/app', destination: '/portal', permanent: true },
+      { source: '/mentorship', destination: '/contact', permanent: true },
     ];
   },
 };
