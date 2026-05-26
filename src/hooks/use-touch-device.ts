@@ -2,16 +2,32 @@
 
 import { useEffect, useState } from "react";
 
-/** Detecta móvil / tablet táctil (sin hover fino). */
+/**
+ * iPhone, Android y iPad en modo táctil (hover fino ausente o puntero grueso).
+ * iPad con teclado/ratón puede comportarse como escritorio (hover) — correcto.
+ */
 export function useTouchDevice() {
   const [isTouch, setIsTouch] = useState(false);
 
   useEffect(() => {
-    const media = window.matchMedia("(hover: none) and (pointer: coarse)");
-    const update = () => setIsTouch(media.matches);
+    const coarsePointer = window.matchMedia("(hover: none) and (pointer: coarse)");
+    const touchOnly = window.matchMedia("(hover: none)");
+
+    const update = () => {
+      const hasTouchScreen = navigator.maxTouchPoints > 0;
+      setIsTouch(
+        coarsePointer.matches ||
+          (touchOnly.matches && hasTouchScreen)
+      );
+    };
+
     update();
-    media.addEventListener("change", update);
-    return () => media.removeEventListener("change", update);
+    coarsePointer.addEventListener("change", update);
+    touchOnly.addEventListener("change", update);
+    return () => {
+      coarsePointer.removeEventListener("change", update);
+      touchOnly.removeEventListener("change", update);
+    };
   }, []);
 
   return isTouch;

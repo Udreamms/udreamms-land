@@ -43,12 +43,17 @@ export default function StudentShowcase() {
                         
                         <video
                             ref={videoRef}
-                            src="https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2FVideo%20completo.mov?alt=media&token=f11b4b46-3521-45e7-bbd0-46c18a10bcb8"
-                            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 z-20 opacity-100`}
+                            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 z-20 opacity-100"
                             muted={isMuted}
                             loop
                             playsInline
-                        />
+                            preload="metadata"
+                        >
+                            <source
+                                src="https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/chatbot_media%2FVideo%20completo.mov?alt=media&token=f11b4b46-3521-45e7-bbd0-46c18a10bcb8"
+                                type="video/quicktime"
+                            />
+                        </video>
                         
                         <button
                             type="button"

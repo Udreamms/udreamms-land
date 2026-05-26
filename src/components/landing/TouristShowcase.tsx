@@ -2,11 +2,10 @@
 
 import { useRef } from "react";
 import { Button } from '@/components/ui/button';
-import { useInView } from "framer-motion";
+import InlineYouTubeFeature from "@/components/landing/InlineYouTubeFeature";
 
 export default function TouristShowcase() {
     const ref = useRef(null);
-    const isInView = useInView(ref, { margin: "-20% 0px -20% 0px" });
 
     return (
         <section className="py-12 md:py-16 lg:py-20 bg-white text-black overflow-hidden font-sans">
@@ -26,21 +25,13 @@ export default function TouristShowcase() {
                     </div>
 
                     {/* Right Column: Video/Media */}
-                    <div ref={ref} className="w-full lg:w-2/3 relative h-[280px] sm:h-[350px] lg:h-[650px] bg-[#0a0a0a] rounded-3xl overflow-hidden flex items-center justify-center shadow-2xl">
-                        {isInView ? (
-                            <iframe
-                                src="https://www.youtube.com/embed/ksaKUwErSGw?autoplay=1&mute=1&loop=1&playlist=ksaKUwErSGw"
-                                className="w-full h-full border-0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                            />
-                        ) : (
-                            <img 
-                                src="/assets/generated/tourist_showcase_disney.png" 
-                                alt="Visa Turismo" 
-                                className="absolute inset-0 w-full h-full object-cover opacity-40 transition-all duration-700" 
-                            />
-                        )}
+                    <div ref={ref} className="w-full lg:w-2/3 relative h-[280px] sm:h-[350px] lg:h-[650px] rounded-3xl overflow-hidden shadow-2xl">
+                        <InlineYouTubeFeature
+                            videoId="ksaKUwErSGw"
+                            posterSrc="/assets/generated/tourist_showcase_disney.png"
+                            posterAlt="Visa Turismo"
+                            className="rounded-3xl"
+                        />
                     </div>
 
                 </div>

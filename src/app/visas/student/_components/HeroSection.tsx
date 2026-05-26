@@ -38,11 +38,12 @@ export default function HeroSection() {
             <div className="absolute inset-0 w-full h-full">
                 {videoSrc && (
                     <video
-                        key={videoSrc} // Force re-render on source change if needed
+                        key={videoSrc}
                         autoPlay
                         loop
                         muted
                         playsInline
+                        preload="metadata"
                         className="w-full h-full object-cover"
                     >
                         <source src={videoSrc} type="video/mp4" />

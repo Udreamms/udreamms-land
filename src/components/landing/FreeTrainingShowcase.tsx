@@ -2,12 +2,10 @@
 
 import { useRef } from "react";
 import { Button } from '@/components/ui/button';
-import Link from "next/link";
-import { useInView } from "framer-motion";
+import InlineYouTubeFeature from "@/components/landing/InlineYouTubeFeature";
 
 export default function FreeTrainingShowcase() {
     const ref = useRef(null);
-    const isInView = useInView(ref, { margin: "-20% 0px -20% 0px" });
 
     return (
         <section className="py-12 md:py-16 lg:py-20 bg-white text-black overflow-hidden font-sans">
@@ -34,19 +32,12 @@ export default function FreeTrainingShowcase() {
                     </div>
 
                     {/* Right Column: Video/Media */}
-                    <div ref={ref} className="w-full lg:w-2/3 relative h-[280px] sm:h-[350px] lg:h-[650px] bg-[#0a0a0a] rounded-3xl overflow-hidden flex items-center justify-center shadow-2xl">
-                        {isInView ? (
-                            <iframe
-                                src="https://www.youtube.com/embed/wIh31q-3dPM?autoplay=1&mute=1&loop=1&playlist=wIh31q-3dPM"
-                                className="w-full h-full border-0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                            />
-                        ) : (
-                            <div className="absolute inset-0 bg-gray-950 flex items-center justify-center">
-                                <div className="text-white text-sm opacity-45 font-medium tracking-wide">Cargando material premium...</div>
-                            </div>
-                        )}
+                    <div ref={ref} className="w-full lg:w-2/3 relative h-[280px] sm:h-[350px] lg:h-[650px] rounded-3xl overflow-hidden shadow-2xl">
+                        <InlineYouTubeFeature
+                            videoId="wIh31q-3dPM"
+                            posterAlt="Capacitación gratuita"
+                            className="rounded-3xl"
+                        />
                     </div>
 
                 </div>

@@ -99,8 +99,10 @@ export default function HeroSection() {
                     className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ${
                         activeVideo === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'
                     }`}
+                    autoPlay
                     muted
                     playsInline
+                    preload="metadata"
                     onTimeUpdate={() => handleTimeUpdate(0)}
                     onEnded={() => handleEnded(0)}
                     src={videoLinks[index0]}
@@ -111,8 +113,10 @@ export default function HeroSection() {
                     className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ${
                         activeVideo === 1 ? 'opacity-100 z-10' : 'opacity-0 z-0'
                     }`}
+                    autoPlay
                     muted
                     playsInline
+                    preload="metadata"
                     onTimeUpdate={() => handleTimeUpdate(1)}
                     onEnded={() => handleEnded(1)}
                     src={videoLinks[index1]}
