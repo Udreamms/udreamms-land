@@ -1,12 +1,17 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useCallback, useMemo, useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
+import CryptoCheckoutPanel from "@/components/payments/CryptoCheckoutPanel";
+import {
+  normalizeStudentPlanParam,
+  type StudentVisaPlanId,
+} from "@/components/payments/visa-plan-types";
 import {
   CheckCircle2, CreditCard, Wallet, Plane, Star, Trophy,
-  ArrowRight, ShieldCheck, MessageCircle, Mail,
+  ArrowRight, ArrowDown, ShieldCheck, MessageCircle, Mail,
   Smartphone, Monitor, Lock, Zap, GraduationCap
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,7 +22,7 @@ import {
   StepItem,
 } from "@/components/payments/instructions-payment-ui";
 
-type PlanId = 'esencial' | 'pro' | 'elite' | 'allinclusive';
+type PlanId = StudentVisaPlanId;
 type PaymentMethod = 'crypto' | 'card' | null;
 
 const planDetails: Record<PlanId, {
@@ -34,21 +39,28 @@ const planDetails: Record<PlanId, {
     normal: "$1,700", crypto: "$850",
     title: "Plan Pro", subtitle: "Visa con acompañamiento",
     icon: Star,
-    stripeLink: "https://buy.stripe.com/00wdR93Ojafgdy2ci7enS0y"
+    stripeLink: "https://buy.stripe.com/cNicN5ckPevw65AdmbenS0A"
   },
   elite: {
     normal: "$3,250", crypto: "$2,500",
     title: "Plan Elite", subtitle: "Gestión completa premium",
     icon: Trophy,
-    stripeLink: "https://buy.stripe.com/bJe3cvfx1cnoeC6fujenS0z"
+    stripeLink: "https://buy.stripe.com/cNidR91GbevweC65TJenS0B"
   },
   allinclusive: {
     normal: "$13,000", crypto: "$10,000",
     title: "Plan All-Inclusive", subtitle: "Experiencia total garantizada",
     icon: GraduationCap,
-    stripeLink: "https://buy.stripe.com/bJe3cvfx1cnoeC6fujenS0z"
+    stripeLink: "https://buy.stripe.com/fZu7sL1Gb8782To4PFenS0C"
   }
 };
+
+function createCheckoutSessionId() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return `session_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+}
 
 const fadeInUp: any = {
   hidden: { opacity: 0, y: 24 },
@@ -63,12 +75,16 @@ function InstructionsContent() {
   const searchParams = useSearchParams();
   const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(null);
+  const [cryptoCheckoutExpanded, setCryptoCheckoutExpanded] = useState(false);
+  const [checkoutSessionId, setCheckoutSessionId] = useState<string | null>(null);
+  const [paymentApproved, setPaymentApproved] = useState(false);
+  const [approvedOrder, setApprovedOrder] = useState<{ requestId: string; email: string } | null>(null);
 
   const planParam = searchParams.get("plan") || "";
 
   useEffect(() => {
-    const planVal = planParam.toLowerCase().replace("-", "") as PlanId;
-    if (planVal && planDetails[planVal]) {
+    const planVal = normalizeStudentPlanParam(planParam);
+    if (planVal) {
       setSelectedPlan(planVal);
     }
   }, [planParam]);
@@ -76,7 +92,30 @@ function InstructionsContent() {
   const handlePlanSelect = (plan: PlanId) => {
     setSelectedPlan(plan);
     setPaymentMethod(null);
+    setCryptoCheckoutExpanded(false);
+    setCheckoutSessionId(null);
+    setPaymentApproved(false);
+    setApprovedOrder(null);
   };
+
+  const toggleCryptoCheckout = useCallback(() => {
+    if (!selectedPlan) return;
+    setCryptoCheckoutExpanded((open) => {
+      const willOpen = !open;
+      if (willOpen && !checkoutSessionId) {
+        setCheckoutSessionId(createCheckoutSessionId());
+      }
+      return willOpen;
+    });
+  }, [selectedPlan, checkoutSessionId]);
+
+  const handleCryptoPaymentSuccess = useCallback((details: { requestId: string; email: string }) => {
+    setCryptoCheckoutExpanded(false);
+    setPaymentApproved(true);
+    setApprovedOrder(details);
+  }, []);
+
+  const checkoutPlanId = useMemo(() => selectedPlan, [selectedPlan]);
 
   return (
     <div className={s.root}>
@@ -112,6 +151,8 @@ function InstructionsContent() {
               {(Object.entries(planDetails) as [PlanId, typeof planDetails[PlanId]][]).map(([id, plan]) => {
                 const isSelected = selectedPlan === id;
                 const Icon = plan.icon;
+                const cardClass = `${s.planCard} h-full flex flex-col ${isSelected ? s.planCardSelected : s.planCardDefault}`;
+
                 return (
                   <motion.button
                     key={id}
@@ -119,7 +160,7 @@ function InstructionsContent() {
                     whileHover={{ y: -4 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handlePlanSelect(id)}
-                    className={`${s.planCard} h-full flex flex-col ${isSelected ? s.planCardSelected : s.planCardDefault}`}
+                    className={cardClass}
                   >
                     <Icon className={`${s.icon} mb-3`} strokeWidth={1.5} />
                     <h3 className="text-base font-medium mb-1 text-white leading-tight">{plan.title}</h3>
@@ -155,7 +196,7 @@ function InstructionsContent() {
                   <motion.button
                     whileHover={{ y: -4 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => setPaymentMethod('crypto')}
+                    onClick={() => { setPaymentMethod('crypto'); setPaymentApproved(false); setApprovedOrder(null); }}
                     className={`${s.paymentCard} ${paymentMethod === 'crypto' ? s.paymentCardSelected : s.paymentCardDefault}`}
                   >
                     <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-1.5">
@@ -175,7 +216,7 @@ function InstructionsContent() {
                   <motion.button
                     whileHover={{ y: -4 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => setPaymentMethod('card')}
+                    onClick={() => { setPaymentMethod('card'); setPaymentApproved(false); setApprovedOrder(null); }}
                     className={`${s.paymentCard} ${paymentMethod === 'card' ? s.paymentCardSelected : s.paymentCardDefault}`}
                   >
                     <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-1.5">
@@ -195,9 +236,50 @@ function InstructionsContent() {
             )}
           </AnimatePresence>
 
+          {/* ── Payment Approved ── */}
+          <AnimatePresence mode="wait">
+            {paymentApproved && selectedPlan && approvedOrder && (
+              <motion.div
+                key="payment-success"
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.5 }}
+                className="mb-20"
+              >
+                <div className="ring-1 ring-white/10 rounded-[2rem] bg-black p-8 md:p-12 text-center">
+                  <CheckCircle2 className="w-10 h-10 text-slate-300 mx-auto mb-4" strokeWidth={1.5} />
+                  <h2 className="text-2xl md:text-3xl font-medium text-white mb-3 tracking-tight">
+                    ¡Pago aprobado!
+                  </h2>
+                  <p className="text-sm text-slate-400 max-w-xl mx-auto mb-6 font-normal">
+                    Tu transacción en Solana fue confirmada. Hemos registrado tu solicitud para el {planDetails[selectedPlan].title}.
+                  </p>
+                  <div className="text-left max-w-md mx-auto mb-6 border-t border-white/5 pt-6">
+                    <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-2">Número de orden</p>
+                    <p className="text-sm font-mono text-slate-300 break-all">{approvedOrder.requestId}</p>
+                    {approvedOrder.email && (
+                      <p className="text-sm text-slate-500 mt-2">Comprobante enviado a: <span className="text-slate-300">{approvedOrder.email}</span></p>
+                    )}
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center text-slate-400 text-sm font-normal">
+                    <div className="flex items-center gap-2">
+                      <Mail className={s.iconSm} strokeWidth={1.5} />
+                      Revisa tu correo para el comprobante oficial de Udreamms.
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MessageCircle className={s.iconSm} strokeWidth={1.5} />
+                      Un asesor VIP te contactará en menos de 24 horas.
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* ── Step 3: Instructions ── */}
           <AnimatePresence mode="wait">
-            {paymentMethod && selectedPlan && (
+            {paymentMethod && selectedPlan && !paymentApproved && (
               <motion.div
                 key="instructions-step"
                 initial={{ opacity: 0, y: 24 }}
@@ -232,6 +314,37 @@ function InstructionsContent() {
                         <InstructionGroup icon={Monitor} title="2. En esta Página">
                           <StepItem number="3" title="Genera tu Código QR"
                             description={<>Haz clic en el botón de abajo <strong className="text-white">"Proceder al Pago Seguramente"</strong>. Llena tus datos, elige la moneda y se generará un código QR.</>} />
+                          <div className="mt-8 flex flex-col items-center gap-4">
+                            <button
+                              type="button"
+                              onClick={toggleCryptoCheckout}
+                              className={s.ctaPrimary}
+                            >
+                              {cryptoCheckoutExpanded ? 'Ocultar checkout' : 'Proceder al Pago Seguramente'}
+                              {cryptoCheckoutExpanded
+                                ? <ArrowDown className="w-5 h-5 rotate-180" />
+                                : <ArrowRight className="w-5 h-5" />}
+                            </button>
+                            <AnimatePresence>
+                              {cryptoCheckoutExpanded && checkoutPlanId && checkoutSessionId ? (
+                                <motion.div
+                                  key="inline-crypto-checkout"
+                                  initial={{ opacity: 0, height: 0 }}
+                                  animate={{ opacity: 1, height: 'auto' }}
+                                  exit={{ opacity: 0, height: 0 }}
+                                  transition={{ duration: 0.35, ease: 'easeInOut' }}
+                                  className="w-full overflow-hidden"
+                                >
+                                  <CryptoCheckoutPanel
+                                    planId={checkoutPlanId}
+                                    sessionId={checkoutSessionId}
+                                    onSuccess={handleCryptoPaymentSuccess}
+                                    className="w-full"
+                                  />
+                                </motion.div>
+                              ) : null}
+                            </AnimatePresence>
+                          </div>
                         </InstructionGroup>
 
                         <InstructionGroup icon={Smartphone} title="3. De vuelta en tu Celular">
@@ -271,16 +384,16 @@ function InstructionsContent() {
 
                     <div className="mt-12 pt-8 border-t border-white/5 flex justify-center">
                       {paymentMethod === 'card' && selectedPlan ? (
-                        <a href={planDetails[selectedPlan].stripeLink} target="_blank" rel="noreferrer" className={s.ctaPrimary}>
+                        <a href={planDetails[selectedPlan].stripeLink!} target="_blank" rel="noreferrer" className={s.ctaPrimary}>
                           <Lock className={s.icon} strokeWidth={1.5} />
                           Proceder al Pago Seguramente
                           <ArrowRight className={s.icon} strokeWidth={1.5} />
                         </a>
                       ) : (
-                        <button type="button" className={s.ctaPrimary}>
+                        <button type="button" onClick={toggleCryptoCheckout} className={s.ctaPrimary}>
                           <Wallet className={s.icon} strokeWidth={1.5} />
-                          Generar Código QR
-                          <ArrowRight className={s.icon} strokeWidth={1.5} />
+                          {cryptoCheckoutExpanded ? 'Ocultar checkout' : 'Generar Código QR'}
+                          <ArrowRight className={`${s.icon} transition-transform ${cryptoCheckoutExpanded ? 'rotate-90' : ''}`} strokeWidth={1.5} />
                         </button>
                       )}
                     </div>

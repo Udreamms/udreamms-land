@@ -31,7 +31,12 @@ const COUNTRIES = [
 ];
 
 const inputClass =
-  'bg-white border-slate-200 h-9 text-sm text-slate-900 placeholder:text-slate-400 rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500/30 focus-visible:border-blue-400';
+  'bg-white/5 border-white/10 h-9 text-sm text-white placeholder:text-slate-500 rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500/30 focus-visible:border-blue-500/50';
+
+const selectClass =
+  'bg-transparent text-sm text-white focus:outline-none appearance-none cursor-pointer [color-scheme:dark]';
+
+const optionClass = 'bg-[#111] text-white';
 
 export default function BillingForm({
   initialEmail = '',
@@ -71,7 +76,7 @@ export default function BillingForm({
   return (
     <div className="space-y-4">
       <div>
-        <Label htmlFor="fullName" className="text-xs font-semibold text-slate-700 mb-1.5 block">
+        <Label htmlFor="fullName" className="text-xs font-semibold text-slate-300 mb-1.5 block">
           Nombre completo
         </Label>
         <Input
@@ -84,7 +89,7 @@ export default function BillingForm({
       </div>
 
       <div>
-        <Label htmlFor="email" className="text-xs font-semibold text-slate-700 mb-1.5 block">
+        <Label htmlFor="email" className="text-xs font-semibold text-slate-300 mb-1.5 block">
           Correo electrónico
         </Label>
         <Input
@@ -98,25 +103,25 @@ export default function BillingForm({
       </div>
 
       <div>
-        <Label htmlFor="phone" className="text-xs font-semibold text-slate-700 mb-1.5 block">
+        <Label htmlFor="phone" className="text-xs font-semibold text-slate-300 mb-1.5 block">
           Teléfono
         </Label>
-        <div className="flex bg-white border border-slate-200 rounded-lg focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:border-blue-400 overflow-hidden h-9">
+        <div className="flex bg-white/5 border border-white/10 rounded-lg focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:border-blue-500/50 overflow-hidden h-9">
           <select
             value={data.phonePrefix}
             onChange={(e) => handleChange('phonePrefix', e.target.value)}
-            className="bg-slate-50 border-r border-slate-200 text-xs text-slate-700 px-2 focus:outline-none appearance-none cursor-pointer"
+            className={`${selectClass} border-r border-white/10 text-xs text-white/80 px-2 shrink-0`}
           >
-            <option value="+1">🇺🇸 +1</option>
-            <option value="+34">🇪🇸 +34</option>
-            <option value="+52">🇲🇽 +52</option>
-            <option value="+54">🇦🇷 +54</option>
-            <option value="+57">🇨🇴 +57</option>
-            <option value="+51">🇵🇪 +51</option>
-            <option value="+56">🇨🇱 +56</option>
-            <option value="+58">🇻🇪 +58</option>
-            <option value="+593">🇪🇨 +593</option>
-            <option value="+507">🇵🇦 +507</option>
+            <option value="+1" className={optionClass}>🇺🇸 +1</option>
+            <option value="+34" className={optionClass}>🇪🇸 +34</option>
+            <option value="+52" className={optionClass}>🇲🇽 +52</option>
+            <option value="+54" className={optionClass}>🇦🇷 +54</option>
+            <option value="+57" className={optionClass}>🇨🇴 +57</option>
+            <option value="+51" className={optionClass}>🇵🇪 +51</option>
+            <option value="+56" className={optionClass}>🇨🇱 +56</option>
+            <option value="+58" className={optionClass}>🇻🇪 +58</option>
+            <option value="+593" className={optionClass}>🇪🇨 +593</option>
+            <option value="+507" className={optionClass}>🇵🇦 +507</option>
           </select>
           <Input
             id="phone"
@@ -124,24 +129,26 @@ export default function BillingForm({
             placeholder="555 123 4567"
             value={data.phone}
             onChange={(e) => handleChange('phone', e.target.value)}
-            className="flex-1 border-none bg-transparent h-9 text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 rounded-none shadow-none px-3"
+            className="flex-1 border-none bg-transparent h-9 text-sm text-white placeholder:text-slate-500 focus-visible:ring-0 rounded-none shadow-none px-3"
           />
         </div>
       </div>
 
       <div>
-        <Label className="text-xs font-semibold text-slate-700 mb-1.5 block">
+        <Label className="text-xs font-semibold text-slate-300 mb-1.5 block">
           Dirección de facturación
         </Label>
-        <div className="flex flex-col border border-slate-200 rounded-lg overflow-hidden bg-white focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:border-blue-400 transition-all">
+        <div className="flex flex-col border border-white/10 rounded-lg overflow-hidden bg-white/5 focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:border-blue-500/50 transition-all">
           <select
             value={data.country}
             onChange={(e) => handleChange('country', e.target.value)}
-            className="w-full h-9 bg-slate-50 px-3 text-sm text-slate-900 focus:outline-none border-b border-slate-200 appearance-none cursor-pointer"
+            className={`w-full h-9 px-3 border-b border-white/10 ${selectClass}`}
           >
-            <option value="" disabled>Selecciona país</option>
+            <option value="" disabled className={optionClass}>
+              Selecciona país
+            </option>
             {COUNTRIES.map((country) => (
-              <option key={country} value={country}>
+              <option key={country} value={country} className={optionClass}>
                 {country}
               </option>
             ))}
@@ -152,7 +159,7 @@ export default function BillingForm({
             placeholder="Dirección línea 1"
             value={data.addressLine1}
             onChange={(e) => handleChange('addressLine1', e.target.value)}
-            className="w-full h-9 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 border-b border-slate-200 focus:outline-none"
+            className="w-full h-9 bg-transparent px-3 text-sm text-white placeholder:text-slate-500 border-b border-white/10 focus:outline-none"
           />
 
           <input
@@ -160,23 +167,23 @@ export default function BillingForm({
             placeholder="Dirección línea 2 (opcional)"
             value={data.addressLine2}
             onChange={(e) => handleChange('addressLine2', e.target.value)}
-            className="w-full h-9 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 border-b border-slate-200 focus:outline-none"
+            className="w-full h-9 bg-transparent px-3 text-sm text-white placeholder:text-slate-500 border-b border-white/10 focus:outline-none"
           />
 
-          <div className="flex border-b border-slate-200">
+          <div className="flex border-b border-white/10">
             <input
               type="text"
               placeholder="Ciudad"
               value={data.city}
               onChange={(e) => handleChange('city', e.target.value)}
-              className="w-1/2 h-9 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 border-r border-slate-200 focus:outline-none"
+              className="w-1/2 h-9 bg-transparent px-3 text-sm text-white placeholder:text-slate-500 border-r border-white/10 focus:outline-none"
             />
             <input
               type="text"
               placeholder="Código postal"
               value={data.zipCode}
               onChange={(e) => handleChange('zipCode', e.target.value)}
-              className="w-1/2 h-9 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
+              className="w-1/2 h-9 bg-transparent px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none"
             />
           </div>
 
@@ -185,7 +192,7 @@ export default function BillingForm({
             placeholder="Estado / Provincia"
             value={data.state}
             onChange={(e) => handleChange('state', e.target.value)}
-            className="w-full h-9 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
+            className="w-full h-9 bg-transparent px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none"
           />
         </div>
       </div>

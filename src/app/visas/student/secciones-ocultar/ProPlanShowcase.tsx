@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
     CheckCircle2,
     School,
@@ -11,7 +12,6 @@ import {
     Car,
     CreditCard
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 const features = [
     {
@@ -80,7 +80,7 @@ export default function ProPlanShowcase() {
                     <Link href="/instructions-payment-student?plan=pro">
                         <Button
                             size="lg"
-                            className="rounded-full px-10 py-7 bg-black hover:bg-black/90 text-white font-medium text-lg shadow-xl shadow-gray-200 transition-all"
+                            className="rounded-full px-10 py-4 bg-black hover:bg-black/90 text-white font-medium text-base shadow-xl shadow-gray-200 transition-all"
                         >
                             Elegir Plan Pro
                         </Button>

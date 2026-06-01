@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
     Plane,
     Home,
@@ -16,7 +17,6 @@ import {
     Users,
     Languages
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 const features = [
     {
@@ -112,10 +112,10 @@ export default function AllInclusivePlanShowcase() {
                             La solución definitiva donde nosotros nos encargamos de absolutamente todo, desde tu boleto de avión hasta tu hogar en USA.
                         </p>
                     </div>
-                    <Link href="/instructions-payment-student?plan=all-inclusive">
+                    <Link href="/instructions-payment-student?plan=allinclusive">
                         <Button
                             size="lg"
-                            className="rounded-full px-10 py-7 bg-black hover:bg-black/90 text-white font-medium text-lg shadow-xl shadow-gray-200 transition-all"
+                            className="rounded-full px-10 py-4 bg-black hover:bg-black/90 text-white font-medium text-base shadow-xl shadow-gray-200 transition-all"
                         >
                             Elegir All-Inclusive
                         </Button>

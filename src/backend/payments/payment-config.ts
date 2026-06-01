@@ -8,7 +8,7 @@ export interface CryptoPaymentConfig {
 }
 
 export const TREASURY_WALLET =
-  process.env.NEXT_PUBLIC_TREASURY_WALLET || 'Ao8RqGikw3joMDo25nb3s3c7WcP6ouazJJnA1twirDAT';
+  process.env.NEXT_PUBLIC_TREASURY_WALLET || 'E5eZJPT2un3X2RZZK4yXvkiGKbkkRtGH1GwWsUBSxLD3';
 
 export const SOLANA_RPC_URL =
   process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
@@ -19,6 +19,20 @@ export const VISA_PLAN_CATALOG_USD: Record<string, number> = {
   basico: 380,
   premium: 3500,
   vip: 4990,
+  esencial: 380,
+  pro: 850,
+  elite: 2500,
+  allinclusive: 10000,
+};
+
+export const PLAN_DISPLAY_TITLES: Record<string, string> = {
+  basico: 'Plan Básico',
+  premium: 'Plan Premium',
+  vip: 'Experiencia VIP',
+  esencial: 'Plan Esencial',
+  pro: 'Plan Pro',
+  elite: 'Plan Elite',
+  allinclusive: 'Plan All-Inclusive',
 };
 
 export const SOLANA_PAYMENT_CONFIG: Record<CryptoPaymentMethod, CryptoPaymentConfig> = {

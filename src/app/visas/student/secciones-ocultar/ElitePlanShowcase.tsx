@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
     CheckCircle2,
     School,
@@ -14,7 +15,6 @@ import {
     Users,
     Languages
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 const features = [
     {
@@ -159,7 +159,7 @@ export default function ElitePlanShowcase() {
                     <Link href="/instructions-payment-student?plan=elite">
                         <Button
                             size="lg"
-                            className="rounded-full px-10 py-8 bg-black hover:bg-black/90 text-white font-medium text-xl shadow-2xl transition-all hover:-translate-y-1 active:scale-95 shrink-0"
+                            className="rounded-full px-10 py-4 bg-black hover:bg-black/90 text-white font-medium text-base shadow-xl shadow-gray-200 transition-all shrink-0"
                         >
                             Elegir Plan Elite
                         </Button>

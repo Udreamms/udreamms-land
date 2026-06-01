@@ -7,6 +7,7 @@ import {
   getVisaCryptoPaymentRequestsCollectionPath,
 } from '@/backend/payments/firestore-schema';
 import {
+  PLAN_DISPLAY_TITLES,
   QR_EXPIRATION_MINUTES,
   TREASURY_WALLET,
   VISA_PLAN_CATALOG_USD,
@@ -68,18 +69,12 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date(createdAt.getTime() + QR_EXPIRATION_MINUTES * 60 * 1000);
     const billingEmail = extractBillingEmail(billingData);
 
-    const planTitles: Record<string, string> = {
-      basico: 'Básico',
-      premium: 'Premium',
-      vip: 'VIP',
-    };
-
     const qrUrl = encodeSolanaPayUrl({
       recipient: TREASURY_WALLET,
       amount: String(expectedAmountUi),
       splToken: config.mint,
       reference,
-      label: `Udreamms Plan ${planTitles[planKey] || planKey}`,
+      label: `Udreamms ${PLAN_DISPLAY_TITLES[planKey] || planKey}`,
       message: 'Escanea con Phantom para completar tu pago',
       memo: `visa:${requestId}`,
     });
