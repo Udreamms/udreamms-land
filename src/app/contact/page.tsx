@@ -18,7 +18,7 @@ export default function ContactPage() {
               Contacta a un Asesor
             </h2>
             
-            <div className="text-lg text-white/90 max-w-3xl mx-auto space-y-12 text-center mt-10">
+            <div className="text-lg text-white/90 max-w-3xl mx-auto space-y-12 text-left mt-10">
               
               {/* Paso 1 */}
               <div className="space-y-3">
@@ -32,14 +32,16 @@ export default function ContactPage() {
               <div className="space-y-4">
                  <h3 className="text-lg font-semibold text-white">2. Envíanos tu Información</h3>
                  <p>
-                   Envía un correo a <a href="mailto:services@udreamms.com" className="font-semibold text-blue-400 hover:underline">services@udreamms.com</a> adjuntando ambos documentos e incluyendo la siguiente información:
+                   Envía un correo a <a href="mailto:services@udreamms.com?subject=Inicio%20de%20proceso%20-%20Env%C3%ADo%20de%20Documentos&body=Buenos%20d%C3%ADas%20equipo%20de%20Udreamms%2C%0A%0AAdjunto%20mi%20pasaporte%20y%20estado%20de%20cuenta%20para%20iniciar%20mi%20proceso%20con%20ustedes.%20A%20continuaci%C3%B3n%2C%20comparto%20mi%20informaci%C3%B3n%3A%0A%0A-%20Nombre%20y%20Apellido%3A%20%0A-%20Pa%C3%ADs%20donde%20vivo%20actualmente%3A%20%0A-%20Correo%20electr%C3%B3nico%20%28Email%29%3A%20%0A-%20Tel%C3%A9fono%20de%20contacto%3A%20%0A-%20Programa%20de%20inter%C3%A9s%3A%20%0A-%20Ciudad%20en%20la%20que%20deseo%20estudiar%3A%20%0A-%20Preguntas%20para%20su%20equipo%3A%20%0A%0AQuedo%20a%20la%20espera%20de%20sus%20comentarios%20con%20los%20siguientes%20pasos.%0A%C2%A1Saludos%20cordiales%21" className="font-semibold text-blue-400 hover:underline">services@udreamms.com</a> adjuntando ambos documentos e incluyendo la siguiente información:
                  </p>
-                 <div className="flex justify-center text-left">
-                   <ul className="list-disc list-inside space-y-2 inline-block">
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 mt-4 ml-4">
+                   <ul className="list-disc list-outside space-y-2">
                      <li>Nombre y Apellido</li>
                      <li>País donde vives actualmente</li>
                      <li>Correo electrónico (Email)</li>
                      <li>Teléfono de contacto</li>
+                   </ul>
+                   <ul className="list-disc list-outside space-y-2">
                      <li>Programa de interés</li>
                      <li>Ciudad en la que deseas estudiar</li>
                      <li>Preguntas para nuestro equipo</li>
@@ -53,12 +55,12 @@ export default function ContactPage() {
                  <p>
                    Una vez enviado el correo, contacta de manera directa con uno de nuestros asesores en vivo presionando el botón inferior. Indícale que ya enviaste tus documentos para recibir asistencia inmediata.
                  </p>
-                 <div className="flex justify-center pt-2">
+                 <div className="pt-2">
                    <a
                      href="https://wa.me/13854162224?text=Hola,%20ya%20envi%C3%A9%20mi%20pasaporte%20y%20estado%20de%20cuenta%20por%20correo.%20Me%20gustar%C3%ADa%20iniciar%20mi%20proceso."
                      target="_blank"
                      rel="noopener noreferrer"
-                     className="w-full max-w-2xl group relative inline-flex items-center justify-center px-8 py-3 gap-3 text-lg md:text-xl font-medium text-white overflow-hidden rounded-full bg-transparent border-2 border-white/40 hover:bg-purple-600 hover:border-purple-600 hover:scale-[1.02] transition-all duration-300 shadow-lg"
+                     className="w-full max-w-md group relative inline-flex items-center justify-center px-8 py-3 gap-3 text-lg font-medium text-white overflow-hidden rounded-full bg-transparent border-2 border-white/40 hover:bg-purple-600 hover:border-purple-600 hover:scale-[1.02] transition-all duration-300 shadow-lg"
                    >
                      Comunicarme con un asesor en Vivo
                      <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
