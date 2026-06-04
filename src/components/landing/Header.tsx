@@ -79,7 +79,7 @@ const menuData: MenuItemData[] = [
   },
   { label: "FAQs", href: "/#faqs" },
   { label: "¡Estoy listo para empezar!", href: "/contact" },
-  { label: "Luxor | $LXR", href: "https://www.byluxor.com/es" },
+  { label: "LUXOR", href: "/luxor" },
 ];
 
 export default function Header() {
