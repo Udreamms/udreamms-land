@@ -11,8 +11,8 @@ export default function ContactPage() {
       <section id="contact" className="py-20 bg-black">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-primary-glow rounded-full mb-6">
-              <Mail className="w-8 h-8 text-white" />
+            <div className="flex justify-center mb-6">
+              <Mail className="w-12 h-12 text-white" />
             </div>
             <h2 className="text-4xl lg:text-5xl font-medium tracking-tight text-white mb-6">
               Contacta a un Asesor
