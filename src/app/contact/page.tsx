@@ -80,9 +80,30 @@ export default function ContactPage() {
             <h2 className="text-4xl lg:text-5xl font-medium tracking-tight text-white mb-6">
               Contacta a un Asesor
             </h2>
-            <p className="text-xl text-white max-w-3xl mx-auto">
-              Completa el formulario y nuestro equipo se pondrá en contacto contigo
-            </p>
+            <div className="text-base md:text-lg text-white/90 max-w-3xl mx-auto space-y-4 text-left md:text-center mt-6">
+              <p>
+                Si ya cuentas con tu <strong>Pasaporte</strong> y <strong>Estado de Cuenta</strong>, y te gustaría empezar tu proceso, envíanos un correo a <a href="mailto:services@udreamms.com" className="font-semibold text-blue-400 hover:underline">services@udreamms.com</a> adjuntando ambos documentos escaneados (preferiblemente en formato PDF).
+              </p>
+              <div className="bg-white/5 border border-white/10 p-6 rounded-xl text-left mt-6 mb-6 w-full shadow-sm mx-auto">
+                <p className="mb-4 font-semibold text-white">Por favor, incluye la siguiente información en tu correo:</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-90 text-sm md:text-base ml-2">
+                  <ul className="list-disc list-inside space-y-2">
+                    <li>Nombre y Apellido</li>
+                    <li>País donde vives actualmente</li>
+                    <li>Correo electrónico (Email)</li>
+                    <li>Teléfono de contacto</li>
+                  </ul>
+                  <ul className="list-disc list-inside space-y-2">
+                    <li>Programa de interés</li>
+                    <li>Ciudad en la que deseas estudiar</li>
+                    <li>Preguntas para nuestro equipo</li>
+                  </ul>
+                </div>
+              </div>
+              <p className="mt-4">
+                Una vez enviado el correo, completa y envía el formulario de abajo para contactar de manera directa con uno de nuestros asesores. Al conectarte, indícale que ya has enviado tus documentos para iniciar tu proceso y recibirás asistencia inmediata con los pasos a seguir.
+              </p>
+            </div>
           </div>
 
           <div className="max-w-3xl mx-auto">
