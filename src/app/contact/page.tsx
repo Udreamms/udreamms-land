@@ -69,9 +69,9 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-black">
       <Header />
-      <section id="contact" className="py-20 bg-gradient-subtle">
+      <section id="contact" className="py-20 bg-black">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-primary-glow rounded-full mb-6">
@@ -86,7 +86,7 @@ export default function ContactPage() {
           </div>
 
           <div className="max-w-3xl mx-auto">
-            <Card className="group hover:shadow-card transition-all duration-300 border-0 shadow-soft">
+            <Card className="group hover:shadow-card transition-all duration-300 border border-white/10 shadow-soft bg-black">
               <CardContent className="p-8">
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -96,7 +96,7 @@ export default function ContactPage() {
                         name="nombre"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Nombre *</FormLabel>
+                            <FormLabel>Nombre</FormLabel>
                             <FormControl>
                               <Input placeholder="Tu nombre" {...field} />
                             </FormControl>
@@ -110,7 +110,7 @@ export default function ContactPage() {
                         name="apellido"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Apellido *</FormLabel>
+                            <FormLabel>Apellido</FormLabel>
                             <FormControl>
                               <Input placeholder="Tu apellido" {...field} />
                             </FormControl>
@@ -125,7 +125,7 @@ export default function ContactPage() {
                       name="pais"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>País donde vives actualmente *</FormLabel>
+                          <FormLabel>País donde vives actualmente</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger>
@@ -155,7 +155,7 @@ export default function ContactPage() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Email *</FormLabel>
+                            <FormLabel>Email</FormLabel>
                             <FormControl>
                               <Input type="email" placeholder="tu@email.com" {...field} />
                             </FormControl>
@@ -169,7 +169,7 @@ export default function ContactPage() {
                         name="telefono"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Teléfono *</FormLabel>
+                            <FormLabel>Teléfono</FormLabel>
                             <FormControl>
                               <Input placeholder="+1 234 567 8900" {...field} />
                             </FormControl>
@@ -184,7 +184,7 @@ export default function ContactPage() {
                       name="programa"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Programa *</FormLabel>
+                          <FormLabel>Programa</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger>
@@ -210,7 +210,7 @@ export default function ContactPage() {
                       name="ciudad"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Ciudad en la que quieres estudiar *</FormLabel>
+                          <FormLabel>Ciudad en la que quieres estudiar</FormLabel>
                           <FormControl>
                             <Input placeholder="Ej: Nueva York, Los Ángeles, Miami..." {...field} />
                           </FormControl>
