@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import Link from "next/link";
+import { sendMetaEvent } from "@/lib/meta-events";
 import { Button } from "@/components/ui/button";
 import InlineYouTubeFeature from "@/components/landing/InlineYouTubeFeature";
 
@@ -25,7 +26,7 @@ export default function MentorshipShowcase() {
                             Acelera tu integración y triunfa en Estados Unidos con el acompañamiento personalizado de mentores experimentados. Aprende sobre planificación financiera, inserción en el mercado laboral estadounidense, cultura de negocios y desarrollo de carrera directo de profesionales que ya recorrieron el camino y alcanzaron el éxito.<br /><br />
                             Diseñamos sesiones individuales y grupales 1 a 1 adaptadas a tus objetivos específicos para que evites errores comunes, ahorres miles de dólares y multipliques tus oportunidades desde el primer día.
                         </p>
-                        <Link href="/contact">
+                        <Link href="/contact" onClick={() => sendMetaEvent('Lead', { source: 'MentorshipShowcase: Quiero saber más' })}>
                            <Button className="mt-6 w-64 px-5 py-2.5 bg-transparent border border-black text-black rounded-full hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] transition-all flex justify-center items-center hover:scale-105 hover:shadow-lg text-sm">Quiero saber más</Button>
                         </Link>
                     </div>

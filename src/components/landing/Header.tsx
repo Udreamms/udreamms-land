@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { sendMetaEvent } from "@/lib/meta-events";
 
 // --- TIPOS DE DATOS ---
 type SubItem = {
@@ -184,7 +185,10 @@ export default function Header() {
             </Link>
 
             <Button
-              onClick={handleApplyClick}
+              onClick={() => {
+                sendMetaEvent('Lead', { source: 'Header Apply Button Desktop' });
+                handleApplyClick();
+              }}
               className="bg-transparent text-white border border-white/40 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] rounded-full h-8 px-5 font-medium text-xs transition-all duration-300 hover:scale-105 shadow-xl"
             >
               Aplica Ahora
@@ -195,7 +199,10 @@ export default function Header() {
           {!isVisaLandingPage && (
             <div className="lg:hidden flex items-center gap-2">
               <Button
-                onClick={handleApplyClick}
+                onClick={() => {
+                  sendMetaEvent('Lead', { source: 'Header Apply Button Mobile' });
+                  handleApplyClick();
+                }}
                 size="sm"
                 className="bg-transparent text-white border border-white/40 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] hover:scale-105 transition-all duration-300 rounded-full text-[11px] h-8 px-4"
               >
@@ -219,7 +226,10 @@ export default function Header() {
                 </Button>
               </Link>
               <Button
-                onClick={handleApplyClick}
+                onClick={() => {
+                  sendMetaEvent('Lead', { source: 'Header Apply Button Visa Landing Mobile' });
+                  handleApplyClick();
+                }}
                 size="sm"
                 className="bg-transparent text-white border border-white/40 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] hover:scale-105 transition-all duration-300 rounded-full text-[10px] h-7 px-3"
               >
@@ -302,6 +312,7 @@ export default function Header() {
                                   href={social.href}
                                   target="_blank"
                                   rel="noopener noreferrer"
+                                  onClick={() => social.label === 'WhatsApp' && sendMetaEvent('Lead', { source: 'Header MegaMenu WhatsApp' })}
                                   className="group flex items-center gap-3 transition-all duration-300 hover:translate-x-1"
                                 >
                                   <div className="relative w-8 h-8 shrink-0">
@@ -404,7 +415,10 @@ export default function Header() {
                     </Button>
                   </Link>
                   <Button
-                    onClick={handleApplyClick}
+                    onClick={() => {
+                      sendMetaEvent('Lead', { source: 'Header Apply Button Mobile Menu' });
+                      handleApplyClick();
+                    }}
                     className="w-full bg-transparent text-white border border-white/40 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] hover:scale-[1.02] transition-all duration-300 h-12 rounded-xl text-lg font-medium shadow-lg"
                   >
                     Aplica Ahora

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "./Animations";
+import { sendMetaEvent } from "@/lib/meta-events";
 
 const videoLinks = [
   "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/New%20version%2F1.mp4?alt=media&token=cc87cead-407d-4e4f-a643-6152d31eff1a",
@@ -177,6 +178,7 @@ export default function HeroSection() {
                             href="https://wa.me/13858882799?text=Hola%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n"
                             target="_blank"
                             rel="noopener noreferrer"
+                            onClick={() => sendMetaEvent('Lead', { source: 'Tourist Hero WhatsApp Button' })}
                             className="group relative inline-flex items-center justify-center px-8 py-3 gap-2 text-sm font-medium uppercase tracking-tight text-white overflow-hidden rounded-full bg-transparent border border-white/40 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] hover:scale-105 transition-all duration-300 shadow-lg pointer-events-auto"
                         >
                             Tengo preguntas antes de empezar

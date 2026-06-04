@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { Button } from '@/components/ui/button';
+import { sendMetaEvent } from "@/lib/meta-events";
 
 export default function FreeTrainingShowcase() {
     const ref = useRef(null);
@@ -27,7 +28,7 @@ export default function FreeTrainingShowcase() {
                             Accede de forma inmediata a nuestra biblioteca digital de recursos gratuitos de primer nivel. Descarga guías prácticas paso a paso, audiolibros esenciales sobre desarrollo personal y finanzas, y masterclasses completas en video para preparar tu camino hacia el éxito.<br /><br />
                             Una recopilación estratégica de herramientas premium diseñadas para que tomes decisiones inteligentes, minimices riesgos y comiences a estructurar tu futuro en Estados Unidos hoy mismo.
                         </p>
-                <Button className="mt-6 w-64 px-5 py-2.5 bg-transparent border border-black text-black rounded-full hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] transition-all flex justify-center items-center hover:scale-105 hover:shadow-lg text-sm">Quiero saber más</Button>
+                <Button onClick={() => sendMetaEvent('Lead', { source: 'FreeTrainingShowcase: Quiero saber más' })} className="mt-6 w-64 px-5 py-2.5 bg-transparent border border-black text-black rounded-full hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] transition-all flex justify-center items-center hover:scale-105 hover:shadow-lg text-sm">Quiero saber más</Button>
                     </div>
 
                     {/* Right Column: Video/Media */}

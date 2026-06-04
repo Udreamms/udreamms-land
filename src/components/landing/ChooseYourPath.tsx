@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { sendMetaEvent } from "@/lib/meta-events";
 import {
   Search,
   FileCheck,
@@ -118,7 +119,12 @@ export default function ChooseYourPath() {
 
 
                 <div className="flex flex-col items-center gap-3 mt-2 mb-5 md:mb-8 w-full">
-                  <Link href={path.href} className={`w-full py-2.5 md:py-3 rounded-full bg-transparent text-white font-normal text-base shadow-2xl hover:scale-[1.03] active:scale-95 transition-all duration-300 border border-white/40 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] text-center`} aria-label={`Ir a ${path.title}`}>
+                  <Link 
+                    href={path.href} 
+                    onClick={() => sendMetaEvent('Lead', { source: 'ChooseYourPath: ' + path.title })}
+                    className={`w-full py-2.5 md:py-3 rounded-full bg-transparent text-white font-normal text-base shadow-2xl hover:scale-[1.03] active:scale-95 transition-all duration-300 border border-white/40 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] text-center`} 
+                    aria-label={`Ir a ${path.title}`}
+                  >
                     {path.buttonText}
                   </Link>
                 </div>
