@@ -54,7 +54,6 @@ const menuData: MenuItemData[] = [
       ]
     }
   },
-  { label: "Testimonios", href: "/#reviews" }, // Placeholder anchor
   {
     label: "Comunidad",
     megaMenu: {
