@@ -25,7 +25,7 @@ export default function FullWidthYouTubeSection({
   theme = "dark",
 }: FullWidthYouTubeSectionProps) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { margin: "-10% 0px -10% 0px" });
+  const isInView = useInView(ref, { once: true, margin: "-10% 0px -10% 0px" });
   const isTouch = useTouchDevice();
   const isDark = theme === "dark";
 
