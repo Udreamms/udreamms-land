@@ -33,12 +33,23 @@ export default function StudentShowcase() {
               inglés ESL, TOEFL, inglés de negocios y preparación académica. Te
               ayudamos a elegir el programa ideal que se adapte a tus objetivos.
             </p>
-            <Button
-              asChild
-              className="mt-6 w-64 px-5 py-2.5 bg-transparent border border-black text-black rounded-full hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] transition-all flex justify-center items-center hover:scale-105 hover:shadow-lg text-sm"
-            >
-              <Link href="/visas/student">Quiero saber más</Link>
-            </Button>
+            <p className="text-xs text-gray-400 mt-4 leading-relaxed">
+              *Nota: Si tienes alguna duda o pregunta puedes agendar una asesoría gratuita para responder a todas tus dudas, intenta tener a la mano una copia de tu estado de cuenta y tu pasaporte.*
+            </p>
+            <div className="mt-6 flex flex-col sm:flex-row gap-4">
+              <Button
+                asChild
+                className="w-full sm:w-64 px-5 py-2.5 bg-transparent border border-black text-black rounded-full hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] transition-all flex justify-center items-center hover:scale-105 hover:shadow-lg text-sm"
+              >
+                <Link href="/visas/student">Quiero saber más</Link>
+              </Button>
+              <Button
+                asChild
+                className="w-full sm:w-64 px-5 py-2.5 bg-transparent border border-black text-black rounded-full hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] transition-all flex justify-center items-center hover:scale-105 hover:shadow-lg text-sm"
+              >
+                <a href="https://calendar.app.google/wvmELP7dKEmZKtL37" target="_blank" rel="noopener noreferrer">Agendar reunión virtual</a>
+              </Button>
+            </div>
           </div>
 
           <div className="w-full lg:w-2/3 relative h-[280px] sm:h-[350px] lg:h-[650px] rounded-3xl overflow-hidden shadow-2xl">

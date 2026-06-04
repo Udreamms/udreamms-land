@@ -81,9 +81,28 @@ const Footer = () => {
               <li>
                 <Link href="/contact" className="hover:text-white transition-colors">¡Estoy listo para empezar!</Link>
               </li>
-              <li className="pt-4">
-                <span className="text-gray-400 block">📞 +1 650 784 0581</span>
-                <span className="text-gray-400 block">✉️ udreamms@gmail.com</span>
+              <li className="pt-4 flex flex-col gap-1.5 text-xs">
+                <span className="text-gray-400 block">
+                  📞 Fijo empresa:{' '}
+                  <a href="https://wa.me/16507840581" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                    +1 650 784 0581
+                  </a>
+                </span>
+                <span className="text-gray-400 block">
+                  📞 Asesor humano:{' '}
+                  <a href="https://wa.me/13854162224" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                    +1 385 416 2224
+                  </a>
+                </span>
+                <span className="text-gray-400 block">
+                  🤖 Bot información:{' '}
+                  <a href="https://wa.me/13858882799" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                    +1 385 888 2799
+                  </a>
+                </span>
+                <span className="text-gray-400 block mt-2">
+                  ✉️ <a href="https://mail.google.com/mail/?view=cm&fs=1&to=services@udreamms.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">services@udreamms.com</a>
+                </span>
                 <span className="text-gray-400 block">📍 Salt Lake City, Utah</span>
               </li>
             </ul>

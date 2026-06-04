@@ -7,6 +7,28 @@ import WhatsappIcon from "@/components/icons/WhatsappIcon";
 
 const categories = [
   {
+    id: "udreamms",
+    title: "Udreamms",
+    faqs: [
+      {
+        question: "¿Qué es Udreamms?",
+        answer: "Somos una empresa especializada en brindar asesoramiento logístico y acompañamiento integral durante todo el proceso de visado estudiantil. Nos encargamos de guiarte paso a paso, desde la elección de tu programa y destino hasta tu llegada a los Estados Unidos, asegurando que tu experiencia sea segura, organizada y exitosa."
+      },
+      {
+        question: "¿Por dónde empiezo?",
+        answer: "Para iniciar, debes tener tu pasaporte vigente a la mano y un estado de cuenta con un mínimo de $5,000 USD que respalde tus gastos de estadía. Envía estos documentos en formato PDF a services@udreamms.com y realiza el pago por nuestros servicios migratorios (recuerda que ofrecemos un descuento considerable si pagas con criptomonedas). Una vez hecho esto, un asesor se comunicará contigo por WhatsApp para definir el estado al que deseas viajar e iniciar tu proceso de admisión."
+      },
+      {
+        question: "¿Quién es la persona ideal para vivir esta experiencia?",
+        answer: "Este programa está diseñado para estudiantes entre 17 y 65 años que ya se hayan graduado de bachillerato. Puedes vivir esta experiencia solo o junto a tu familia. En caso de viajar con tu familia, solo debes presentar un estado de cuenta que demuestre los recursos necesarios para cubrir los gastos de todos, asegurando así su tranquilidad en Estados Unidos."
+      },
+      {
+        question: "¿Qué es Luxor y cómo me beneficia?",
+        answer: "Luxor es una criptomoneda o moneda digital. Nuestro paquete básico de viaje para estudiantes tiene un costo de $380, pero si pagas con Luxor te costará solo $300. Así te ahorras $80 además de las comisiones y gastos de envío que tendrías con métodos de pago tradicionales (tarjetas de crédito, débito o Western Union). Este servicio estará disponible a partir del 5 de enero de 2027. Puedes visitar byluxor.com para unirte y descubrir una gran red de establecimientos (cafeterías, restaurantes, etc.) donde también podrás obtener descuentos al pagar con Luxor."
+      }
+    ]
+  },
+  {
     id: "visa",
     title: "Proceso de Visa",
     faqs: [
@@ -73,7 +95,7 @@ const categories = [
 ];
 
 export default function FAQsSection() {
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState(categories[0].id);
   const [expandedIndex, setExpandedIndex] = useState<string | null>(null);
 
   const filteredFaqs = selectedCategory === "all"
@@ -93,9 +115,6 @@ export default function FAQsSection() {
         
         {/* Header */}
         <div className="mb-16 text-center flex flex-col items-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-400 mb-3 block">
-            FAQ / PREGUNTAS FRECUENTES
-          </span>
           <h2 className="text-3xl md:text-5xl font-medium tracking-tight mb-4 text-white">
             Tus dudas resueltas <br className="hidden md:inline" />
             <span className="text-gray-400">de forma directa</span>
@@ -107,19 +126,6 @@ export default function FAQsSection() {
 
         {/* Category Pills (Filtros) */}
         <div className="flex flex-wrap items-center justify-center gap-2.5 mb-12">
-          <button
-            onClick={() => {
-              setSelectedCategory("all");
-              setExpandedIndex(null);
-            }}
-            className={`px-5 py-2.5 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 ${
-              selectedCategory === "all"
-                ? "bg-white text-black shadow-md shadow-white/10"
-                : "bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10 hover:text-white"
-            }`}
-          >
-            Todas
-          </button>
           {categories.map((cat) => (
             <button
               key={cat.id}
@@ -153,12 +159,7 @@ export default function FAQsSection() {
                     aria-expanded={isExpanded}
                   >
                     <div className="flex flex-col gap-1 pr-6">
-                      {selectedCategory === "all" && (
-                        <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">
-                          {faq.categoryTitle}
-                        </span>
-                      )}
-                      <span className="text-base md:text-lg font-medium text-white group-hover:text-blue-400 transition-colors duration-200">
+                      <span className="text-base md:text-lg font-medium text-white transition-colors duration-200">
                         {faq.question}
                       </span>
                     </div>
@@ -210,7 +211,7 @@ export default function FAQsSection() {
             href="https://wa.me/13858882799?text=Hola%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center w-auto px-5 py-3 rounded-full bg-white/5 border border-white/10 text-white font-medium text-xs md:text-sm hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 transition-all duration-300"
+            className="inline-flex items-center justify-center w-auto px-5 py-3 rounded-full bg-white/5 border border-white/10 text-white font-medium text-xs md:text-sm hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 transition-all duration-300"
           >
             <WhatsappIcon className="w-4 h-4" />
             <span className="ml-2">Chatear por WhatsApp</span>
