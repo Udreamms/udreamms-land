@@ -24,7 +24,7 @@ export default function ContactPage() {
               <div className="space-y-3">
                  <h3 className="text-lg font-semibold text-white">1. Prepara tus Documentos</h3>
                  <p>
-                   Si te gustaría empezar tu proceso, asegúrate de contar con tu <strong>Pasaporte</strong> y tu <strong>Estado de Cuenta</strong>, preferiblemente escaneados en formato PDF.
+                   Si ya estás listo para empezar con tu proceso de admisión, asegúrate de contar con tu <strong>Pasaporte</strong> y tu <strong>Estado de Cuenta</strong>, preferiblemente escaneados en formato PDF.
                  </p>
               </div>
               
@@ -55,12 +55,12 @@ export default function ContactPage() {
                  <p>
                    Una vez enviado el correo, contacta de manera directa con uno de nuestros asesores en vivo presionando el botón inferior. Indícale que ya enviaste tus documentos para recibir asistencia inmediata.
                  </p>
-                 <div className="pt-2">
+                 <div className="flex justify-center pt-6">
                    <a
                      href="https://wa.me/13854162224?text=Hola,%20ya%20envi%C3%A9%20mi%20pasaporte%20y%20estado%20de%20cuenta%20por%20correo.%20Me%20gustar%C3%ADa%20iniciar%20mi%20proceso."
                      target="_blank"
                      rel="noopener noreferrer"
-                     className="w-full max-w-md group relative inline-flex items-center justify-center px-8 py-3 gap-3 text-lg font-medium text-white overflow-hidden rounded-full bg-transparent border-2 border-white/40 hover:bg-purple-600 hover:border-purple-600 hover:scale-[1.02] transition-all duration-300 shadow-lg"
+                     className="w-full max-w-lg group relative inline-flex items-center justify-center px-8 py-3 gap-3 text-lg font-medium text-white overflow-hidden rounded-full bg-transparent border-2 border-white/40 hover:bg-purple-600 hover:border-purple-600 hover:scale-[1.02] transition-all duration-300 shadow-lg"
                    >
                      Comunicarme con un asesor en Vivo
                      <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
