@@ -79,7 +79,7 @@ const Footer = () => {
                 <Link href="/referrals" className="hover:text-white transition-colors">Programa de Afiliados</Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-white transition-colors">Contáctanos</Link>
+                <Link href="/contact" className="hover:text-white transition-colors">¡Estoy listo para empezar!</Link>
               </li>
               <li className="pt-4">
                 <span className="text-gray-400 block">📞 +1 650 784 0581</span>
