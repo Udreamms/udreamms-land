@@ -41,15 +41,7 @@ export default function InlineYouTubeFeature({
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
             allowFullScreen
           />
-          <a
-            href={youtubeWatchUrl(videoId, startSeconds)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="absolute top-3 right-3 z-20 flex items-center gap-1 rounded-full bg-black/70 px-3 py-1.5 text-xs font-medium text-white hover:bg-black/90 transition-colors"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-            YouTube
-          </a>
+
         </>
       ) : posterSrc ? (
         <img

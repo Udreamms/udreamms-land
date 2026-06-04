@@ -170,9 +170,9 @@ export default function UdreammsTVShowcase() {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="w-fit flex items-center gap-3 bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md px-8 py-4 rounded-full text-base font-normal tracking-wide transition-all shadow-xl shadow-black/30"
+                                    className="w-fit flex items-center gap-3 bg-white/10 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] text-white border border-white/20 backdrop-blur-md px-8 py-2.5 rounded-full text-base font-normal tracking-wide transition-all shadow-xl shadow-black/30"
                                 >
-                                    Udreamms TV
+                                    Udreamms Streaming
                                 </motion.button>
                             </div>
                         </motion.div>
@@ -194,12 +194,12 @@ export default function UdreammsTVShowcase() {
                                 startAirHockeyBounces();
                             }}
                             whileDrag={{ scale: 1.15, cursor: "grabbing" }}
-                            className="relative lg:absolute lg:right-0 lg:-top-64 w-56 h-56 md:w-[28rem] md:h-[28rem] lg:w-[40rem] lg:h-[40rem] flex items-center justify-center shrink-0 z-20 cursor-grab select-none pointer-events-auto"
+                            className="relative lg:absolute lg:right-0 lg:-top-64 w-40 h-40 md:w-72 md:h-72 lg:w-[30rem] lg:h-[30rem] flex items-center justify-center shrink-0 z-20 cursor-grab select-none pointer-events-auto"
                         >
                             <img 
-                                src="/tv.png" 
-                                alt="TV Icon" 
-                                className="w-full h-full object-contain filter brightness-0 invert drop-shadow-[0_0_35px_rgba(255,255,255,0.6)] pointer-events-none"
+                                src="https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/Phantom%2FAction.png?alt=media&token=240f1da6-7c9e-457d-8320-9e30f9383e60" 
+                                alt="Udreamms Streaming" 
+                                className="w-full h-full object-contain drop-shadow-[0_0_35px_rgba(255,255,255,0.6)] pointer-events-none"
                             />
                         </motion.div>
                     </div>

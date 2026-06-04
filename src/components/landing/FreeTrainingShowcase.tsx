@@ -2,13 +2,12 @@
 
 import { useRef } from "react";
 import { Button } from '@/components/ui/button';
-import InlineYouTubeFeature from "@/components/landing/InlineYouTubeFeature";
 
 export default function FreeTrainingShowcase() {
     const ref = useRef(null);
 
     return (
-        <section className="py-12 md:py-16 lg:py-20 bg-white text-black overflow-hidden font-sans">
+        <section className="pt-12 md:pt-16 lg:pt-20 pb-16 md:pb-20 lg:pb-24 bg-white text-black overflow-hidden font-sans">
             <div className="container mx-auto px-6 max-w-[1500px]">
                 <div className="flex flex-col lg:flex-row gap-6 lg:gap-24 items-center lg:items-center">
                     
@@ -28,15 +27,15 @@ export default function FreeTrainingShowcase() {
                             Accede de forma inmediata a nuestra biblioteca digital de recursos gratuitos de primer nivel. Descarga guías prácticas paso a paso, audiolibros esenciales sobre desarrollo personal y finanzas, y masterclasses completas en video para preparar tu camino hacia el éxito.<br /><br />
                             Una recopilación estratégica de herramientas premium diseñadas para que tomes decisiones inteligentes, minimices riesgos y comiences a estructurar tu futuro en Estados Unidos hoy mismo.
                         </p>
-                <Button className="mt-4 w-fit px-4 py-1.5 bg-black text-white rounded-full hover:bg-gray-800 transition text-sm">Saber más</Button>
+                <Button className="mt-6 w-64 px-5 py-2.5 bg-transparent border border-black text-black rounded-full hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] transition-all flex justify-center items-center hover:scale-105 hover:shadow-lg text-sm">Quiero saber más</Button>
                     </div>
 
                     {/* Right Column: Video/Media */}
                     <div ref={ref} className="w-full lg:w-2/3 relative h-[280px] sm:h-[350px] lg:h-[650px] rounded-3xl overflow-hidden shadow-2xl">
-                        <InlineYouTubeFeature
-                            videoId="wIh31q-3dPM"
-                            posterAlt="Capacitación gratuita"
-                            className="rounded-3xl"
+                        <img
+                            src="https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/Phantom%2FWhatsApp%20Image%202026-05-25%20at%205.09.26%20PM.jpeg?alt=media&token=b4f0e5c3-5524-4f89-b9a9-35eea571b392"
+                            alt="Videos, Libros y Guías"
+                            className="w-full h-full object-cover object-center rounded-3xl"
                         />
                     </div>
 

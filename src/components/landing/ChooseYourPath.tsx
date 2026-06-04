@@ -81,7 +81,7 @@ export default function ChooseYourPath() {
         {/* Header Centrado Simplificado - "Planes" tamaño reducido */}
         <div className="mb-12 md:mb-20 max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-normal tracking-tight text-white leading-tight mb-4">
-            Planes
+            Vive y Estudia en Estados Unidos
           </h2>
           <p className="text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
             Selecciona la ruta ideal para tu objetivo. Estrategias probadas para turismo, educación y eventos mundiales.
@@ -118,7 +118,7 @@ export default function ChooseYourPath() {
 
 
                 <div className="flex flex-col items-center gap-3 mt-2 mb-5 md:mb-8 w-full">
-                  <Link href={path.href} className={`w-full py-2.5 md:py-3 rounded-full bg-transparent text-white font-normal text-base shadow-2xl hover:scale-[1.03] active:scale-95 transition-all duration-300 border border-white/40 hover:bg-blue-600 hover:border-blue-600 text-center`} aria-label={`Ir a ${path.title}`}>
+                  <Link href={path.href} className={`w-full py-2.5 md:py-3 rounded-full bg-transparent text-white font-normal text-base shadow-2xl hover:scale-[1.03] active:scale-95 transition-all duration-300 border border-white/40 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] text-center`} aria-label={`Ir a ${path.title}`}>
                     {path.buttonText}
                   </Link>
                 </div>

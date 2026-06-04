@@ -272,7 +272,7 @@ export default function Roadmap() {
              <h3 className="text-xl font-medium text-white mb-1">¿Ya identificaste tu fase?</h3>
              <p className="text-xs text-gray-400 mb-3 max-w-sm">Nuestros expertos están listos para impulsarte al siguiente nivel sin importar dónde empieces.</p>
              <Button
-               className="rounded-full px-5 py-2 bg-white text-black hover:bg-gray-200 font-bold text-xs transition-all hover:-translate-y-0.5 active:scale-95"
+               className="rounded-full px-5 py-2 bg-white text-black hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] font-bold text-xs transition-all hover:-translate-y-0.5 active:scale-95"
                onClick={() => document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' })}
              >
                Comienza Ahora
@@ -315,7 +315,7 @@ export default function Roadmap() {
                       <Button 
                          onClick={handleStartHere}
                          size="sm"
-                         className="bg-white/10 hover:bg-white/20 text-white border border-white/10 rounded-full w-full justify-between group-hover:bg-[#D31245] group-hover:border-[#D31245] transition-colors"
+                         className="bg-white/10 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] text-white border border-white/10 rounded-full w-full justify-between transition-colors"
                       >
                          Inicia Aquí <ChevronRight className="w-4 h-4" />
                       </Button>
@@ -328,7 +328,7 @@ export default function Roadmap() {
                <h3 className="text-lg font-medium text-white mb-2">¿Ya identificaste tu fase?</h3>
                <p className="text-xs text-gray-400 mb-4">Nuestros expertos están listos para impulsarte al siguiente nivel sin importar dónde empieces.</p>
                <Button
-                 className="rounded-full px-6 py-2.5 w-full bg-white text-black hover:bg-gray-200 font-bold text-sm transition-all active:scale-95"
+                 className="rounded-full px-6 py-2.5 w-full bg-white text-black hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] font-bold text-sm transition-all active:scale-95"
                  onClick={() => document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' })}
                >
                  Comienza Ahora
@@ -414,7 +414,7 @@ const StepCardMobile = ({ step, onStart }: { step: any, onStart: () => void }) =
             <Button 
                onClick={onStart}
                size="sm"
-               className="bg-white/10 hover:bg-white/20 text-white border border-white/10 rounded-full w-full justify-between group-hover:bg-[#D31245] group-hover:border-[#D31245] transition-colors"
+               className="bg-white/10 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] text-white border border-white/10 rounded-full w-full justify-between transition-colors"
             >
                Inicia Aquí <ChevronRight className="w-4 h-4" />
             </Button>

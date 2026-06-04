@@ -35,9 +35,9 @@ export default function StudentShowcase() {
             </p>
             <Button
               asChild
-              className="mt-6 w-fit px-5 py-2.5 bg-black text-white rounded-full hover:bg-gray-800 transition text-sm"
+              className="mt-6 w-64 px-5 py-2.5 bg-transparent border border-black text-black rounded-full hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] transition-all flex justify-center items-center hover:scale-105 hover:shadow-lg text-sm"
             >
-              <Link href="/visas/student">Saber más</Link>
+              <Link href="/visas/student">Quiero saber más</Link>
             </Button>
           </div>
 

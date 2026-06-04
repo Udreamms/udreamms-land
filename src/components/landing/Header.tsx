@@ -185,7 +185,7 @@ export default function Header() {
 
             <Button
               onClick={handleApplyClick}
-              className="bg-transparent text-white border border-white/40 hover:bg-blue-600 hover:border-blue-600 rounded-full h-8 px-5 font-medium text-xs transition-all duration-300 hover:scale-105 shadow-xl"
+              className="bg-transparent text-white border border-white/40 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] rounded-full h-8 px-5 font-medium text-xs transition-all duration-300 hover:scale-105 shadow-xl"
             >
               Aplica Ahora
             </Button>
@@ -197,7 +197,7 @@ export default function Header() {
               <Button
                 onClick={handleApplyClick}
                 size="sm"
-                className="bg-transparent text-white border border-white/40 hover:bg-blue-600 hover:border-blue-600 hover:scale-105 transition-all duration-300 rounded-full text-[11px] h-8 px-4"
+                className="bg-transparent text-white border border-white/40 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] hover:scale-105 transition-all duration-300 rounded-full text-[11px] h-8 px-4"
               >
                 Aplica Ahora
               </Button>
@@ -221,7 +221,7 @@ export default function Header() {
               <Button
                 onClick={handleApplyClick}
                 size="sm"
-                className="bg-transparent text-white border border-white/40 hover:bg-blue-600 hover:border-blue-600 hover:scale-105 transition-all duration-300 rounded-full text-[10px] h-7 px-3"
+                className="bg-transparent text-white border border-white/40 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] hover:scale-105 transition-all duration-300 rounded-full text-[10px] h-7 px-3"
               >
                 Aplica
               </Button>
@@ -405,7 +405,7 @@ export default function Header() {
                   </Link>
                   <Button
                     onClick={handleApplyClick}
-                    className="w-full bg-transparent text-white border border-white/40 hover:bg-blue-600 hover:border-blue-600 hover:scale-[1.02] transition-all duration-300 h-12 rounded-xl text-lg font-medium shadow-lg"
+                    className="w-full bg-transparent text-white border border-white/40 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] hover:scale-[1.02] transition-all duration-300 h-12 rounded-xl text-lg font-medium shadow-lg"
                   >
                     Aplica Ahora
                   </Button>

@@ -36,7 +36,7 @@ export default function UdreammsAppShowcase() {
                     </p>
 
                     <div className="relative">
-                        <Button className="rounded-full bg-white text-black hover:bg-white/90 font-medium px-12 py-8 text-xl shadow-2xl transition-all border-none flex items-center gap-3">
+                        <Button className="rounded-full bg-white text-black hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white font-medium px-12 py-8 text-xl shadow-2xl transition-all border-none flex items-center gap-3">
                             <Smartphone className="w-6 h-6" />
                             Descargar Udreamms App
                         </Button>
