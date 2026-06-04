@@ -29,7 +29,7 @@ export async function POST(req: Request) {
             client_user_agent: userAgent,
             fbp: fbp, // Cookie de pixel
             fbc: fbc, // Cookie de click de fb
-          },
+          } as any,
           custom_data: eventData || {},
         },
       ],
