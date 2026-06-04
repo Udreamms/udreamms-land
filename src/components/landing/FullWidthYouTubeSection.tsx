@@ -54,10 +54,11 @@ export default function FullWidthYouTubeSection({
         )}
       </div>
 
-      <div
-        ref={ref}
-        className="relative w-full aspect-video min-h-[240px] sm:min-h-[360px] md:min-h-[min(56.25vw,85vh)] bg-black"
-      >
+      <div className="w-full px-4 md:px-8 lg:px-12 max-w-[1600px] mx-auto pb-16">
+        <div
+          ref={ref}
+          className="relative w-full aspect-video min-h-[240px] sm:min-h-[360px] md:min-h-[500px] bg-black rounded-3xl overflow-hidden shadow-2xl ring-1 ring-white/10"
+        >
         {isInView ? (
           <>
             <iframe
@@ -91,6 +92,7 @@ export default function FullWidthYouTubeSection({
             Cargando video…
           </div>
         )}
+        </div>
       </div>
     </section>
   );

@@ -61,7 +61,7 @@ export default function VipPlanShowcase() {
                             </div>
                             <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium tracking-tighter text-white leading-[1.1]">
                                 Libertad Sin Límites<br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">VIP EXPERIENCE</span>
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca]">VIP EXPERIENCE</span>
                             </h2>
                             <div className="mt-4 space-y-2 max-w-sm">
                                 <p className="text-sm text-slate-300 font-normal leading-relaxed">
@@ -87,7 +87,7 @@ export default function VipPlanShowcase() {
                                     >
                                         <div className="py-4 border-b border-white/10 last:border-0">
                                             <div className="flex items-center gap-2 mb-1">
-                                                <div className={`p-1 rounded-lg transition-colors duration-300 ${isActive ? "bg-white/20 text-white" : "bg-transparent text-slate-400 group-hover:bg-white/10 group-hover:text-white"}`}>
+                                                <div className={`transition-colors duration-300 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-white'}`}>
                                                     <Icon size={16} strokeWidth={2.5} />
                                                 </div>
                                                 <h4 className={`text-base transition-colors duration-300 ${isActive ? 'font-medium text-white' : 'font-medium text-slate-400 group-hover:text-white'}`}>
@@ -116,13 +116,23 @@ export default function VipPlanShowcase() {
                             })}
                         </div>
                         
-                        {/* Button moved to the bottom */}
-                        <Button
-                            className="mt-6 lg:mt-auto rounded-full px-6 py-4 bg-transparent border border-white/40 hover:bg-blue-600 hover:border-blue-600 text-white font-medium text-sm shadow-xl transition-all self-start"
-                            onClick={() => router.push('/instructions-payment-tourist?plan=vip')}
-                        >
-                            Elegir Experiencia VIP
-                        </Button>
+                        {/* Buttons moved to the bottom */}
+                        <div className="mt-6 lg:mt-auto flex flex-col sm:flex-row gap-4 self-start w-full sm:w-auto">
+                            <Button
+                                className="w-full sm:w-auto px-6 py-3 bg-transparent border border-white/40 text-white rounded-full hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] transition-all flex justify-center items-center hover:scale-105 hover:shadow-lg text-sm font-medium"
+                                onClick={() => router.push('/instructions-payment-tourist?plan=vip')}
+                            >
+                                Iniciar VIP Experience
+                            </Button>
+                            <Button
+                                asChild
+                                className="w-full sm:w-auto px-6 py-3 bg-transparent border border-white/40 text-white rounded-full hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] transition-all flex justify-center items-center hover:scale-105 hover:shadow-lg text-sm font-medium"
+                            >
+                                <a href="https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ3X9M9IxjU-0QyoLH4nwKpy5WjuxDwM-KQC0QrZS_Mcri7IKWXEPWn4s5eOtySu9m_EFqZQgpv0" target="_blank" rel="noopener noreferrer">
+                                    Agendar reunión virtual
+                                </a>
+                            </Button>
+                        </div>
                     </div>
 
                     {/* Right Column: Dynamic Visual */}

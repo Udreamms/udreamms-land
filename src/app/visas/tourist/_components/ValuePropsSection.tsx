@@ -32,7 +32,7 @@ export default function ValuePropsSection() {
                             return (
                                 <motion.div
                                     key={index}
-                                    className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-center cursor-pointer border border-slate-50"
+                                    className="w-16 h-16 md:w-20 md:h-20 bg-transparent rounded-full border border-white/30 flex items-center justify-center cursor-pointer hover:bg-white/10 transition-colors duration-300"
                                     animate={{
                                         y: [0, -yRange, 0],
                                     }}
@@ -44,7 +44,7 @@ export default function ValuePropsSection() {
                                     }}
                                     whileHover={{ scale: 1.15, rotate: 5 }}
                                 >
-                                    <Icon strokeWidth={1.5} className="w-6 h-6 md:w-8 md:h-8 text-purple-500" />
+                                    <Icon strokeWidth={1.5} className="w-6 h-6 md:w-8 md:h-8 text-white" />
                                 </motion.div>
                             );
                         })}

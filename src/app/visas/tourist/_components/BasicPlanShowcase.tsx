@@ -57,7 +57,7 @@ export default function BasicPlanShowcase() {
                             </div>
                             <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium tracking-tighter text-white leading-[1.1]">
                                 Empieza con el pie derecho<br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">Plan Básico</span>
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca]">Plan Básico</span>
                             </h2>
                             <p className="mt-4 text-sm text-slate-300 font-normal leading-relaxed max-w-sm">
                                 Nuestra gestión incluye auditoría, llenado de formularios y preparación para la entrevista consular con acompañamiento 1 a 1.
@@ -78,7 +78,7 @@ export default function BasicPlanShowcase() {
                                     >
                                         <div className="py-4 last:border-0">
                                             <div className="flex items-center gap-2 mb-1">
-                                                <div className={`p-1 rounded-lg transition-colors duration-300 bg-gradient-to-r from-purple-800 to-purple-400 text-white ${isActive ? "" : ""}`}>
+                                                <div className={`transition-colors duration-300 ${isActive ? 'text-purple-400' : 'text-slate-500 group-hover:text-purple-400'}`}>
                                                     <Icon size={16} strokeWidth={2.5} />
                                                 </div>
                                                 <h4 className={`text-base transition-colors duration-300 ${isActive ? 'font-medium text-white' : 'font-medium text-slate-400 group-hover:text-white'}`}>
@@ -107,13 +107,23 @@ export default function BasicPlanShowcase() {
                             })}
                         </div>
                         
-                        {/* Button moved to the bottom */}
-                        <Button
-                            className="mt-6 lg:mt-auto rounded-full px-6 py-4 bg-transparent border border-white/40 hover:bg-blue-600 hover:border-blue-600 text-white font-medium text-sm shadow-xl transition-all self-start"
-                            onClick={() => router.push('/instructions-payment-tourist?plan=basico')}
-                        >
-                            Elegir Plan Básico
-                        </Button>
+                        {/* Buttons moved to the bottom */}
+                        <div className="mt-6 lg:mt-auto flex flex-col sm:flex-row gap-4 self-start w-full sm:w-auto">
+                            <Button
+                                className="w-full sm:w-auto px-6 py-3 bg-transparent border border-white/40 text-white rounded-full hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] transition-all flex justify-center items-center hover:scale-105 hover:shadow-lg text-sm font-medium"
+                                onClick={() => router.push('/instructions-payment-tourist?plan=basico')}
+                            >
+                                Elegir Plan Básico
+                            </Button>
+                            <Button
+                                asChild
+                                className="w-full sm:w-auto px-6 py-3 bg-transparent border border-white/40 text-white rounded-full hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] transition-all flex justify-center items-center hover:scale-105 hover:shadow-lg text-sm font-medium"
+                            >
+                                <a href="https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ3X9M9IxjU-0QyoLH4nwKpy5WjuxDwM-KQC0QrZS_Mcri7IKWXEPWn4s5eOtySu9m_EFqZQgpv0" target="_blank" rel="noopener noreferrer">
+                                    Agendar reunión virtual
+                                </a>
+                            </Button>
+                        </div>
                     </div>
 
                     {/* Right Column: Dynamic Visual */}
@@ -132,11 +142,7 @@ export default function BasicPlanShowcase() {
                                     alt={activeTab.title}
                                     className="w-full h-full object-cover opacity-80"
                                 />
-                                {/* Floating Badge */}
-                                <div className="absolute top-8 right-8 bg-black/80 backdrop-blur-md p-6 rounded-3xl shadow-xl flex flex-col items-center">
-                                    <span className="text-slate-400 text-xs font-medium uppercase tracking-widest mb-1">Aprobación</span>
-                                    <span className="text-3xl font-medium tracking-tighter text-white">98%</span>
-                                </div>
+                                {/* The floating badge has been removed as requested */}
                             </motion.div>
                         </AnimatePresence>
 

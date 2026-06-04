@@ -102,7 +102,7 @@ export default function DestinationsShowcase() {
                         </span>
                         <h2 className="text-4xl md:text-6xl font-medium tracking-tighter leading-[1.1] text-white">
                             Explora lo Mejor de USA<br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">Tu Ruta Personalizada</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca]">Tu Ruta Personalizada</span>
                         </h2>
                     </div>
                 </div>
