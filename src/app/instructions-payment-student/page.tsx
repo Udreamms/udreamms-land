@@ -404,7 +404,7 @@ function InstructionsContent() {
                         <p className="text-sm text-slate-400 font-normal">Nuestro equipo está listo para ayudarte.</p>
                       </div>
                       <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                        <a href="https://wa.me/16507840581" target="_blank" rel="noreferrer" className={s.ctaPrimary}>
+                        <a href="https://wa.me/13858882799?text=Hola%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n" target="_blank" rel="noreferrer" className={s.ctaPrimary}>
                           <MessageCircle className={s.iconSm} strokeWidth={1.5} /> WhatsApp
                         </a>
                         <a href="https://mail.google.com/mail/?view=cm&fs=1&to=payments@udreamms.com" target="_blank" rel="noreferrer" className={s.ctaPrimary}>

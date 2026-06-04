@@ -107,7 +107,6 @@ export default function Hero({ onStartQuote }: HeroProps) {
           autoPlay
           muted
           playsInline
-          controls={activeVideo === 0}
           controlsList="nodownload"
           preload="metadata"
           onTimeUpdate={() => handleTimeUpdate(0)}
@@ -124,7 +123,6 @@ export default function Hero({ onStartQuote }: HeroProps) {
           autoPlay
           muted
           playsInline
-          controls={activeVideo === 1}
           controlsList="nodownload"
           preload="metadata"
           onTimeUpdate={() => handleTimeUpdate(1)}
@@ -162,7 +160,7 @@ export default function Hero({ onStartQuote }: HeroProps) {
 
           <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-4 shrink-0 mb-4">
             <a
-              href="https://wa.me/16507840581"
+              href="https://wa.me/13858882799?text=Hola%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n"
               target="_blank"
               rel="noopener noreferrer"
               className="group relative inline-flex items-center justify-center px-8 py-3 gap-2 text-base font-medium text-white overflow-hidden rounded-full bg-transparent border border-white/40 hover:bg-blue-600 hover:border-blue-600 hover:scale-105 transition-all duration-300 shadow-lg"

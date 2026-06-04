@@ -207,7 +207,7 @@ export default function FAQsSection() {
           </p>
           
           <a
-            href="https://wa.me/16507840581"
+            href="https://wa.me/13858882799?text=Hola%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center w-auto px-5 py-3 rounded-full bg-white/5 border border-white/10 text-white font-medium text-xs md:text-sm hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 transition-all duration-300"
