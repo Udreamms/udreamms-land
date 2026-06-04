@@ -77,10 +77,10 @@ export default function ContactPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-primary-glow rounded-full mb-6">
               <Mail className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-4xl lg:text-5xl font-medium tracking-tight bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent mb-6">
+            <h2 className="text-4xl lg:text-5xl font-medium tracking-tight text-white mb-6">
               Contacta a un Asesor
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl text-white max-w-3xl mx-auto">
               Completa el formulario y nuestro equipo se pondrá en contacto contigo
             </p>
           </div>
