@@ -1,73 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Mail } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { toast } from "sonner";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
-
-const contactSchema = z.object({
-  nombre: z.string().trim().min(1, { message: "El nombre es requerido" }).max(100, { message: "El nombre debe tener menos de 100 caracteres" }),
-  apellido: z.string().trim().min(1, { message: "El apellido es requerido" }).max(100, { message: "El apellido debe tener menos de 100 caracteres" }),
-  pais: z.string().min(1, { message: "El país es requerido" }),
-  email: z.string().trim().email({ message: "Email inválido" }).max(255, { message: "El email debe tener menos de 255 caracteres" }),
-  telefono: z.string().trim().min(1, { message: "El teléfono es requerido" }).max(50, { message: "El teléfono debe tener menos de 50 caracteres" }),
-  programa: z.string().min(1, { message: "El programa es requerido" }),
-  ciudad: z.string().trim().min(1, { message: "La ciudad es requerida" }).max(100, { message: "La ciudad debe tener menos de 100 caracteres" }),
-  preguntas: z.string().trim().max(1000, { message: "Las preguntas deben tener menos de 1000 caracteres" }).optional(),
-});
-
-type ContactFormData = z.infer<typeof contactSchema>;
+import { Mail } from "lucide-react";
 
 export default function ContactPage() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const form = useForm<ContactFormData>({
-    resolver: zodResolver(contactSchema),
-    defaultValues: {
-      nombre: "",
-      apellido: "",
-      pais: "",
-      email: "",
-      telefono: "",
-      programa: "",
-      ciudad: "",
-      preguntas: "",
-    },
-  });
-
-  const onSubmit = async (data: ContactFormData) => {
-    setIsSubmitting(true);
-    try {
-      // Aquí puedes agregar la lógica para enviar el formulario
-      console.log("Form data:", data);
-
-      toast.success("¡Formulario enviado! Nos pondremos en contacto contigo pronto.");
-
-      form.reset();
-    } catch (error) {
-      toast.error("Hubo un problema al enviar el formulario. Por favor intenta de nuevo.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-black">
       <Header />
@@ -101,175 +38,23 @@ export default function ContactPage() {
                 </div>
               </div>
               <p className="mt-4">
-                Una vez enviado el correo, completa y envía el formulario de abajo para contactar de manera directa con uno de nuestros asesores. Al conectarte, indícale que ya has enviado tus documentos para iniciar tu proceso y recibirás asistencia inmediata con los pasos a seguir.
+                Una vez enviado el correo, haz clic en el botón de abajo para contactar de manera directa con uno de nuestros asesores en vivo. Al conectarte, indícale que ya has enviado tus documentos para iniciar tu proceso y recibirás asistencia inmediata con los pasos a seguir.
               </p>
             </div>
           </div>
 
-          <div className="max-w-3xl mx-auto">
-            <Card className="group hover:shadow-card transition-all duration-300 border border-white/10 shadow-soft bg-black">
-              <CardContent className="p-8">
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <FormField
-                        control={form.control}
-                        name="nombre"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Nombre</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Tu nombre" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="apellido"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Apellido</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Tu apellido" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <FormField
-                      control={form.control}
-                      name="pais"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>País donde vives actualmente</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecciona tu país" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="mexico">México</SelectItem>
-                              <SelectItem value="colombia">Colombia</SelectItem>
-                              <SelectItem value="argentina">Argentina</SelectItem>
-                              <SelectItem value="chile">Chile</SelectItem>
-                              <SelectItem value="peru">Perú</SelectItem>
-                              <SelectItem value="venezuela">Venezuela</SelectItem>
-                              <SelectItem value="ecuador">Ecuador</SelectItem>
-                              <SelectItem value="spain">España</SelectItem>
-                              <SelectItem value="otro">Otro</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                              <Input type="email" placeholder="tu@email.com" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="telefono"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Teléfono</FormLabel>
-                            <FormControl>
-                              <Input placeholder="+1 234 567 8900" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <FormField
-                      control={form.control}
-                      name="programa"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Programa</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecciona un programa" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="licenciatura">Licenciatura</SelectItem>
-                              <SelectItem value="maestria">Maestría</SelectItem>
-                              <SelectItem value="doctorado">Doctorado</SelectItem>
-                              <SelectItem value="ingles">Curso de Inglés</SelectItem>
-                              <SelectItem value="certificacion">Certificación</SelectItem>
-                              <SelectItem value="otro">Otro</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="ciudad"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Ciudad en la que quieres estudiar</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Ej: Nueva York, Los Ángeles, Miami..." {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="preguntas"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>¿Preguntas para nuestro equipo?</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="Escribe tus preguntas o comentarios aquí..."
-                              className="min-h-[120px] resize-none"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <Button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full font-medium"
-                      size="lg"
-                    >
-                      {isSubmitting ? "Enviando..." : "Enviar Formulario"}
-                    </Button>
-                  </form>
-                </Form>
-              </CardContent>
-            </Card>
+          <div className="max-w-3xl mx-auto flex justify-center mt-12">
+            <a
+              href="https://wa.me/13854162224?text=Hola,%20ya%20envi%C3%A9%20mi%20pasaporte%20y%20estado%20de%20cuenta%20por%20correo.%20Me%20gustar%C3%ADa%20iniciar%20mi%20proceso."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full max-w-2xl group relative inline-flex items-center justify-center px-8 py-5 gap-3 text-lg md:text-xl font-medium text-white overflow-hidden rounded-full bg-transparent border-2 border-white/40 hover:bg-green-600 hover:border-green-600 hover:scale-[1.02] transition-all duration-300 shadow-lg"
+            >
+              Comunicarme con un asesor en Vivo
+              <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+              </svg>
+            </a>
           </div>
         </div>
       </section>
