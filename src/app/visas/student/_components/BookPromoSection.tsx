@@ -56,7 +56,7 @@ export default function BookPromoSection() {
                         </ScaleIn>
 
                         <div className="mt-8 w-full flex justify-center">
-                            <Button className="rounded-full px-8 py-3 w-full bg-transparent border border-white/40 hover:bg-blue-600 hover:border-blue-600 text-white font-medium tracking-wide text-base transition-all hover:-translate-y-1 active:scale-95">
+                            <Button className="rounded-full px-8 py-3 w-full bg-transparent border border-white/40 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] hover:scale-105 text-white font-medium tracking-wide text-base transition-all active:scale-95 shadow-lg">
                                 Obtener libro
                             </Button>
                         </div>

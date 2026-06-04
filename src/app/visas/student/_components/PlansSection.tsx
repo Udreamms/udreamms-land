@@ -182,7 +182,7 @@ export default function PlansSection() {
                                     <div className="flex flex-col items-center gap-3 mt-auto mb-6 w-full">
                                         <Link 
                                             href={`/instructions-payment-student?plan=${plan.name.toLowerCase().split(":")[1]?.trim().replace(" ", "-") || "esencial"}`} 
-                                            className="w-full py-3 rounded-full bg-transparent text-white font-normal text-base shadow-2xl hover:scale-[1.03] active:scale-95 transition-all duration-300 border border-white/40 hover:bg-blue-600 hover:border-blue-600 text-center"
+                                            className="w-full py-3 rounded-full bg-transparent text-white font-normal text-base shadow-2xl active:scale-95 transition-all duration-300 border border-white/40 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] hover:scale-105 text-center"
                                         >
                                             Elegir Plan
                                         </Link>
