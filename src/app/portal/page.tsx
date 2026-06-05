@@ -40,8 +40,15 @@ import {
   Star,
   Map,
   Hotel,
-  ShoppingBag
+  ShoppingBag,
+  Zap,
+  ShieldCheck,
+  Wallet,
+  ArrowDown
 } from "lucide-react";
+import QrTokenPayment from "@/components/payments/QrTokenPayment";
+import BillingForm, { BillingData } from "@/components/payments/BillingForm";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const studentModules = [
   {
@@ -259,6 +266,44 @@ export default function PortalPage() {
   const [cart, setCart] = useState<string[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [checkoutMethod, setCheckoutMethod] = useState<'card' | 'crypto' | null>(null);
+  const [checkoutSessionId, setCheckoutSessionId] = useState<string | null>(null);
+  const [isProcessingCrypto, setIsProcessingCrypto] = useState(false);
+  const [billingData, setBillingData] = useState<BillingData | null>(null);
+  const [isBillingValid, setIsBillingValid] = useState(false);
+  const [paymentApproved, setPaymentApproved] = useState(false);
+  const [approvedOrder, setApprovedOrder] = useState<any>(null);
+
+  const createCheckoutSessionId = () => {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+    return `session_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+  };
+
+  const getStripeLink = (items: string[]) => {
+    if (items.includes('plan-esencial') || items.includes('plan-turista-basico')) {
+      return "https://buy.stripe.com/00w4gzdoT734alQeqfenS0x";
+    }
+    if (items.includes('plan-pro')) {
+      return "https://buy.stripe.com/cNicN5ckPevw65AdmbenS0A";
+    }
+    if (items.includes('plan-elite')) {
+      return "https://buy.stripe.com/cNidR91GbevweC65TJenS0B";
+    }
+    if (items.includes('plan-allinclusive')) {
+      return "https://buy.stripe.com/fZu7sL1Gb8782To4PFenS0C";
+    }
+    if (items.includes('plan-turista-premium')) {
+      return "https://buy.stripe.com/00wdR93Ojafgdy2ci7enS0y";
+    }
+    if (items.includes('plan-turista-vip')) {
+      return "https://buy.stripe.com/bJe3cvfx1cnoeC6fujenS0z";
+    }
+    return "https://buy.stripe.com/00w4gzdoT734alQeqfenS0x";
+  };
+
   const addToCart = (itemId: string) => {
     if (cart.includes(itemId)) {
       toast.info("Ya está en el carrito");
@@ -273,14 +318,14 @@ export default function PortalPage() {
     toast.success("Eliminado del carrito");
   };
 
-  const handleCheckout = async () => {
+  const completeDatabasePurchase = async (itemsToUnlock: string[]) => {
     if (!user) return;
     setLoading(true);
     try {
       const userRef = doc(db, 'users', user.uid);
       const updates: Record<string, boolean> = {};
       
-      cart.forEach((itemId) => {
+      itemsToUnlock.forEach((itemId) => {
         if (itemId === 'curso-estudiante') updates.purchased_curso_estudiante = true;
         if (itemId === 'libro-estudiante') updates.purchased_libro_estudiante = true;
         if (itemId === 'curso-turista') updates.purchased_curso_turista = true;
@@ -288,22 +333,32 @@ export default function PortalPage() {
         if (itemId === 'plan-esencial') updates.purchased_plan_esencial = true;
         if (itemId === 'plan-pro') updates.purchased_plan_pro = true;
         if (itemId === 'plan-elite') updates.purchased_plan_elite = true;
+        if (itemId === 'plan-allinclusive') updates.purchased_plan_allinclusive = true;
         if (itemId === 'plan-turista-basico') updates.purchased_plan_turista_basico = true;
         if (itemId === 'plan-turista-premium') updates.purchased_plan_turista_premium = true;
         if (itemId === 'plan-turista-vip') updates.purchased_plan_turista_vip = true;
       });
 
-      // Synchronize with database
       await updateDoc(userRef, updates);
-      
       toast.success("¡Pago completado con éxito! Contenido desbloqueado.");
       setCart([]);
       setIsCartOpen(false);
+      setIsCheckoutOpen(false);
     } catch (err: any) {
       toast.error("Error al procesar pago: " + err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCheckout = () => {
+    if (cart.length === 0) return;
+    setCheckoutSessionId(createCheckoutSessionId());
+    setCheckoutMethod(null);
+    setPaymentApproved(false);
+    setApprovedOrder(null);
+    setIsCartOpen(false);
+    setIsCheckoutOpen(true);
   };
 
   const isUnlocked = (type: 'curso' | 'libro', visa: 'estudiante' | 'turista') => {
@@ -359,18 +414,18 @@ export default function PortalPage() {
           <div className="pt-2">
             {isAdded ? (
               <Button
-                onClick={() => setIsCartOpen(true)}
+                onClick={() => handleCheckout()}
                 className="w-full h-12 rounded-full bg-purple-500/20 border border-purple-500/50 text-purple-300 hover:bg-purple-500/30 transition-all text-xs font-normal tracking-widest uppercase flex items-center justify-center gap-2"
               >
                 <ShoppingCart className="w-4 h-4" />
-                Ver en el carrito
+                Ver en carrito
               </Button>
             ) : (
               <Button
                 onClick={() => addToCart(itemId)}
                 className="w-full h-12 rounded-full bg-transparent border border-white/40 text-white hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg text-xs font-normal tracking-widest uppercase flex items-center justify-center gap-2"
               >
-                Agregar al carrito
+                Añadir al carrito
               </Button>
             )}
           </div>
@@ -1509,6 +1564,245 @@ export default function PortalPage() {
                   </Button>
                 </div>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* CHECKOUT PORTAL MODAL */}
+      <AnimatePresence>
+        {isCheckoutOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+            {/* Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+              onClick={() => {
+                if (!isProcessingCrypto && !paymentApproved) {
+                  setIsCheckoutOpen(false);
+                }
+              }}
+            />
+
+            {/* Modal Card */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="bg-[#0d0d11] border border-white/10 rounded-3xl p-6 md:p-8 w-full max-w-4xl shadow-2xl relative z-10 space-y-6 max-h-[90vh] overflow-y-auto"
+            >
+              {/* Header */}
+              <div className="flex justify-between items-start border-b border-white/5 pb-4">
+                <div>
+                  <h3 className="text-xl font-normal text-white">Pasarela de Pago Segura</h3>
+                  <p className="text-xs text-white/40">Sigue los pasos para completar tu orden.</p>
+                </div>
+                {!isProcessingCrypto && !paymentApproved && (
+                  <button
+                    onClick={() => setIsCheckoutOpen(false)}
+                    className="text-xs text-white/40 hover:text-white uppercase tracking-wider font-semibold"
+                  >
+                    Cerrar
+                  </button>
+                )}
+              </div>
+
+              {/* Success Screen */}
+              {paymentApproved && approvedOrder ? (
+                <div className="text-center py-8 space-y-6">
+                  <CheckCircle2 className="w-16 h-16 text-purple-400 mx-auto animate-pulse" />
+                  <div className="space-y-2">
+                    <h4 className="text-2xl font-normal text-white">¡Pago aprobado con éxito!</h4>
+                    <p className="text-xs text-white/50 max-w-md mx-auto">
+                      Tu transacción fue confirmada y tus servicios han sido desbloqueados en la plataforma.
+                    </p>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-4 max-w-md mx-auto text-left space-y-2">
+                    <p className="text-[10px] uppercase tracking-widest text-white/40">ID de Orden</p>
+                    <p className="text-xs font-mono text-white/80 break-all">{approvedOrder.requestId}</p>
+                    {approvedOrder.email && (
+                      <p className="text-xs text-white/40">
+                        Comprobante enviado a: <span className="text-white/80">{approvedOrder.email}</span>
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    onClick={() => {
+                      setIsCheckoutOpen(false);
+                      setPaymentApproved(false);
+                      setApprovedOrder(null);
+                    }}
+                    className="h-11 px-8 rounded-full bg-transparent border border-white/40 text-white hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] text-xs font-normal uppercase"
+                  >
+                    Ir a mis servicios
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                  
+                  {/* Left Column: Cart Overview & Method Selector */}
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <p className="text-[10px] font-normal tracking-widest text-white/40 uppercase">Resumen del Carrito</p>
+                      <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                        {cart.map((itemId) => {
+                          const item = cartItemsConfig[itemId];
+                          if (!item) return null;
+                          return (
+                            <div key={itemId} className="flex justify-between items-center p-3 rounded-2xl bg-white/5 border border-white/5">
+                              <div>
+                                <p className="text-xs font-normal text-white">{item.name}</p>
+                                <p className="text-[10px] text-purple-400 font-semibold">${item.price}.00 USD</p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="pt-2 border-t border-white/5 flex justify-between items-center">
+                        <span className="text-xs text-white/50 uppercase tracking-wider">Total a pagar</span>
+                        <span className="text-lg font-semibold text-white">
+                          ${cart.reduce((total, itemId) => total + (cartItemsConfig[itemId]?.price || 0), 0)}.00 USD
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <p className="text-[10px] font-normal tracking-widest text-white/40 uppercase">Método de Pago</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <button
+                          onClick={() => setCheckoutMethod('crypto')}
+                          className={`p-4 rounded-2xl border text-left space-y-2 transition-all ${
+                            checkoutMethod === 'crypto'
+                              ? 'border-purple-500 bg-purple-500/5 shadow-[0_0_15px_rgba(168,85,247,0.1)]'
+                              : 'border-white/10 bg-white/5 hover:border-white/20'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <Wallet className="w-4 h-4 text-purple-400" />
+                            <span className="text-xs font-semibold text-white">Pagar con Crypto</span>
+                          </div>
+                          <p className="text-[9px] text-white/50 leading-relaxed">USDC, USDT, SOL, LXR</p>
+                        </button>
+
+                        <button
+                          onClick={() => setCheckoutMethod('card')}
+                          className={`p-4 rounded-2xl border text-left space-y-2 transition-all ${
+                            checkoutMethod === 'card'
+                              ? 'border-purple-500 bg-purple-500/5 shadow-[0_0_15px_rgba(168,85,247,0.1)]'
+                              : 'border-white/10 bg-white/5 hover:border-white/20'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <CreditCard className="w-4 h-4 text-purple-400" />
+                            <span className="text-xs font-semibold text-white">Pagar con Tarjeta</span>
+                          </div>
+                          <p className="text-[9px] text-white/50 leading-relaxed">Visa, Mastercard, Amex</p>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Dynamic Payment Steps & Forms */}
+                  <div className="border-t lg:border-t-0 lg:border-l border-white/5 pt-6 lg:pt-0 lg:pl-8 min-h-[350px]">
+                    {!checkoutMethod ? (
+                      <div className="flex flex-col items-center justify-center h-full text-center py-12 text-white/40 space-y-3">
+                        <ShieldCheck className="w-10 h-10 text-white/20" />
+                        <p className="text-xs">Selecciona un método de pago a la izquierda para continuar.</p>
+                      </div>
+                    ) : checkoutMethod === 'crypto' ? (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <p className="text-xs font-semibold text-white">1. Datos de Contacto</p>
+                          <BillingForm initialEmail={user.email || ''} onDataChange={setBillingData} onValidChange={setIsBillingValid} />
+                        </div>
+
+                        {checkoutSessionId && (
+                          <div className="space-y-2 pt-2">
+                            <p className="text-xs font-semibold text-white">2. Escanea y Realiza el Pago</p>
+                            <Tabs defaultValue="usdc" className="w-full">
+                              <TabsList className="grid w-full grid-cols-4 bg-white/5 border border-white/10 rounded-xl p-1 mb-4 h-10">
+                                <TabsTrigger value="usdc" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-xs font-bold rounded-lg text-slate-400">USDC</TabsTrigger>
+                                <TabsTrigger value="usdt" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-xs font-bold rounded-lg text-slate-400">USDT</TabsTrigger>
+                                <TabsTrigger value="sol" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-xs font-bold rounded-lg text-slate-400">SOL</TabsTrigger>
+                                <TabsTrigger value="lxr" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-xs font-bold rounded-lg text-slate-400">LXR</TabsTrigger>
+                              </TabsList>
+
+                              {(['usdc', 'usdt', 'sol', 'lxr'] as const).map((method) => (
+                                <TabsContent key={method} value={method}>
+                                  <QrTokenPayment
+                                    plan="cart"
+                                    priceUSD={cart.reduce((total, itemId) => total + (cartItemsConfig[itemId]?.price || 0), 0)}
+                                    paymentMethod={method}
+                                    isProcessing={isProcessingCrypto}
+                                    setIsProcessing={setIsProcessingCrypto}
+                                    onSuccess={(details) => {
+                                      setPaymentApproved(true);
+                                      setApprovedOrder({
+                                        requestId: details.requestId,
+                                        email: billingData?.email || user.email || '',
+                                      });
+                                      completeDatabasePurchase(cart);
+                                    }}
+                                    sessionId={checkoutSessionId}
+                                    billingData={billingData}
+                                    isBillingValid={isBillingValid}
+                                  />
+                                </TabsContent>
+                              ))}
+                            </Tabs>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        <div className="space-y-2">
+                          <p className="text-xs font-semibold text-white font-medium">Pago con Tarjeta a través de Stripe</p>
+                          <p className="text-xs text-white/50 leading-relaxed">
+                            Haz clic en el botón inferior para ser redirigido a la pasarela encriptada oficial de Stripe y realizar tu pago de manera segura.
+                          </p>
+                        </div>
+
+                        <div className="bg-white/5 border border-white/5 rounded-2xl p-4 space-y-4">
+                          <p className="text-[10px] font-normal tracking-widest text-white/40 uppercase">Instrucciones</p>
+                          <div className="space-y-2 text-xs text-white/70">
+                            <p>1. Presiona "Pagar en Stripe".</p>
+                            <p>2. Rellena los datos de tu tarjeta en el portal seguro de Stripe.</p>
+                            <p>3. Regresa a esta pestaña y haz clic en "Confirmar Pago" para activar tus servicios.</p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                          <a
+                            href={getStripeLink(cart)}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex-1 h-11 rounded-full bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg text-xs font-normal uppercase flex items-center justify-center gap-2 text-white"
+                          >
+                            <Lock className="w-4 h-4" />
+                            Pagar en Stripe
+                          </a>
+                          <Button
+                            onClick={() => {
+                              setPaymentApproved(true);
+                              setApprovedOrder({
+                                requestId: `stripe_${Date.now()}`,
+                                email: user.email || '',
+                              });
+                              completeDatabasePurchase(cart);
+                            }}
+                            className="flex-1 h-11 rounded-full bg-transparent border border-white/40 text-white hover:bg-white/5 hover:scale-105 active:scale-95 transition-all duration-300 text-xs font-normal uppercase"
+                          >
+                            Confirmar Pago
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </motion.div>
           </div>
         )}

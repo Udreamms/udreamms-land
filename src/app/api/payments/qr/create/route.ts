@@ -26,6 +26,7 @@ export async function POST(request: NextRequest) {
       expectedAmountUi,
       expectedAmountRaw,
       billingData,
+      items,
     } = await request.json();
 
     if (!sessionId || !plan || !paymentMethod || !expectedAmountUi || !expectedAmountRaw) {
@@ -36,9 +37,24 @@ export async function POST(request: NextRequest) {
     }
 
     const planKey = String(plan).toLowerCase();
-    const catalogPlanPriceUSD = VISA_PLAN_CATALOG_USD[planKey];
+    let catalogPlanPriceUSD = 0;
+    if (planKey === 'cart') {
+      if (!Array.isArray(items) || items.length === 0) {
+        return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
+      }
+      for (const itemId of items) {
+        const itemPrice = VISA_PLAN_CATALOG_USD[itemId];
+        if (!itemPrice) {
+          return NextResponse.json({ error: `Invalid cart item: ${itemId}` }, { status: 400 });
+        }
+        catalogPlanPriceUSD += itemPrice;
+      }
+    } else {
+      catalogPlanPriceUSD = VISA_PLAN_CATALOG_USD[planKey];
+    }
+
     if (!catalogPlanPriceUSD) {
-      return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid plan or empty checkout value' }, { status: 400 });
     }
 
     const clientChargeUSD = typeof chargeUSD === 'number' ? chargeUSD : Number(chargeUSD);
@@ -74,7 +90,7 @@ export async function POST(request: NextRequest) {
       amount: String(expectedAmountUi),
       splToken: config.mint,
       reference,
-      label: `Udreamms ${PLAN_DISPLAY_TITLES[planKey] || planKey}`,
+      label: planKey === 'cart' ? 'Udreamms - Pago de Carrito' : `Udreamms ${PLAN_DISPLAY_TITLES[planKey] || planKey}`,
       message: 'Escanea con Phantom para completar tu pago',
       memo: `visa:${requestId}`,
     });

@@ -23,6 +23,17 @@ export const VISA_PLAN_CATALOG_USD: Record<string, number> = {
   pro: 850,
   elite: 2500,
   allinclusive: 10000,
+  'plan-esencial': 380,
+  'plan-pro': 850,
+  'plan-elite': 2500,
+  'plan-allinclusive': 10000,
+  'plan-turista-basico': 380,
+  'plan-turista-premium': 3500,
+  'plan-turista-vip': 4990,
+  'curso-estudiante': 99,
+  'libro-estudiante': 29,
+  'curso-turista': 79,
+  'libro-turista': 19,
 };
 
 export const PLAN_DISPLAY_TITLES: Record<string, string> = {
@@ -33,6 +44,18 @@ export const PLAN_DISPLAY_TITLES: Record<string, string> = {
   pro: 'Plan Pro',
   elite: 'Plan Elite',
   allinclusive: 'Plan All-Inclusive',
+  'plan-esencial': 'Plan Esencial F-1',
+  'plan-pro': 'Plan Pro F-1',
+  'plan-elite': 'Plan Elite F-1',
+  'plan-allinclusive': 'Plan All-Inclusive F-1',
+  'plan-turista-basico': 'Plan Turista Básico B-2',
+  'plan-turista-premium': 'Plan Turista Premium B-2',
+  'plan-turista-vip': 'Experiencia VIP B-2',
+  'curso-estudiante': 'Curso Digital (Estudiante)',
+  'libro-estudiante': 'Libro Digital (Estudiante)',
+  'curso-turista': 'Curso Digital (Turista)',
+  'libro-turista': 'Libro Digital (Turista)',
+  cart: 'Carrito de Compras',
 };
 
 export const SOLANA_PAYMENT_CONFIG: Record<CryptoPaymentMethod, CryptoPaymentConfig> = {
