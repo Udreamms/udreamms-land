@@ -264,11 +264,10 @@ export default function UdreammsTVShowcase() {
                                     variants={{
                                         initial: { scale: 0, opacity: 0 },
                                         animate: {
-                                            scale: [0, 0, 1.25, 1],
-                                            opacity: [0, 0, 1, 1],
+                                            scale: 1,
+                                            opacity: 1,
                                             transition: {
-                                                duration: 2.5,
-                                                times: [0, 0.83, 0.9, 1],
+                                                delay: 2.1,
                                                 type: "spring",
                                                 stiffness: 100,
                                                 damping: 8
