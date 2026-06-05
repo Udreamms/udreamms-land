@@ -12,19 +12,19 @@ const categories = [
     faqs: [
       {
         question: "¿Qué es Udreamms?",
-        answer: "Somos una empresa especializada en brindar asesoramiento logístico y acompañamiento integral durante todo el proceso de visado estudiantil. Nos encargamos de guiarte paso a paso, desde la elección de tu programa y destino hasta tu llegada a los Estados Unidos, asegurando que tu experiencia sea segura, organizada y exitosa."
+        answer: "Udreamms es un ecosistema creado para ayudar a las personas a cumplir su sueño de vivir y estudiar en Estados Unidos, acompañándolas en todo el proceso de la preparación antes del viaje hasta su adaptación en el país. Brinda guías, recursos y herramientas prácticas para reducir el miedo, facilitar la integración y empoderar a cada estudiante para que logre sus metas y se desarrolle plenamente en el extranjero."
       },
       {
         question: "¿Por dónde empiezo?",
-        answer: "Para iniciar, debes tener tu pasaporte vigente a la mano y un estado de cuenta con un mínimo de $5,000 USD que respalde tus gastos de estadía. Envía estos documentos en formato PDF a services@udreamms.com y realiza el pago por nuestros servicios migratorios (recuerda que ofrecemos un descuento considerable si pagas con criptomonedas). Una vez hecho esto, un asesor se comunicará contigo por WhatsApp para definir el estado al que deseas viajar e iniciar tu proceso de admisión."
+        answer: "Empiezas identificando en qué etapa te encuentras dentro del roadmap de cuatro fases de Udreamms. Este mapa te guía paso a paso desde cero hasta tu llegada y adaptación en Estados Unidos, para que sepas exactamente qué hacer en cada momento y avances de forma clara hacia tu objetivo de estudiar y vivir en USA."
       },
       {
         question: "¿Quién es la persona ideal para vivir esta experiencia?",
-        answer: "Este programa está diseñado para estudiantes entre 17 y 65 años que ya se hayan graduado de bachillerato. Puedes vivir esta experiencia solo o junto a tu familia. En caso de viajar con tu familia, solo debes presentar un estado de cuenta que demuestre los recursos necesarios para cubrir los gastos de todos, asegurando así su tranquilidad en Estados Unidos."
+        answer: "La persona correcta para Udreamms es quien tiene el sueño de estudiar y vivir en Estados Unidos, pero necesita guía clara para saber por dónde empezar y cómo avanzar en el proceso. Es ideal para quienes quieren hacerlo de forma organizada, con acompañamiento en cada etapa, desde la preparación inicial hasta su adaptación en el país."
       },
       {
         question: "¿Qué es Luxor y cómo me beneficia?",
-        answer: "Luxor es una criptomoneda o moneda digital. Nuestro paquete básico de viaje para estudiantes tiene un costo de $380, pero si pagas con Luxor te costará solo $300. Así te ahorras $80 además de las comisiones y gastos de envío que tendrías con métodos de pago tradicionales (tarjetas de crédito, débito o Western Union). Este servicio estará disponible a partir del 5 de enero de 2027. Puedes visitar byluxor.com para unirte y descubrir una gran red de establecimientos (cafeterías, restaurantes, etc.) donde también podrás obtener descuentos al pagar con Luxor."
+        answer: "Luxor es una moneda digital creada para los estudiantes de Udreamms, diseñada para que puedan acceder y prepararse antes de su viaje a Estados Unidos sin verse afectados por los cambios del dólar. Al iniciar el proceso, cada estudiante recibe 100 monedas como bienvenida, las cuales pueden utilizarse dentro del ecosistema para acceder a diferentes servicios y herramientas de apoyo."
       }
     ]
   },
