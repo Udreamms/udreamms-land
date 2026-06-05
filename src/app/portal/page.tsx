@@ -28,7 +28,16 @@ import {
   Sparkles,
   Download,
   ShoppingCart,
-  Lock
+  Lock,
+  School,
+  Plane,
+  Car,
+  CreditCard,
+  Home,
+  Languages,
+  Users,
+  CheckCircle2,
+  Star
 } from "lucide-react";
 
 const studentModules = [
@@ -88,6 +97,80 @@ const cartItemsConfig: Record<string, { name: string; price: number; type: 'curs
   'curso-turista': { name: "Curso Digital - Visa de Turista B-2", price: 79, type: 'curso', visa: 'turista' },
   'libro-turista': { name: "Libro Digital - Visa de Turista B-2", price: 19, type: 'libro', visa: 'turista' },
 };
+
+const studentPlans = [
+  {
+    name: "PLAN 1: ESENCIAL",
+    price: "$380",
+    originalPrice: "$494",
+    discount: "30% OFF",
+    description: "El punto de partida ideal.",
+    highlight: false,
+    features: [
+      { name: "Servicios Básicos", icon: CheckCircle2 },
+      { name: "Aplicación escuela + I-20", icon: School },
+      { name: "DS-160 + SEVIS + Cita", icon: FileText },
+      { name: "Simulacro de Entrevista (3 sesiones)", icon: MessageSquare },
+    ]
+  },
+  {
+    name: "PLAN 2: PRO",
+    price: "$850",
+    originalPrice: "$1,700",
+    discount: "50% OFF",
+    description: "Para quienes buscan seguridad.",
+    highlight: true,
+    features: [
+      { name: "Servicios Básicos", icon: CheckCircle2 },
+      { name: "Aplicación escuela + I-20", icon: School },
+      { name: "DS-160 + SEVIS + Cita", icon: FileText },
+      { name: "Simulacro de Entrevista (3 sesiones)", icon: MessageSquare },
+      { name: "Link vuelos / Seguro Médico", icon: Plane },
+      { name: "Pick-up Aeropuerto (UT)", icon: Car },
+      { name: "Banco, Celular y Licencia", icon: CreditCard },
+    ]
+  },
+  {
+    name: "PLAN 3: ELITE",
+    price: "$2,500",
+    originalPrice: "$3,250",
+    discount: "30% OFF",
+    description: "Soporte completo y alojamiento.",
+    highlight: false,
+    features: [
+      { name: "Servicios Básicos", icon: CheckCircle2 },
+      { name: "Aplicación escuela + I-20", icon: School },
+      { name: "DS-160 + SEVIS + Cita", icon: FileText },
+      { name: "Simulacro de Entrevista (3 sesiones)", icon: MessageSquare },
+      { name: "Link tickets aéreos", icon: Plane },
+      { name: "Pick-up Aeropuerto (UT)", icon: Car },
+      { name: "Banco, Celular y Licencia", icon: CreditCard },
+      { name: "Búsqueda de Alojamiento (Aplicación de vivienda incluida)", icon: Home },
+      { name: "Mentoria de Adaptación (1 mes)", icon: Users },
+      { name: "Clases de Inglés (1er Mes Gratis)", icon: Languages },
+    ]
+  },
+  {
+    name: "PLAN 4: ALL-INCLUSIVE",
+    price: "$10,000",
+    originalPrice: "$13,000",
+    discount: "30% OFF",
+    description: "La experiencia VIP definitiva.",
+    highlight: false,
+    features: [
+      { name: "Servicios Básicos", icon: CheckCircle2 },
+      { name: "Aplicación escuela + I-20", icon: School },
+      { name: "DS-160 + SEVIS + Cita", icon: FileText },
+      { name: "Simulacro de Entrevista (Ilimitadas)", icon: MessageSquare },
+      { name: "Tickets aéreos a USA (incluidos)", icon: Plane },
+      { name: "Pick-up Aeropuerto (UT)", icon: Car },
+      { name: "Banco, Celular y Licencia", icon: CreditCard },
+      { name: "Búsqueda de Alojamiento (4 Meses Pagados)", icon: Home },
+      { name: "Mentoria de Adaptación (4 meses)", icon: Star },
+      { name: "Clases de Inglés (4 Meses Pagados)", icon: Languages },
+    ]
+  }
+];
 
 export default function PortalPage() {
   const [user, setUser] = useState<any>(null);
@@ -750,32 +833,114 @@ export default function PortalPage() {
             {activeSection === 'servicios' && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-2xl md:text-3xl font-normal tracking-tight">Servicios y Soporte</h2>
-                  <p className="text-sm text-white/50">Administra tus servicios y mantente en comunicación con tu asesor.</p>
+                  <h2 className="text-2xl md:text-3xl font-normal tracking-tight">
+                    {activeTopSection === 'visa-estudiante' ? "Elige tu Plan Ideal" : "Servicios y Soporte"}
+                  </h2>
+                  <p className="text-sm text-white/50">
+                    {activeTopSection === 'visa-estudiante' 
+                      ? "Integramos admisión universitaria y preparación consular estratégica en un solo lugar." 
+                      : "Administra tus servicios y mantente en comunicación con tu asesor."}
+                  </p>
                 </div>
 
-                <div className="w-full bg-[#0d0d11]/80 backdrop-blur-md border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 justify-between">
-                  <div className="space-y-4 max-w-2xl">
-                    <Shield className="w-8 h-8 text-purple-400" />
-                    <h3 className="text-xl font-normal">Asesor Designado</h3>
-                    <p className="text-sm text-white/50 leading-relaxed">
-                      {activeTopSection === 'visa-estudiante' 
-                        ? "Tienes soporte de primer nivel asignado para tu trámite de Visa de Estudiante F-1. Si tienes preguntas urgentes sobre tus pasos o necesitas cargar documentos, comunícate directamente por el canal preferencial."
-                        : "Tienes soporte de primer nivel asignado para tu trámite de Visa de Turista B-2. Si tienes preguntas urgentes sobre tus pasos o necesitas cargar documentos, comunícate directamente por el canal preferencial."}
-                    </p>
+                {activeTopSection === 'visa-estudiante' ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch w-full">
+                    {studentPlans.map((plan, index) => (
+                      <div key={index} className="relative group w-full flex flex-col h-full">
+                        {/* Glow Effect Background */}
+                        <div className="absolute -inset-1.5 bg-white/10 rounded-[2rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                        {/* Card Content */}
+                        <div className={`relative flex-1 bg-[#0d0d11]/80 border rounded-[2rem] p-6 flex flex-col overflow-hidden transition-all duration-300 ${plan.highlight ? 'border-purple-500/50 ring-1 ring-purple-500/30 shadow-2xl shadow-purple-500/5 z-10' : 'border-white/5 hover:border-white/10 shadow-2xl hover:bg-[#0f0f15]'}`}>
+                          
+                          {/* Visual Accent */}
+                          <div className="absolute top-0 right-0 w-24 h-24 bg-white/[0.02] blur-2xl" />
+
+                          {/* Discount Badge */}
+                          {plan.discount && (
+                            <div className="absolute top-4 right-4 bg-purple-950/80 text-purple-300 px-2.5 py-1 rounded-md text-[10px] font-semibold tracking-wide border border-purple-500/30">
+                              {plan.discount}
+                            </div>
+                          )}
+
+                          {/* Recommended Badge */}
+                          {plan.highlight && (
+                            <div className="absolute top-0 right-1/2 translate-x-1/2 bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] text-white text-[9px] font-semibold uppercase tracking-widest px-4 py-1 rounded-b-xl shadow-lg z-20">
+                              MÁS POPULAR
+                            </div>
+                          )}
+
+                          <div className="flex flex-col items-center text-center mt-6 mb-6">
+                            <h3 className="text-md font-semibold text-white tracking-wider mb-2">
+                              {plan.name}
+                            </h3>
+                            <div className="flex flex-col items-center justify-center">
+                              <span className="text-white/40 line-through text-xs font-normal">
+                                {plan.originalPrice}
+                              </span>
+                              <span className="text-3xl font-normal text-white tracking-tight pt-0.5">
+                                {plan.price}
+                              </span>
+                            </div>
+                            <p className="text-white/50 text-xs font-light mt-3 leading-relaxed">
+                              {plan.description}
+                            </p>
+                          </div>
+
+                          <div className="flex flex-col items-center gap-3 mt-auto mb-6 w-full">
+                            <a 
+                              href={`/instructions-payment-student?plan=${plan.name.toLowerCase().split(":")[1]?.trim().replace(" ", "-") || "esencial"}`} 
+                              className="w-full py-2.5 rounded-full bg-transparent text-white font-normal text-xs shadow-lg border border-white/20 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:scale-105 active:scale-95 transition-all duration-300 text-center uppercase tracking-widest"
+                            >
+                              Elegir Plan
+                            </a>
+                          </div>
+
+                          <div className="space-y-4 flex-1 border-t border-white/5 pt-5">
+                            <p className="text-white/30 font-normal text-[10px] uppercase tracking-widest mb-2 text-center">
+                              LO QUE INCLUYE:
+                            </p>
+                            <ul className="space-y-3">
+                              {plan.features.map((feature, i) => {
+                                const Icon = feature.icon;
+                                return (
+                                  <li key={i} className="flex items-start gap-2 text-white/70 hover:text-white transition-colors cursor-default leading-relaxed">
+                                    <Icon className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" strokeWidth={2} />
+                                    <span className="text-xs font-light text-white/80">
+                                      {feature.name}
+                                    </span>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </div>
+
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                ) : (
+                  <div className="w-full bg-[#0d0d11]/80 backdrop-blur-md border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 justify-between">
+                    <div className="space-y-4 max-w-2xl">
+                      <Shield className="w-8 h-8 text-purple-400" />
+                      <h3 className="text-xl font-normal">Asesor Designado</h3>
+                      <p className="text-sm text-white/50 leading-relaxed">
+                        Tienes soporte de primer nivel asignado para tu trámite de Visa de Turista B-2. Si tienes preguntas urgentes sobre tus pasos o necesitas cargar documentos, comunícate directamente por el canal preferencial.
+                      </p>
+                    </div>
 
-                  <Button 
-                    onClick={() => {
-                      setActiveTopSection('experto');
-                      setActiveSection('experto');
-                    }}
-                    className="w-full md:w-auto h-12 rounded-full bg-transparent border border-white/40 text-white hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg text-xs font-normal tracking-widest uppercase px-8 flex items-center justify-center gap-2"
-                  >
-                    Contactar Asesor
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </div>
+                    <Button 
+                      onClick={() => {
+                        setActiveTopSection('experto');
+                        setActiveSection('experto');
+                      }}
+                      className="w-full md:w-auto h-12 rounded-full bg-transparent border border-white/40 text-white hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg text-xs font-normal tracking-widest uppercase px-8 flex items-center justify-center gap-2"
+                    >
+                      Contactar Asesor
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
 
