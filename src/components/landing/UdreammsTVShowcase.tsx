@@ -1,24 +1,66 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 export default function UdreammsTVShowcase() {
 
-        const starVariants = {
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 1024);
+        };
+        checkMobile();
+        if (typeof window !== "undefined") window.addEventListener("resize", checkMobile);
+        return () => {
+            if (typeof window !== "undefined") window.removeEventListener("resize", checkMobile);
+        };
+    }, []);
+
+    const containerVariants = {
         initial: {
-            x: "80vw",
+            x: isMobile ? "0vw" : "40vw",
+            y: isMobile ? "25vh" : "0vh",
+            scale: 2.5,
+        },
+        animate: {
+            x: [
+                isMobile ? "0vw" : "40vw",
+                isMobile ? "0vw" : "40vw",
+                "0vw",
+                "0vw"
+            ],
+            y: [
+                isMobile ? "25vh" : "0vh",
+                isMobile ? "25vh" : "0vh",
+                "0vh",
+                "0vh"
+            ],
+            scale: [2.5, 2.5, 1.0, 1.0],
+            transition: {
+                duration: 3.0,
+                times: [0, 0.4, 0.73, 1.0],
+                ease: "easeInOut" as const
+            }
+        }
+    };
+
+    const starVariants = {
+        initial: {
+            x: "40vw",
             y: "-20vh",
             scale: 0,
             opacity: 0
         },
         animate: {
-            x: ["80vw", "80vw", "0vw", "-35vw", "-35vw"],
+            x: ["40vw", "40vw", "0vw", "-35vw", "-35vw"],
             y: ["-20vh", "-20vh", "0vh", "0vh", "0vh"],
             scale: [0, 1.5, 1.0, 0, 0],
             opacity: [0, 1, 1, 0, 0],
             transition: {
-                duration: 2.5,
-                times: [0, 0.15, 0.48, 0.72, 1.0],
+                duration: 3.0,
+                times: [0, 0.15, 0.40, 0.73, 1.0],
                 ease: "easeInOut" as const
             }
         }
@@ -47,8 +89,8 @@ export default function UdreammsTVShowcase() {
                 "0 0 25px rgba(217, 70, 239, 0.8), 0 0 50px rgba(217, 70, 239, 0.4)"
             ],
             transition: {
-                duration: 2.5,
-                times: [0, 0.45, 0.48, 0.72, 1],
+                duration: 3.0,
+                times: [0, 0.38, 0.40, 0.73, 1],
                 ease: "easeInOut" as const
             }
         }
@@ -77,8 +119,8 @@ export default function UdreammsTVShowcase() {
                 "0 0 25px rgba(217, 70, 239, 0.8), 0 0 50px rgba(217, 70, 239, 0.4)"
             ],
             transition: {
-                duration: 2.5,
-                times: [0, 0.45, 0.48, 0.72, 1],
+                duration: 3.0,
+                times: [0, 0.38, 0.40, 0.73, 1],
                 ease: "easeInOut" as const
             }
         }
@@ -107,8 +149,8 @@ export default function UdreammsTVShowcase() {
                 "0 0 25px rgba(217, 70, 239, 0.8), 0 0 50px rgba(217, 70, 239, 0.4)"
             ],
             transition: {
-                duration: 2.5,
-                times: [0, 0.45, 0.48, 0.72, 1],
+                duration: 3.0,
+                times: [0, 0.38, 0.40, 0.73, 1],
                 ease: "easeInOut" as const
             }
         }
@@ -196,7 +238,13 @@ export default function UdreammsTVShowcase() {
                             <h2 className="text-4xl md:text-[5.5rem] lg:text-[6.5rem] font-bold text-white tracking-tighter leading-none select-none flex items-center gap-3 md:gap-5">
                                 UDREAMMS
                                 {/* Wrapper contenedor relativo que agrupa el Plus animado y la Estrella fugaz (sin rotación) */}
-                                <div className="relative w-10 h-10 md:w-24 md:h-24 lg:w-28 lg:h-28 flex items-center justify-center shrink-0 z-20 select-none pointer-events-auto">
+                                <motion.div 
+                                    variants={containerVariants}
+                                    initial="initial"
+                                    whileInView="animate"
+                                    viewport={{ once: true }}
+                                    className="relative w-10 h-10 md:w-24 md:h-24 lg:w-28 lg:h-28 flex items-center justify-center shrink-0 z-20 select-none pointer-events-auto"
+                                >
                                     
                                     {/* Contenedor del signo más (+) animado que sí rota */}
                                     <motion.div 
@@ -206,8 +254,8 @@ export default function UdreammsTVShowcase() {
                                             animate: {
                                                 rotate: [0, 360, 360],
                                                 transition: {
-                                                    duration: 2.5,
-                                                    times: [0, 0.55, 1],
+                                                    duration: 3.0,
+                                                    times: [0, 0.40, 1.0],
                                                     ease: "easeInOut" as const
                                                 }
                                             }
@@ -309,7 +357,7 @@ export default function UdreammsTVShowcase() {
                                         {/* Cola de luz difuminada */}
                                         <div className="absolute right-3 w-32 md:w-48 h-[2px] rounded-full bg-gradient-to-r from-transparent via-[#d946ef]/60 to-white filter blur-[1.5px]" />
                                     </motion.div>
-                                </div>
+                                </motion.div>
                             </h2>
                             
                             {/* Subtítulos y Copia Premium de Acompañamiento (Perfectamente pegados) */}
