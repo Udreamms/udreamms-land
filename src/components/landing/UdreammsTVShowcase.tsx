@@ -1,113 +1,24 @@
 "use client";
 
-import { motion, useAnimation } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 
 export default function UdreammsTVShowcase() {
-    const controls = useAnimation();
-    const [isMobile, setIsMobile] = useState(false);
 
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 1024);
-        };
-        checkMobile();
-        if (typeof window !== "undefined") window.addEventListener("resize", checkMobile);
-        return () => {
-            if (typeof window !== "undefined") window.removeEventListener("resize", checkMobile);
-        };
-    }, []);
-
-    const resizeTimer = useRef<number | null>(null);
-    const sectionRef = useRef<HTMLElement | null>(null);
-    const tvRef = useRef<any>(null);
-
-    // Calcula límites basados en las dimensiones reales de la sección y el TV
-    const startAirHockeyBounces = () => {
-        if (typeof window === "undefined") return;
-        const sec = sectionRef.current;
-        const tv = tvRef.current;
-        if (!sec || !tv) return;
-
-        const c = sec.getBoundingClientRect();
-        const t = tv.getBoundingClientRect();
-
-        // límites para que el TV no salga del area visible de la sección
-        const minX = Math.round(c.left - t.left);
-        const maxX = Math.round(c.right - t.right);
-        const minY = Math.round(c.top - t.top);
-        const maxY = Math.round(c.bottom - t.bottom);
-
-        const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
-
-        // Generar puntos intermedios dentro de los límites con margen
-        const marginX = Math.round(Math.min(Math.abs(minX), Math.abs(maxX)) * 0.85);
-        const marginY = Math.round(Math.min(Math.abs(minY), Math.abs(maxY)) * 0.6);
-
-        const xs = [
-            0,
-            clamp(-marginX * 0.6, minX, maxX),
-            clamp(marginX * 0.5, minX, maxX),
-            clamp(-marginX * 0.3, minX, maxX),
-            clamp(marginX * 0.25, minX, maxX),
-            0
-        ];
-
-        const ys = [
-            0,
-            clamp(-marginY * 0.9, minY, maxY),
-            clamp(marginY * 0.6, minY, maxY),
-            clamp(-marginY * 0.4, minY, maxY),
-            0
-        ];
-
-        controls.start({
-            x: xs,
-            y: ys,
-            rotate: [0, 3, -2, 1, 0],
-            transition: {
-                repeat: Infinity,
-                duration: 30,
-                ease: "easeInOut"
-            }
-        });
-    };
-
-    // Iniciar la animación y reiniciarla en resize (debounced)
-    useEffect(() => {
-        startAirHockeyBounces();
-        const onResize = () => {
-            if (resizeTimer.current) window.clearTimeout(resizeTimer.current);
-            resizeTimer.current = window.setTimeout(() => {
-                startAirHockeyBounces();
-            }, 150);
-        };
-        if (typeof window !== "undefined") window.addEventListener("resize", onResize);
-        return () => {
-            if (typeof window !== "undefined") window.removeEventListener("resize", onResize);
-            if (resizeTimer.current) window.clearTimeout(resizeTimer.current);
-        };
-    }, []);
-
-    const starVariants = {
+        const starVariants = {
         initial: {
-            left: isMobile ? "50%" : "75%",
-            top: isMobile ? "80%" : "35%",
+            x: "80vw",
+            y: "-20vh",
             scale: 0,
             opacity: 0
         },
         animate: {
-            left: isMobile 
-                ? ["50%", "50%", "72%", "72%"] 
-                : ["75%", "75%", "48%", "48%"],
-            top: isMobile 
-                ? ["80%", "80%", "22%", "22%"] 
-                : ["35%", "35%", "35%", "35%"],
-            scale: [0, 1.5, 1.0, 0],
-            opacity: [0, 1, 1, 0],
+            x: ["80vw", "80vw", "0vw", "-35vw", "-35vw"],
+            y: ["-20vh", "-20vh", "0vh", "0vh", "0vh"],
+            scale: [0, 1.5, 1.0, 0, 0],
+            opacity: [0, 1, 1, 0, 0],
             transition: {
                 duration: 2.5,
-                times: [0, 0.55, 0.85, 1],
+                times: [0, 0.15, 0.48, 0.72, 1.0],
                 ease: "easeInOut" as const
             }
         }
@@ -115,7 +26,7 @@ export default function UdreammsTVShowcase() {
 
     const bar1Variants = {
         initial: {
-            left: "26%",
+            left: "27%",
             top: "2.5%",
             rotate: 0,
             scale: 1,
@@ -123,20 +34,21 @@ export default function UdreammsTVShowcase() {
             boxShadow: "0 0 10px rgba(124, 58, 237, 0.3)"
         },
         animate: {
-            left: ["26%", "46%", "46%", "46%"],
-            top: ["2.5%", "12.5%", "12.5%", "12.5%"],
-            rotate: [0, 90, 90, 90],
-            scale: [1, 1.08, 1.0, 1.0],
-            opacity: [1, 1, 1, 1],
+            left: ["27%", "47%", "47%", "47%", "47%"],
+            top: ["2.5%", "12.5%", "12.5%", "12.5%", "12.5%"],
+            rotate: [0, 90, 90, 90, 90],
+            scale: [1, 1.08, 1.25, 1.0, 1.0],
+            opacity: [1, 1, 1, 1, 1],
             boxShadow: [
                 "0 0 15px rgba(124, 58, 237, 0.3)",
-                "0 0 35px rgba(217, 70, 239, 0.9), 0 0 70px rgba(217, 70, 239, 0.5)",
-                "0 0 35px rgba(217, 70, 239, 0.9), 0 0 70px rgba(217, 70, 239, 0.5)",
-                "0 0 35px rgba(217, 70, 239, 0.9), 0 0 70px rgba(217, 70, 239, 0.5)"
+                "0 0 15px rgba(124, 58, 237, 0.3)",
+                "0 0 45px rgba(217, 70, 239, 1.0), 0 0 90px rgba(217, 70, 239, 0.7)",
+                "0 0 25px rgba(217, 70, 239, 0.8), 0 0 50px rgba(217, 70, 239, 0.4)",
+                "0 0 25px rgba(217, 70, 239, 0.8), 0 0 50px rgba(217, 70, 239, 0.4)"
             ],
             transition: {
                 duration: 2.5,
-                times: [0, 0.45, 0.55, 1],
+                times: [0, 0.45, 0.48, 0.72, 1],
                 ease: "easeInOut" as const
             }
         }
@@ -144,7 +56,7 @@ export default function UdreammsTVShowcase() {
 
     const bar2Variants = {
         initial: {
-            left: "46%",
+            left: "47%",
             top: "15.5%",
             rotate: 0,
             scale: 1,
@@ -152,20 +64,21 @@ export default function UdreammsTVShowcase() {
             boxShadow: "0 0 10px rgba(124, 58, 237, 0.3)"
         },
         animate: {
-            left: ["46%", "46%", "46%", "46%"],
-            top: ["15.5%", "12.5%", "12.5%", "12.5%"],
-            rotate: [0, 0, 0, 0],
-            scale: [1, 1.08, 1.0, 1.0],
-            opacity: [1, 1, 1, 1],
+            left: ["47%", "47%", "47%", "47%", "47%"],
+            top: ["15.5%", "12.5%", "12.5%", "12.5%", "12.5%"],
+            rotate: [0, 0, 0, 0, 0],
+            scale: [1, 1.08, 1.25, 1.0, 1.0],
+            opacity: [1, 1, 1, 1, 1],
             boxShadow: [
                 "0 0 15px rgba(124, 58, 237, 0.3)",
-                "0 0 35px rgba(217, 70, 239, 0.9), 0 0 70px rgba(217, 70, 239, 0.5)",
-                "0 0 35px rgba(217, 70, 239, 0.9), 0 0 70px rgba(217, 70, 239, 0.5)",
-                "0 0 35px rgba(217, 70, 239, 0.9), 0 0 70px rgba(217, 70, 239, 0.5)"
+                "0 0 15px rgba(124, 58, 237, 0.3)",
+                "0 0 45px rgba(217, 70, 239, 1.0), 0 0 90px rgba(217, 70, 239, 0.7)",
+                "0 0 25px rgba(217, 70, 239, 0.8), 0 0 50px rgba(217, 70, 239, 0.4)",
+                "0 0 25px rgba(217, 70, 239, 0.8), 0 0 50px rgba(217, 70, 239, 0.4)"
             ],
             transition: {
                 duration: 2.5,
-                times: [0, 0.45, 0.55, 1],
+                times: [0, 0.45, 0.48, 0.72, 1],
                 ease: "easeInOut" as const
             }
         }
@@ -173,7 +86,7 @@ export default function UdreammsTVShowcase() {
 
     const bar3Variants = {
         initial: {
-            left: "66%",
+            left: "67%",
             top: "28.5%",
             rotate: 0,
             scale: 1,
@@ -181,27 +94,28 @@ export default function UdreammsTVShowcase() {
             boxShadow: "0 0 10px rgba(124, 58, 237, 0.3)"
         },
         animate: {
-            left: ["66%", "46%", "46%", "46%"],
-            top: ["28.5%", "12.5%", "12.5%", "12.5%"],
-            rotate: [0, 90, 90, 90],
-            scale: [1, 1.08, 1.0, 1.0],
-            opacity: [1, 1, 1, 1],
+            left: ["67%", "47%", "47%", "47%", "47%"],
+            top: ["28.5%", "12.5%", "12.5%", "12.5%", "12.5%"],
+            rotate: [0, 90, 90, 90, 90],
+            scale: [1, 1.08, 1.25, 1.0, 1.0],
+            opacity: [1, 1, 1, 1, 1],
             boxShadow: [
                 "0 0 15px rgba(124, 58, 237, 0.3)",
-                "0 0 35px rgba(217, 70, 239, 0.9), 0 0 70px rgba(217, 70, 239, 0.5)",
-                "0 0 35px rgba(217, 70, 239, 0.9), 0 0 70px rgba(217, 70, 239, 0.5)",
-                "0 0 35px rgba(217, 70, 239, 0.9), 0 0 70px rgba(217, 70, 239, 0.5)"
+                "0 0 15px rgba(124, 58, 237, 0.3)",
+                "0 0 45px rgba(217, 70, 239, 1.0), 0 0 90px rgba(217, 70, 239, 0.7)",
+                "0 0 25px rgba(217, 70, 239, 0.8), 0 0 50px rgba(217, 70, 239, 0.4)",
+                "0 0 25px rgba(217, 70, 239, 0.8), 0 0 50px rgba(217, 70, 239, 0.4)"
             ],
             transition: {
                 duration: 2.5,
-                times: [0, 0.45, 0.55, 1],
+                times: [0, 0.45, 0.48, 0.72, 1],
                 ease: "easeInOut" as const
             }
         }
     };
 
     return (
-        <section ref={sectionRef} className="relative w-full min-h-[600px] md:min-h-[850px] lg:min-h-[950px] bg-black overflow-hidden flex items-center z-10">
+        <section className="relative w-full min-h-[600px] md:min-h-[850px] lg:min-h-[950px] bg-black overflow-hidden flex items-center z-10">
             {/* Transición suave hacia el bloque negro inferior */}
             <div
               className="pointer-events-none absolute bottom-0 left-0 right-0 z-30 h-28 md:h-40 lg:h-48 bg-gradient-to-b from-transparent via-black/80 to-black"
@@ -278,33 +192,124 @@ export default function UdreammsTVShowcase() {
                                 PRÓXIMAMENTE • PLATAFORMA DE STREAMING
                             </span>
 
-                            {/* Título Principal */}
-                            <h2 className="text-4xl md:text-[5.5rem] lg:text-[6.5rem] font-bold text-white tracking-tighter leading-none select-none flex items-center gap-3">
+                            {/* Título Principal con Signo Más (+) Animado */}
+                            <h2 className="text-4xl md:text-[5.5rem] lg:text-[6.5rem] font-bold text-white tracking-tighter leading-none select-none flex items-center gap-3 md:gap-5">
                                 UDREAMMS
-                                <motion.span
-                                    variants={{
-                                        initial: { scale: 0, opacity: 0 },
-                                        animate: {
-                                            scale: 1,
-                                            opacity: 1,
-                                            transition: {
-                                                delay: 2.1,
-                                                type: "spring",
-                                                stiffness: 100,
-                                                damping: 8
+                                {/* Wrapper contenedor relativo que agrupa el Plus animado y la Estrella fugaz (sin rotación) */}
+                                <div className="relative w-10 h-10 md:w-24 md:h-24 lg:w-28 lg:h-28 flex items-center justify-center shrink-0 z-20 select-none pointer-events-auto">
+                                    
+                                    {/* Contenedor del signo más (+) animado que sí rota */}
+                                    <motion.div 
+                                        className="absolute inset-0 flex items-center justify-center"
+                                        variants={{
+                                            initial: { rotate: 0 },
+                                            animate: {
+                                                rotate: [0, 360, 360],
+                                                transition: {
+                                                    duration: 2.5,
+                                                    times: [0, 0.55, 1],
+                                                    ease: "easeInOut" as const
+                                                }
                                             }
-                                        }
-                                    }}
-                                    initial="initial"
-                                    whileInView="animate"
-                                    viewport={{ once: true }}
-                                    className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-white via-[#bf5af2] to-[#bf5af2] font-extrabold"
-                                    style={{
-                                        textShadow: "0 0 20px rgba(191,90,242,0.8)"
-                                    }}
-                                >
-                                    +
-                                </motion.span>
+                                        }}
+                                        initial="initial"
+                                        whileInView="animate"
+                                        viewport={{ once: true }}
+                                    >
+                                        {/* Bar 1 (Left -> Horizontal) */}
+                                        <motion.div 
+                                            className="absolute w-[6%] h-[75%] rounded-full bg-gradient-to-b from-[#7c3aed] via-[#d946ef] to-[#6366f1] overflow-hidden border border-fuchsia-500/30"
+                                            variants={bar1Variants}
+                                            initial="initial"
+                                            whileInView="animate"
+                                            viewport={{ once: true }}
+                                        >
+                                            {/* Glassy Shine Sweep */}
+                                            <motion.div 
+                                                className="absolute inset-0 bg-gradient-to-b from-transparent via-white/25 to-transparent"
+                                                initial={{ y: "-100%" }}
+                                                animate={{ y: ["-100%", "100%", "100%"] }}
+                                                transition={{
+                                                    y: {
+                                                        repeat: Infinity,
+                                                        duration: 2.5,
+                                                        ease: "easeInOut",
+                                                        repeatDelay: 3.5,
+                                                        delay: 1.0
+                                                    }
+                                                }}
+                                            />
+                                        </motion.div>
+
+                                        {/* Bar 2 (Middle -> Vertical) */}
+                                        <motion.div 
+                                            className="absolute w-[6%] h-[75%] rounded-full bg-gradient-to-b from-[#7c3aed] via-[#d946ef] to-[#6366f1] overflow-hidden border border-fuchsia-500/30"
+                                            variants={bar2Variants}
+                                            initial="initial"
+                                            whileInView="animate"
+                                            viewport={{ once: true }}
+                                        >
+                                            {/* Glassy Shine Sweep */}
+                                            <motion.div 
+                                                className="absolute inset-0 bg-gradient-to-b from-transparent via-white/25 to-transparent"
+                                                initial={{ y: "-100%" }}
+                                                animate={{ y: ["-100%", "100%", "100%"] }}
+                                                transition={{
+                                                    y: {
+                                                        repeat: Infinity,
+                                                        duration: 2.5,
+                                                        ease: "easeInOut",
+                                                        repeatDelay: 3.5,
+                                                        delay: 1.6
+                                                    }
+                                                }}
+                                            />
+                                        </motion.div>
+
+                                        {/* Bar 3 (Right -> Horizontal) */}
+                                        <motion.div 
+                                            className="absolute w-[6%] h-[75%] rounded-full bg-gradient-to-b from-[#7c3aed] via-[#d946ef] to-[#6366f1] overflow-hidden border border-fuchsia-500/30"
+                                            variants={bar3Variants}
+                                            initial="initial"
+                                            whileInView="animate"
+                                            viewport={{ once: true }}
+                                        >
+                                            {/* Glassy Shine Sweep */}
+                                            <motion.div 
+                                                className="absolute inset-0 bg-gradient-to-b from-transparent via-white/25 to-transparent"
+                                                initial={{ y: "-100%" }}
+                                                animate={{ y: ["-100%", "100%", "100%"] }}
+                                                transition={{
+                                                    y: {
+                                                        repeat: Infinity,
+                                                        duration: 2.5,
+                                                        ease: "easeInOut",
+                                                        repeatDelay: 3.5,
+                                                        delay: 2.2
+                                                    }
+                                                }}
+                                            />
+                                        </motion.div>
+                                    </motion.div>
+
+                                    {/* Estrella fugaz con cola de luz (No afectada por la rotación del Plus) */}
+                                    <motion.div
+                                        variants={starVariants}
+                                        initial="initial"
+                                        whileInView="animate"
+                                        viewport={{ once: true }}
+                                        className="absolute w-4 h-4 md:w-6 md:h-6 rounded-full bg-white z-50 pointer-events-none flex items-center justify-end"
+                                        style={{
+                                            boxShadow: '0 0 20px #fff, 0 0 40px #bf5af2, 0 0 80px #bf5af2',
+                                            left: '50%',
+                                            top: '50%',
+                                            transform: 'translate(-50%, -50%)'
+                                        }}
+                                    >
+                                        {/* Cola de luz difuminada */}
+                                        <div className="absolute right-3 w-32 md:w-48 h-[2px] rounded-full bg-gradient-to-r from-transparent via-[#d946ef]/60 to-white filter blur-[1.5px]" />
+                                    </motion.div>
+                                </div>
                             </h2>
                             
                             {/* Subtítulos y Copia Premium de Acompañamiento (Perfectamente pegados) */}
@@ -330,139 +335,10 @@ export default function UdreammsTVShowcase() {
                         </motion.div>
                     </div>
 
-                    {/* Right Column: Interactive TV Icon (Fully responsive) */}
-                    <div className="w-full lg:w-1/2 flex items-center justify-center lg:justify-end relative h-[240px] md:h-[450px] lg:h-auto">
-                        <motion.div
-                            initial={{ scale: 0.8, rotate: -5, opacity: 0, x: 200 }}
-                            whileInView={{ scale: 1, rotate: 0, opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            animate={controls}
-                            ref={tvRef}
-                            drag
-                            dragConstraints={{ left: -1000, right: 100, top: -200, bottom: 200 }}
-                            dragElastic={0.2}
-                            onDragEnd={() => {
-                                // Al soltar el cursor, reactivamos de inmediato y de forma fluida el bucle de rebotes infinitos!
-                                startAirHockeyBounces();
-                            }}
-                            whileDrag={{ scale: 1.15, cursor: "grabbing" }}
-                            className="relative lg:absolute lg:right-0 lg:-top-64 w-40 h-40 md:w-72 md:h-72 lg:w-[30rem] lg:h-[30rem] flex items-center justify-center shrink-0 z-20 cursor-grab select-none pointer-events-auto"
-                        >
-                            {/* Background Purple Glow */}
-                            <div className="absolute w-[80%] h-[80%] rounded-full bg-[#bf5af2]/20 blur-[100px] pointer-events-none z-0" />
-                            
-                            {/* 3D Glowing Bars Container */}
-                            <motion.div 
-                                className="relative w-[75%] h-[75%] pointer-events-none z-10"
-                                variants={{
-                                    initial: { rotate: 0 },
-                                    animate: {
-                                        rotate: [0, 360, 360],
-                                        transition: {
-                                            duration: 2.5,
-                                            times: [0, 0.55, 1],
-                                            ease: "easeInOut" as const
-                                        }
-                                    }
-                                }}
-                                initial="initial"
-                                whileInView="animate"
-                                viewport={{ once: true }}
-                            >
-                                
-                                {/* Bar 1 (Left -> Horizontal) */}
-                                <motion.div 
-                                    className="absolute w-[8%] h-[75%] rounded-full bg-gradient-to-b from-[#7c3aed] via-[#d946ef] to-[#6366f1] overflow-hidden border border-fuchsia-500/30"
-                                    variants={bar1Variants}
-                                    initial="initial"
-                                    whileInView="animate"
-                                    viewport={{ once: true }}
-                                >
-                                    {/* Glassy Shine Sweep */}
-                                    <motion.div 
-                                        className="absolute inset-0 bg-gradient-to-b from-transparent via-white/25 to-transparent"
-                                        initial={{ y: "-100%" }}
-                                        animate={{ y: ["-100%", "100%", "100%"] }}
-                                        transition={{
-                                            y: {
-                                                repeat: Infinity,
-                                                duration: 2.5,
-                                                ease: "easeInOut",
-                                                repeatDelay: 3.5,
-                                                delay: 1.0
-                                            }
-                                        }}
-                                    />
-                                </motion.div>
-
-                                {/* Bar 2 (Middle -> Vertical) */}
-                                <motion.div 
-                                    className="absolute w-[8%] h-[75%] rounded-full bg-gradient-to-b from-[#7c3aed] via-[#d946ef] to-[#6366f1] overflow-hidden border border-fuchsia-500/30"
-                                    variants={bar2Variants}
-                                    initial="initial"
-                                    whileInView="animate"
-                                    viewport={{ once: true }}
-                                >
-                                    {/* Glassy Shine Sweep */}
-                                    <motion.div 
-                                        className="absolute inset-0 bg-gradient-to-b from-transparent via-white/25 to-transparent"
-                                        initial={{ y: "-100%" }}
-                                        animate={{ y: ["-100%", "100%", "100%"] }}
-                                        transition={{
-                                            y: {
-                                                repeat: Infinity,
-                                                duration: 2.5,
-                                                ease: "easeInOut",
-                                                repeatDelay: 3.5,
-                                                delay: 1.6
-                                            }
-                                        }}
-                                    />
-                                </motion.div>
-
-                                {/* Bar 3 (Right -> Horizontal) */}
-                                <motion.div 
-                                    className="absolute w-[8%] h-[75%] rounded-full bg-gradient-to-b from-[#7c3aed] via-[#d946ef] to-[#6366f1] overflow-hidden border border-fuchsia-500/30"
-                                    variants={bar3Variants}
-                                    initial="initial"
-                                    whileInView="animate"
-                                    viewport={{ once: true }}
-                                >
-                                    {/* Glassy Shine Sweep */}
-                                    <motion.div 
-                                        className="absolute inset-0 bg-gradient-to-b from-transparent via-white/25 to-transparent"
-                                        initial={{ y: "-100%" }}
-                                        animate={{ y: ["-100%", "100%", "100%"] }}
-                                        transition={{
-                                            y: {
-                                                repeat: Infinity,
-                                                duration: 2.5,
-                                                ease: "easeInOut",
-                                                repeatDelay: 3.5,
-                                                delay: 2.2
-                                            }
-                                        }}
-                                    />
-                                </motion.div>
-
-                            </motion.div>
-                        </motion.div>
+                    {/* Right Column: Spacing / Empty Column showing TV Background with radial glow */}
+                    <div className="w-full lg:w-1/2 flex items-center justify-center lg:justify-end relative h-[100px] md:h-[200px] lg:h-auto pointer-events-none">
+                        <div className="absolute w-[60%] h-[60%] rounded-full bg-[#bf5af2]/5 blur-[120px]" />
                     </div>
-
-                    {/* Shooting Star Flare with Trail */}
-                    <motion.div
-                        variants={starVariants}
-                        initial="initial"
-                        whileInView="animate"
-                        viewport={{ once: true }}
-                        className="absolute w-6 h-6 rounded-full bg-white z-50 pointer-events-none flex items-center justify-end"
-                        style={{
-                            boxShadow: '0 0 20px #fff, 0 0 40px #bf5af2, 0 0 80px #bf5af2'
-                        }}
-                    >
-                        {/* Light tail */}
-                        <div className="absolute right-3 w-32 md:w-48 h-[2px] rounded-full bg-gradient-to-r from-transparent via-[#d946ef]/60 to-white filter blur-[1.5px]" />
-                    </motion.div>
                 </div>
             </motion.div>
         </section>
