@@ -18,24 +18,26 @@ export default function UdreammsTVShowcase() {
         };
     }, []);
 
-    const containerVariants = {
+    const starVariants = {
         initial: {
             x: isMobile ? "0vw" : "40vw",
             y: isMobile ? "25vh" : "20vh",
-            scale: 2.5,
+            scale: 0,
+            opacity: 0
         },
         animate: {
             x: isMobile
-                ? ["0vw", "0vw", "-10vw", "10vw", "0vw", "-1vw", "0.5vw", "0vw"]
-                : ["40vw", "40vw", "30vw", "15vw", "0vw", "-0.7vw", "0.3vw", "0vw"],
+                ? ["0vw", "0vw", "0vw", "0vw"]
+                : ["40vw", "40vw", "20vw", "0vw", "0vw"],
             y: isMobile
-                ? ["25vh", "25vh", "18vh", "10vh", "0vh", "-2vh", "0.8vh", "0vh"]
-                : ["20vh", "20vh", "5vh", "22vh", "0vh", "-2vh", "0.8vh", "0vh"],
-            scale: [2.5, 2.5, 2.0, 1.5, 1.0, 0.95, 1.02, 1.0],
+                ? ["25vh", "25vh", "12vh", "0vh", "0vh"]
+                : ["20vh", "20vh", "5vh", "0vh", "0vh"],
+            scale: [0, 1.5, 1.2, 0, 0],
+            opacity: [0, 1, 1, 0, 0],
             transition: {
-                duration: 3.0,
-                times: [0, 0.40, 0.53, 0.66, 0.80, 0.85, 0.90, 1.0],
-                ease: "easeInOut" as const
+                duration: 2.5,
+                times: [0, 0.04, 0.24, 0.44, 1.0],
+                ease: "easeOut" as const
             }
         }
     };
@@ -45,26 +47,26 @@ export default function UdreammsTVShowcase() {
             left: "27%",
             top: "2.5%",
             rotate: 0,
-            scale: 1,
-            opacity: 1,
-            boxShadow: "0 0 10px rgba(124, 58, 237, 0.3)"
+            scale: 0.5,
+            opacity: 0,
+            boxShadow: "0 0 0px rgba(124, 58, 237, 0)"
         },
         animate: {
-            left: ["27%", "47%", "47%", "47%", "47%"],
-            top: ["2.5%", "12.5%", "12.5%", "12.5%", "12.5%"],
-            rotate: [0, 90, 90, 90, 90],
-            scale: [1, 1.08, 1.25, 1.0, 1.0],
-            opacity: [1, 1, 1, 1, 1],
+            left: ["27%", "27%", "47%", "47%", "47%"],
+            top: ["2.5%", "2.5%", "12.5%", "12.5%", "12.5%"],
+            rotate: [0, 0, 90, 90, 90],
+            scale: [0.5, 0.5, 1.25, 1.0, 1.0],
+            opacity: [0, 0, 1, 1, 1],
             boxShadow: [
-                "0 0 15px rgba(124, 58, 237, 0.3)",
-                "0 0 15px rgba(124, 58, 237, 0.3)",
+                "0 0 0px rgba(124, 58, 237, 0)",
+                "0 0 0px rgba(124, 58, 237, 0)",
                 "0 0 45px rgba(217, 70, 239, 1.0), 0 0 90px rgba(217, 70, 239, 0.7)",
                 "0 0 25px rgba(217, 70, 239, 0.8), 0 0 50px rgba(217, 70, 239, 0.4)",
                 "0 0 25px rgba(217, 70, 239, 0.8), 0 0 50px rgba(217, 70, 239, 0.4)"
             ],
             transition: {
-                duration: 3.0,
-                times: [0, 0.38, 0.40, 0.80, 1],
+                duration: 2.5,
+                times: [0, 0.44, 0.52, 0.68, 1.0],
                 ease: "easeInOut" as const
             }
         }
@@ -75,26 +77,26 @@ export default function UdreammsTVShowcase() {
             left: "47%",
             top: "15.5%",
             rotate: 0,
-            scale: 1,
-            opacity: 1,
-            boxShadow: "0 0 10px rgba(124, 58, 237, 0.3)"
+            scale: 0.5,
+            opacity: 0,
+            boxShadow: "0 0 0px rgba(124, 58, 237, 0)"
         },
         animate: {
             left: ["47%", "47%", "47%", "47%", "47%"],
-            top: ["15.5%", "12.5%", "12.5%", "12.5%", "12.5%"],
+            top: ["15.5%", "15.5%", "12.5%", "12.5%", "12.5%"],
             rotate: [0, 0, 0, 0, 0],
-            scale: [1, 1.08, 1.25, 1.0, 1.0],
-            opacity: [1, 1, 1, 1, 1],
+            scale: [0.5, 0.5, 1.25, 1.0, 1.0],
+            opacity: [0, 0, 1, 1, 1],
             boxShadow: [
-                "0 0 15px rgba(124, 58, 237, 0.3)",
-                "0 0 15px rgba(124, 58, 237, 0.3)",
+                "0 0 0px rgba(124, 58, 237, 0)",
+                "0 0 0px rgba(124, 58, 237, 0)",
                 "0 0 45px rgba(217, 70, 239, 1.0), 0 0 90px rgba(217, 70, 239, 0.7)",
                 "0 0 25px rgba(217, 70, 239, 0.8), 0 0 50px rgba(217, 70, 239, 0.4)",
                 "0 0 25px rgba(217, 70, 239, 0.8), 0 0 50px rgba(217, 70, 239, 0.4)"
             ],
             transition: {
-                duration: 3.0,
-                times: [0, 0.38, 0.40, 0.80, 1],
+                duration: 2.5,
+                times: [0, 0.44, 0.52, 0.68, 1.0],
                 ease: "easeInOut" as const
             }
         }
@@ -105,26 +107,26 @@ export default function UdreammsTVShowcase() {
             left: "67%",
             top: "28.5%",
             rotate: 0,
-            scale: 1,
-            opacity: 1,
-            boxShadow: "0 0 10px rgba(124, 58, 237, 0.3)"
+            scale: 0.5,
+            opacity: 0,
+            boxShadow: "0 0 0px rgba(124, 58, 237, 0)"
         },
         animate: {
-            left: ["67%", "47%", "47%", "47%", "47%"],
-            top: ["28.5%", "12.5%", "12.5%", "12.5%", "12.5%"],
-            rotate: [0, 90, 90, 90, 90],
-            scale: [1, 1.08, 1.25, 1.0, 1.0],
-            opacity: [1, 1, 1, 1, 1],
+            left: ["67%", "67%", "47%", "47%", "47%"],
+            top: ["28.5%", "28.5%", "12.5%", "12.5%", "12.5%"],
+            rotate: [0, 0, 90, 90, 90],
+            scale: [0.5, 0.5, 1.25, 1.0, 1.0],
+            opacity: [0, 0, 1, 1, 1],
             boxShadow: [
-                "0 0 15px rgba(124, 58, 237, 0.3)",
-                "0 0 15px rgba(124, 58, 237, 0.3)",
+                "0 0 0px rgba(124, 58, 237, 0)",
+                "0 0 0px rgba(124, 58, 237, 0)",
                 "0 0 45px rgba(217, 70, 239, 1.0), 0 0 90px rgba(217, 70, 239, 0.7)",
                 "0 0 25px rgba(217, 70, 239, 0.8), 0 0 50px rgba(217, 70, 239, 0.4)",
                 "0 0 25px rgba(217, 70, 239, 0.8), 0 0 50px rgba(217, 70, 239, 0.4)"
             ],
             transition: {
-                duration: 3.0,
-                times: [0, 0.38, 0.40, 0.80, 1],
+                duration: 2.5,
+                times: [0, 0.44, 0.52, 0.68, 1.0],
                 ease: "easeInOut" as const
             }
         }
@@ -212,13 +214,7 @@ export default function UdreammsTVShowcase() {
                             <h2 className="text-4xl md:text-[5.5rem] lg:text-[6.5rem] font-bold text-white tracking-tighter leading-none select-none flex items-center gap-3 md:gap-5">
                                 UDREAMMS
                                 {/* Wrapper contenedor relativo que agrupa el Plus animado y la Estrella fugaz (sin rotación) */}
-                                <motion.div 
-                                    variants={containerVariants}
-                                    initial="initial"
-                                    whileInView="animate"
-                                    viewport={{ once: true }}
-                                    className="relative w-10 h-10 md:w-24 md:h-24 lg:w-28 lg:h-28 flex items-center justify-center shrink-0 z-20 select-none pointer-events-auto"
-                                >
+                                <div className="relative w-10 h-10 md:w-24 md:h-24 lg:w-28 lg:h-28 flex items-center justify-center shrink-0 z-20 select-none pointer-events-auto">
                                     
                                     {/* Contenedor del signo más (+) animado que sí rota */}
                                     <motion.div 
@@ -228,8 +224,8 @@ export default function UdreammsTVShowcase() {
                                             animate: {
                                                 rotate: [0, 360, 360],
                                                 transition: {
-                                                    duration: 3.0,
-                                                    times: [0, 0.40, 1.0],
+                                                    duration: 2.5,
+                                                    times: [0, 0.44, 1.0],
                                                     ease: "easeInOut" as const
                                                 }
                                             }
@@ -314,28 +310,24 @@ export default function UdreammsTVShowcase() {
                                         </motion.div>
                                     </motion.div>
 
-                                    {/* LED Stars Orbit Container */}
+                                    {/* Estrella fugaz con cola de luz (No afectada por la rotación del Plus) */}
                                     <motion.div
-                                        className="absolute inset-0 pointer-events-none"
-                                        animate={{
-                                            rotate: [0, 720, 1080],
-                                        }}
-                                        transition={{
-                                            duration: 3.0,
-                                            times: [0, 0.40, 1.0],
-                                            ease: "easeInOut" as const
+                                        variants={starVariants}
+                                        initial="initial"
+                                        whileInView="animate"
+                                        viewport={{ once: true }}
+                                        className="absolute w-4 h-4 md:w-6 md:h-6 rounded-full bg-white z-50 pointer-events-none flex items-center justify-end"
+                                        style={{
+                                            boxShadow: '0 0 20px #fff, 0 0 40px #bf5af2, 0 0 80px #bf5af2',
+                                            left: '50%',
+                                            top: '50%',
+                                            transform: 'translate(-50%, -50%)'
                                         }}
                                     >
-                                        {/* LED Star 1 */}
-                                        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_#fff,0_0_15px_#bf5af2] pointer-events-none" />
-                                        {/* LED Star 2 */}
-                                        <div className="absolute bottom-[-10%] left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white shadow-[0_0_6px_#fff,0_0_12px_#7c3aed] pointer-events-none" />
-                                        {/* LED Star 3 */}
-                                        <div className="absolute left-[-10%] top-1/2 -translate-y-1/2 w-1.2 h-1.2 rounded-full bg-white shadow-[0_0_7px_#fff,0_0_14px_#d946ef] pointer-events-none" />
-                                        {/* LED Star 4 */}
-                                        <div className="absolute right-[-10%] top-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-white shadow-[0_0_6px_#fff,0_0_12px_#6366f1] pointer-events-none" />
+                                        {/* Cola de luz difuminada */}
+                                        <div className="absolute right-3 w-32 md:w-48 h-[2px] rounded-full bg-gradient-to-r from-transparent via-[#d946ef]/60 to-white filter blur-[1.5px]" />
                                     </motion.div>
-                                </motion.div>
+                                </div>
                             </h2>
                             
                             {/* Subtítulos y Copia Premium de Acompañamiento (Perfectamente pegados) */}
