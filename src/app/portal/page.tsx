@@ -28,11 +28,64 @@ import {
   Download
 } from "lucide-react";
 
+const studentModules = [
+  {
+    title: "PASO 1: APLICA A UNA ESCUELA DE INGLES EN USA",
+    description: "Aprende el proceso detallado para seleccionar, aplicar y ser admitido en una escuela de inglés autorizada en los Estados Unidos para obtener tu formulario I-20.",
+    videoUrl: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/Curso%20Digital%2F1.mp4?alt=media&token=44dbb5ff-96d5-4843-b719-190391776999"
+  },
+  {
+    title: "PASO 2: COMPRA TU TARIFA SEVIS",
+    description: "Te guiamos paso a paso para realizar el pago de tu tasa SEVIS I-901, un requisito indispensable antes de tu cita en la embajada.",
+    videoUrl: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/Curso%20Digital%2F2.mp4?alt=media&token=59db6b37-2f47-403d-a93d-052b08a0a1f2"
+  },
+  {
+    title: "PASO 3: COMPLETA TU FORMULARIO DS160",
+    description: "Instrucciones precisas para completar el formulario consular DS-160 sin cometer errores críticos que puedan comprometer tu visa de estudiante.",
+    videoUrl: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/Curso%20Digital%2F3.mp4?alt=media&token=ac30bc0f-fef5-4edc-bee8-62af82952803"
+  },
+  {
+    title: "PASO 4: COMO COMPRAR TU CITA EN LA EMBAJADA AMERICANA",
+    description: "Descubre cómo navegar el portal de citas consulares, realizar el pago del arancel de visa (MRV) y programar tus citas en el CAS y la Embajada.",
+    videoUrl: "https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/Curso%20Digital%2F4.mp4?alt=media&token=7fab24dd-0b89-4dfb-a3cb-3af7d4751755"
+  }
+];
+
+const touristModules = [
+  {
+    title: "1. Requisitos y Pilares de la Visa B-2",
+    description: "Entiende los criterios de evaluación del cónsul para la visa de turismo B-2.",
+    videoUrl: ""
+  },
+  {
+    title: "2. Llenado del Formulario DS-160",
+    description: "Cómo responder a las preguntas del DS-160 enfocado en turismo y arraigo.",
+    videoUrl: ""
+  },
+  {
+    title: "3. Justificación de Arraigo Familiar",
+    description: "Estrategias para demostrar lazos familiares fuertes en tu país de origen.",
+    videoUrl: ""
+  },
+  {
+    title: "4. Solvencia y Lazos Laborales",
+    description: "Cómo estructurar tus pruebas de solvencia económica y empleo estable.",
+    videoUrl: ""
+  },
+  {
+    title: "5. Simulacro de Entrevista y Casos",
+    description: "Preguntas frecuentes del cónsul y consejos para responder correctamente.",
+    videoUrl: ""
+  }
+];
+
 export default function PortalPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTopSection, setActiveTopSection] = useState<'visa-estudiante' | 'visa-turista' | 'experto'>('visa-estudiante');
   const [activeSection, setActiveSection] = useState<'servicios' | 'productos' | 'curso' | 'libro' | 'experto' | 'proceso'>('proceso');
+  const [activeStudentStep, setActiveStudentStep] = useState(0);
+  const [activeTouristStep, setActiveTouristStep] = useState(0);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [newDisplayName, setNewDisplayName] = useState("");
@@ -578,28 +631,52 @@ export default function PortalPage() {
             {activeSection === 'curso' && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-2xl md:text-3xl font-normal tracking-tight">Mi Curso de Preparación</h2>
+                  <h2 className="text-2xl md:text-3xl font-normal tracking-tight">
+                    {activeTopSection === 'visa-estudiante' ? "OBTÉN TU VISA DE ESTUDIANTE EN 30 DÍAS" : "Mi Curso de Preparación"}
+                  </h2>
                   <p className="text-sm text-white/50">Capacítate con nuestros videocursos prácticos dictados por mentores autorizados.</p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Video Player Mockup */}
+                  {/* Video Player or Mockup */}
                   <div className="lg:col-span-2 bg-[#0d0d11] border border-white/5 rounded-3xl overflow-hidden flex flex-col">
-                    <div className="aspect-video bg-zinc-950 w-full relative flex items-center justify-center border-b border-white/5 group">
-                      <div className="absolute inset-0 bg-purple-500/5 group-hover:bg-purple-500/0 transition-all pointer-events-none" />
-                      <Video className="w-16 h-16 text-white/40 group-hover:text-white transition-all cursor-pointer" />
-                      <span className="absolute bottom-4 left-4 px-3 py-1 rounded bg-black/60 backdrop-blur text-[10px] font-normal tracking-wider text-white/80">Vista previa del curso</span>
-                    </div>
+                    {activeTopSection === 'visa-estudiante' ? (
+                      <div className="aspect-video bg-zinc-950 w-full relative flex items-center justify-center border-b border-white/5">
+                        <video
+                          key={studentModules[activeStudentStep].videoUrl}
+                          src={studentModules[activeStudentStep].videoUrl}
+                          controls
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    ) : (
+                      touristModules[activeTouristStep].videoUrl ? (
+                        <div className="aspect-video bg-zinc-950 w-full relative flex items-center justify-center border-b border-white/5">
+                          <video
+                            key={touristModules[activeTouristStep].videoUrl}
+                            src={touristModules[activeTouristStep].videoUrl}
+                            controls
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                      ) : (
+                        <div className="aspect-video bg-zinc-950 w-full relative flex items-center justify-center border-b border-white/5 group">
+                          <div className="absolute inset-0 bg-purple-500/5 group-hover:bg-purple-500/0 transition-all pointer-events-none" />
+                          <Video className="w-16 h-16 text-white/40 group-hover:text-white transition-all cursor-pointer" />
+                          <span className="absolute bottom-4 left-4 px-3 py-1 rounded bg-black/60 backdrop-blur text-[10px] font-normal tracking-wider text-white/80">Vista previa del curso</span>
+                        </div>
+                      )
+                    )}
                     <div className="p-6 space-y-2">
                       <h3 className="text-lg font-normal">
                         {activeTopSection === 'visa-estudiante' 
-                          ? "Introducción al proceso de visa americana y perfiles" 
-                          : "Introducción a la Visa de Turista B-2 y perfiles"}
+                          ? studentModules[activeStudentStep].title 
+                          : touristModules[activeTouristStep].title}
                       </h3>
                       <p className="text-xs text-white/50 leading-relaxed">
                         {activeTopSection === 'visa-estudiante'
-                          ? "En este módulo aprenderás el funcionamiento básico del sistema consular de USA y cómo analizar las debilidades y fortalezas de tu perfil antes de presentarte."
-                          : "En este módulo aprenderás el funcionamiento básico del sistema consular de USA para visas de turismo y cómo estructurar tus lazos con tu país."}
+                          ? studentModules[activeStudentStep].description
+                          : touristModules[activeTouristStep].description}
                       </p>
                     </div>
                   </div>
@@ -610,59 +687,53 @@ export default function PortalPage() {
                     
                     <div className="space-y-2 overflow-y-auto max-h-[350px] pr-2 no-scrollbar">
                       {activeTopSection === 'visa-estudiante' ? (
-                        <>
-                          <div className="p-3 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-between">
-                            <span className="text-xs font-normal text-purple-400">1. Introducción y Conceptos Básicos</span>
-                            <span className="text-[10px] font-normal text-purple-400 bg-purple-500/20 px-2 py-0.5 rounded uppercase">Viendo</span>
-                          </div>
-
-                          <div className="p-3 rounded-2xl hover:bg-white/5 transition-colors flex items-center justify-between cursor-pointer group">
-                            <span className="text-xs text-white/80 group-hover:text-white">2. Formulario DS-160 paso a paso</span>
-                            <span className="text-[10px] text-white/40 group-hover:text-white/60">32 min</span>
-                          </div>
-
-                          <div className="p-3 rounded-2xl hover:bg-white/5 transition-colors flex items-center justify-between cursor-pointer group">
-                            <span className="text-xs text-white/80 group-hover:text-white">3. Solvencia Económica y Enlaces</span>
-                            <span className="text-[10px] text-white/40 group-hover:text-white/60">24 min</span>
-                          </div>
-
-                          <div className="p-3 rounded-2xl hover:bg-white/5 transition-colors flex items-center justify-between cursor-pointer group">
-                            <span className="text-xs text-white/80 group-hover:text-white">4. Psicología Consular y Postura</span>
-                            <span className="text-[10px] text-white/40 group-hover:text-white/60">40 min</span>
-                          </div>
-
-                          <div className="p-3 rounded-2xl hover:bg-white/5 transition-colors flex items-center justify-between cursor-pointer group">
-                            <span className="text-xs text-white/80 group-hover:text-white">5. Casos de Estudio y Prácticas</span>
-                            <span className="text-[10px] text-white/40 group-hover:text-white/60">18 min</span>
-                          </div>
-                        </>
+                        studentModules.map((mod, index) => {
+                          const isActive = activeStudentStep === index;
+                          return (
+                            <div
+                              key={index}
+                              onClick={() => setActiveStudentStep(index)}
+                              className={`p-3 rounded-2xl transition-all flex items-center justify-between cursor-pointer group ${
+                                isActive 
+                                  ? "bg-purple-500/10 border border-purple-500/20" 
+                                  : "hover:bg-white/5 border border-transparent"
+                              }`}
+                            >
+                              <span className={`text-xs ${isActive ? "font-normal text-purple-400" : "text-white/80 group-hover:text-white"}`}>
+                                {mod.title}
+                              </span>
+                              {isActive && (
+                                <span className="text-[10px] font-normal text-purple-400 bg-purple-500/20 px-2 py-0.5 rounded uppercase">
+                                  Viendo
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })
                       ) : (
-                        <>
-                          <div className="p-3 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-between">
-                            <span className="text-xs font-normal text-purple-400">1. Requisitos y Pilares de la Visa B-2</span>
-                            <span className="text-[10px] font-normal text-purple-400 bg-purple-500/20 px-2 py-0.5 rounded uppercase">Viendo</span>
-                          </div>
-
-                          <div className="p-3 rounded-2xl hover:bg-white/5 transition-colors flex items-center justify-between cursor-pointer group">
-                            <span className="text-xs text-white/80 group-hover:text-white">2. Llenado del Formulario DS-160</span>
-                            <span className="text-[10px] text-white/40 group-hover:text-white/60">35 min</span>
-                          </div>
-
-                          <div className="p-3 rounded-2xl hover:bg-white/5 transition-colors flex items-center justify-between cursor-pointer group">
-                            <span className="text-xs text-white/80 group-hover:text-white">3. Justificación de Arraigo Familiar</span>
-                            <span className="text-[10px] text-white/40 group-hover:text-white/60">20 min</span>
-                          </div>
-
-                          <div className="p-3 rounded-2xl hover:bg-white/5 transition-colors flex items-center justify-between cursor-pointer group">
-                            <span className="text-xs text-white/80 group-hover:text-white">4. Solvencia y Lazos Laborales</span>
-                            <span className="text-[10px] text-white/40 group-hover:text-white/60">28 min</span>
-                          </div>
-
-                          <div className="p-3 rounded-2xl hover:bg-white/5 transition-colors flex items-center justify-between cursor-pointer group">
-                            <span className="text-xs text-white/80 group-hover:text-white">5. Simulacro de Entrevista y Casos</span>
-                            <span className="text-[10px] text-white/40 group-hover:text-white/60">25 min</span>
-                          </div>
-                        </>
+                        touristModules.map((mod, index) => {
+                          const isActive = activeTouristStep === index;
+                          return (
+                            <div
+                              key={index}
+                              onClick={() => setActiveTouristStep(index)}
+                              className={`p-3 rounded-2xl transition-all flex items-center justify-between cursor-pointer group ${
+                                isActive 
+                                  ? "bg-purple-500/10 border border-purple-500/20" 
+                                  : "hover:bg-white/5 border border-transparent"
+                              }`}
+                            >
+                              <span className={`text-xs ${isActive ? "font-normal text-purple-400" : "text-white/80 group-hover:text-white"}`}>
+                                {mod.title}
+                              </span>
+                              {isActive && (
+                                <span className="text-[10px] font-normal text-purple-400 bg-purple-500/20 px-2 py-0.5 rounded uppercase">
+                                  Viendo
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })
                       )}
                     </div>
                   </div>
