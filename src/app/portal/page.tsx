@@ -37,7 +37,10 @@ import {
   Languages,
   Users,
   CheckCircle2,
-  Star
+  Star,
+  Map,
+  Hotel,
+  ShoppingBag
 } from "lucide-react";
 
 const studentModules = [
@@ -100,6 +103,9 @@ const cartItemsConfig: Record<string, { name: string; price: number; type: 'curs
   'plan-pro': { name: "Plan 2: Pro - F-1", price: 850, type: 'plan', visa: 'estudiante' },
   'plan-elite': { name: "Plan 3: Elite - F-1", price: 2500, type: 'plan', visa: 'estudiante' },
   'plan-allinclusive': { name: "Plan 4: All-Inclusive - F-1", price: 10000, type: 'plan', visa: 'estudiante' },
+  'plan-turista-basico': { name: "Plan 1: Turista Básico - B-2", price: 380, type: 'plan', visa: 'turista' },
+  'plan-turista-premium': { name: "Plan 2: Turista Premium - B-2", price: 3500, type: 'plan', visa: 'turista' },
+  'plan-turista-vip': { name: "Plan 3: Experiencia VIP - B-2", price: 4990, type: 'plan', visa: 'turista' },
 };
 
 const studentPlans = [
@@ -180,6 +186,62 @@ const studentPlans = [
   }
 ];
 
+const touristPlans = [
+  {
+    id: "plan-turista-basico",
+    name: "PLAN 1: TURISTA BÁSICO",
+    price: "$380",
+    originalPrice: "$494",
+    discount: "30% OFF",
+    description: "Lo esencial para tu solicitud.",
+    highlight: false,
+    features: [
+      { name: "Auditoría de Perfil Migratorio", icon: FileText },
+      { name: "Gestión de Visa B1/B2", icon: CheckCircle2 },
+      { name: "Preparación para la Entrevista", icon: Users },
+      { name: "Guía general para el día de la entrevista", icon: Video },
+    ]
+  },
+  {
+    id: "plan-turista-premium",
+    name: "PLAN 2: TURISTA PREMIUM",
+    price: "$3,500",
+    originalPrice: "$4,550",
+    discount: "30% OFF",
+    description: "La experiencia completa y cómoda.",
+    highlight: true,
+    features: [
+      { name: "Elige ciudad: FL, NY, CA, UT, NV, HI", icon: Map },
+      { name: "Itinerario 8 días / 7 noches totalmente planificado", icon: Calendar },
+      { name: "Vuelos y traslados internos incluidos", icon: Plane },
+      { name: "Hospedaje 4–5 estrellas seleccionado", icon: Hotel },
+      { name: "Entradas a parques y actividades", icon: ShoppingBag },
+      { name: "Experiencias: ski, hiking, naturaleza", icon: Star },
+      { name: "Gestión total del viaje", icon: CheckCircle2 },
+      { name: "💡 Todo incluido: viaja sin preocupaciones", icon: Star },
+    ]
+  },
+  {
+    id: "plan-turista-vip",
+    name: "PLAN 3: EXPERIENCIA VIP",
+    price: "$4,990",
+    originalPrice: "$6,500",
+    discount: "30% OFF",
+    description: "Lujo y atención exclusiva.",
+    highlight: false,
+    features: [
+      { name: "Ruta Turística Multi-Estado – Todo Incluido", icon: Map },
+      { name: "Itinerario personalizado 12–15 días", icon: Calendar },
+      { name: "Vuelos y traslados internos incluidos", icon: Plane },
+      { name: "Hospedaje 4–5 estrellas garantizado", icon: Star },
+      { name: "Entradas a parques y experiencias premium", icon: ShoppingBag },
+      { name: "Actividades exclusivas: shows y aventuras", icon: Video },
+      { name: "Gestión integral del viaje, todo cubierto", icon: CheckCircle2 },
+      { name: "💡 Todo incluido: solo llega y disfruta", icon: Star },
+    ]
+  }
+];
+
 export default function PortalPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -226,7 +288,9 @@ export default function PortalPage() {
         if (itemId === 'plan-esencial') updates.purchased_plan_esencial = true;
         if (itemId === 'plan-pro') updates.purchased_plan_pro = true;
         if (itemId === 'plan-elite') updates.purchased_plan_elite = true;
-        if (itemId === 'plan-allinclusive') updates.purchased_plan_allinclusive = true;
+        if (itemId === 'plan-turista-basico') updates.purchased_plan_turista_basico = true;
+        if (itemId === 'plan-turista-premium') updates.purchased_plan_turista_premium = true;
+        if (itemId === 'plan-turista-vip') updates.purchased_plan_turista_vip = true;
       });
 
       // Synchronize with database
@@ -260,6 +324,9 @@ export default function PortalPage() {
     if (planId === 'plan-pro') return !!dbUser.purchased_plan_pro;
     if (planId === 'plan-elite') return !!dbUser.purchased_plan_elite;
     if (planId === 'plan-allinclusive') return !!dbUser.purchased_plan_allinclusive;
+    if (planId === 'plan-turista-basico') return !!dbUser.purchased_plan_turista_basico;
+    if (planId === 'plan-turista-premium') return !!dbUser.purchased_plan_turista_premium;
+    if (planId === 'plan-turista-vip') return !!dbUser.purchased_plan_turista_vip;
     return false;
   };
 
@@ -855,12 +922,12 @@ export default function PortalPage() {
               <div className="space-y-6">
                 <div>
                   <h2 className="text-2xl md:text-3xl font-normal tracking-tight">
-                    {activeTopSection === 'visa-estudiante' ? "Elige tu Plan Ideal" : "Servicios y Soporte"}
+                    Elige tu Plan Ideal
                   </h2>
                   <p className="text-sm text-white/50">
                     {activeTopSection === 'visa-estudiante' 
                       ? "Integramos admisión universitaria y preparación consular estratégica en un solo lugar." 
-                      : "Administra tus servicios y mantente en comunicación con tu asesor."}
+                      : "Te preparamos con éxito para tu cita consular con planes diseñados para tu viaje turístico."}
                   </p>
                 </div>
 
@@ -958,25 +1025,97 @@ export default function PortalPage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="w-full bg-[#0d0d11]/80 backdrop-blur-md border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 justify-between">
-                    <div className="space-y-4 max-w-2xl">
-                      <Shield className="w-8 h-8 text-purple-400" />
-                      <h3 className="text-xl font-normal">Asesor Designado</h3>
-                      <p className="text-sm text-white/50 leading-relaxed">
-                        Tienes soporte de primer nivel asignado para tu trámite de Visa de Turista B-2. Si tienes preguntas urgentes sobre tus pasos o necesitas cargar documentos, comunícate directamente por el canal preferencial.
-                      </p>
-                    </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch w-full">
+                    {touristPlans.map((plan, index) => (
+                      <div key={index} className="relative group w-full flex flex-col h-full">
+                        {/* Glow Effect Background */}
+                        <div className="absolute -inset-1.5 bg-white/10 rounded-[2rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-                    <Button 
-                      onClick={() => {
-                        setActiveTopSection('experto');
-                        setActiveSection('experto');
-                      }}
-                      className="w-full md:w-auto h-12 rounded-full bg-transparent border border-white/40 text-white hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg text-xs font-normal tracking-widest uppercase px-8 flex items-center justify-center gap-2"
-                    >
-                      Contactar Asesor
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
+                        {/* Card Content */}
+                        <div className={`relative flex-1 bg-[#0d0d11]/80 border rounded-[2rem] p-6 flex flex-col overflow-hidden transition-all duration-300 ${plan.highlight ? 'border-purple-500/50 ring-1 ring-purple-500/30 shadow-2xl shadow-purple-500/5 z-10' : 'border-white/5 hover:border-white/10 shadow-2xl hover:bg-[#0f0f15]'}`}>
+                          
+                          {/* Visual Accent */}
+                          <div className="absolute top-0 right-0 w-24 h-24 bg-white/[0.02] blur-2xl" />
+
+                          {/* Discount Badge */}
+                          {plan.discount && (
+                            <div className="absolute top-4 right-4 bg-purple-950/80 text-purple-300 px-2.5 py-1 rounded-md text-[10px] font-semibold tracking-wide border border-purple-500/30">
+                              {plan.discount}
+                            </div>
+                          )}
+
+                          {/* Recommended Badge */}
+                          {plan.highlight && (
+                            <div className="absolute top-0 right-1/2 translate-x-1/2 bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] text-white text-[9px] font-semibold uppercase tracking-widest px-4 py-1 rounded-b-xl shadow-lg z-20">
+                              MÁS POPULAR
+                            </div>
+                          )}
+
+                          <div className="flex flex-col items-center text-center mt-6 mb-6">
+                            <h3 className="text-md font-semibold text-white tracking-wider mb-2">
+                              {plan.name}
+                            </h3>
+                            <div className="flex flex-col items-center justify-center">
+                              <span className="text-white/40 line-through text-xs font-normal">
+                                {plan.originalPrice}
+                              </span>
+                              <span className="text-3xl font-normal text-white tracking-tight pt-0.5">
+                                {plan.price}
+                              </span>
+                            </div>
+                            <p className="text-white/50 text-xs font-light mt-3 leading-relaxed">
+                              {plan.description}
+                            </p>
+                          </div>
+
+                          <div className="flex flex-col items-center gap-3 mt-auto mb-6 w-full">
+                            {isPlanPurchased(plan.id) ? (
+                              <Button
+                                disabled
+                                className="w-full h-11 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 text-xs font-normal tracking-widest uppercase cursor-default"
+                              >
+                                Plan Adquirido
+                              </Button>
+                            ) : cart.includes(plan.id) ? (
+                              <Button
+                                onClick={() => setIsCartOpen(true)}
+                                className="w-full h-11 rounded-full bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border border-purple-500/50 hover:scale-105 active:scale-95 transition-all duration-300 text-xs font-normal tracking-widest uppercase flex items-center justify-center gap-2 shadow-lg"
+                              >
+                                <ShoppingCart className="w-4 h-4" />
+                                Ver en carrito
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={() => addToCart(plan.id)}
+                                className="w-full h-11 rounded-full bg-transparent border border-white/20 text-white hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:scale-105 active:scale-95 transition-all duration-300 text-xs font-normal tracking-widest uppercase flex items-center justify-center gap-2 shadow-lg"
+                              >
+                                Añadir al carrito
+                              </Button>
+                            )}
+                          </div>
+
+                          <div className="space-y-4 flex-1 border-t border-white/5 pt-5">
+                            <p className="text-white/30 font-normal text-[10px] uppercase tracking-widest mb-2 text-center">
+                              LO QUE INCLUYE:
+                            </p>
+                            <ul className="space-y-3">
+                              {plan.features.map((feature, i) => {
+                                const Icon = feature.icon;
+                                return (
+                                  <li key={i} className="flex items-start gap-2 text-white/70 hover:text-white transition-colors cursor-default leading-relaxed">
+                                    <Icon className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" strokeWidth={2} />
+                                    <span className="text-xs font-light text-white/80">
+                                      {feature.name}
+                                    </span>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </div>
+
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
