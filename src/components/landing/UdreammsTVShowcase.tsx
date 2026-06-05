@@ -25,34 +25,16 @@ export default function UdreammsTVShowcase() {
             scale: 2.5,
         },
         animate: {
-            x: "0vw",
-            y: "0vh",
-            scale: 1.0,
-            transition: {
-                type: "spring" as const,
-                damping: 11,   // Bouncy bounce!
-                stiffness: 60, // Elastic feel
-                mass: 1.0,
-                delay: 1.2,    // wait for merge to complete
-            }
-        }
-    };
-
-    const starVariants = {
-        initial: {
-            x: "40vw",
-            y: "-20vh",
-            scale: 0,
-            opacity: 0
-        },
-        animate: {
-            x: ["40vw", "40vw", "0vw", "-35vw", "-35vw"],
-            y: ["-20vh", "-20vh", "0vh", "0vh", "0vh"],
-            scale: [0, 1.5, 1.0, 0, 0],
-            opacity: [0, 1, 1, 0, 0],
+            x: isMobile
+                ? ["0vw", "0vw", "-10vw", "10vw", "0vw", "-1vw", "0.5vw", "0vw"]
+                : ["40vw", "40vw", "30vw", "15vw", "0vw", "-0.7vw", "0.3vw", "0vw"],
+            y: isMobile
+                ? ["25vh", "25vh", "18vh", "10vh", "0vh", "-2vh", "0.8vh", "0vh"]
+                : ["20vh", "20vh", "5vh", "22vh", "0vh", "-2vh", "0.8vh", "0vh"],
+            scale: [2.5, 2.5, 2.0, 1.5, 1.0, 0.95, 1.02, 1.0],
             transition: {
                 duration: 3.0,
-                times: [0, 0.15, 0.40, 0.73, 1.0],
+                times: [0, 0.40, 0.53, 0.66, 0.80, 0.85, 0.90, 1.0],
                 ease: "easeInOut" as const
             }
         }
@@ -82,7 +64,7 @@ export default function UdreammsTVShowcase() {
             ],
             transition: {
                 duration: 3.0,
-                times: [0, 0.38, 0.40, 0.73, 1],
+                times: [0, 0.38, 0.40, 0.80, 1],
                 ease: "easeInOut" as const
             }
         }
@@ -112,7 +94,7 @@ export default function UdreammsTVShowcase() {
             ],
             transition: {
                 duration: 3.0,
-                times: [0, 0.38, 0.40, 0.73, 1],
+                times: [0, 0.38, 0.40, 0.80, 1],
                 ease: "easeInOut" as const
             }
         }
@@ -142,7 +124,7 @@ export default function UdreammsTVShowcase() {
             ],
             transition: {
                 duration: 3.0,
-                times: [0, 0.38, 0.40, 0.73, 1],
+                times: [0, 0.38, 0.40, 0.80, 1],
                 ease: "easeInOut" as const
             }
         }
@@ -332,22 +314,26 @@ export default function UdreammsTVShowcase() {
                                         </motion.div>
                                     </motion.div>
 
-                                    {/* Estrella fugaz con cola de luz (No afectada por la rotación del Plus) */}
+                                    {/* LED Stars Orbit Container */}
                                     <motion.div
-                                        variants={starVariants}
-                                        initial="initial"
-                                        whileInView="animate"
-                                        viewport={{ once: true }}
-                                        className="absolute w-4 h-4 md:w-6 md:h-6 rounded-full bg-white z-50 pointer-events-none flex items-center justify-end"
-                                        style={{
-                                            boxShadow: '0 0 20px #fff, 0 0 40px #bf5af2, 0 0 80px #bf5af2',
-                                            left: '50%',
-                                            top: '50%',
-                                            transform: 'translate(-50%, -50%)'
+                                        className="absolute inset-0 pointer-events-none"
+                                        animate={{
+                                            rotate: [0, 720, 1080],
+                                        }}
+                                        transition={{
+                                            duration: 3.0,
+                                            times: [0, 0.40, 1.0],
+                                            ease: "easeInOut" as const
                                         }}
                                     >
-                                        {/* Cola de luz difuminada */}
-                                        <div className="absolute right-3 w-32 md:w-48 h-[2px] rounded-full bg-gradient-to-r from-transparent via-[#d946ef]/60 to-white filter blur-[1.5px]" />
+                                        {/* LED Star 1 */}
+                                        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_#fff,0_0_15px_#bf5af2] pointer-events-none" />
+                                        {/* LED Star 2 */}
+                                        <div className="absolute bottom-[-10%] left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white shadow-[0_0_6px_#fff,0_0_12px_#7c3aed] pointer-events-none" />
+                                        {/* LED Star 3 */}
+                                        <div className="absolute left-[-10%] top-1/2 -translate-y-1/2 w-1.2 h-1.2 rounded-full bg-white shadow-[0_0_7px_#fff,0_0_14px_#d946ef] pointer-events-none" />
+                                        {/* LED Star 4 */}
+                                        <div className="absolute right-[-10%] top-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-white shadow-[0_0_6px_#fff,0_0_12px_#6366f1] pointer-events-none" />
                                     </motion.div>
                                 </motion.div>
                             </h2>
