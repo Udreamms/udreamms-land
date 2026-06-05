@@ -724,9 +724,6 @@ export default function PortalPage() {
                         Descargar Libro
                         <Download className="w-4 h-4" />
                       </a>
-                      <Button className="h-12 rounded-full bg-transparent border border-white/40 text-white hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg text-xs font-normal tracking-widest uppercase px-8">
-                        Leer Online
-                      </Button>
                     </div>
                   </div>
                 </div>
