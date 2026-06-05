@@ -119,14 +119,21 @@ export default function UdreammsTVShowcase() {
             top: "2.5%",
             rotate: 0,
             scale: 1,
-            opacity: 1
+            opacity: 1,
+            boxShadow: "0 0 10px rgba(124, 58, 237, 0.3)"
         },
         animate: {
             left: ["26%", "46%", "46%", "46%"],
             top: ["2.5%", "12.5%", "12.5%", "12.5%"],
             rotate: [0, 90, 90, 90],
-            scale: [1, 1.08, 0, 0],
-            opacity: [1, 1, 0, 0],
+            scale: [1, 1.08, 1.0, 1.0],
+            opacity: [1, 1, 1, 1],
+            boxShadow: [
+                "0 0 15px rgba(124, 58, 237, 0.3)",
+                "0 0 35px rgba(217, 70, 239, 0.9), 0 0 70px rgba(217, 70, 239, 0.5)",
+                "0 0 35px rgba(217, 70, 239, 0.9), 0 0 70px rgba(217, 70, 239, 0.5)",
+                "0 0 35px rgba(217, 70, 239, 0.9), 0 0 70px rgba(217, 70, 239, 0.5)"
+            ],
             transition: {
                 duration: 2.5,
                 times: [0, 0.45, 0.55, 1],
@@ -141,14 +148,21 @@ export default function UdreammsTVShowcase() {
             top: "15.5%",
             rotate: 0,
             scale: 1,
-            opacity: 1
+            opacity: 1,
+            boxShadow: "0 0 10px rgba(124, 58, 237, 0.3)"
         },
         animate: {
             left: ["46%", "46%", "46%", "46%"],
             top: ["15.5%", "12.5%", "12.5%", "12.5%"],
             rotate: [0, 0, 0, 0],
-            scale: [1, 1.08, 0, 0],
-            opacity: [1, 1, 0, 0],
+            scale: [1, 1.08, 1.0, 1.0],
+            opacity: [1, 1, 1, 1],
+            boxShadow: [
+                "0 0 15px rgba(124, 58, 237, 0.3)",
+                "0 0 35px rgba(217, 70, 239, 0.9), 0 0 70px rgba(217, 70, 239, 0.5)",
+                "0 0 35px rgba(217, 70, 239, 0.9), 0 0 70px rgba(217, 70, 239, 0.5)",
+                "0 0 35px rgba(217, 70, 239, 0.9), 0 0 70px rgba(217, 70, 239, 0.5)"
+            ],
             transition: {
                 duration: 2.5,
                 times: [0, 0.45, 0.55, 1],
@@ -163,14 +177,21 @@ export default function UdreammsTVShowcase() {
             top: "28.5%",
             rotate: 0,
             scale: 1,
-            opacity: 1
+            opacity: 1,
+            boxShadow: "0 0 10px rgba(124, 58, 237, 0.3)"
         },
         animate: {
             left: ["66%", "46%", "46%", "46%"],
             top: ["28.5%", "12.5%", "12.5%", "12.5%"],
             rotate: [0, 90, 90, 90],
-            scale: [1, 1.08, 0, 0],
-            opacity: [1, 1, 0, 0],
+            scale: [1, 1.08, 1.0, 1.0],
+            opacity: [1, 1, 1, 1],
+            boxShadow: [
+                "0 0 15px rgba(124, 58, 237, 0.3)",
+                "0 0 35px rgba(217, 70, 239, 0.9), 0 0 70px rgba(217, 70, 239, 0.5)",
+                "0 0 35px rgba(217, 70, 239, 0.9), 0 0 70px rgba(217, 70, 239, 0.5)",
+                "0 0 35px rgba(217, 70, 239, 0.9), 0 0 70px rgba(217, 70, 239, 0.5)"
+            ],
             transition: {
                 duration: 2.5,
                 times: [0, 0.45, 0.55, 1],
@@ -274,6 +295,9 @@ export default function UdreammsTVShowcase() {
                                             }
                                         }
                                     }}
+                                    initial="initial"
+                                    whileInView="animate"
+                                    viewport={{ once: true }}
                                     className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-white via-[#bf5af2] to-[#bf5af2] font-extrabold"
                                     style={{
                                         textShadow: "0 0 20px rgba(191,90,242,0.8)"
@@ -325,7 +349,7 @@ export default function UdreammsTVShowcase() {
                             className="relative lg:absolute lg:right-0 lg:-top-64 w-40 h-40 md:w-72 md:h-72 lg:w-[30rem] lg:h-[30rem] flex items-center justify-center shrink-0 z-20 cursor-grab select-none pointer-events-auto"
                         >
                             {/* Background Purple Glow */}
-                            <div className="absolute w-[80%] h-[80%] rounded-full bg-[#bf5af2]/10 blur-[80px] pointer-events-none z-0" />
+                            <div className="absolute w-[80%] h-[80%] rounded-full bg-[#bf5af2]/20 blur-[100px] pointer-events-none z-0" />
                             
                             {/* 3D Glowing Bars Container */}
                             <motion.div 
@@ -337,16 +361,22 @@ export default function UdreammsTVShowcase() {
                                         transition: {
                                             duration: 2.5,
                                             times: [0, 0.55, 1],
-                                            ease: "easeInOut"
+                                            ease: "easeInOut" as const
                                         }
                                     }
                                 }}
+                                initial="initial"
+                                whileInView="animate"
+                                viewport={{ once: true }}
                             >
                                 
                                 {/* Bar 1 (Left -> Horizontal) */}
                                 <motion.div 
-                                    className="absolute w-[8%] h-[75%] rounded-full bg-gradient-to-b from-[#140d3a] via-[#bf5af2] to-[#0f092b] overflow-hidden border border-white/5"
+                                    className="absolute w-[8%] h-[75%] rounded-full bg-gradient-to-b from-[#7c3aed] via-[#d946ef] to-[#6366f1] overflow-hidden border border-fuchsia-500/30"
                                     variants={bar1Variants}
+                                    initial="initial"
+                                    whileInView="animate"
+                                    viewport={{ once: true }}
                                 >
                                     {/* Glassy Shine Sweep */}
                                     <motion.div 
@@ -367,8 +397,11 @@ export default function UdreammsTVShowcase() {
 
                                 {/* Bar 2 (Middle -> Vertical) */}
                                 <motion.div 
-                                    className="absolute w-[8%] h-[75%] rounded-full bg-gradient-to-b from-[#140d3a] via-[#bf5af2] to-[#0f092b] overflow-hidden border border-white/5"
+                                    className="absolute w-[8%] h-[75%] rounded-full bg-gradient-to-b from-[#7c3aed] via-[#d946ef] to-[#6366f1] overflow-hidden border border-fuchsia-500/30"
                                     variants={bar2Variants}
+                                    initial="initial"
+                                    whileInView="animate"
+                                    viewport={{ once: true }}
                                 >
                                     {/* Glassy Shine Sweep */}
                                     <motion.div 
@@ -389,8 +422,11 @@ export default function UdreammsTVShowcase() {
 
                                 {/* Bar 3 (Right -> Horizontal) */}
                                 <motion.div 
-                                    className="absolute w-[8%] h-[75%] rounded-full bg-gradient-to-b from-[#140d3a] via-[#bf5af2] to-[#0f092b] overflow-hidden border border-white/5"
+                                    className="absolute w-[8%] h-[75%] rounded-full bg-gradient-to-b from-[#7c3aed] via-[#d946ef] to-[#6366f1] overflow-hidden border border-fuchsia-500/30"
                                     variants={bar3Variants}
+                                    initial="initial"
+                                    whileInView="animate"
+                                    viewport={{ once: true }}
                                 >
                                     {/* Glassy Shine Sweep */}
                                     <motion.div 
@@ -416,13 +452,16 @@ export default function UdreammsTVShowcase() {
                     {/* Shooting Star Flare with Trail */}
                     <motion.div
                         variants={starVariants}
+                        initial="initial"
+                        whileInView="animate"
+                        viewport={{ once: true }}
                         className="absolute w-6 h-6 rounded-full bg-white z-50 pointer-events-none flex items-center justify-end"
                         style={{
-                            boxShadow: '0 0 15px #fff, 0 0 30px #bf5af2, 0 0 60px #bf5af2'
+                            boxShadow: '0 0 20px #fff, 0 0 40px #bf5af2, 0 0 80px #bf5af2'
                         }}
                     >
                         {/* Light tail */}
-                        <div className="absolute right-3 w-16 h-1 rounded-full bg-gradient-to-r from-transparent via-[#bf5af2]/40 to-white/80 filter blur-[1px]" />
+                        <div className="absolute right-3 w-32 md:w-48 h-[2px] rounded-full bg-gradient-to-r from-transparent via-[#d946ef]/60 to-white filter blur-[1.5px]" />
                     </motion.div>
                 </div>
             </motion.div>
