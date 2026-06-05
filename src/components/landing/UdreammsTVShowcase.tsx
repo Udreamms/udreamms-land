@@ -1,10 +1,18 @@
 "use client";
 
 import { motion, useAnimation } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function UdreammsTVShowcase() {
     const controls = useAnimation();
+    const [isPlus, setIsPlus] = useState(false);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setIsPlus(prev => !prev);
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
 
     const resizeTimer = useRef<number | null>(null);
     const sectionRef = useRef<HTMLElement | null>(null);
@@ -200,27 +208,38 @@ export default function UdreammsTVShowcase() {
                             <div className="absolute w-[80%] h-[80%] rounded-full bg-[#bf5af2]/10 blur-[80px] pointer-events-none z-0" />
                             
                             {/* 3D Glowing Bars Container */}
-                            <div className="relative w-[75%] h-[75%] flex items-center justify-center gap-[8%] pointer-events-none z-10">
+                            <motion.div 
+                                className="relative w-[75%] h-[75%] pointer-events-none z-10"
+                                animate={{ rotate: isPlus ? 360 : 0 }}
+                                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                            >
                                 
-                                {/* Bar 1 (Left) */}
+                                {/* Bar 1 (Left -> Horizontal) */}
                                 <motion.div 
-                                    className="relative w-[22%] h-[75%] rounded-full bg-gradient-to-b from-[#140d3a] via-[#bf5af2] to-[#0f092b] overflow-hidden border border-white/5"
-                                    initial={{ scaleY: 0, opacity: 0, y: "-12%" }}
+                                    className="absolute w-[22%] h-[75%] rounded-full bg-gradient-to-b from-[#140d3a] via-[#bf5af2] to-[#0f092b] overflow-hidden border border-white/5"
                                     animate={{
-                                        scaleY: 1,
-                                        opacity: 1,
-                                        y: ['-12%', '-16%', '-12%'],
-                                        boxShadow: [
-                                            '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)',
-                                            '0 0 40px rgba(191,90,242,0.8), 0 0 70px rgba(191,90,242,0.4)',
-                                            '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)'
-                                        ]
+                                        left: isPlus ? "39%" : "11%",
+                                        top: isPlus ? "12.5%" : "2.5%",
+                                        rotate: isPlus ? 90 : 0,
+                                        scale: isPlus ? 1.08 : 1.0,
+                                        boxShadow: isPlus 
+                                            ? [
+                                                '0 0 30px rgba(191,90,242,0.8), 0 0 60px rgba(191,90,242,0.4)',
+                                                '0 0 50px rgba(191,90,242,1.0), 0 0 80px rgba(191,90,242,0.6)',
+                                                '0 0 30px rgba(191,90,242,0.8), 0 0 60px rgba(191,90,242,0.4)'
+                                              ]
+                                            : [
+                                                '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)',
+                                                '0 0 40px rgba(191,90,242,0.8), 0 0 70px rgba(191,90,242,0.4)',
+                                                '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)'
+                                              ]
                                     }}
                                     transition={{
-                                        scaleY: { duration: 0.8, ease: "easeOut" },
-                                        opacity: { duration: 0.8, ease: "easeOut" },
-                                        y: { repeat: Infinity, duration: 4, ease: "easeInOut" },
-                                        boxShadow: { repeat: Infinity, duration: 3, ease: "easeInOut" }
+                                        left: { type: "spring", stiffness: 70, damping: 14 },
+                                        top: { type: "spring", stiffness: 70, damping: 14 },
+                                        rotate: { type: "spring", stiffness: 70, damping: 14 },
+                                        scale: { duration: 0.5 },
+                                        boxShadow: { repeat: Infinity, duration: 2.5, ease: "easeInOut" }
                                     }}
                                 >
                                     {/* Glassy Shine Sweep */}
@@ -240,25 +259,32 @@ export default function UdreammsTVShowcase() {
                                     />
                                 </motion.div>
 
-                                {/* Bar 2 (Middle) */}
+                                {/* Bar 2 (Middle -> Vertical) */}
                                 <motion.div 
-                                    className="relative w-[22%] h-[75%] rounded-full bg-gradient-to-b from-[#140d3a] via-[#bf5af2] to-[#0f092b] overflow-hidden border border-white/5"
-                                    initial={{ scaleY: 0, opacity: 0, y: "3%" }}
+                                    className="absolute w-[22%] h-[75%] rounded-full bg-gradient-to-b from-[#140d3a] via-[#bf5af2] to-[#0f092b] overflow-hidden border border-white/5"
                                     animate={{
-                                        scaleY: 1,
-                                        opacity: 1,
-                                        y: ['3%', '-1%', '3%'],
-                                        boxShadow: [
-                                            '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)',
-                                            '0 0 40px rgba(191,90,242,0.8), 0 0 70px rgba(191,90,242,0.4)',
-                                            '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)'
-                                        ]
+                                        left: "39%",
+                                        top: isPlus ? "12.5%" : "15.5%",
+                                        rotate: 0,
+                                        scale: isPlus ? 1.08 : 1.0,
+                                        boxShadow: isPlus 
+                                            ? [
+                                                '0 0 30px rgba(191,90,242,0.8), 0 0 60px rgba(191,90,242,0.4)',
+                                                '0 0 50px rgba(191,90,242,1.0), 0 0 80px rgba(191,90,242,0.6)',
+                                                '0 0 30px rgba(191,90,242,0.8), 0 0 60px rgba(191,90,242,0.4)'
+                                              ]
+                                            : [
+                                                '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)',
+                                                '0 0 40px rgba(191,90,242,0.8), 0 0 70px rgba(191,90,242,0.4)',
+                                                '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)'
+                                              ]
                                     }}
                                     transition={{
-                                        scaleY: { duration: 0.8, ease: "easeOut", delay: 0.2 },
-                                        opacity: { duration: 0.8, ease: "easeOut", delay: 0.2 },
-                                        y: { repeat: Infinity, duration: 4, ease: "easeInOut", delay: 0.5 },
-                                        boxShadow: { repeat: Infinity, duration: 3, ease: "easeInOut", delay: 0.3 }
+                                        left: { type: "spring", stiffness: 70, damping: 14 },
+                                        top: { type: "spring", stiffness: 70, damping: 14 },
+                                        rotate: { type: "spring", stiffness: 70, damping: 14 },
+                                        scale: { duration: 0.5 },
+                                        boxShadow: { repeat: Infinity, duration: 2.5, ease: "easeInOut", delay: 0.3 }
                                     }}
                                 >
                                     {/* Glassy Shine Sweep */}
@@ -278,25 +304,32 @@ export default function UdreammsTVShowcase() {
                                     />
                                 </motion.div>
 
-                                {/* Bar 3 (Right) */}
+                                {/* Bar 3 (Right -> Horizontal) */}
                                 <motion.div 
-                                    className="relative w-[22%] h-[75%] rounded-full bg-gradient-to-b from-[#140d3a] via-[#bf5af2] to-[#0f092b] overflow-hidden border border-white/5"
-                                    initial={{ scaleY: 0, opacity: 0, y: "18%" }}
+                                    className="absolute w-[22%] h-[75%] rounded-full bg-gradient-to-b from-[#140d3a] via-[#bf5af2] to-[#0f092b] overflow-hidden border border-white/5"
                                     animate={{
-                                        scaleY: 1,
-                                        opacity: 1,
-                                        y: ['18%', '14%', '18%'],
-                                        boxShadow: [
-                                            '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)',
-                                            '0 0 40px rgba(191,90,242,0.8), 0 0 70px rgba(191,90,242,0.4)',
-                                            '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)'
-                                        ]
+                                        left: isPlus ? "39%" : "67%",
+                                        top: isPlus ? "12.5%" : "28.5%",
+                                        rotate: isPlus ? 90 : 0,
+                                        scale: isPlus ? 1.08 : 1.0,
+                                        boxShadow: isPlus 
+                                            ? [
+                                                '0 0 30px rgba(191,90,242,0.8), 0 0 60px rgba(191,90,242,0.4)',
+                                                '0 0 50px rgba(191,90,242,1.0), 0 0 80px rgba(191,90,242,0.6)',
+                                                '0 0 30px rgba(191,90,242,0.8), 0 0 60px rgba(191,90,242,0.4)'
+                                              ]
+                                            : [
+                                                '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)',
+                                                '0 0 40px rgba(191,90,242,0.8), 0 0 70px rgba(191,90,242,0.4)',
+                                                '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)'
+                                              ]
                                     }}
                                     transition={{
-                                        scaleY: { duration: 0.8, ease: "easeOut", delay: 0.4 },
-                                        opacity: { duration: 0.8, ease: "easeOut", delay: 0.4 },
-                                        y: { repeat: Infinity, duration: 4, ease: "easeInOut", delay: 1.0 },
-                                        boxShadow: { repeat: Infinity, duration: 3, ease: "easeInOut", delay: 0.6 }
+                                        left: { type: "spring", stiffness: 70, damping: 14 },
+                                        top: { type: "spring", stiffness: 70, damping: 14 },
+                                        rotate: { type: "spring", stiffness: 70, damping: 14 },
+                                        scale: { duration: 0.5 },
+                                        boxShadow: { repeat: Infinity, duration: 2.5, ease: "easeInOut", delay: 0.6 }
                                     }}
                                 >
                                     {/* Glassy Shine Sweep */}
@@ -316,7 +349,7 @@ export default function UdreammsTVShowcase() {
                                     />
                                 </motion.div>
 
-                            </div>
+                            </motion.div>
                         </motion.div>
                     </div>
 
