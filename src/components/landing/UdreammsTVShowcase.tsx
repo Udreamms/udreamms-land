@@ -21,27 +21,19 @@ export default function UdreammsTVShowcase() {
     const containerVariants = {
         initial: {
             x: isMobile ? "0vw" : "40vw",
-            y: isMobile ? "25vh" : "0vh",
+            y: isMobile ? "25vh" : "20vh",
             scale: 2.5,
         },
         animate: {
-            x: [
-                isMobile ? "0vw" : "40vw",
-                isMobile ? "0vw" : "40vw",
-                "0vw",
-                "0vw"
-            ],
-            y: [
-                isMobile ? "25vh" : "0vh",
-                isMobile ? "25vh" : "0vh",
-                "0vh",
-                "0vh"
-            ],
-            scale: [2.5, 2.5, 1.0, 1.0],
+            x: "0vw",
+            y: "0vh",
+            scale: 1.0,
             transition: {
-                duration: 3.0,
-                times: [0, 0.4, 0.73, 1.0],
-                ease: "easeInOut" as const
+                type: "spring" as const,
+                damping: 11,   // Bouncy bounce!
+                stiffness: 60, // Elastic feel
+                mass: 1.0,
+                delay: 1.2,    // wait for merge to complete
             }
         }
     };
