@@ -26,7 +26,7 @@ export default function FreeTrainingShowcase() {
                     
                     <Button 
                         onClick={() => sendMetaEvent('Lead', { source: 'FreeTrainingShowcase: Quiero saber más' })} 
-                        className="mt-8 w-64 px-5 py-2.5 bg-transparent border border-black text-black rounded-full hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] transition-all flex justify-center items-center hover:scale-105 hover:shadow-lg text-sm"
+                        className="mt-8 w-64 px-5 py-2.5 bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] border border-[#2d1b4e] text-white rounded-full hover:[transition-property:transform,box-shadow] transition-all flex justify-center items-center hover:scale-105 hover:shadow-lg text-sm"
                     >
                         Quiero saber más
                     </Button>

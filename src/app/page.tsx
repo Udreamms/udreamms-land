@@ -44,7 +44,7 @@ export default function Home() {
               target="_blank" 
               rel="noopener noreferrer" 
               onClick={() => sendMetaEvent('Lead', { source: 'Home Page WhatsApp Button' })}
-              className="w-full sm:w-auto px-8 py-3.5 bg-transparent border border-black text-black rounded-full hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] hover:shadow-lg hover:scale-105 transition-all flex items-center justify-center gap-3 text-base md:text-lg font-medium"
+              className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] border border-[#2d1b4e] text-white rounded-full hover:[transition-property:transform,box-shadow] hover:shadow-lg hover:scale-105 transition-all flex items-center justify-center gap-3 text-base md:text-lg font-medium"
             >
               <span>¡Quiero Vivir y Estudiar en Usa!</span>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
