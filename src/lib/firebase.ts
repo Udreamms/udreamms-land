@@ -11,7 +11,7 @@ export const firebaseConfig = {
   apiKey: "AIzaSyBKkNyleaQC52S1s1v13WfQ7-U7wol-SVA",
   authDomain: "udreamms-platform-1.firebaseapp.com",
   projectId: "udreamms-platform-1",
-  storageBucket: "udreamms-platform-1.firebasestorage.app", // <--- CORREGIDO
+  storageBucket: "udreamms-platform-1.firebasestorage.app",
   messagingSenderId: "860170719759",
   appId: "1:860170719759:web:cb8e6008e08c19b0e7897a",
   measurementId: "G-GP2PVZBTQP"

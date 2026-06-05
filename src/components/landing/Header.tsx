@@ -112,14 +112,6 @@ export default function Header() {
     setActiveMenu(null);
   };
 
-  const handleApplyClick = () => {
-    if (pathname === '/') {
-      document.getElementById('planes')?.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      window.location.href = '/#planes';
-    }
-    setIsMobileMenuOpen(false);
-  };
 
   return (
     <>
@@ -170,71 +162,36 @@ export default function Header() {
           </div>
 
           {/* GRUPO DERECHA: ACCIONES */}
-          <div className="hidden lg:flex items-center gap-4 z-50">
+          <div className="hidden lg:flex items-center gap-3 z-50">
             {/* Solo mostrar Staff si NO es landing de visa, o podrías dejarlo oculto si quieres algo más limpio */}
             {!isVisaLandingPage && (
-              <Link href="/portal" className="text-[10px] font-medium text-gray-400 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1.5 opacity-80 hover:opacity-100">
+              <Link href="/portal" className="text-[10px] font-medium text-gray-400 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1.5 opacity-80 hover:opacity-100 mr-1">
                 <Lock className="w-3 h-3" /> Staff
               </Link>
             )}
 
-            <Link href="/portal">
+            <Link href="/login?mode=login">
               <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10 rounded-full h-8 px-3 text-xs font-medium border border-transparent hover:border-white/10 transition-all">
-                Portal de Cliente
+                Iniciar Sesión
               </Button>
             </Link>
 
-            <Button
-              onClick={() => {
-                sendMetaEvent('Lead', { source: 'Header Apply Button Desktop' });
-                handleApplyClick();
-              }}
-              className="bg-transparent text-white border border-white/40 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] rounded-full h-8 px-5 font-medium text-xs transition-all duration-300 hover:scale-105 shadow-xl"
-            >
-              Aplica Ahora
-            </Button>
+            <Link href="/login?register=true">
+              <Button className="bg-white text-black hover:bg-white/90 rounded-full h-8 px-4 font-semibold text-xs transition-all duration-300 hover:scale-105 shadow-md">
+                Comenzar
+              </Button>
+            </Link>
           </div>
 
-          {/* MOBILE TOGGLE AND CTA */}
+          {/* MOBILE TOGGLE */}
           {!isVisaLandingPage && (
             <div className="lg:hidden flex items-center gap-2">
-              <Button
-                onClick={() => {
-                  sendMetaEvent('Lead', { source: 'Header Apply Button Mobile' });
-                  handleApplyClick();
-                }}
-                size="sm"
-                className="bg-transparent text-white border border-white/40 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] hover:scale-105 transition-all duration-300 rounded-full text-[11px] h-8 px-4"
-              >
-                Aplica Ahora
-              </Button>
               <button
                 className="text-white p-2"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               >
                 {isMobileMenuOpen ? <X /> : <Menu />}
               </button>
-            </div>
-          )}
-
-          {/* En móvil si es landing de visa, igual mostramos portal y aplica ahora si no hay menu de hamburguesa? O simplemente dejamos el logo y botones? */}
-          {isVisaLandingPage && (
-            <div className="lg:hidden flex items-center gap-2">
-              <Link href="/portal">
-                <Button variant="ghost" size="sm" className="text-white hover:bg-white/10 rounded-full text-xs px-3">
-                  Portal
-                </Button>
-              </Link>
-              <Button
-                onClick={() => {
-                  sendMetaEvent('Lead', { source: 'Header Apply Button Visa Landing Mobile' });
-                  handleApplyClick();
-                }}
-                size="sm"
-                className="bg-transparent text-white border border-white/40 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] hover:scale-105 transition-all duration-300 rounded-full text-[10px] h-7 px-3"
-              >
-                Aplica
-              </Button>
             </div>
           )}
 
@@ -408,21 +365,20 @@ export default function Header() {
                 ))}
 
                 <div className="pt-6 space-y-4">
-                  <Link href="/portal" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/10 h-16 text-lg font-medium border border-white/10 rounded-2xl">
-                      <GraduationCap className="w-6 h-6 mr-4" />
-                      Portal de Cliente
-                    </Button>
-                  </Link>
-                  <Button
-                    onClick={() => {
-                      sendMetaEvent('Lead', { source: 'Header Apply Button Mobile Menu' });
-                      handleApplyClick();
-                    }}
-                    className="w-full bg-transparent text-white border border-white/40 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] hover:scale-[1.02] transition-all duration-300 h-12 rounded-xl text-lg font-medium shadow-lg"
-                  >
-                    Aplica Ahora
-                  </Button>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Link href="/login?mode=login" onClick={() => setIsMobileMenuOpen(false)} className="w-full">
+                      <Button variant="ghost" className="w-full text-white hover:bg-white/10 h-12 text-sm font-medium border border-white/10 rounded-xl">
+                        Iniciar Sesión
+                      </Button>
+                    </Link>
+                    <Link href="/login?register=true" onClick={() => setIsMobileMenuOpen(false)} className="w-full">
+                      <Button className="w-full bg-white text-black hover:bg-white/90 h-12 text-sm font-semibold rounded-xl">
+                        Comenzar
+                      </Button>
+                    </Link>
+                  </div>
+
+
                 </div>
               </div>
             </div>

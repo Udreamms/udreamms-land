@@ -62,7 +62,6 @@ const nextConfig = {
       { source: '/suite', destination: '/', permanent: true },
       { source: '/suite/:path*', destination: '/', permanent: true },
       // Old bookmarks / broken internal links
-      { source: '/login', destination: '/portal', permanent: true },
       { source: '/app', destination: '/portal', permanent: true },
       { source: '/mentorship', destination: '/contact', permanent: true },
     ];
