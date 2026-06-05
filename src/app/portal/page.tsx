@@ -91,15 +91,20 @@ const touristModules = [
   }
 ];
 
-const cartItemsConfig: Record<string, { name: string; price: number; type: 'curso' | 'libro'; visa: 'estudiante' | 'turista' }> = {
+const cartItemsConfig: Record<string, { name: string; price: number; type: 'curso' | 'libro' | 'plan'; visa: 'estudiante' | 'turista' }> = {
   'curso-estudiante': { name: "Curso Digital - Visa de Estudiante F-1", price: 99, type: 'curso', visa: 'estudiante' },
   'libro-estudiante': { name: "Libro Digital - Visa de Estudiante F-1", price: 29, type: 'libro', visa: 'estudiante' },
   'curso-turista': { name: "Curso Digital - Visa de Turista B-2", price: 79, type: 'curso', visa: 'turista' },
   'libro-turista': { name: "Libro Digital - Visa de Turista B-2", price: 19, type: 'libro', visa: 'turista' },
+  'plan-esencial': { name: "Plan 1: Esencial - F-1", price: 380, type: 'plan', visa: 'estudiante' },
+  'plan-pro': { name: "Plan 2: Pro - F-1", price: 850, type: 'plan', visa: 'estudiante' },
+  'plan-elite': { name: "Plan 3: Elite - F-1", price: 2500, type: 'plan', visa: 'estudiante' },
+  'plan-allinclusive': { name: "Plan 4: All-Inclusive - F-1", price: 10000, type: 'plan', visa: 'estudiante' },
 };
 
 const studentPlans = [
   {
+    id: "plan-esencial",
     name: "PLAN 1: ESENCIAL",
     price: "$380",
     originalPrice: "$494",
@@ -114,6 +119,7 @@ const studentPlans = [
     ]
   },
   {
+    id: "plan-pro",
     name: "PLAN 2: PRO",
     price: "$850",
     originalPrice: "$1,700",
@@ -131,6 +137,7 @@ const studentPlans = [
     ]
   },
   {
+    id: "plan-elite",
     name: "PLAN 3: ELITE",
     price: "$2,500",
     originalPrice: "$3,250",
@@ -151,6 +158,7 @@ const studentPlans = [
     ]
   },
   {
+    id: "plan-allinclusive",
     name: "PLAN 4: ALL-INCLUSIVE",
     price: "$10,000",
     originalPrice: "$13,000",
@@ -215,6 +223,10 @@ export default function PortalPage() {
         if (itemId === 'libro-estudiante') updates.purchased_libro_estudiante = true;
         if (itemId === 'curso-turista') updates.purchased_curso_turista = true;
         if (itemId === 'libro-turista') updates.purchased_libro_turista = true;
+        if (itemId === 'plan-esencial') updates.purchased_plan_esencial = true;
+        if (itemId === 'plan-pro') updates.purchased_plan_pro = true;
+        if (itemId === 'plan-elite') updates.purchased_plan_elite = true;
+        if (itemId === 'plan-allinclusive') updates.purchased_plan_allinclusive = true;
       });
 
       // Synchronize with database
@@ -239,6 +251,15 @@ export default function PortalPage() {
       if (type === 'curso') return !!dbUser.purchased_curso_turista;
       if (type === 'libro') return !!dbUser.purchased_libro_turista;
     }
+    return false;
+  };
+
+  const isPlanPurchased = (planId: string) => {
+    if (!dbUser) return false;
+    if (planId === 'plan-esencial') return !!dbUser.purchased_plan_esencial;
+    if (planId === 'plan-pro') return !!dbUser.purchased_plan_pro;
+    if (planId === 'plan-elite') return !!dbUser.purchased_plan_elite;
+    if (planId === 'plan-allinclusive') return !!dbUser.purchased_plan_allinclusive;
     return false;
   };
 
@@ -888,12 +909,29 @@ export default function PortalPage() {
                           </div>
 
                           <div className="flex flex-col items-center gap-3 mt-auto mb-6 w-full">
-                            <a 
-                              href={`/instructions-payment-student?plan=${plan.name.toLowerCase().split(":")[1]?.trim().replace(" ", "-") || "esencial"}`} 
-                              className="w-full py-2.5 rounded-full bg-transparent text-white font-normal text-xs shadow-lg border border-white/20 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:text-white hover:border-[#2d1b4e] hover:scale-105 active:scale-95 transition-all duration-300 text-center uppercase tracking-widest"
-                            >
-                              Elegir Plan
-                            </a>
+                            {isPlanPurchased(plan.id) ? (
+                              <Button
+                                disabled
+                                className="w-full h-11 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 text-xs font-normal tracking-widest uppercase cursor-default"
+                              >
+                                Plan Adquirido
+                              </Button>
+                            ) : cart.includes(plan.id) ? (
+                              <Button
+                                onClick={() => setIsCartOpen(true)}
+                                className="w-full h-11 rounded-full bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border border-purple-500/50 hover:scale-105 active:scale-95 transition-all duration-300 text-xs font-normal tracking-widest uppercase flex items-center justify-center gap-2 shadow-lg"
+                              >
+                                <ShoppingCart className="w-4 h-4" />
+                                Ver en carrito
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={() => addToCart(plan.id)}
+                                className="w-full h-11 rounded-full bg-transparent border border-white/20 text-white hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:scale-105 active:scale-95 transition-all duration-300 text-xs font-normal tracking-widest uppercase flex items-center justify-center gap-2 shadow-lg"
+                              >
+                                Añadir al carrito
+                              </Button>
+                            )}
                           </div>
 
                           <div className="space-y-4 flex-1 border-t border-white/5 pt-5">
