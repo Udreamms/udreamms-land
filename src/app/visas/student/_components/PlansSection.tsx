@@ -58,8 +58,8 @@ const PLANS = [
     },
     {
         name: "PLAN 2: PRO",
-        price: "$850",
-        originalPrice: "$1,700",
+        price: "$550",
+        originalPrice: "$1,100",
         discount: "50% OFF",
         description: "Para quienes buscan seguridad.",
         highlight: true,
@@ -77,7 +77,6 @@ const PLANS = [
         name: "PLAN 3: ELITE",
         price: "$2,500",
         originalPrice: "$3,250",
-        discount: "30% OFF",
         description: "Soporte completo y alojamiento.",
         highlight: false,
         features: [
@@ -97,7 +96,6 @@ const PLANS = [
         name: "PLAN 4: ALL-INCLUSIVE",
         price: "$10,000",
         originalPrice: "$13,000",
-        discount: "30% OFF",
         description: "La experiencia VIP definitiva.",
         highlight: false,
         features: [
