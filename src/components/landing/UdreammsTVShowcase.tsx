@@ -172,7 +172,7 @@ export default function UdreammsTVShowcase() {
                                     whileTap={{ scale: 0.95 }}
                                     className="w-fit flex items-center gap-3 bg-white/10 hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:[transition-property:transform,box-shadow] text-white border border-white/20 backdrop-blur-md px-8 py-2.5 rounded-full text-base font-normal tracking-wide transition-all shadow-xl shadow-black/30"
                                 >
-                                    Udreamms Streaming
+                                    Udreamms +
                                 </motion.button>
                             </div>
                         </motion.div>
@@ -196,11 +196,127 @@ export default function UdreammsTVShowcase() {
                             whileDrag={{ scale: 1.15, cursor: "grabbing" }}
                             className="relative lg:absolute lg:right-0 lg:-top-64 w-40 h-40 md:w-72 md:h-72 lg:w-[30rem] lg:h-[30rem] flex items-center justify-center shrink-0 z-20 cursor-grab select-none pointer-events-auto"
                         >
-                            <img 
-                                src="https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/Phantom%2FAction.png?alt=media&token=240f1da6-7c9e-457d-8320-9e30f9383e60" 
-                                alt="Udreamms Streaming" 
-                                className="w-full h-full object-contain drop-shadow-[0_0_35px_rgba(255,255,255,0.6)] pointer-events-none"
-                            />
+                            {/* Background Purple Glow */}
+                            <div className="absolute w-[80%] h-[80%] rounded-full bg-[#bf5af2]/10 blur-[80px] pointer-events-none z-0" />
+                            
+                            {/* 3D Glowing Bars Container */}
+                            <div className="relative w-[75%] h-[75%] flex items-center justify-center gap-[8%] pointer-events-none z-10">
+                                
+                                {/* Bar 1 (Left) */}
+                                <motion.div 
+                                    className="relative w-[22%] h-[75%] rounded-full bg-gradient-to-b from-[#140d3a] via-[#bf5af2] to-[#0f092b] overflow-hidden border border-white/5"
+                                    initial={{ scaleY: 0, opacity: 0, y: "-12%" }}
+                                    animate={{
+                                        scaleY: 1,
+                                        opacity: 1,
+                                        y: ['-12%', '-16%', '-12%'],
+                                        boxShadow: [
+                                            '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)',
+                                            '0 0 40px rgba(191,90,242,0.8), 0 0 70px rgba(191,90,242,0.4)',
+                                            '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)'
+                                        ]
+                                    }}
+                                    transition={{
+                                        scaleY: { duration: 0.8, ease: "easeOut" },
+                                        opacity: { duration: 0.8, ease: "easeOut" },
+                                        y: { repeat: Infinity, duration: 4, ease: "easeInOut" },
+                                        boxShadow: { repeat: Infinity, duration: 3, ease: "easeInOut" }
+                                    }}
+                                >
+                                    {/* Glassy Shine Sweep */}
+                                    <motion.div 
+                                        className="absolute inset-0 bg-gradient-to-b from-transparent via-white/25 to-transparent"
+                                        initial={{ y: "-100%" }}
+                                        animate={{ y: ["-100%", "100%", "100%"] }}
+                                        transition={{
+                                            y: {
+                                                repeat: Infinity,
+                                                duration: 2.5,
+                                                ease: "easeInOut",
+                                                repeatDelay: 3.5,
+                                                delay: 1.0
+                                            }
+                                        }}
+                                    />
+                                </motion.div>
+
+                                {/* Bar 2 (Middle) */}
+                                <motion.div 
+                                    className="relative w-[22%] h-[75%] rounded-full bg-gradient-to-b from-[#140d3a] via-[#bf5af2] to-[#0f092b] overflow-hidden border border-white/5"
+                                    initial={{ scaleY: 0, opacity: 0, y: "3%" }}
+                                    animate={{
+                                        scaleY: 1,
+                                        opacity: 1,
+                                        y: ['3%', '-1%', '3%'],
+                                        boxShadow: [
+                                            '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)',
+                                            '0 0 40px rgba(191,90,242,0.8), 0 0 70px rgba(191,90,242,0.4)',
+                                            '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)'
+                                        ]
+                                    }}
+                                    transition={{
+                                        scaleY: { duration: 0.8, ease: "easeOut", delay: 0.2 },
+                                        opacity: { duration: 0.8, ease: "easeOut", delay: 0.2 },
+                                        y: { repeat: Infinity, duration: 4, ease: "easeInOut", delay: 0.5 },
+                                        boxShadow: { repeat: Infinity, duration: 3, ease: "easeInOut", delay: 0.3 }
+                                    }}
+                                >
+                                    {/* Glassy Shine Sweep */}
+                                    <motion.div 
+                                        className="absolute inset-0 bg-gradient-to-b from-transparent via-white/25 to-transparent"
+                                        initial={{ y: "-100%" }}
+                                        animate={{ y: ["-100%", "100%", "100%"] }}
+                                        transition={{
+                                            y: {
+                                                repeat: Infinity,
+                                                duration: 2.5,
+                                                ease: "easeInOut",
+                                                repeatDelay: 3.5,
+                                                delay: 1.6
+                                            }
+                                        }}
+                                    />
+                                </motion.div>
+
+                                {/* Bar 3 (Right) */}
+                                <motion.div 
+                                    className="relative w-[22%] h-[75%] rounded-full bg-gradient-to-b from-[#140d3a] via-[#bf5af2] to-[#0f092b] overflow-hidden border border-white/5"
+                                    initial={{ scaleY: 0, opacity: 0, y: "18%" }}
+                                    animate={{
+                                        scaleY: 1,
+                                        opacity: 1,
+                                        y: ['18%', '14%', '18%'],
+                                        boxShadow: [
+                                            '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)',
+                                            '0 0 40px rgba(191,90,242,0.8), 0 0 70px rgba(191,90,242,0.4)',
+                                            '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)'
+                                        ]
+                                    }}
+                                    transition={{
+                                        scaleY: { duration: 0.8, ease: "easeOut", delay: 0.4 },
+                                        opacity: { duration: 0.8, ease: "easeOut", delay: 0.4 },
+                                        y: { repeat: Infinity, duration: 4, ease: "easeInOut", delay: 1.0 },
+                                        boxShadow: { repeat: Infinity, duration: 3, ease: "easeInOut", delay: 0.6 }
+                                    }}
+                                >
+                                    {/* Glassy Shine Sweep */}
+                                    <motion.div 
+                                        className="absolute inset-0 bg-gradient-to-b from-transparent via-white/25 to-transparent"
+                                        initial={{ y: "-100%" }}
+                                        animate={{ y: ["-100%", "100%", "100%"] }}
+                                        transition={{
+                                            y: {
+                                                repeat: Infinity,
+                                                duration: 2.5,
+                                                ease: "easeInOut",
+                                                repeatDelay: 3.5,
+                                                delay: 2.2
+                                            }
+                                        }}
+                                    />
+                                </motion.div>
+
+                            </div>
                         </motion.div>
                     </div>
 
