@@ -5,13 +5,17 @@ import { useEffect, useRef, useState } from "react";
 
 export default function UdreammsTVShowcase() {
     const controls = useAnimation();
-    const [isPlus, setIsPlus] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setIsPlus(prev => !prev);
-        }, 5000);
-        return () => clearInterval(interval);
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 1024);
+        };
+        checkMobile();
+        if (typeof window !== "undefined") window.addEventListener("resize", checkMobile);
+        return () => {
+            if (typeof window !== "undefined") window.removeEventListener("resize", checkMobile);
+        };
     }, []);
 
     const resizeTimer = useRef<number | null>(null);
@@ -85,6 +89,96 @@ export default function UdreammsTVShowcase() {
         };
     }, []);
 
+    const starVariants = {
+        initial: {
+            left: isMobile ? "50%" : "75%",
+            top: isMobile ? "80%" : "35%",
+            scale: 0,
+            opacity: 0
+        },
+        animate: {
+            left: isMobile 
+                ? ["50%", "50%", "72%", "72%"] 
+                : ["75%", "75%", "48%", "48%"],
+            top: isMobile 
+                ? ["80%", "80%", "22%", "22%"] 
+                : ["35%", "35%", "35%", "35%"],
+            scale: [0, 1.5, 1.0, 0],
+            opacity: [0, 1, 1, 0],
+            transition: {
+                duration: 2.5,
+                times: [0, 0.55, 0.85, 1],
+                ease: "easeInOut" as const
+            }
+        }
+    };
+
+    const bar1Variants = {
+        initial: {
+            left: "26%",
+            top: "2.5%",
+            rotate: 0,
+            scale: 1,
+            opacity: 1
+        },
+        animate: {
+            left: ["26%", "46%", "46%", "46%"],
+            top: ["2.5%", "12.5%", "12.5%", "12.5%"],
+            rotate: [0, 90, 90, 90],
+            scale: [1, 1.08, 0, 0],
+            opacity: [1, 1, 0, 0],
+            transition: {
+                duration: 2.5,
+                times: [0, 0.45, 0.55, 1],
+                ease: "easeInOut" as const
+            }
+        }
+    };
+
+    const bar2Variants = {
+        initial: {
+            left: "46%",
+            top: "15.5%",
+            rotate: 0,
+            scale: 1,
+            opacity: 1
+        },
+        animate: {
+            left: ["46%", "46%", "46%", "46%"],
+            top: ["15.5%", "12.5%", "12.5%", "12.5%"],
+            rotate: [0, 0, 0, 0],
+            scale: [1, 1.08, 0, 0],
+            opacity: [1, 1, 0, 0],
+            transition: {
+                duration: 2.5,
+                times: [0, 0.45, 0.55, 1],
+                ease: "easeInOut" as const
+            }
+        }
+    };
+
+    const bar3Variants = {
+        initial: {
+            left: "66%",
+            top: "28.5%",
+            rotate: 0,
+            scale: 1,
+            opacity: 1
+        },
+        animate: {
+            left: ["66%", "46%", "46%", "46%"],
+            top: ["28.5%", "12.5%", "12.5%", "12.5%"],
+            rotate: [0, 90, 90, 90],
+            scale: [1, 1.08, 0, 0],
+            opacity: [1, 1, 0, 0],
+            transition: {
+                duration: 2.5,
+                times: [0, 0.45, 0.55, 1],
+                ease: "easeInOut" as const
+            }
+        }
+    };
+
     return (
         <section ref={sectionRef} className="relative w-full min-h-[600px] md:min-h-[850px] lg:min-h-[950px] bg-black overflow-hidden flex items-center z-10">
             {/* Transición suave hacia el bloque negro inferior */}
@@ -134,7 +228,12 @@ export default function UdreammsTVShowcase() {
             </motion.div>
 
             {/* Contenido de la Sección */}
-            <div className="container max-w-[1500px] mx-auto px-6 md:px-12 py-16 md:py-24 relative z-20">
+            <motion.div 
+                initial="initial"
+                whileInView="animate"
+                viewport={{ once: true, margin: "-10% 0px" }}
+                className="container max-w-[1500px] mx-auto px-6 md:px-12 py-16 md:py-24 relative z-20"
+            >
                 <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16">
                     
                     {/* Left Column: Texts */}
@@ -159,8 +258,30 @@ export default function UdreammsTVShowcase() {
                             </span>
 
                             {/* Título Principal */}
-                            <h2 className="text-4xl md:text-[5.5rem] lg:text-[6.5rem] font-bold text-white tracking-tighter leading-none select-none">
+                            <h2 className="text-4xl md:text-[5.5rem] lg:text-[6.5rem] font-bold text-white tracking-tighter leading-none select-none flex items-center gap-3">
                                 UDREAMMS
+                                <motion.span
+                                    variants={{
+                                        initial: { scale: 0, opacity: 0 },
+                                        animate: {
+                                            scale: [0, 0, 1.25, 1],
+                                            opacity: [0, 0, 1, 1],
+                                            transition: {
+                                                duration: 2.5,
+                                                times: [0, 0.83, 0.9, 1],
+                                                type: "spring",
+                                                stiffness: 100,
+                                                damping: 8
+                                            }
+                                        }
+                                    }}
+                                    className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-white via-[#bf5af2] to-[#bf5af2] font-extrabold"
+                                    style={{
+                                        textShadow: "0 0 20px rgba(191,90,242,0.8)"
+                                    }}
+                                >
+                                    +
+                                </motion.span>
                             </h2>
                             
                             {/* Subtítulos y Copia Premium de Acompañamiento (Perfectamente pegados) */}
@@ -210,37 +331,23 @@ export default function UdreammsTVShowcase() {
                             {/* 3D Glowing Bars Container */}
                             <motion.div 
                                 className="relative w-[75%] h-[75%] pointer-events-none z-10"
-                                animate={{ rotate: isPlus ? 360 : 0 }}
-                                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                                variants={{
+                                    initial: { rotate: 0 },
+                                    animate: {
+                                        rotate: [0, 360, 360],
+                                        transition: {
+                                            duration: 2.5,
+                                            times: [0, 0.55, 1],
+                                            ease: "easeInOut"
+                                        }
+                                    }
+                                }}
                             >
                                 
                                 {/* Bar 1 (Left -> Horizontal) */}
                                 <motion.div 
-                                    className="absolute w-[22%] h-[75%] rounded-full bg-gradient-to-b from-[#140d3a] via-[#bf5af2] to-[#0f092b] overflow-hidden border border-white/5"
-                                    animate={{
-                                        left: isPlus ? "39%" : "11%",
-                                        top: isPlus ? "12.5%" : "2.5%",
-                                        rotate: isPlus ? 90 : 0,
-                                        scale: isPlus ? 1.08 : 1.0,
-                                        boxShadow: isPlus 
-                                            ? [
-                                                '0 0 30px rgba(191,90,242,0.8), 0 0 60px rgba(191,90,242,0.4)',
-                                                '0 0 50px rgba(191,90,242,1.0), 0 0 80px rgba(191,90,242,0.6)',
-                                                '0 0 30px rgba(191,90,242,0.8), 0 0 60px rgba(191,90,242,0.4)'
-                                              ]
-                                            : [
-                                                '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)',
-                                                '0 0 40px rgba(191,90,242,0.8), 0 0 70px rgba(191,90,242,0.4)',
-                                                '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)'
-                                              ]
-                                    }}
-                                    transition={{
-                                        left: { type: "spring", stiffness: 70, damping: 14 },
-                                        top: { type: "spring", stiffness: 70, damping: 14 },
-                                        rotate: { type: "spring", stiffness: 70, damping: 14 },
-                                        scale: { duration: 0.5 },
-                                        boxShadow: { repeat: Infinity, duration: 2.5, ease: "easeInOut" }
-                                    }}
+                                    className="absolute w-[8%] h-[75%] rounded-full bg-gradient-to-b from-[#140d3a] via-[#bf5af2] to-[#0f092b] overflow-hidden border border-white/5"
+                                    variants={bar1Variants}
                                 >
                                     {/* Glassy Shine Sweep */}
                                     <motion.div 
@@ -261,31 +368,8 @@ export default function UdreammsTVShowcase() {
 
                                 {/* Bar 2 (Middle -> Vertical) */}
                                 <motion.div 
-                                    className="absolute w-[22%] h-[75%] rounded-full bg-gradient-to-b from-[#140d3a] via-[#bf5af2] to-[#0f092b] overflow-hidden border border-white/5"
-                                    animate={{
-                                        left: "39%",
-                                        top: isPlus ? "12.5%" : "15.5%",
-                                        rotate: 0,
-                                        scale: isPlus ? 1.08 : 1.0,
-                                        boxShadow: isPlus 
-                                            ? [
-                                                '0 0 30px rgba(191,90,242,0.8), 0 0 60px rgba(191,90,242,0.4)',
-                                                '0 0 50px rgba(191,90,242,1.0), 0 0 80px rgba(191,90,242,0.6)',
-                                                '0 0 30px rgba(191,90,242,0.8), 0 0 60px rgba(191,90,242,0.4)'
-                                              ]
-                                            : [
-                                                '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)',
-                                                '0 0 40px rgba(191,90,242,0.8), 0 0 70px rgba(191,90,242,0.4)',
-                                                '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)'
-                                              ]
-                                    }}
-                                    transition={{
-                                        left: { type: "spring", stiffness: 70, damping: 14 },
-                                        top: { type: "spring", stiffness: 70, damping: 14 },
-                                        rotate: { type: "spring", stiffness: 70, damping: 14 },
-                                        scale: { duration: 0.5 },
-                                        boxShadow: { repeat: Infinity, duration: 2.5, ease: "easeInOut", delay: 0.3 }
-                                    }}
+                                    className="absolute w-[8%] h-[75%] rounded-full bg-gradient-to-b from-[#140d3a] via-[#bf5af2] to-[#0f092b] overflow-hidden border border-white/5"
+                                    variants={bar2Variants}
                                 >
                                     {/* Glassy Shine Sweep */}
                                     <motion.div 
@@ -306,31 +390,8 @@ export default function UdreammsTVShowcase() {
 
                                 {/* Bar 3 (Right -> Horizontal) */}
                                 <motion.div 
-                                    className="absolute w-[22%] h-[75%] rounded-full bg-gradient-to-b from-[#140d3a] via-[#bf5af2] to-[#0f092b] overflow-hidden border border-white/5"
-                                    animate={{
-                                        left: isPlus ? "39%" : "67%",
-                                        top: isPlus ? "12.5%" : "28.5%",
-                                        rotate: isPlus ? 90 : 0,
-                                        scale: isPlus ? 1.08 : 1.0,
-                                        boxShadow: isPlus 
-                                            ? [
-                                                '0 0 30px rgba(191,90,242,0.8), 0 0 60px rgba(191,90,242,0.4)',
-                                                '0 0 50px rgba(191,90,242,1.0), 0 0 80px rgba(191,90,242,0.6)',
-                                                '0 0 30px rgba(191,90,242,0.8), 0 0 60px rgba(191,90,242,0.4)'
-                                              ]
-                                            : [
-                                                '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)',
-                                                '0 0 40px rgba(191,90,242,0.8), 0 0 70px rgba(191,90,242,0.4)',
-                                                '0 0 20px rgba(191,90,242,0.4), 0 0 40px rgba(191,90,242,0.2)'
-                                              ]
-                                    }}
-                                    transition={{
-                                        left: { type: "spring", stiffness: 70, damping: 14 },
-                                        top: { type: "spring", stiffness: 70, damping: 14 },
-                                        rotate: { type: "spring", stiffness: 70, damping: 14 },
-                                        scale: { duration: 0.5 },
-                                        boxShadow: { repeat: Infinity, duration: 2.5, ease: "easeInOut", delay: 0.6 }
-                                    }}
+                                    className="absolute w-[8%] h-[75%] rounded-full bg-gradient-to-b from-[#140d3a] via-[#bf5af2] to-[#0f092b] overflow-hidden border border-white/5"
+                                    variants={bar3Variants}
                                 >
                                     {/* Glassy Shine Sweep */}
                                     <motion.div 
@@ -353,9 +414,19 @@ export default function UdreammsTVShowcase() {
                         </motion.div>
                     </div>
 
+                    {/* Shooting Star Flare with Trail */}
+                    <motion.div
+                        variants={starVariants}
+                        className="absolute w-6 h-6 rounded-full bg-white z-50 pointer-events-none flex items-center justify-end"
+                        style={{
+                            boxShadow: '0 0 15px #fff, 0 0 30px #bf5af2, 0 0 60px #bf5af2'
+                        }}
+                    >
+                        {/* Light tail */}
+                        <div className="absolute right-3 w-16 h-1 rounded-full bg-gradient-to-r from-transparent via-[#bf5af2]/40 to-white/80 filter blur-[1px]" />
+                    </motion.div>
                 </div>
-            </div>
-            
+            </motion.div>
         </section>
     );
 }
