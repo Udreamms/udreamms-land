@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { onAuthStateChanged, updateProfile, signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
+import { doc, onSnapshot, updateDoc, setDoc, getDoc } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
@@ -25,7 +26,9 @@ import {
   Video,
   UserCheck,
   Sparkles,
-  Download
+  Download,
+  ShoppingCart,
+  Lock
 } from "lucide-react";
 
 const studentModules = [
@@ -79,6 +82,13 @@ const touristModules = [
   }
 ];
 
+const cartItemsConfig: Record<string, { name: string; price: number; type: 'curso' | 'libro'; visa: 'estudiante' | 'turista' }> = {
+  'curso-estudiante': { name: "Curso Digital - Visa de Estudiante F-1", price: 99, type: 'curso', visa: 'estudiante' },
+  'libro-estudiante': { name: "Libro Digital - Visa de Estudiante F-1", price: 29, type: 'libro', visa: 'estudiante' },
+  'curso-turista': { name: "Curso Digital - Visa de Turista B-2", price: 79, type: 'curso', visa: 'turista' },
+  'libro-turista': { name: "Libro Digital - Visa de Turista B-2", price: 19, type: 'libro', visa: 'turista' },
+};
+
 export default function PortalPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -92,18 +102,149 @@ export default function PortalPage() {
   const [savingProfile, setSavingProfile] = useState(false);
   const router = useRouter();
 
-  // Watch Auth State
+  const [dbUser, setDbUser] = useState<any>(null);
+  const [cart, setCart] = useState<string[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const addToCart = (itemId: string) => {
+    if (cart.includes(itemId)) {
+      toast.info("Ya está en el carrito");
+      return;
+    }
+    setCart((prev) => [...prev, itemId]);
+    toast.success("Agregado al carrito");
+  };
+
+  const removeFromCart = (itemId: string) => {
+    setCart((prev) => prev.filter((id) => id !== itemId));
+    toast.success("Eliminado del carrito");
+  };
+
+  const handleCheckout = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const updates: Record<string, boolean> = {};
+      
+      cart.forEach((itemId) => {
+        if (itemId === 'curso-estudiante') updates.purchased_curso_estudiante = true;
+        if (itemId === 'libro-estudiante') updates.purchased_libro_estudiante = true;
+        if (itemId === 'curso-turista') updates.purchased_curso_turista = true;
+        if (itemId === 'libro-turista') updates.purchased_libro_turista = true;
+      });
+
+      // Synchronize with database
+      await updateDoc(userRef, updates);
+      
+      toast.success("¡Pago completado con éxito! Contenido desbloqueado.");
+      setCart([]);
+      setIsCartOpen(false);
+    } catch (err: any) {
+      toast.error("Error al procesar pago: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isUnlocked = (type: 'curso' | 'libro', visa: 'estudiante' | 'turista') => {
+    if (!dbUser) return false;
+    if (visa === 'estudiante') {
+      if (type === 'curso') return !!dbUser.purchased_curso_estudiante;
+      if (type === 'libro') return !!dbUser.purchased_libro_estudiante;
+    } else {
+      if (type === 'curso') return !!dbUser.purchased_curso_turista;
+      if (type === 'libro') return !!dbUser.purchased_libro_turista;
+    }
+    return false;
+  };
+
+  const renderLockOverlay = (itemId: 'curso-estudiante' | 'libro-estudiante' | 'curso-turista' | 'libro-turista') => {
+    const itemInfo = cartItemsConfig[itemId];
+    const isAdded = cart.includes(itemId);
+    
+    return (
+      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-6 bg-black/80 backdrop-blur-md rounded-3xl border border-white/5 text-center">
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="max-w-md bg-[#0d0d11]/90 border border-white/10 rounded-3xl p-8 space-y-6 shadow-2xl relative overflow-hidden"
+        >
+          <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] bg-purple-500/10 rounded-full blur-[40px] pointer-events-none" />
+          
+          <Lock className="w-12 h-12 text-purple-400 mx-auto animate-pulse" />
+          
+          <div className="space-y-2">
+            <h3 className="text-xl font-normal text-white uppercase tracking-wider">{itemInfo.name}</h3>
+            <p className="text-xs text-white/50 leading-relaxed">
+              Este contenido exclusivo está bloqueado. Adquiere el acceso permanente para comenzar tu preparación consular con nuestros mentores autorizados.
+            </p>
+          </div>
+
+          <div className="text-2xl font-normal text-purple-400 tracking-tight">
+            ${itemInfo.price}.00 USD
+          </div>
+
+          <div className="pt-2">
+            {isAdded ? (
+              <Button
+                onClick={() => setIsCartOpen(true)}
+                className="w-full h-12 rounded-full bg-purple-500/20 border border-purple-500/50 text-purple-300 hover:bg-purple-500/30 transition-all text-xs font-normal tracking-widest uppercase flex items-center justify-center gap-2"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                Ver en el carrito
+              </Button>
+            ) : (
+              <Button
+                onClick={() => addToCart(itemId)}
+                className="w-full h-12 rounded-full bg-transparent border border-white/40 text-white hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg text-xs font-normal tracking-widest uppercase flex items-center justify-center gap-2"
+              >
+                Agregar al carrito
+              </Button>
+            )}
+          </div>
+        </motion.div>
+      </div>
+    );
+  };
+
+  // Watch Auth State and listen to Firestore user document
   useEffect(() => {
+    let unsubDoc: (() => void) | undefined;
+
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
         setNewDisplayName(currentUser.displayName || "");
+        
+        // Listen to user document in Firestore in real-time
+        const userDocRef = doc(db, "users", currentUser.uid);
+        unsubDoc = onSnapshot(userDocRef, (docSnap) => {
+          if (docSnap.exists()) {
+            setDbUser(docSnap.data());
+          } else {
+            // Document might not exist yet, set an empty object
+            setDbUser({});
+          }
+        }, (err) => {
+          console.error("Error listening to user document:", err);
+        });
       } else {
         setUser(null);
+        setDbUser(null);
+        if (unsubDoc) {
+          unsubDoc();
+        }
       }
       setLoading(false);
     });
-    return () => unsubscribe();
+
+    return () => {
+      unsubscribe();
+      if (unsubDoc) {
+        unsubDoc();
+      }
+    };
   }, []);
 
   // Redirect to login if unauthenticated
@@ -240,75 +381,157 @@ export default function PortalPage() {
             </button>
           </nav>
 
-          {/* User profile section */}
-          <div className="relative z-50">
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="w-9 h-9 rounded-full overflow-hidden border border-white/20 hover:border-purple-500/50 cursor-pointer transition-colors relative flex items-center justify-center bg-white/5 shadow-inner"
-            >
-              {user.photoURL ? (
-                <img 
-                  src={user.photoURL} 
-                  alt={user.displayName || "Usuario"} 
-                  className="w-full h-full object-cover" 
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-xs font-normal text-white uppercase tracking-wider">
-                  {userInitials}
-                </div>
-              )}
-            </button>
+          {/* Right Header Area (Cart + Profile) */}
+          <div className="flex items-center gap-4 relative z-50">
+            
+            {/* Shopping Cart Button */}
+            <div className="relative">
+              <button
+                onClick={() => setIsCartOpen(!isCartOpen)}
+                className="relative w-9 h-9 rounded-full bg-white/5 border border-white/20 hover:border-purple-500/50 flex items-center justify-center cursor-pointer transition-colors shadow-inner text-white"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                {cart.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-purple-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
+                    {cart.length}
+                  </span>
+                )}
+              </button>
 
-            {/* Dropdown Menu */}
-            <AnimatePresence>
-              {isDropdownOpen && (
-                <>
-                  {/* Backdrop to close dropdown on outer click */}
-                  <div className="fixed inset-0 z-40 pointer-events-auto" onClick={() => setIsDropdownOpen(false)} />
-                  
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                    transition={{ duration: 0.15, ease: "easeOut" }}
-                    className="absolute right-0 mt-3 w-64 rounded-2xl bg-[#0d0d11]/95 backdrop-blur-xl border border-white/10 shadow-2xl p-4 z-50 space-y-3"
-                  >
-                    <div className="px-1 py-1">
-                      <p className="text-xs font-normal tracking-widest text-white/40 uppercase mb-1">Tu Cuenta</p>
-                      <p className="text-sm font-normal truncate text-white">{user.displayName || "Usuario Udreamms"}</p>
-                      <p className="text-xs truncate text-white/50">{user.email}</p>
-                    </div>
+              {/* Cart Dropdown */}
+              <AnimatePresence>
+                {isCartOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40 pointer-events-auto" onClick={() => setIsCartOpen(false)} />
+                    
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                      transition={{ duration: 0.15, ease: "easeOut" }}
+                      className="absolute right-0 mt-3 w-80 rounded-2xl bg-[#0d0d11]/95 backdrop-blur-xl border border-white/10 shadow-2xl p-4 z-50 space-y-4"
+                    >
+                      <div>
+                        <p className="text-xs font-normal tracking-widest text-white/40 uppercase mb-2">Carrito de Compras</p>
+                        {cart.length === 0 ? (
+                          <p className="text-xs text-white/50 py-4 text-center">Tu carrito está vacío</p>
+                        ) : (
+                          <div className="space-y-3 max-h-60 overflow-y-auto pr-1 no-scrollbar">
+                            {cart.map((itemId) => {
+                              const item = cartItemsConfig[itemId];
+                              if (!item) return null;
+                              return (
+                                <div key={itemId} className="flex justify-between items-center gap-2 p-2 rounded-xl bg-white/5 border border-white/5">
+                                  <div className="min-w-0">
+                                    <p className="text-xs font-normal truncate text-white">{item.name}</p>
+                                    <p className="text-[10px] text-purple-400 font-medium">${item.price}.00 USD</p>
+                                  </div>
+                                  <button
+                                    onClick={() => removeFromCart(itemId)}
+                                    className="text-[10px] text-red-400 hover:text-red-300 uppercase tracking-wider font-semibold shrink-0"
+                                  >
+                                    Quitar
+                                  </button>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
 
-                    <div className="border-t border-white/5" />
+                      {cart.length > 0 && (
+                        <>
+                          <div className="border-t border-white/5" />
+                          <div className="flex justify-between items-center px-1">
+                            <span className="text-xs text-white/50 uppercase tracking-wider">Total</span>
+                            <span className="text-sm font-semibold text-white">
+                              ${cart.reduce((total, itemId) => total + (cartItemsConfig[itemId]?.price || 0), 0)}.00 USD
+                            </span>
+                          </div>
+                          <Button
+                            onClick={handleCheckout}
+                            className="w-full h-11 rounded-full bg-transparent border border-white/40 text-white hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg text-xs font-normal tracking-widest uppercase flex items-center justify-center gap-2"
+                          >
+                            Realizar Pago
+                          </Button>
+                        </>
+                      )}
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
 
-                    <div className="space-y-1">
-                      <button
-                        onClick={() => {
-                          setIsDropdownOpen(false);
-                          setIsProfileModalOpen(true);
-                        }}
-                        className="w-full h-10 rounded-xl hover:bg-white/5 transition-colors flex items-center gap-3 px-3 text-left text-xs font-normal text-white/80 hover:text-white"
-                      >
-                        <Settings className="w-4 h-4 text-white" />
-                        Administrar Perfil
-                      </button>
-                      
-                      <button
-                        onClick={() => {
-                          setIsDropdownOpen(false);
-                          handleSignOut();
-                        }}
-                        className="w-full h-10 rounded-xl hover:bg-red-500/10 transition-colors flex items-center gap-3 px-3 text-left text-xs font-normal text-red-400 hover:text-red-300"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        Cerrar Sesión
-                      </button>
-                    </div>
-                  </motion.div>
-                </>
-              )}
-            </AnimatePresence>
+            {/* User profile dropdown button */}
+            <div className="relative">
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="w-9 h-9 rounded-full overflow-hidden border border-white/20 hover:border-purple-500/50 cursor-pointer transition-colors relative flex items-center justify-center bg-white/5 shadow-inner"
+              >
+                {user.photoURL ? (
+                  <img 
+                    src={user.photoURL} 
+                    alt={user.displayName || "Usuario"} 
+                    className="w-full h-full object-cover" 
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-xs font-normal text-white uppercase tracking-wider">
+                    {userInitials}
+                  </div>
+                )}
+              </button>
+
+              {/* Dropdown Menu */}
+              <AnimatePresence>
+                {isDropdownOpen && (
+                  <>
+                    {/* Backdrop to close dropdown on outer click */}
+                    <div className="fixed inset-0 z-45 pointer-events-auto" onClick={() => setIsDropdownOpen(false)} />
+                    
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                      transition={{ duration: 0.15, ease: "easeOut" }}
+                      className="absolute right-0 mt-3 w-64 rounded-2xl bg-[#0d0d11]/95 backdrop-blur-xl border border-white/10 shadow-2xl p-4 z-50 space-y-3"
+                    >
+                      <div className="px-1 py-1">
+                        <p className="text-xs font-normal tracking-widest text-white/40 uppercase mb-1">Tu Cuenta</p>
+                        <p className="text-sm font-normal truncate text-white">{user.displayName || "Usuario Udreamms"}</p>
+                        <p className="text-xs truncate text-white/50">{user.email}</p>
+                      </div>
+
+                      <div className="border-t border-white/5" />
+
+                      <div className="space-y-1">
+                        <button
+                          onClick={() => {
+                            setIsDropdownOpen(false);
+                            setIsProfileModalOpen(true);
+                          }}
+                          className="w-full h-10 rounded-xl hover:bg-white/5 transition-colors flex items-center gap-3 px-3 text-left text-xs font-normal text-white/80 hover:text-white"
+                        >
+                          <Settings className="w-4 h-4 text-white" />
+                          Administrar Perfil
+                        </button>
+                        
+                        <button
+                          onClick={() => {
+                            setIsDropdownOpen(false);
+                            handleSignOut();
+                          }}
+                          className="w-full h-10 rounded-xl hover:bg-red-500/10 transition-colors flex items-center gap-3 px-3 text-left text-xs font-normal text-red-400 hover:text-red-300"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Cerrar Sesión
+                        </button>
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
         </div>
@@ -637,7 +860,11 @@ export default function PortalPage() {
                   <p className="text-sm text-white/50">Capacítate con nuestros videocursos prácticos dictados por mentores autorizados.</p>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="relative min-h-[450px]">
+                  {!isUnlocked('curso', activeTopSection === 'visa-estudiante' ? 'estudiante' : 'turista') && 
+                    renderLockOverlay(activeTopSection === 'visa-estudiante' ? 'curso-estudiante' : 'curso-turista')}
+
+                  <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 ${!isUnlocked('curso', activeTopSection === 'visa-estudiante' ? 'estudiante' : 'turista') ? 'filter blur-sm select-none pointer-events-none' : ''}`}>
                   {/* Video Player or Mockup */}
                   <div className="lg:col-span-2 bg-[#0d0d11] border border-white/5 rounded-3xl overflow-hidden flex flex-col">
                     {activeTopSection === 'visa-estudiante' ? (
@@ -738,6 +965,7 @@ export default function PortalPage() {
                     </div>
                   </div>
                 </div>
+                </div>
               </div>
             )}
 
@@ -749,7 +977,11 @@ export default function PortalPage() {
                   <p className="text-sm text-white/50">Tu guía definitiva hacia Estados Unidos en formato ebook.</p>
                 </div>
 
-                <div className="bg-[#0d0d11]/80 backdrop-blur-md border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 w-full font-sans">
+                <div className="relative min-h-[350px]">
+                  {!isUnlocked('libro', activeTopSection === 'visa-estudiante' ? 'estudiante' : 'turista') && 
+                    renderLockOverlay(activeTopSection === 'visa-estudiante' ? 'libro-estudiante' : 'libro-turista')}
+
+                  <div className={`bg-[#0d0d11]/80 backdrop-blur-md border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 w-full font-sans ${!isUnlocked('libro', activeTopSection === 'visa-estudiante' ? 'estudiante' : 'turista') ? 'filter blur-sm select-none pointer-events-none' : ''}`}>
                   {/* Book Mockup cover */}
                   <div className="w-48 h-64 shrink-0 rounded-2xl bg-gradient-to-tr from-[#1b1030] to-[#5b238d] border border-purple-500/30 flex flex-col justify-between p-4 shadow-[0_15px_35px_rgba(168,85,247,0.2)] hover:scale-105 transition-transform duration-300 relative group overflow-hidden">
                     <div className="absolute inset-0 bg-black/20 pointer-events-none" />
@@ -797,6 +1029,7 @@ export default function PortalPage() {
                       </a>
                     </div>
                   </div>
+                </div>
                 </div>
               </div>
             )}
