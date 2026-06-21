@@ -143,6 +143,19 @@ export async function POST(req: Request) {
 
         const wa_id = response.data?.messages?.[0]?.id;
 
+        if (!db) {
+            return NextResponse.json(
+                {
+                    success: true,
+                    data: response.data,
+                    messageId: wa_id,
+                    sentTo: cleanTo,
+                    warning: 'Message sent but Firebase Admin is not configured; Kanban was not updated.',
+                },
+                { status: 200 }
+            );
+        }
+
         // 2. Log in Firestore
         // If cardId and groupId are provided, update existing card
         // Otherwise, find or create a card for this contact

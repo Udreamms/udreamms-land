@@ -14,10 +14,14 @@ export const instructionsPageClass = {
   lead: "text-sm md:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed font-normal",
   planCard:
     "relative p-6 md:p-8 rounded-[2rem] text-left transition-all duration-300 border-0 ring-1 w-full",
+  planCardCentered:
+    "relative p-6 md:p-8 lg:p-10 rounded-[2rem] text-center transition-all duration-300 border-0 ring-1 w-full flex flex-col items-center",
   planCardDefault: "bg-black ring-white/5 hover:ring-white/15",
   planCardSelected: "bg-black ring-slate-500/50 shadow-2xl",
   paymentCard:
     "relative p-6 md:p-8 rounded-[2rem] text-left transition-all duration-300 ring-1 w-full",
+  paymentCardCentered:
+    "relative p-6 md:p-8 lg:p-10 rounded-[2rem] text-center transition-all duration-300 ring-1 w-full flex flex-col items-center",
   paymentCardDefault: "bg-black ring-white/5 hover:ring-white/15",
   paymentCardSelected: "bg-black ring-slate-500/50",
   instructionsWrap: "pt-4 md:pt-6",
@@ -26,6 +30,14 @@ export const instructionsPageClass = {
   icon: "w-5 h-5 text-slate-400 shrink-0",
   iconSm: "w-4 h-4 text-slate-400 shrink-0",
 } as const;
+
+export function LimitedTimeTag() {
+  return (
+    <div className="absolute top-0 right-0 bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] text-white text-[9px] sm:text-[10px] font-medium uppercase tracking-widest px-3 py-1.5 md:px-5 md:py-2 rounded-bl-3xl shadow-lg z-20 pointer-events-none animate-pulse">
+      Por tiempo limitado
+    </div>
+  );
+}
 
 export function StepHeader({ number, label }: { number: string; label: string }) {
   return (

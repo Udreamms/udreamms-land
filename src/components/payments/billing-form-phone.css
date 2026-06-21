@@ -1,0 +1,102 @@
+.billing-phone-field .react-tel-input {
+  width: 100%;
+}
+
+.billing-phone-field .form-control {
+  width: 100% !important;
+  height: 2.75rem !important;
+  font-size: 0.875rem !important;
+  background: transparent !important;
+  border: 0 !important;
+  color: #fff !important;
+  border-radius: 0 !important;
+  padding-left: 52px !important;
+}
+
+.billing-phone-field .form-control::placeholder {
+  color: rgb(100 116 139);
+}
+
+.billing-phone-field .flag-dropdown {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+.billing-phone-field .selected-flag {
+  background: transparent !important;
+  width: 46px !important;
+  padding-left: 12px !important;
+  border-radius: 0 !important;
+}
+
+.billing-phone-field .selected-flag:hover,
+.billing-phone-field .selected-flag:focus,
+.billing-phone-field .selected-flag.open {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+.billing-phone-field .country-list {
+  position: absolute !important;
+  z-index: 50 !important;
+  left: 0 !important;
+  right: auto !important;
+  width: min(100vw - 2rem, 22rem) !important;
+  max-height: min(22rem, 60vh) !important;
+  margin-top: 4px !important;
+  padding: 0 !important;
+  overflow-y: auto !important;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  background: #141414 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45) !important;
+}
+
+.billing-phone-field .country-list::-webkit-scrollbar {
+  display: none;
+}
+
+.billing-phone-field .country-list .search {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 2 !important;
+  background: #141414 !important;
+  padding: 0.75rem !important;
+}
+
+.billing-phone-field .country-list .search-box {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 0.5rem !important;
+}
+
+.billing-phone-field .country-list .country {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.625rem !important;
+  padding: 0.625rem 0.875rem !important;
+  font-size: 0.875rem !important;
+  color: #fff !important;
+}
+
+.billing-phone-field .country-list .country:hover,
+.billing-phone-field .country-list .country.highlight {
+  background: rgba(59, 130, 246, 0.35) !important;
+}
+
+.billing-phone-field .country-list .country .dial-code {
+  color: rgba(255, 255, 255, 0.55) !important;
+  margin-left: auto !important;
+}
+
+.billing-phone-field .country-list .flag {
+  margin-right: 0 !important;
+  transform: scale(1.05);
+}

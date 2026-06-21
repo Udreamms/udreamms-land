@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { ChevronDown, Mail, User } from 'lucide-react';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
+import './billing-form-phone.css';
 
 export interface BillingData {
   email: string;
@@ -27,22 +29,32 @@ const COUNTRIES = [
   'Argentina', 'Bolivia', 'Brasil', 'Chile', 'Colombia', 'Costa Rica',
   'Cuba', 'República Dominicana', 'Ecuador', 'El Salvador', 'Guatemala',
   'Honduras', 'México', 'Nicaragua', 'Panamá', 'Paraguay', 'Perú',
-  'Puerto Rico', 'Uruguay', 'Venezuela', 'España', 'Estados Unidos', 'Otros'
+  'Puerto Rico', 'Uruguay', 'Venezuela', 'España', 'Estados Unidos', 'Otros',
 ];
 
-const inputClass =
-  'bg-white/5 border-white/10 h-9 text-sm text-white placeholder:text-slate-500 rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500/30 focus-visible:border-blue-500/50';
+const contactRequiredFields: (keyof BillingData)[] = ['email', 'phone', 'fullName'];
+
+const rowInputClass =
+  'w-full h-10 bg-transparent text-sm text-white placeholder:text-slate-500 focus:outline-none';
 
 const selectClass =
-  'bg-transparent text-sm text-white focus:outline-none appearance-none cursor-pointer [color-scheme:dark]';
+  'w-full h-10 bg-transparent text-sm text-white focus:outline-none appearance-none cursor-pointer [color-scheme:dark]';
 
 const optionClass = 'bg-[#111] text-white';
+
+function validateContact(data: BillingData) {
+  const isContactValid = contactRequiredFields.every((f) => data[f].trim() !== '');
+  const isEmailValid = data.email.includes('@');
+  const hasPhone = data.phone.trim().length >= 6;
+  return isContactValid && isEmailValid && hasPhone;
+}
 
 export default function BillingForm({
   initialEmail = '',
   onDataChange,
   onValidChange,
 }: BillingFormProps) {
+  const [manualAddress, setManualAddress] = useState(false);
   const [data, setData] = useState<BillingData>({
     email: initialEmail,
     phonePrefix: '+1',
@@ -56,144 +68,160 @@ export default function BillingForm({
     zipCode: '',
   });
 
-  const requiredFields: (keyof BillingData)[] = ['email', 'phone', 'fullName', 'country', 'addressLine1', 'city', 'state', 'zipCode'];
+  const phoneInputValue = `${data.phonePrefix.replace(/\D/g, '')}${data.phone.replace(/\D/g, '')}`;
 
-  const handleChange = (field: keyof BillingData, value: string) => {
-    const newData = { ...data, [field]: value };
+  const commitData = (newData: BillingData) => {
     setData(newData);
-
-    const isValid = requiredFields.every((f) => {
-      const val = f === field ? value : newData[f];
-      return val.trim() !== '';
-    });
-
-    const isEmailValid = newData.email.includes('@');
-
-    onValidChange(isValid && isEmailValid);
+    onValidChange(validateContact(newData));
     onDataChange(newData);
   };
 
+  const handleChange = (field: keyof BillingData, value: string) => {
+    commitData({ ...data, [field]: value });
+  };
+
+  const handlePhoneChange = (value: string, country: { dialCode: string }) => {
+    const dialCode = country.dialCode;
+    const prefix = `+${dialCode}`;
+    const local = value.startsWith(dialCode) ? value.slice(dialCode.length) : value;
+    commitData({ ...data, phonePrefix: prefix, phone: local });
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div>
-        <Label htmlFor="fullName" className="text-xs font-semibold text-slate-300 mb-1.5 block">
-          Nombre completo
-        </Label>
-        <Input
-          id="fullName"
-          placeholder="Juan Pérez"
-          value={data.fullName}
-          onChange={(e) => handleChange('fullName', e.target.value)}
-          className={inputClass}
-        />
-      </div>
+        <p className="text-xs font-medium text-slate-400 mb-2">Datos de contacto</p>
+        <div className="rounded-lg border border-white/10 bg-white/5">
+          <div className="divide-y divide-white/10 overflow-hidden rounded-t-lg">
+            <div className="flex items-center gap-2.5 px-4 h-11 focus-within:bg-white/[0.03]">
+              <Mail className="w-4 h-4 text-slate-500 shrink-0" strokeWidth={1.5} />
+              <input
+                id="email"
+                type="email"
+                placeholder="correoelectrónico@ejemplo.com"
+                value={data.email}
+                onChange={(e) => handleChange('email', e.target.value)}
+                className={rowInputClass}
+              />
+            </div>
 
-      <div>
-        <Label htmlFor="email" className="text-xs font-semibold text-slate-300 mb-1.5 block">
-          Correo electrónico
-        </Label>
-        <Input
-          id="email"
-          type="email"
-          placeholder="correo@ejemplo.com"
-          value={data.email}
-          onChange={(e) => handleChange('email', e.target.value)}
-          className={inputClass}
-        />
-      </div>
+            <div className="flex items-center gap-2.5 px-4 h-11 focus-within:bg-white/[0.03]">
+              <User className="w-4 h-4 text-slate-500 shrink-0" strokeWidth={1.5} />
+              <input
+                id="fullName"
+                type="text"
+                placeholder="Nombre completo"
+                value={data.fullName}
+                onChange={(e) => handleChange('fullName', e.target.value)}
+                className={rowInputClass}
+              />
+            </div>
+          </div>
 
-      <div>
-        <Label htmlFor="phone" className="text-xs font-semibold text-slate-300 mb-1.5 block">
-          Teléfono
-        </Label>
-        <div className="flex bg-white/5 border border-white/10 rounded-lg focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:border-blue-500/50 overflow-hidden h-9">
-          <select
-            value={data.phonePrefix}
-            onChange={(e) => handleChange('phonePrefix', e.target.value)}
-            className={`${selectClass} border-r border-white/10 text-xs text-white/80 px-2 shrink-0`}
-          >
-            <option value="+1" className={optionClass}>🇺🇸 +1</option>
-            <option value="+34" className={optionClass}>🇪🇸 +34</option>
-            <option value="+52" className={optionClass}>🇲🇽 +52</option>
-            <option value="+54" className={optionClass}>🇦🇷 +54</option>
-            <option value="+57" className={optionClass}>🇨🇴 +57</option>
-            <option value="+51" className={optionClass}>🇵🇪 +51</option>
-            <option value="+56" className={optionClass}>🇨🇱 +56</option>
-            <option value="+58" className={optionClass}>🇻🇪 +58</option>
-            <option value="+593" className={optionClass}>🇪🇨 +593</option>
-            <option value="+507" className={optionClass}>🇵🇦 +507</option>
-          </select>
-          <Input
-            id="phone"
-            type="tel"
-            placeholder="555 123 4567"
-            value={data.phone}
-            onChange={(e) => handleChange('phone', e.target.value)}
-            className="flex-1 border-none bg-transparent h-9 text-sm text-white placeholder:text-slate-500 focus-visible:ring-0 rounded-none shadow-none px-3"
-          />
+          <div className="relative z-30 border-t border-white/10 px-2 h-11 billing-phone-field">
+            <PhoneInput
+              country="us"
+              value={phoneInputValue}
+              onChange={handlePhoneChange}
+              enableSearch
+              searchPlaceholder="Buscar país..."
+              preferredCountries={['us', 'mx', 'co', 've', 'ar', 'cl', 'pe', 'es', 'ec', 'pa']}
+              placeholder="(201) 555-0123"
+              inputProps={{ id: 'phone', name: 'phone' }}
+              dropdownClass="billing-phone-dropdown"
+            />
+          </div>
         </div>
       </div>
 
       <div>
-        <Label className="text-xs font-semibold text-slate-300 mb-1.5 block">
-          Dirección de facturación
-        </Label>
-        <div className="flex flex-col border border-white/10 rounded-lg overflow-hidden bg-white/5 focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:border-blue-500/50 transition-all">
-          <select
-            value={data.country}
-            onChange={(e) => handleChange('country', e.target.value)}
-            className={`w-full h-9 px-3 border-b border-white/10 ${selectClass}`}
-          >
-            <option value="" disabled className={optionClass}>
-              Selecciona país
-            </option>
-            {COUNTRIES.map((country) => (
-              <option key={country} value={country} className={optionClass}>
-                {country}
-              </option>
-            ))}
-          </select>
-
-          <input
-            type="text"
-            placeholder="Dirección línea 1"
-            value={data.addressLine1}
-            onChange={(e) => handleChange('addressLine1', e.target.value)}
-            className="w-full h-9 bg-transparent px-3 text-sm text-white placeholder:text-slate-500 border-b border-white/10 focus:outline-none"
-          />
-
-          <input
-            type="text"
-            placeholder="Dirección línea 2 (opcional)"
-            value={data.addressLine2}
-            onChange={(e) => handleChange('addressLine2', e.target.value)}
-            className="w-full h-9 bg-transparent px-3 text-sm text-white placeholder:text-slate-500 border-b border-white/10 focus:outline-none"
-          />
-
-          <div className="flex border-b border-white/10">
-            <input
-              type="text"
-              placeholder="Ciudad"
-              value={data.city}
-              onChange={(e) => handleChange('city', e.target.value)}
-              className="w-1/2 h-9 bg-transparent px-3 text-sm text-white placeholder:text-slate-500 border-r border-white/10 focus:outline-none"
-            />
-            <input
-              type="text"
-              placeholder="Código postal"
-              value={data.zipCode}
-              onChange={(e) => handleChange('zipCode', e.target.value)}
-              className="w-1/2 h-9 bg-transparent px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none"
-            />
+        <p className="text-xs font-medium text-slate-400 mb-2">Dirección de facturación</p>
+        <div className="rounded-lg border border-white/10 overflow-hidden bg-white/5 divide-y divide-white/10">
+          <div className="relative flex items-center px-4 h-11">
+            <select
+              value={data.country}
+              onChange={(e) => handleChange('country', e.target.value)}
+              className={`${selectClass} pr-8`}
+              aria-label="País"
+            >
+              {COUNTRIES.map((country) => (
+                <option key={country} value={country} className={optionClass}>
+                  {country}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="w-4 h-4 text-slate-500 absolute right-4 pointer-events-none" strokeWidth={1.5} />
           </div>
 
-          <input
-            type="text"
-            placeholder="Estado / Provincia"
-            value={data.state}
-            onChange={(e) => handleChange('state', e.target.value)}
-            className="w-full h-9 bg-transparent px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none"
-          />
+          {manualAddress ? (
+            <>
+              <div className="relative flex items-center px-4 h-11 gap-2">
+                <input
+                  type="text"
+                  placeholder="Línea 1 de dirección"
+                  value={data.addressLine1}
+                  onChange={(e) => handleChange('addressLine1', e.target.value)}
+                  className={`${rowInputClass} flex-1 min-w-0 placeholder:text-white/70`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setManualAddress(false)}
+                  className="shrink-0 p-1 text-slate-500 hover:text-slate-300 transition-colors"
+                  aria-label="Ocultar dirección detallada"
+                >
+                  <ChevronDown className="w-4 h-4 rotate-180" strokeWidth={1.5} />
+                </button>
+              </div>
+              <input
+                type="text"
+                placeholder="Línea 2 de dirección"
+                value={data.addressLine2}
+                onChange={(e) => handleChange('addressLine2', e.target.value)}
+                className={`${rowInputClass} px-4 placeholder:text-white/70`}
+              />
+              <div className="flex divide-x divide-white/10">
+                <input
+                  type="text"
+                  placeholder="Ciudad"
+                  value={data.city}
+                  onChange={(e) => handleChange('city', e.target.value)}
+                  className={`${rowInputClass} px-4 w-1/2 placeholder:text-white/70`}
+                />
+                <input
+                  type="text"
+                  placeholder="Código postal"
+                  value={data.zipCode}
+                  onChange={(e) => handleChange('zipCode', e.target.value)}
+                  className={`${rowInputClass} px-4 w-1/2 placeholder:text-white/70`}
+                />
+              </div>
+              <input
+                type="text"
+                placeholder="Estado"
+                value={data.state}
+                onChange={(e) => handleChange('state', e.target.value)}
+                className={`${rowInputClass} px-4 placeholder:text-white/70`}
+              />
+            </>
+          ) : (
+            <div className="relative flex items-center px-4 h-11 gap-2">
+              <input
+                type="text"
+                placeholder="Ingresar dirección"
+                value={data.addressLine1}
+                onChange={(e) => handleChange('addressLine1', e.target.value)}
+                className={`${rowInputClass} flex-1 min-w-0 placeholder:text-white/80`}
+              />
+              <button
+                type="button"
+                onClick={() => setManualAddress(true)}
+                className="shrink-0 p-1 text-slate-500 hover:text-slate-300 transition-colors"
+                aria-label="Ingresar dirección manualmente"
+              >
+                <ChevronDown className="w-4 h-4" strokeWidth={1.5} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

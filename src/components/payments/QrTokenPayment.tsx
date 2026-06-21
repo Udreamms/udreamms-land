@@ -1,17 +1,23 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
+import { Keypair } from '@solana/web3.js';
 import { AlertCircle, CheckCircle2, Clock, Loader2, RefreshCw, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { usePriceFromJupiter } from '@/hooks/usePriceFromJupiter';
 import { BillingData } from './BillingForm';
+import BrandedQrCode from './BrandedQrCode';
+import WalletCopyButton from './WalletCopyButton';
 import {
   getPaymentConfig,
+  getLxrLaunchLabel,
   getLxrUsdPriceFallback,
+  SOL_MINT,
+  TREASURY_WALLET,
   type CryptoPaymentMethod,
 } from '@/lib/payments/payment-config';
+import { encodeCompactSolanaPayQrUrl } from '@/lib/payments/solana-pay';
 
 interface QrTokenPaymentProps {
   plan: string;
@@ -23,6 +29,7 @@ interface QrTokenPaymentProps {
   sessionId: string;
   billingData: BillingData | null;
   isBillingValid: boolean;
+  compact?: boolean;
 }
 
 interface PaymentRequestState {
@@ -30,8 +37,39 @@ interface PaymentRequestState {
   qrUrl: string;
   expiresAt: string;
   reference: string;
+  recipientWallet: string;
   status: 'pending' | 'paid' | 'expired';
   paymentSignature?: string | null;
+  isLocalFallback?: boolean;
+}
+
+function createLocalFallbackPaymentRequest({
+  sessionId,
+  preciseAmount,
+  config,
+}: {
+  sessionId: string;
+  preciseAmount: { uiAmount: string };
+  config: ReturnType<typeof getPaymentConfig>;
+}): PaymentRequestState {
+  const reference = Keypair.generate().publicKey.toBase58();
+  const qrUrl = encodeCompactSolanaPayQrUrl({
+    recipient: TREASURY_WALLET,
+    amount: preciseAmount.uiAmount,
+    splToken: config.mint,
+    reference,
+  });
+
+  return {
+    requestId: `local_${Date.now()}`,
+    qrUrl,
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+    reference,
+    recipientWallet: TREASURY_WALLET,
+    status: 'pending',
+    paymentSignature: null,
+    isLocalFallback: true,
+  };
 }
 
 function toUiAndRawAmount(value: number, decimals: number) {
@@ -53,10 +91,11 @@ export default function QrTokenPayment({
   sessionId,
   billingData,
   isBillingValid,
+  compact = false,
 }: QrTokenPaymentProps) {
   const config = useMemo(() => getPaymentConfig(paymentMethod), [paymentMethod]);
   const needsPriceFeed = paymentMethod !== 'usdc' && paymentMethod !== 'usdt';
-  const priceMint = paymentMethod === 'sol' ? 'So11111111111111111111111111111111111111112' : config.mint;
+  const priceMint = paymentMethod === 'sol' ? SOL_MINT : config.mint;
   const lxrUsdFallback = useMemo(() => getLxrUsdPriceFallback(), []);
   const priceFallbacks = useMemo(() => {
     if (paymentMethod === 'lxr' && config.mint && lxrUsdFallback) {
@@ -98,7 +137,7 @@ export default function QrTokenPayment({
   }, [paymentRequest?.expiresAt]);
 
   useEffect(() => {
-    if (!paymentRequest?.requestId || paymentRequest.status !== 'pending') {
+    if (!paymentRequest?.requestId || paymentRequest.status !== 'pending' || paymentRequest.isLocalFallback) {
       return;
     }
 
@@ -196,7 +235,7 @@ export default function QrTokenPayment({
   const handleGenerateQr = async (auto = false) => {
     if (!billingData || !isBillingValid) {
       if (!auto) {
-        toast.error('Completa tus datos de facturación primero');
+        toast.error('Completa tu nombre, correo y teléfono primero');
       }
       return;
     }
@@ -240,7 +279,18 @@ export default function QrTokenPayment({
 
       if (!response.ok) {
         const errorBody = await response.json().catch(() => ({}));
-        throw new Error(errorBody.error || 'No se pudo crear el código QR en el servidor');
+        console.warn('[QR] Servidor no disponible:', errorBody.error || response.statusText);
+
+        const fallback = createLocalFallbackPaymentRequest({
+          sessionId,
+          preciseAmount,
+          config,
+        });
+        setPaymentRequest(fallback);
+        if (generationKey) {
+          setLastGenerationKey(generationKey);
+        }
+        return;
       }
 
       const created = await response.json();
@@ -250,8 +300,10 @@ export default function QrTokenPayment({
         qrUrl: created.qrUrl,
         expiresAt: created.expiresAt,
         reference: created.reference,
+        recipientWallet: created.recipientWallet || TREASURY_WALLET,
         status: 'pending',
         paymentSignature: null,
+        isLocalFallback: false,
       });
       if (generationKey) {
         setLastGenerationKey(generationKey);
@@ -261,11 +313,18 @@ export default function QrTokenPayment({
         toast.success('Código QR de Phantom generado');
       }
     } catch (error: unknown) {
-      console.error('QR generation error:', error);
-      if (!auto) {
-        const message = error instanceof Error ? error.message : 'No se pudo generar el código QR';
-        toast.error(message);
+      console.warn('[QR] Error de red, usando QR local:', error);
+
+      if (generationKey) {
+        setLastGenerationKey(generationKey);
       }
+
+      const fallback = createLocalFallbackPaymentRequest({
+        sessionId,
+        preciseAmount,
+        config,
+      });
+      setPaymentRequest(fallback);
     } finally {
       setIsProcessing(false);
     }
@@ -276,18 +335,16 @@ export default function QrTokenPayment({
       return;
     }
 
-    if (paymentRequest && paymentRequest.status !== 'expired' && lastGenerationKey === generationKey) {
-      return;
-    }
-
-    if (lastGenerationKey === generationKey && paymentRequest?.status === 'expired') {
+    if (lastGenerationKey === generationKey) {
       return;
     }
 
     handleGenerateQr(true);
-  }, [generationKey, isProcessing, lastGenerationKey, paymentRequest]);
+  }, [generationKey, isProcessing, lastGenerationKey]);
 
   const showPriceLoader = needsPriceFeed && loadingPrice;
+  const qrSize = compact ? 300 : 340;
+  const walletAddress = paymentRequest?.recipientWallet || TREASURY_WALLET;
 
   return (
     <div className="space-y-3">
@@ -321,118 +378,111 @@ export default function QrTokenPayment({
             </div>
           </div>
 
-          {paymentRequest ? (
-            <div className="rounded-2xl ring-1 ring-white/10 p-4 space-y-3">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-white">QR listo</p>
-                  <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                    Escanea con Phantom en tu celular para completar el pago en Solana mainnet.
-                  </p>
-                </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => handleGenerateQr(false)}
-                  disabled={isProcessing}
-                  className="h-8 px-3 text-xs text-slate-400 hover:text-blue-400 hover:bg-white/10"
-                >
-                  <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
-                  Actualizar
-                </Button>
-              </div>
-
-              <div className="bg-white rounded-2xl p-4 flex justify-center border border-white/10">
-                <QRCodeSVG value={paymentRequest.qrUrl} size={190} bgColor="#ffffff" fgColor="#0f172a" />
-              </div>
-
-              <div className="grid gap-3 md:grid-cols-2">
-                <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-                  <p className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Estado</p>
-                  <div className="mt-1.5 flex items-center gap-2 text-xs font-medium text-slate-200">
-                    {paymentRequest.status === 'paid' ? (
-                      <>
-                        <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
-                        Pago confirmado
-                      </>
-                    ) : paymentRequest.status === 'expired' ? (
-                      <>
-                        <AlertCircle className="w-3.5 h-3.5 text-red-500" />
-                        QR expirado
-                      </>
-                    ) : (
-                      <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-400" />
-                        Esperando pago en Phantom
-                      </>
-                    )}
+          <div className="rounded-2xl ring-1 ring-white/10 p-4 space-y-3">
+            {paymentRequest ? (
+              <>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-white">QR listo</p>
+                    <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                      Escanea con Phantom en tu celular para completar el pago en Solana mainnet.
+                    </p>
                   </div>
+                  {!paymentRequest.isLocalFallback && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => {
+                        setLastGenerationKey(null);
+                        handleGenerateQr(false);
+                      }}
+                      disabled={isProcessing}
+                      className="h-8 px-3 text-xs text-slate-400 hover:text-blue-400 hover:bg-white/10"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                      Actualizar
+                    </Button>
+                  )}
                 </div>
 
-                <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-                  <p className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Expira</p>
-                  <p className="mt-1.5 text-xs font-medium text-slate-200">
-                    {secondsUntilExpiry > 0 ? `${secondsUntilExpiry}s restantes` : 'Expirado'}
-                  </p>
+                <div className="flex flex-col items-center gap-3">
+                  <BrandedQrCode value={paymentRequest.qrUrl} size={qrSize} />
                 </div>
-              </div>
 
-              <div className="rounded-xl border border-blue-500/20 bg-blue-500/10 p-3 space-y-1.5">
-                <div className="flex items-center gap-2 text-blue-400">
-                  <Smartphone className="w-3.5 h-3.5" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Usa Phantom en tu celular</span>
-                </div>
-                <p className="text-xs leading-relaxed text-slate-400">
-                  Escanea el QR desde Phantom, aprueba la transacción y verificaremos el pago automáticamente.
-                </p>
-                <a
-                  href={paymentRequest.qrUrl}
-                  className="inline-flex text-xs font-semibold text-blue-400 hover:text-blue-300"
-                >
-                  Abrir enlace de pago
-                </a>
-              </div>
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] p-4 space-y-3">
-              <div className="bg-white/5 rounded-2xl p-4 flex items-center justify-center min-h-[216px] border border-white/10">
+                {!paymentRequest.isLocalFallback && (
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                      <p className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Estado</p>
+                      <div className="mt-1.5 flex items-center gap-2 text-xs font-medium text-slate-200">
+                        {paymentRequest.status === 'paid' ? (
+                          <>
+                            <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                            Pago confirmado
+                          </>
+                        ) : paymentRequest.status === 'expired' ? (
+                          <>
+                            <AlertCircle className="w-3.5 h-3.5 text-red-500" />
+                            QR expirado
+                          </>
+                        ) : (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-400" />
+                            Esperando pago en Phantom
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                      <p className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Expira</p>
+                      <p className="mt-1.5 text-xs font-medium text-slate-200">
+                        {secondsUntilExpiry > 0 ? `${secondsUntilExpiry}s restantes` : 'Expirado'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="bg-white/5 rounded-2xl p-4 flex items-center justify-center min-h-[180px] border border-white/10">
                 {isProcessing ? (
                   <div className="flex flex-col items-center gap-2 text-center">
                     <Loader2 className="w-5 h-5 animate-spin text-blue-400" />
                     <p className="text-xs text-slate-400">Generando tu código QR único...</p>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center gap-2 text-center">
+                  <div className="flex flex-col items-center gap-2 text-center px-4">
                     <Smartphone className="w-6 h-6 text-slate-500" />
                     <p className="text-xs text-slate-400">
                       {isBillingValid
                         ? 'Preparando tu QR automáticamente...'
-                        : 'Completa tus datos para generar el QR'}
+                        : 'Completa nombre, correo y teléfono para generar el QR'}
                     </p>
                   </div>
                 )}
               </div>
-            </div>
-          )}
+            )}
 
-          {!isBillingValid && (
-            <div className="flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-500/25 rounded-xl">
-              <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
-              <p className="text-xs font-medium text-amber-200">Completa tus datos de facturación para continuar</p>
-            </div>
-          )}
+          </div>
+
         </>
+      ) : paymentMethod === 'lxr' && !loadingPrice && !quotedTokenPrice ? (
+        <div className="rounded-xl border border-purple-500/25 bg-purple-500/10 p-4 text-center space-y-2">
+          <p className="text-sm font-medium text-purple-200">
+            LXR — disponible en {getLxrLaunchLabel()}
+          </p>
+          <p className="text-xs text-slate-400 leading-relaxed max-w-sm mx-auto">
+            El token aún no cotiza en Jupiter. Cuando salga al público, el precio y el código QR se
+            activarán solos cada 60 segundos, igual que con SOL.
+          </p>
+          <p className="text-xs text-slate-500">Por ahora puedes pagar con USDC, USDT o SOL.</p>
+        </div>
       ) : (
         <div className="text-center text-red-400 py-4 space-y-2">
           <p className="font-medium">Error al cargar el precio de {config.label}</p>
-          {paymentMethod === 'lxr' && !lxrUsdFallback ? (
-            <p className="text-xs text-red-400/90 max-w-sm mx-auto">
-              Jupiter no publica cotización para LXR. Configura{' '}
-              <code className="bg-red-500/10 px-1 rounded text-red-300">NEXT_PUBLIC_LXR_USD_PRICE</code> en tu entorno o paga con USDC, USDT o SOL.
-            </p>
-          ) : null}
         </div>
       )}
+
+      <WalletCopyButton address={walletAddress} />
     </div>
   );
 }

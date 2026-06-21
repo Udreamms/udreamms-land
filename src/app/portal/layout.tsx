@@ -37,9 +37,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import QrTokenPayment from "@/components/payments/QrTokenPayment";
 import BillingForm from "@/components/payments/BillingForm";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CryptoPaymentTabs from "@/components/payments/CryptoPaymentTabs";
 
 function PortalLayoutContent({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -834,37 +833,24 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
                         {checkoutSessionId && (
                           <div className="space-y-2 pt-2">
                             <p className="text-xs font-semibold text-white">2. Escanea y Realiza el Pago</p>
-                            <Tabs defaultValue="usdc" className="w-full">
-                              <TabsList className="grid w-full grid-cols-4 bg-white/5 border border-white/10 rounded-xl p-1 mb-4 h-10">
-                                <TabsTrigger value="usdc" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-xs font-bold rounded-lg text-slate-400">USDC</TabsTrigger>
-                                <TabsTrigger value="usdt" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-xs font-bold rounded-lg text-slate-400">USDT</TabsTrigger>
-                                <TabsTrigger value="sol" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-xs font-bold rounded-lg text-slate-400">SOL</TabsTrigger>
-                                <TabsTrigger value="lxr" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-xs font-bold rounded-lg text-slate-400">LXR</TabsTrigger>
-                              </TabsList>
-
-                              {(['usdc', 'usdt', 'sol', 'lxr'] as const).map((method) => (
-                                <TabsContent key={method} value={method}>
-                                  <QrTokenPayment
-                                    plan="cart"
-                                    priceUSD={cart.reduce((total, itemId) => total + (getItemPrice(itemId, checkoutMethod) || 0), 0)}
-                                    paymentMethod={method}
-                                    isProcessing={isProcessingCrypto}
-                                    setIsProcessing={setIsProcessingCrypto}
-                                    onSuccess={(details) => {
-                                      setPaymentApproved(true);
-                                      setApprovedOrder({
-                                        requestId: details.requestId,
-                                        email: billingData?.email || user.email || '',
-                                      });
-                                      completeDatabasePurchase(cart);
-                                    }}
-                                    sessionId={checkoutSessionId}
-                                    billingData={billingData}
-                                    isBillingValid={isBillingValid}
-                                  />
-                                </TabsContent>
-                              ))}
-                            </Tabs>
+                            <CryptoPaymentTabs
+                              plan="cart"
+                              priceUSD={cart.reduce((total, itemId) => total + (getItemPrice(itemId, checkoutMethod) || 0), 0)}
+                              sessionId={checkoutSessionId}
+                              billingData={billingData}
+                              isBillingValid={isBillingValid}
+                              isProcessing={isProcessingCrypto}
+                              setIsProcessing={setIsProcessingCrypto}
+                              onSuccess={(details) => {
+                                setPaymentApproved(true);
+                                setApprovedOrder({
+                                  requestId: details.requestId,
+                                  email: billingData?.email || user.email || '',
+                                });
+                                completeDatabasePurchase(cart);
+                              }}
+                              accent="purple"
+                            />
                           </div>
                         )}
                       </div>

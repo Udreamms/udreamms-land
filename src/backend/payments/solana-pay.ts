@@ -43,6 +43,28 @@ export function encodeSolanaPayUrl({
   return url.toString();
 }
 
+/** Minimal Solana Pay URL for QR — fewer modules, better scan reliability. */
+export function encodeCompactSolanaPayQrUrl({
+  recipient,
+  amount,
+  splToken,
+  reference,
+}: Pick<SolanaPayUrlFields, 'recipient' | 'amount' | 'splToken' | 'reference'>) {
+  const url = new URL(`solana:${recipient}`);
+  url.searchParams.set('amount', amount);
+
+  if (splToken) {
+    url.searchParams.set('spl-token', splToken);
+  }
+
+  if (reference) {
+    const references = Array.isArray(reference) ? reference : [reference];
+    references.forEach((item) => url.searchParams.append('reference', item));
+  }
+
+  return url.toString();
+}
+
 export function formatBaseUnitsToDecimal(amountRaw: string, decimals: number) {
   const negative = amountRaw.startsWith('-');
   const unsigned = negative ? amountRaw.slice(1) : amountRaw;

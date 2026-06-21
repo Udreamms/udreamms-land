@@ -10,21 +10,30 @@ export interface CryptoPaymentConfig {
 export const TREASURY_WALLET =
   process.env.NEXT_PUBLIC_TREASURY_WALLET || 'E5eZJPT2un3X2RZZK4yXvkiGKbkkRtGH1GwWsUBSxLD3';
 
+export const LXR_MINT =
+  process.env.NEXT_PUBLIC_LXR_MINT || '7Qm6qUCXGZfGBYYFzq2kTbwTDah5r3d9DcPJHRT8Wdth';
+
+/** Shown in UI until Jupiter lists a live LXR price (expected public launch). */
+export const LXR_PUBLIC_LAUNCH_LABEL =
+  process.env.NEXT_PUBLIC_LXR_LAUNCH_LABEL || 'enero 2027';
+
+export const SOL_MINT = 'So11111111111111111111111111111111111111112';
+
 export const SOLANA_RPC_URL =
   process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
 
 export const QR_EXPIRATION_MINUTES = 60;
 
 export const VISA_PLAN_CATALOG_USD: Record<string, number> = {
-  basico: 380,
+  basico: 299.99,
   premium: 3500,
   vip: 4990,
-  esencial: 380,
-  pro: 550,
+  esencial: 299.99,
+  pro: 449.99,
   elite: 2500,
   allinclusive: 10000,
-  'plan-esencial': 380,
-  'plan-pro': 550,
+  'plan-esencial': 299.99,
+  'plan-pro': 449.99,
   'plan-elite': 2500,
   'plan-allinclusive': 10000,
   'plan-turista-basico': 380,
@@ -80,17 +89,40 @@ export const SOLANA_PAYMENT_CONFIG: Record<CryptoPaymentMethod, CryptoPaymentCon
   lxr: {
     method: 'lxr',
     label: 'LXR',
-    mint: '7Qm6qUCXGZfGBYYFzq2kTbwTDah5r3d9DcPJHRT8Wdth',
+    mint: LXR_MINT,
     decimals: 9,
   },
 };
 
-/** LXR is not listed on Jupiter Price API; set USD price via env. */
+export function getLxrLaunchLabel(): string {
+  return LXR_PUBLIC_LAUNCH_LABEL;
+}
+
+/** LXR checkout is hidden until Jupiter lists a live price or payments are forced on for testing. */
+export function isLxrPaymentsForcedOn(): boolean {
+  return process.env.NEXT_PUBLIC_LXR_PAYMENTS_ENABLED === 'true';
+}
+
+/** Optional fixed USD price for pre-launch testing only. At public launch Jupiter feeds live price automatically. */
 export function getLxrUsdPriceFallback(): number | null {
   const raw = process.env.NEXT_PUBLIC_LXR_USD_PRICE;
   if (!raw) return null;
   const value = Number.parseFloat(raw);
   return Number.isFinite(value) && value > 0 ? value : null;
+}
+
+export function getMintDecimals(mint: string): number {
+  if (mint === SOL_MINT) {
+    return SOLANA_PAYMENT_CONFIG.sol.decimals;
+  }
+
+  for (const config of Object.values(SOLANA_PAYMENT_CONFIG)) {
+    if (config.mint === mint) {
+      return config.decimals;
+    }
+  }
+
+  return 9;
 }
 
 export function getPaymentConfig(method: CryptoPaymentMethod): CryptoPaymentConfig {

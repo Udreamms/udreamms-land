@@ -2,12 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 
-interface PriceDataV3 {
-  usdPrice: number;
-  blockId: number;
-  decimals: number;
-  priceChange24h: number;
-}
+export type JupiterPriceSource = 'jupiter-v3' | 'jupiter-quote' | 'env-fallback' | null;
 
 export function usePriceFromJupiter(
   tokenAddresses: string[],
@@ -15,14 +10,17 @@ export function usePriceFromJupiter(
   fallbackUsdPrices: Record<string, number> = {}
 ) {
   const [prices, setPrices] = useState<{ [key: string]: number | null }>({});
+  const [sources, setSources] = useState<{ [key: string]: JupiterPriceSource }>({});
   const [loading, setLoading] = useState(true);
   const [secondsRemaining, setSecondsRemaining] = useState(0);
   const cacheRef = useRef<{ [key: string]: number | null }>({});
+  const sourcesRef = useRef<{ [key: string]: JupiterPriceSource }>({});
   const cacheTimeRef = useRef<number>(0);
 
   useEffect(() => {
     if (tokenAddresses.length === 0) {
       setPrices({});
+      setSources({});
       setLoading(false);
       setSecondsRemaining(0);
       return;
@@ -34,6 +32,7 @@ export function usePriceFromJupiter(
 
       if (isCached) {
         setPrices(cacheRef.current);
+        setSources(sourcesRef.current);
         setLoading(false);
         return;
       }
@@ -41,25 +40,48 @@ export function usePriceFromJupiter(
       try {
         setLoading(true);
         const params = tokenAddresses.join(',');
-        const response = await fetch(`https://api.jup.ag/price/v3?ids=${params}`);
+        const response = await fetch(`/api/prices/jupiter?ids=${params}`);
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          console.warn(`Price API returned ${response.status}`);
+          setPrices(
+            tokenAddresses.reduce(
+              (acc, addr) => ({ ...acc, [addr]: fallbackUsdPrices[addr] ?? null }),
+              {}
+            )
+          );
+          setSources(
+            tokenAddresses.reduce((acc, addr) => {
+              const fallback = fallbackUsdPrices[addr];
+              return { ...acc, [addr]: fallback ? 'env-fallback' : null };
+            }, {})
+          );
+          return;
         }
 
-        const data: { [key: string]: PriceDataV3 } = await response.json();
+        const data: {
+          prices: { [key: string]: number | null };
+          sources?: { [key: string]: JupiterPriceSource };
+        } = await response.json();
 
         const newPrices: { [key: string]: number | null } = {};
+        const newSources: { [key: string]: JupiterPriceSource } = {};
         for (const address of tokenAddresses) {
-          const jupiterPrice = data[address]?.usdPrice;
-          newPrices[address] =
+          const jupiterPrice = data.prices?.[address];
+          const resolvedPrice =
             jupiterPrice && jupiterPrice > 0
               ? jupiterPrice
               : fallbackUsdPrices[address] ?? null;
+          newPrices[address] = resolvedPrice;
+          newSources[address] =
+            data.sources?.[address] ??
+            (resolvedPrice && fallbackUsdPrices[address] ? 'env-fallback' : null);
         }
         cacheRef.current = newPrices;
+        sourcesRef.current = newSources;
         cacheTimeRef.current = now;
         setPrices(newPrices);
+        setSources(newSources);
       } catch (error) {
         console.error('Error fetching prices from Jupiter:', error);
         setPrices(
@@ -67,6 +89,12 @@ export function usePriceFromJupiter(
             (acc, addr) => ({ ...acc, [addr]: fallbackUsdPrices[addr] ?? null }),
             {}
           )
+        );
+        setSources(
+          tokenAddresses.reduce((acc, addr) => {
+            const fallback = fallbackUsdPrices[addr];
+            return { ...acc, [addr]: fallback ? 'env-fallback' : null };
+          }, {})
         );
       } finally {
         setLoading(false);
@@ -93,5 +121,5 @@ export function usePriceFromJupiter(
     };
   }, [tokenAddresses.join(','), cacheDurationMs, JSON.stringify(fallbackUsdPrices)]);
 
-  return { prices, loading, secondsRemaining };
+  return { prices, sources, loading, secondsRemaining };
 }

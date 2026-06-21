@@ -1,20 +1,19 @@
 
 // src/lib/firebase.ts
-import { initializeApp, getApps, getApp } from 'firebase/app';
+import { initializeApp, getApps, getApp, type FirebaseOptions } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 import { getFunctions } from 'firebase/functions';
 
-// Your web app's Firebase configuration
-export const firebaseConfig = {
-  apiKey: "AIzaSyBKkNyleaQC52S1s1v13WfQ7-U7wol-SVA",
-  authDomain: "udreamms-platform-1.firebaseapp.com",
-  projectId: "udreamms-platform-1",
-  storageBucket: "udreamms-platform-1.firebasestorage.app",
-  messagingSenderId: "860170719759",
-  appId: "1:860170719759:web:cb8e6008e08c19b0e7897a",
-  measurementId: "G-GP2PVZBTQP"
+export const firebaseConfig: FirebaseOptions = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID,
 };
 
 // Initialize Firebase App

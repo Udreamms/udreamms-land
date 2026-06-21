@@ -7,17 +7,26 @@ import {
   getVisaCryptoPaymentRequestsCollectionPath,
 } from '@/backend/payments/firestore-schema';
 import {
-  PLAN_DISPLAY_TITLES,
   QR_EXPIRATION_MINUTES,
   TREASURY_WALLET,
   VISA_PLAN_CATALOG_USD,
   type CryptoPaymentMethod,
 } from '@/backend/payments/payment-config';
-import { encodeSolanaPayUrl } from '@/backend/payments/solana-pay';
+import { encodeCompactSolanaPayQrUrl } from '@/backend/payments/solana-pay';
 import { upsertVisaCryptoSession, validatePaymentOrderPayload } from '@/backend/payments/qr-payment';
 
 export async function POST(request: NextRequest) {
   try {
+    if (!db) {
+      return NextResponse.json(
+        {
+          error:
+            'Firebase Admin no está configurado. Agrega FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL y FIREBASE_PRIVATE_KEY en .env.local.',
+        },
+        { status: 503 }
+      );
+    }
+
     const {
       sessionId,
       plan,
@@ -85,14 +94,11 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date(createdAt.getTime() + QR_EXPIRATION_MINUTES * 60 * 1000);
     const billingEmail = extractBillingEmail(billingData);
 
-    const qrUrl = encodeSolanaPayUrl({
+    const qrUrl = encodeCompactSolanaPayQrUrl({
       recipient: TREASURY_WALLET,
       amount: String(expectedAmountUi),
       splToken: config.mint,
       reference,
-      label: planKey === 'cart' ? 'Udreamms - Pago de Carrito' : `Udreamms ${PLAN_DISPLAY_TITLES[planKey] || planKey}`,
-      message: 'Escanea con Phantom para completar tu pago',
-      memo: `visa:${requestId}`,
     });
 
     const createdAtIso = createdAt.toISOString();

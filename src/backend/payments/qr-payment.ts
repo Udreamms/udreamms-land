@@ -1,6 +1,6 @@
 import { getAssociatedTokenAddressSync } from '@solana/spl-token';
 import { Connection, ParsedInstruction, ParsedTransactionWithMeta, PublicKey } from '@solana/web3.js';
-import { db } from '@/backend/firebase/admin';
+import { requireAdminDb } from '@/backend/firebase/admin';
 import {
   buildVisaCryptoComprobante,
   extractBillingEmail,
@@ -26,11 +26,11 @@ interface VerificationResult {
 const connection = new Connection(SOLANA_RPC_URL, 'confirmed');
 
 function getPaymentRequestDocRef(sessionId: string, requestId: string) {
-  return db.doc(getVisaCryptoPaymentRequestPath(sessionId, requestId));
+  return requireAdminDb().doc(getVisaCryptoPaymentRequestPath(sessionId, requestId));
 }
 
 function getSessionDocRef(sessionId: string) {
-  return db.doc(getVisaCryptoSessionPath(sessionId));
+  return requireAdminDb().doc(getVisaCryptoSessionPath(sessionId));
 }
 
 function isExpired(expiresAt: string) {
@@ -228,7 +228,7 @@ export async function fulfillVisaOrderFromPayment(
   const config = getPaymentConfig(order.paymentMethod);
   const comprobante = buildVisaCryptoComprobante(order, verification.signature, verification.payerWallet, config.label);
 
-  const batch = db.batch();
+  const batch = requireAdminDb().batch();
 
   batch.set(
     getPaymentRequestDocRef(order.sessionId, order.requestId),
@@ -244,7 +244,7 @@ export async function fulfillVisaOrderFromPayment(
     { merge: true }
   );
 
-  batch.set(db.doc(getVisaCryptoComprobantePath(order.requestId)), comprobante, { merge: true });
+  batch.set(requireAdminDb().doc(getVisaCryptoComprobantePath(order.requestId)), comprobante, { merge: true });
 
   batch.set(
     getSessionDocRef(order.sessionId),
@@ -279,7 +279,7 @@ export async function getPaymentOrder(sessionId: string, requestId: string) {
 }
 
 export async function getComprobante(requestId: string): Promise<VisaCryptoComprobante | null> {
-  const snapshot = await db.doc(getVisaCryptoComprobantePath(requestId)).get();
+  const snapshot = await requireAdminDb().doc(getVisaCryptoComprobantePath(requestId)).get();
   if (!snapshot.exists) {
     return null;
   }
@@ -331,7 +331,7 @@ export async function resolvePaymentOrderStatus(order: VisaCryptoPaymentRequest)
 
 export async function recoverSessionPaymentOrders(sessionId: string) {
   const collectionPath = getVisaCryptoPaymentRequestsCollectionPath(sessionId);
-  const snapshot = await db.collection(collectionPath).where('status', 'in', ['pending', 'expired']).get();
+  const snapshot = await requireAdminDb().collection(collectionPath).where('status', 'in', ['pending', 'expired']).get();
 
   const results: Array<{ requestId: string; status: VisaCryptoPaymentStatus; comprobanteId?: string }> = [];
 

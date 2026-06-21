@@ -7,3 +7,9 @@ export function normalizeStudentPlanParam(planParam: string): StudentVisaPlanId 
   const valid: StudentVisaPlanId[] = ['esencial', 'pro', 'elite', 'allinclusive'];
   return valid.includes(normalized) ? normalized : null;
 }
+
+export function normalizeTouristPlanParam(planParam: string): TouristVisaPlanId | null {
+  const normalized = planParam.toLowerCase().replace(/-/g, '') as TouristVisaPlanId;
+  const valid: TouristVisaPlanId[] = ['basico', 'premium', 'vip'];
+  return valid.includes(normalized) ? normalized : null;
+}

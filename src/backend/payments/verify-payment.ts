@@ -1,9 +1,8 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import { getAssociatedTokenAddress } from '@solana/spl-token';
-import { SOLANA_RPC_URL, TREASURY_WALLET, type CryptoPaymentMethod } from './payment-config';
+import { SOLANA_RPC_URL, TREASURY_WALLET, LXR_MINT, type CryptoPaymentMethod } from './payment-config';
 
 const USDC_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
-const LXR_MINT = '7Qm6qUCXGZfGBYYFzq2kTbwTDah5r3d9DcPJHRT8Wdth';
 
 export async function verifyVisaTransaction(
   signature: string,
