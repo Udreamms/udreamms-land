@@ -87,8 +87,8 @@ const Footer = () => {
               <li className="pt-4 flex flex-col gap-1.5 text-xs">
                 <span className="text-gray-400 block">
                   📞 Fijo empresa:{' '}
-                  <a href="https://wa.me/16507840581" target="_blank" rel="noopener noreferrer" onClick={() => sendMetaEvent('Lead', { source: 'Footer Fijo' })} className="text-blue-400 hover:underline">
-                    +1 650 784 0581
+                  <a href="https://wa.me/16507845209" target="_blank" rel="noopener noreferrer" onClick={() => sendMetaEvent('Lead', { source: 'Footer Fijo' })} className="text-blue-400 hover:underline">
+                    +1 650 784 5209
                   </a>
                 </span>
                 <span className="text-gray-400 block">
