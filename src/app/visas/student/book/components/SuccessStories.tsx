@@ -1,7 +1,7 @@
 export default function SuccessStories() {
   return (
     <section className="w-full bg-black py-24 md:py-32 px-4 md:px-8 lg:px-12 font-sans">
-      <div className="w-full px-4 md:px-16 lg:px-[190px] flex flex-col items-center font-sans">
+      <div className="w-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col items-center font-sans">
         {/* Grid of 6 Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-4 font-sans">
 

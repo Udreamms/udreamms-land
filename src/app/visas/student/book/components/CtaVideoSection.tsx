@@ -12,7 +12,7 @@ export default function CtaVideoSection() {
         className="absolute right-[-2%] bottom-[15%] w-28 md:w-56 opacity-15 pointer-events-none transform rotate-12 scale-x-[-1] z-10"
         alt=""
       />
-      <div className="w-full px-4 md:px-16 lg:px-[190px] flex flex-col items-center justify-center font-sans">
+      <div className="w-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col items-center justify-center font-sans">
         <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold text-white leading-snug font-sans w-full max-w-3xl mx-auto">
           Udreamms ha ayudado a cientos de estudiantes <br className="hidden md:inline" /> a iniciar con éxito su camino <br className="hidden md:inline" /> para estudiar en Estados Unidos
         </h2>

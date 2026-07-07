@@ -13,7 +13,7 @@ export default function GuideFeatureInfo() {
         </defs>
       </svg>
 
-      <div className="w-full px-4 md:px-16 lg:px-[190px] grid grid-cols-1 lg:grid-cols-12 gap-12 items-center font-sans">
+      <div className="w-full max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center font-sans">
 
         {/* Left Column: Info & Bullets */}
         <div className="lg:col-span-7 flex flex-col space-y-6 font-sans">

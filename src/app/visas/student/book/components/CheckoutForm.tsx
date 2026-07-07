@@ -25,11 +25,11 @@ export default function CheckoutForm({ formData, setFormData, handleSubmit }: Ch
           <div className="lg:col-span-5 flex flex-col items-center justify-center font-sans mx-auto w-full">
             <div className="flex flex-row items-center gap-6 justify-center w-full font-sans">
               {/* Portada Libro */}
-              <div className="relative w-24 md:w-32 aspect-[3/4] rounded-xl overflow-hidden bg-slate-900 shadow-lg shrink-0">
+              <div className="relative w-28 md:w-40 aspect-[3/4] rounded-xl overflow-hidden shadow-lg shrink-0">
                 <img
-                  src="/book-udreamms.jpeg"
+                  src="https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/Book%2FMuckup%20(1).png?alt=media&token=90d03452-cb19-47fc-9e75-1d84cf6ba50c"
                   alt="Libro Digital Udreamms - Paso a paso para tu visa"
-                  className="w-full h-full object-cover scale-110 origin-center"
+                  className="w-full h-full object-contain origin-center"
                 />
               </div>
 
@@ -107,7 +107,7 @@ export default function CheckoutForm({ formData, setFormData, handleSubmit }: Ch
                   suppressHydrationWarning
                   className="w-full bg-white text-black hover:bg-white/90 transition-all duration-300 hover:scale-[1.01] active:scale-95 shadow-md text-center tracking-wide text-sm font-sans font-semibold py-4 px-6 rounded-xl"
                 >
-                  QUIERO MI GUÍA AHORA
+                  QUIERO MI LIBRO AHORA
                 </button>
               </div>
             </form>

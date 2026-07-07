@@ -3,7 +3,7 @@ import { Map, CheckSquare, ShieldCheck } from "lucide-react";
 export default function BookChapters() {
   return (
     <section className="w-full bg-black py-24 md:py-32 px-4 md:px-8 lg:px-12 font-sans relative overflow-hidden">
-      <div className="w-full px-4 md:px-16 lg:px-[190px] flex flex-col font-sans">
+      <div className="w-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col font-sans">
 
         {/* Section Header */}
         <div className="text-center md:text-left flex flex-col space-y-4 font-sans">
