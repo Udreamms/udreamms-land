@@ -1,21 +1,27 @@
 import React from "react";
 import { User, Mail, Lock } from "lucide-react";
+import BookCheckoutFlow, { type BookFormData } from "@/components/payments/BookCheckoutFlow";
 
 interface CheckoutFormProps {
-  formData: {
-    nombre: string;
-    apellido: string;
-    email: string;
-  };
-  setFormData: React.Dispatch<React.SetStateAction<{
-    nombre: string;
-    apellido: string;
-    email: string;
-  }>>;
-  handleSubmit: (e: React.FormEvent) => void;
+  formData: BookFormData;
+  setFormData: React.Dispatch<React.SetStateAction<BookFormData>>;
+  onStartCheckout: () => void;
+  checkoutActive?: boolean;
+  onResetCheckout?: () => void;
 }
 
-export default function CheckoutForm({ formData, setFormData, handleSubmit }: CheckoutFormProps) {
+export default function CheckoutForm({
+  formData,
+  setFormData,
+  onStartCheckout,
+  checkoutActive = false,
+  onResetCheckout,
+}: CheckoutFormProps) {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onStartCheckout();
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto px-4 md:px-8 font-sans text-white">
       <div className="bg-slate-950/40 border border-white/5 rounded-3xl p-6 md:p-10 w-full font-sans text-white">
@@ -123,6 +129,14 @@ export default function CheckoutForm({ formData, setFormData, handleSubmit }: Ch
               <span>•</span>
               <span className="font-sans font-medium">Descarga digital</span>
             </div>
+
+            {checkoutActive ? (
+              <BookCheckoutFlow
+                formData={formData}
+                autoStart
+                onReset={onResetCheckout}
+              />
+            ) : null}
           </div>
 
         </div>

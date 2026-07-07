@@ -12,6 +12,7 @@ const BASE_PAYMENT_METHODS = ['usdc', 'usdt', 'sol'] as const;
 
 interface CryptoPaymentTabsProps {
   plan: string;
+  cartItems?: string[];
   priceUSD: number;
   sessionId: string;
   billingData: BillingData | null;
@@ -25,6 +26,7 @@ interface CryptoPaymentTabsProps {
 
 export default function CryptoPaymentTabs({
   plan,
+  cartItems,
   priceUSD,
   sessionId,
   billingData,
@@ -76,6 +78,7 @@ export default function CryptoPaymentTabs({
         <TabsContent key={method} value={method}>
           <QrTokenPayment
             plan={plan}
+            cartItems={cartItems}
             priceUSD={priceUSD}
             paymentMethod={method}
             isProcessing={isProcessing}

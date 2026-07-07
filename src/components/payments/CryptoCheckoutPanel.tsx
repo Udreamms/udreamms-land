@@ -13,6 +13,8 @@ export interface CryptoCheckoutPanelProps {
   onSuccess: (details: { requestId: string; email: string }) => void;
   className?: string;
   compact?: boolean;
+  initialEmail?: string;
+  initialFullName?: string;
 }
 
 export default function CryptoCheckoutPanel({
@@ -21,6 +23,8 @@ export default function CryptoCheckoutPanel({
   onSuccess,
   className = '',
   compact = false,
+  initialEmail = '',
+  initialFullName = '',
 }: CryptoCheckoutPanelProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [billingData, setBillingData] = useState<BillingData | null>(null);
@@ -57,7 +61,12 @@ export default function CryptoCheckoutPanel({
 
             <div className={compact ? 'mb-4' : 'mb-8'}>
               <h3 className={`font-medium text-white ${compact ? 'text-sm mb-3' : 'text-lg mb-4'}`}>Información de contacto</h3>
-              <BillingForm onDataChange={setBillingData} onValidChange={setIsBillingValid} />
+              <BillingForm
+                initialEmail={initialEmail}
+                initialFullName={initialFullName}
+                onDataChange={setBillingData}
+                onValidChange={setIsBillingValid}
+              />
             </div>
 
             <div className={`border-t border-white/10 ${compact ? 'pt-4' : 'pt-6'}`}>

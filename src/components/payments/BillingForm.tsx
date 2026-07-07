@@ -21,6 +21,7 @@ export interface BillingData {
 
 interface BillingFormProps {
   initialEmail?: string;
+  initialFullName?: string;
   onDataChange: (data: BillingData) => void;
   onValidChange: (valid: boolean) => void;
 }
@@ -51,6 +52,7 @@ function validateContact(data: BillingData) {
 
 export default function BillingForm({
   initialEmail = '',
+  initialFullName = '',
   onDataChange,
   onValidChange,
 }: BillingFormProps) {
@@ -59,7 +61,7 @@ export default function BillingForm({
     email: initialEmail,
     phonePrefix: '+1',
     phone: '',
-    fullName: '',
+    fullName: initialFullName,
     country: 'Estados Unidos',
     addressLine1: '',
     addressLine2: '',

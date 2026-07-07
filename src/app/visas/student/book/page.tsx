@@ -58,10 +58,15 @@ export default function StudentBookPage() {
     apellido: "",
     email: ""
   });
+  const [activeCheckoutId, setActiveCheckoutId] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted", formData);
+  const startCheckout = (sectionId: string) => {
+    setActiveCheckoutId(sectionId);
+    if (typeof window !== "undefined") {
+      window.requestAnimationFrame(() => {
+        document.getElementById(`checkout-${sectionId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    }
   };
 
   return (
@@ -91,11 +96,13 @@ export default function StudentBookPage() {
         <BookVideoSection />
 
         {/* CHECKOUT FORM 1 */}
-        <div className="w-full py-12 bg-black">
+        <div id="checkout-top" className="w-full py-12 bg-black">
           <CheckoutForm 
             formData={formData} 
             setFormData={setFormData} 
-            handleSubmit={handleSubmit} 
+            onStartCheckout={() => startCheckout("top")}
+            checkoutActive={activeCheckoutId === "top"}
+            onResetCheckout={() => setActiveCheckoutId(null)}
           />
         </div>
 
@@ -114,11 +121,13 @@ export default function StudentBookPage() {
         <SuccessStories />
 
         {/* CHECKOUT FORM 2 */}
-        <div className="w-full py-12 bg-black">
+        <div id="checkout-middle" className="w-full py-12 bg-black">
           <CheckoutForm 
             formData={formData} 
             setFormData={setFormData} 
-            handleSubmit={handleSubmit} 
+            onStartCheckout={() => startCheckout("middle")}
+            checkoutActive={activeCheckoutId === "middle"}
+            onResetCheckout={() => setActiveCheckoutId(null)}
           />
         </div>
 
@@ -132,11 +141,13 @@ export default function StudentBookPage() {
         <FaqSection />
 
         {/* CHECKOUT FORM 3 */}
-        <div className="w-full py-16 bg-black">
+        <div id="checkout-bottom" className="w-full py-16 bg-black">
           <CheckoutForm 
             formData={formData} 
             setFormData={setFormData} 
-            handleSubmit={handleSubmit} 
+            onStartCheckout={() => startCheckout("bottom")}
+            checkoutActive={activeCheckoutId === "bottom"}
+            onResetCheckout={() => setActiveCheckoutId(null)}
           />
         </div>
       </main>

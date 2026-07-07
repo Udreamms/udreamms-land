@@ -96,6 +96,7 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const isRegisterParam = searchParams.get('register') === 'true';
   const isLoginParam = searchParams.get('mode') === 'login';
+  const emailParam = searchParams.get('email');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -116,6 +117,12 @@ function LoginContent() {
   }, [isRegisterParam, isLoginParam]);
 
   useEffect(() => {
+    if (emailParam) {
+      setEmail(emailParam);
+    }
+  }, [emailParam]);
+
+  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         router.push('/portal');
@@ -131,7 +138,7 @@ function LoginContent() {
 
       const profileData = {
         uid: user.uid,
-        email: user.email || '',
+        email: (user.email || '').trim().toLowerCase(),
         displayName: user.displayName || '',
         photoURL: user.photoURL || '',
         lastLogin: serverTimestamp()
@@ -145,6 +152,16 @@ function LoginContent() {
         });
       } else {
         await updateDoc(userRef, profileData);
+      }
+
+      try {
+        const token = await user.getIdToken();
+        await fetch('/api/payments/apply-pending', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch (pendingError) {
+        console.error('Error applying pending purchases:', pendingError);
       }
     } catch (err: any) {
       console.error("Error al sincronizar usuario en Firestore: ", err);

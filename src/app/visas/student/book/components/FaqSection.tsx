@@ -58,6 +58,7 @@ export default function FaqSection() {
               <div key={index} className="py-5 font-sans">
                 <button
                   onClick={() => toggleFaq(index)}
+                  suppressHydrationWarning
                   className="w-full flex items-center justify-between text-left py-2 font-sans focus:outline-none group"
                 >
                   <span className="text-base md:text-lg font-bold text-white group-hover:text-slate-300 transition-colors">

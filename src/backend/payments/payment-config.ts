@@ -24,25 +24,19 @@ export const SOLANA_RPC_URL =
 
 export const QR_EXPIRATION_MINUTES = 60;
 
+import { buildLegacyCatalogUsd } from '@/lib/payments/product-catalog';
+
+const _legacyCatalog = buildLegacyCatalogUsd();
+
 export const VISA_PLAN_CATALOG_USD: Record<string, number> = {
   basico: 299.99,
   premium: 3500,
   vip: 4990,
   esencial: 299.99,
   pro: 449.99,
-  elite: 2500,
-  allinclusive: 10000,
-  'plan-esencial': 299.99,
-  'plan-pro': 449.99,
-  'plan-elite': 2500,
-  'plan-allinclusive': 10000,
-  'plan-turista-basico': 380,
-  'plan-turista-premium': 3500,
-  'plan-turista-vip': 4990,
-  'curso-estudiante': 9.99,
-  'libro-estudiante': 29.99,
-  'curso-turista': 9.99,
-  'libro-turista': 29.99,
+  elite: 3250,
+  allinclusive: 13000,
+  ..._legacyCatalog,
 };
 
 export const PLAN_DISPLAY_TITLES: Record<string, string> = {

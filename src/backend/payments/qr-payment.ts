@@ -13,6 +13,7 @@ import {
   type VisaCryptoPaymentStatus,
 } from './firestore-schema';
 import { getPaymentConfig, SOLANA_RPC_URL, type CryptoPaymentMethod } from './payment-config';
+import { unlockPurchaseForPlan } from './unlock-purchase';
 
 export type { VisaCryptoPaymentStatus as VisaPaymentStatus };
 export type { VisaCryptoPaymentRequest as VisaPaymentOrder };
@@ -260,6 +261,25 @@ export async function fulfillVisaOrderFromPayment(
   );
 
   await batch.commit();
+
+  try {
+    const itemIds =
+      order.planId === 'cart'
+        ? ((order as { cartItemIds?: string[] }).cartItemIds || []).filter(Boolean)
+        : [order.planId];
+
+    const unlockIds = itemIds.length > 0 ? itemIds : [order.planId];
+    for (const itemId of unlockIds) {
+      if (itemId && itemId !== 'cart') {
+        await unlockPurchaseForPlan(comprobante.billingEmail, itemId, {
+          type: 'crypto',
+          referenceId: order.requestId,
+        });
+      }
+    }
+  } catch (unlockError) {
+    console.error('[payments] Failed to unlock purchase after crypto payment:', unlockError);
+  }
 }
 
 export async function getPaymentOrder(sessionId: string, requestId: string) {

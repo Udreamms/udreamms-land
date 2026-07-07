@@ -1,10 +1,10 @@
 'use client';
 
-import React from "react";
+import React, { useEffect, useCallback, useRef, useState, Suspense } from "react";
 import { PortalProvider, usePortal, cartItemsConfig, studentPlans, touristPlans } from "./PortalContext";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   GraduationCap,
   Briefcase,
@@ -39,9 +39,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import BillingForm from "@/components/payments/BillingForm";
 import CryptoPaymentTabs from "@/components/payments/CryptoPaymentTabs";
+import {
+  clearStripeCheckoutIntent,
+  readStripeCheckoutIntent,
+  saveStripeCheckoutIntent,
+} from "@/lib/payments/portal-stripe-checkout";
+import PortalSidebar from "./components/PortalSidebar";
+import { toast } from "sonner";
+
+const IS_DEV = process.env.NODE_ENV === 'development';
 
 function PortalLayoutContent({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const {
     user,
     dbUser,
@@ -83,7 +93,7 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
 
     // Functions
     getItemPrice,
-    getStripeLink,
+    getCartTotal,
     removeFromCart,
     completeDatabasePurchase,
     handleCheckout,
@@ -93,6 +103,101 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
     handleSignOut,
     handleUpdateProfile
   } = usePortal();
+
+  const checkoutEmail = user?.email || billingData?.email || '';
+  const stripeReturnHandled = useRef(false);
+  const [stripeRedirecting, setStripeRedirecting] = useState(false);
+
+  const handleStartStripeCheckout = useCallback(async () => {
+    if (cart.length === 0) {
+      toast.error('Tu carrito está vacío.');
+      return;
+    }
+    const email = checkoutEmail;
+    if (!email?.includes('@')) {
+      toast.error('Necesitamos tu correo para procesar el pago.');
+      return;
+    }
+
+    setStripeRedirecting(true);
+    try {
+      saveStripeCheckoutIntent(cart, email);
+      const response = await fetch('/api/payments/stripe/create-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, itemIds: cart }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'No se pudo iniciar el pago en Stripe.');
+      }
+      window.location.href = data.url;
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'No se pudo iniciar el pago.';
+      toast.error(message);
+      setStripeRedirecting(false);
+    }
+  }, [cart, checkoutEmail]);
+
+  useEffect(() => {
+    if (loading || !user || stripeReturnHandled.current) {
+      return;
+    }
+
+    const stripeStatus = searchParams.get('stripe');
+    const sessionId = searchParams.get('session_id');
+    if (stripeStatus !== 'success' || !sessionId) {
+      return;
+    }
+
+    stripeReturnHandled.current = true;
+
+    void (async () => {
+      setIsCheckoutOpen(true);
+      setCheckoutMethod('card');
+      try {
+        const response = await fetch('/api/payments/stripe/confirm-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId }),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || data.error || 'No se pudo confirmar el pago.');
+        }
+
+        const itemIds = data.itemIds?.length
+          ? data.itemIds
+          : readStripeCheckoutIntent()?.itemIds || cart;
+
+        setPaymentApproved(true);
+        setApprovedOrder({
+          requestId: sessionId,
+          email: data.email || checkoutEmail,
+        });
+        await completeDatabasePurchase(itemIds);
+        clearStripeCheckoutIntent();
+        toast.success('¡Pago confirmado! Tus servicios ya están desbloqueados.');
+        router.replace('/portal/proceso');
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'No se pudo confirmar el pago.';
+        toast.error(message);
+        router.replace('/portal');
+      }
+    })();
+  }, [
+    loading,
+    searchParams,
+    user,
+    cart,
+    checkoutEmail,
+    router,
+    setIsCheckoutOpen,
+    setCheckoutMethod,
+    setPaymentApproved,
+    setApprovedOrder,
+    completeDatabasePurchase,
+  ]);
 
   if (loading) {
     return (
@@ -107,10 +212,12 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
 
   if (!user) return null;
 
-  // Initials for avatar fallback
-  const userInitials = user.displayName 
+  const userInitials = user.displayName
     ? user.displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
     : user.email ? user.email.slice(0, 2).toUpperCase() : "UD";
+
+  const cryptoCheckoutPlan = cart.length === 1 ? cart[0] : 'cart';
+  const checkoutTotal = getCartTotal(checkoutMethod);
 
   return (
     <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-purple-500/20 flex flex-col relative overflow-hidden">
@@ -145,7 +252,7 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
             <button
               onClick={() => {
                 setActiveTopSection('visa-estudiante');
-                router.push('/portal/proceso');
+                router.push('/portal/visa-estudiante');
               }}
               className={`relative px-4 py-2 text-xs font-normal tracking-wider uppercase rounded-full transition-all duration-300 ${
                 activeTopSection === 'visa-estudiante' ? "text-purple-400 bg-white/5" : "text-white/60 hover:text-white hover:bg-white/5"
@@ -163,7 +270,7 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
             <button
               onClick={() => {
                 setActiveTopSection('visa-turista');
-                router.push('/portal/proceso');
+                router.push('/portal/visa-turista');
               }}
               className={`relative px-4 py-2 text-xs font-normal tracking-wider uppercase rounded-full transition-all duration-300 ${
                 activeTopSection === 'visa-turista' ? "text-purple-400 bg-white/5" : "text-white/60 hover:text-white hover:bg-white/5"
@@ -262,7 +369,7 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
                           <div className="flex justify-between items-center px-1">
                             <span className="text-xs text-white/50 uppercase tracking-wider">Total</span>
                             <span className="text-sm font-semibold text-white">
-                              ${cart.reduce((total, itemId) => total + (getItemPrice(itemId, checkoutMethod) || 0), 0).toFixed(2)} USD
+                              ${checkoutTotal.toFixed(2)} USD
                             </span>
                           </div>
                           <Button
@@ -359,7 +466,7 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
         <button
           onClick={() => {
             setActiveTopSection('visa-estudiante');
-            router.push('/portal/proceso');
+            router.push('/portal/visa-estudiante');
           }}
           className={`px-4 py-1.5 text-[10px] font-normal tracking-widest uppercase rounded-full shrink-0 transition-all ${
             activeTopSection === 'visa-estudiante' ? "text-purple-400 bg-transparent border border-purple-500/40" : "text-white/40 border border-transparent"
@@ -370,7 +477,7 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
         <button
           onClick={() => {
             setActiveTopSection('visa-turista');
-            router.push('/portal/proceso');
+            router.push('/portal/visa-turista');
           }}
           className={`px-4 py-1.5 text-[10px] font-normal tracking-widest uppercase rounded-full shrink-0 transition-all ${
             activeTopSection === 'visa-turista' ? "text-purple-400 bg-transparent border border-purple-500/40" : "text-white/40 border border-transparent"
@@ -396,119 +503,11 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
         <div className="flex flex-col md:flex-row gap-8 items-start w-full">
           
           {(activeTopSection === 'visa-estudiante' || activeTopSection === 'visa-turista') && (
-            <aside className={`shrink-0 flex flex-row md:flex-col gap-2 overflow-x-auto no-scrollbar pb-2 md:pb-0 border-b md:border-b-0 md:border-r border-white/5 transition-all duration-300 ${
-              isSidebarCollapsed ? "w-full md:w-20 md:pr-2" : "w-full md:w-64 md:pr-6"
-            }`}>
-              {!isSidebarCollapsed && (
-                <div className="hidden md:block px-3 py-1.5 text-[10px] font-semibold tracking-widest text-white/40 uppercase mb-2">
-                  Menú de Visa
-                </div>
-              )}
-              
-              <Link
-                href="/portal/proceso"
-                title={isSidebarCollapsed ? (activeTopSection === 'visa-estudiante' ? "Mi proceso de admisión" : "Mi proceso de solicitud") : undefined}
-                className={`px-4 py-2.5 md:py-3 text-[10px] md:text-xs font-normal tracking-widest md:tracking-wider uppercase rounded-full md:rounded-xl shrink-0 transition-all duration-300 flex items-center gap-3 ${
-                  isSidebarCollapsed ? "justify-center" : "justify-start text-left"
-                } ${
-                  activeSection === 'proceso' 
-                    ? "text-purple-400 bg-white/5 border border-purple-500/30" 
-                    : "text-white/60 hover:text-white hover:bg-white/5 border border-transparent"
-                }`}
-              >
-                {activeTopSection === 'visa-estudiante' ? (
-                  <GraduationCap className="w-4 h-4 shrink-0" />
-                ) : (
-                  <Briefcase className="w-4 h-4 shrink-0" />
-                )}
-                {!isSidebarCollapsed && (
-                  <span>{activeTopSection === 'visa-estudiante' ? "Mi proceso de admisión" : "Mi proceso de solicitud"}</span>
-                )}
-              </Link>
-
-              <Link
-                href="/portal/servicios"
-                title={isSidebarCollapsed ? "Servicios" : undefined}
-                className={`px-4 py-2.5 md:py-3 text-[10px] md:text-xs font-normal tracking-widest md:tracking-wider uppercase rounded-full md:rounded-xl shrink-0 transition-all duration-300 flex items-center gap-3 ${
-                  isSidebarCollapsed ? "justify-center" : "justify-start text-left"
-                } ${
-                  activeSection === 'servicios' 
-                    ? "text-purple-400 bg-white/5 border border-purple-500/30" 
-                    : "text-white/60 hover:text-white hover:bg-white/5 border border-transparent"
-                }`}
-              >
-                <Zap className="w-4 h-4 shrink-0" />
-                {!isSidebarCollapsed && (
-                  <span>Servicios</span>
-                )}
-              </Link>
-
-              <Link
-                href="/portal/curso"
-                title={isSidebarCollapsed ? "Master class express" : undefined}
-                className={`px-4 py-2.5 md:py-3 text-[10px] md:text-xs font-normal tracking-widest md:tracking-wider uppercase rounded-full md:rounded-xl shrink-0 transition-all duration-300 flex items-center gap-3 ${
-                  isSidebarCollapsed ? "justify-center" : "justify-start text-left"
-                } ${
-                  activeSection === 'curso' 
-                    ? "text-purple-400 bg-white/5 border border-purple-500/30" 
-                    : "text-white/60 hover:text-white hover:bg-white/5 border border-transparent"
-                }`}
-              >
-                <Video className="w-4 h-4 shrink-0" />
-                {!isSidebarCollapsed && (
-                  <span>Master class express</span>
-                )}
-              </Link>
-
-              <Link
-                href="/portal/libro"
-                title={isSidebarCollapsed ? "Libro Digital" : undefined}
-                className={`px-4 py-2.5 md:py-3 text-[10px] md:text-xs font-normal tracking-widest md:tracking-wider uppercase rounded-full md:rounded-xl shrink-0 transition-all duration-300 flex items-center gap-3 ${
-                  isSidebarCollapsed ? "justify-center" : "justify-start text-left"
-                } ${
-                  activeSection === 'libro' 
-                    ? "text-purple-400 bg-white/5 border border-purple-500/30" 
-                    : "text-white/60 hover:text-white hover:bg-white/5 border border-transparent"
-                }`}
-              >
-                <BookOpen className="w-4 h-4 shrink-0" />
-                {!isSidebarCollapsed && (
-                  <span>Libro Digital</span>
-                )}
-              </Link>
-
-              <Link
-                href="/portal/recursos"
-                title={isSidebarCollapsed ? "Recursos adicionales" : undefined}
-                className={`px-4 py-2.5 md:py-3 text-[10px] md:text-xs font-normal tracking-widest md:tracking-wider uppercase rounded-full md:rounded-xl shrink-0 transition-all duration-300 flex items-center gap-3 ${
-                  isSidebarCollapsed ? "justify-center" : "justify-start text-left"
-                } ${
-                  activeSection === 'recursos' 
-                    ? "text-purple-400 bg-white/5 border border-purple-500/30" 
-                    : "text-white/60 hover:text-white hover:bg-white/5 border border-transparent"
-                }`}
-              >
-                <Download className="w-4 h-4 shrink-0" />
-                {!isSidebarCollapsed && (
-                  <span>Recursos adicionales</span>
-                )}
-              </Link>
-
-              <a
-                href={activeTopSection === 'visa-estudiante' ? "https://www.udreamms.com/visas/student" : "https://www.udreamms.com/visas/tourist"}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={isSidebarCollapsed ? "Sitio web" : undefined}
-                className={`px-4 py-2.5 md:py-3 text-[10px] md:text-xs font-normal tracking-widest md:tracking-wider uppercase rounded-full md:rounded-xl shrink-0 transition-all duration-300 flex items-center gap-3 ${
-                  isSidebarCollapsed ? "justify-center" : "justify-start text-left"
-                } text-white/60 hover:text-white hover:bg-white/5 border border-transparent`}
-              >
-                <Home className="w-4 h-4 shrink-0" />
-                {!isSidebarCollapsed && (
-                  <span>Sitio web</span>
-                )}
-              </a>
-            </aside>
+            <PortalSidebar
+              activeTopSection={activeTopSection}
+              activeSection={activeSection}
+              isSidebarCollapsed={isSidebarCollapsed}
+            />
           )}
 
           {/* MAIN CONTENT AREA */}
@@ -602,7 +601,9 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
                   </div>
                 </form>
 
-                 <div className="border-t border-white/5 pt-4 space-y-4">
+                {IS_DEV && (
+                <div className="border-t border-white/5 pt-4 space-y-4">
+                  <p className="text-[10px] text-amber-400/80 uppercase tracking-widest">Herramientas de desarrollo</p>
                   <div className="space-y-1">
                     <label className="text-[10px] font-normal text-white/40 uppercase tracking-wider block">Código de Desbloqueo Especial</label>
                     <div className="flex gap-2">
@@ -624,51 +625,45 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
                   </div>
                   {isBypassActive ? (
                     <div className="flex flex-col items-center gap-2 p-3 bg-purple-500/10 border border-purple-500/20 rounded-2xl">
-                      <p className="text-[10px] text-purple-300 font-semibold text-center">🔓 Acceso Especial Activado (@Udreamms2026)</p>
+                      <p className="text-[10px] text-purple-300 font-semibold text-center">Acceso especial activado</p>
                       <button
                         type="button"
                         onClick={handleClearBypass}
                         className="text-[10px] text-red-400 hover:text-red-300 underline font-normal transition-colors"
                       >
-                        Desactivar Acceso Especial (Volver a Bloquear)
+                        Desactivar acceso especial
                       </button>
                     </div>
                   ) : (
-                    <div className="pt-2">
-                      <Button
-                        type="button"
-                        onClick={handleResetDbPurchased}
-                        disabled={savingProfile}
-                        className="w-full h-11 rounded-full bg-red-950/20 border border-red-500/30 text-red-400 hover:bg-red-950/40 text-xs font-normal uppercase transition-all duration-300 hover:scale-105 active:scale-95"
-                      >
-                        {savingProfile ? "Restableciendo..." : "Restablecer compras en DB (Bloquear Todo)"}
-                      </Button>
-                    </div>
+                    <Button
+                      type="button"
+                      onClick={handleResetDbPurchased}
+                      disabled={savingProfile}
+                      className="w-full h-11 rounded-full bg-red-950/20 border border-red-500/30 text-red-400 hover:bg-red-950/40 text-xs font-normal uppercase transition-all duration-300"
+                    >
+                      {savingProfile ? "Restableciendo..." : "Restablecer compras en DB"}
+                    </Button>
                   )}
 
-                  {/* Panel de Depuración de Permisos en Tiempo Real */}
                   <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2 text-[10px] text-white/50 text-left font-mono">
-                    <p className="font-semibold text-purple-400 uppercase tracking-widest text-[9px] mb-1">Estado de Permisos (Admin Info):</p>
+                    <p className="font-semibold text-purple-400 uppercase tracking-widest text-[9px] mb-1">Estado de permisos</p>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-white/70 font-semibold mb-0.5 border-b border-white/5 pb-0.5">Estudiante F-1:</p>
-                        <p>Curso: {dbUser?.purchased_curso_estudiante ? "🔓 Libre" : "🔒 Bloqueado"}</p>
-                        <p>Libro: {dbUser?.purchased_libro_estudiante ? "🔓 Libre" : "🔒 Bloqueado"}</p>
-                        <p>Proceso: {dbUser?.purchased_plan_esencial || dbUser?.purchased_plan_pro || dbUser?.purchased_plan_elite || dbUser?.purchased_plan_allinclusive ? "🔓 Libre" : "🔒 Bloqueado"}</p>
+                        <p className="text-white/70 font-semibold mb-0.5 border-b border-white/5 pb-0.5">F-1</p>
+                        <p>Curso: {dbUser?.purchased_curso_estudiante ? "Libre" : "Bloqueado"}</p>
+                        <p>Libro: {dbUser?.purchased_libro_estudiante ? "Libre" : "Bloqueado"}</p>
+                        <p>Proceso: {dbUser?.purchased_plan_esencial || dbUser?.purchased_plan_pro || dbUser?.purchased_plan_elite || dbUser?.purchased_plan_allinclusive ? "Libre" : "Bloqueado"}</p>
                       </div>
                       <div>
-                        <p className="text-white/70 font-semibold mb-0.5 border-b border-white/5 pb-0.5">Turista B-2:</p>
-                        <p>Curso: {dbUser?.purchased_curso_turista ? "🔓 Libre" : "🔒 Bloqueado"}</p>
-                        <p>Libro: {dbUser?.purchased_libro_turista ? "🔓 Libre" : "🔒 Bloqueado"}</p>
-                        <p>Proceso: {dbUser?.purchased_plan_turista_basico || dbUser?.purchased_plan_turista_premium || dbUser?.purchased_plan_turista_vip ? "🔓 Libre" : "🔒 Bloqueado"}</p>
+                        <p className="text-white/70 font-semibold mb-0.5 border-b border-white/5 pb-0.5">B-2</p>
+                        <p>Curso: {dbUser?.purchased_curso_turista ? "Libre" : "Bloqueado"}</p>
+                        <p>Libro: {dbUser?.purchased_libro_turista ? "Libre" : "Bloqueado"}</p>
+                        <p>Proceso: {dbUser?.purchased_plan_turista_basico || dbUser?.purchased_plan_turista_premium || dbUser?.purchased_plan_turista_vip ? "Libre" : "Bloqueado"}</p>
                       </div>
-                    </div>
-                    <div className="border-t border-white/5 pt-2 mt-1 flex justify-between">
-                      <span>Bypass Admin: {isBypassActive ? "✅ ACTIVO" : "❌ INACTIVO"}</span>
-                      <span>UID: {user?.uid ? `${user.uid.slice(0, 6)}...` : 'N/A'}</span>
                     </div>
                   </div>
                 </div>
+                )}
               </div>
             </motion.div>
           </div>
@@ -740,10 +735,11 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
                       setIsCheckoutOpen(false);
                       setPaymentApproved(false);
                       setApprovedOrder(null);
+                      router.push('/portal/proceso');
                     }}
                     className="h-11 px-8 rounded-full bg-transparent border border-white/40 text-white hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] text-xs font-normal uppercase"
                   >
-                    Ir a mis servicios
+                    Ir a mi proceso
                   </Button>
                 </div>
               ) : (
@@ -834,8 +830,9 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
                           <div className="space-y-2 pt-2">
                             <p className="text-xs font-semibold text-white">2. Escanea y Realiza el Pago</p>
                             <CryptoPaymentTabs
-                              plan="cart"
-                              priceUSD={cart.reduce((total, itemId) => total + (getItemPrice(itemId, checkoutMethod) || 0), 0)}
+                              plan={cryptoCheckoutPlan}
+                              cartItems={cart.length > 1 ? cart : undefined}
+                              priceUSD={checkoutTotal}
                               sessionId={checkoutSessionId}
                               billingData={billingData}
                               isBillingValid={isBillingValid}
@@ -867,33 +864,19 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
                           <p className="text-[10px] font-normal tracking-widest text-white/40 uppercase">Instrucciones</p>
                           <div className="space-y-2 text-xs text-white/70">
                             <p>1. Presiona "Pagar en Stripe".</p>
-                            <p>2. Rellena los datos de tu tarjeta en el portal seguro de Stripe.</p>
-                            <p>3. Regresa a esta pestaña y haz clic en "Confirmar Pago" para activar tus servicios.</p>
+                            <p>2. Completa el pago con el mismo correo de tu cuenta.</p>
+                            <p>3. Al regresar, confirmamos automáticamente y desbloqueamos tu acceso.</p>
                           </div>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                          <a
-                            href={getStripeLink(cart)}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="flex-1 h-11 rounded-full bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg text-xs font-normal uppercase flex items-center justify-center gap-2 text-white"
+                        <div className="flex flex-col gap-3 pt-4">
+                          <Button
+                            onClick={() => void handleStartStripeCheckout()}
+                            disabled={stripeRedirecting || cart.length === 0}
+                            className="w-full h-11 rounded-full bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg text-xs font-normal uppercase flex items-center justify-center gap-2 text-white"
                           >
                             <Lock className="w-4 h-4" />
-                            Pagar en Stripe
-                          </a>
-                          <Button
-                            onClick={() => {
-                              setPaymentApproved(true);
-                              setApprovedOrder({
-                                requestId: `stripe_${Date.now()}`,
-                                email: user.email || '',
-                              });
-                              completeDatabasePurchase(cart);
-                            }}
-                            className="flex-1 h-11 rounded-full bg-transparent border border-white/40 text-white hover:bg-white/5 hover:scale-105 active:scale-95 transition-all duration-300 text-xs font-normal uppercase"
-                          >
-                            Confirmar Pago
+                            {stripeRedirecting ? 'Redirigiendo a Stripe...' : `Pagar $${checkoutTotal.toFixed(2)} en Stripe`}
                           </Button>
                         </div>
                       </div>
@@ -913,7 +896,9 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <PortalProvider>
-      <PortalLayoutContent>{children}</PortalLayoutContent>
+      <Suspense fallback={<div className="min-h-screen bg-[#050505]" />}>
+        <PortalLayoutContent>{children}</PortalLayoutContent>
+      </Suspense>
     </PortalProvider>
   );
 }

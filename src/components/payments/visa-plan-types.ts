@@ -1,6 +1,11 @@
 export type TouristVisaPlanId = 'basico' | 'premium' | 'vip';
 export type StudentVisaPlanId = 'esencial' | 'pro' | 'elite' | 'allinclusive';
-export type VisaPlanId = TouristVisaPlanId | StudentVisaPlanId;
+export type DigitalProductId =
+  | 'libro-estudiante'
+  | 'libro-turista'
+  | 'curso-estudiante'
+  | 'curso-turista';
+export type VisaPlanId = TouristVisaPlanId | StudentVisaPlanId | DigitalProductId | 'cart';
 
 export function normalizeStudentPlanParam(planParam: string): StudentVisaPlanId | null {
   const normalized = planParam.toLowerCase().replace(/-/g, '') as StudentVisaPlanId;

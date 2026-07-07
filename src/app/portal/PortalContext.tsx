@@ -25,8 +25,53 @@ import {
   Star
 } from "lucide-react";
 import { BillingData } from "@/components/payments/BillingForm";
+import {
+  cartSupportsCrypto,
+  getCartTotalUsd,
+  getItemPriceUsd,
+  PRODUCT_CATALOG,
+} from "@/lib/payments/product-catalog";
 
-// Configurations and Constants
+const CART_STORAGE_PREFIX = 'udreamms_cart_';
+
+function buildCartItemsConfig() {
+  const typeMap: Record<string, 'curso' | 'libro' | 'plan'> = {
+    'curso-estudiante': 'curso',
+    'curso-turista': 'curso',
+    'libro-estudiante': 'libro',
+    'libro-turista': 'libro',
+  };
+  const visaMap: Record<string, 'estudiante' | 'turista'> = {
+    'curso-estudiante': 'estudiante',
+    'libro-estudiante': 'estudiante',
+    'plan-esencial': 'estudiante',
+    'plan-pro': 'estudiante',
+    'plan-elite': 'estudiante',
+    'plan-allinclusive': 'estudiante',
+    'proceso-estudiante': 'estudiante',
+    'curso-turista': 'turista',
+    'libro-turista': 'turista',
+    'plan-turista-basico': 'turista',
+    'plan-turista-premium': 'turista',
+    'plan-turista-vip': 'turista',
+    'proceso-turista': 'turista',
+  };
+
+  return Object.fromEntries(
+    Object.entries(PRODUCT_CATALOG).map(([id, entry]) => [
+      id,
+      {
+        name: entry.name,
+        price: entry.cardPriceUsd,
+        type: typeMap[id] || 'plan',
+        visa: visaMap[id] || 'estudiante',
+      },
+    ])
+  );
+}
+
+export const cartItemsConfig = buildCartItemsConfig();
+
 export const studentModules = [
   {
     title: "PASO 1: APLICA A UNA ESCUELA DE INGLES EN USA",
@@ -78,21 +123,6 @@ export const touristModules = [
   }
 ];
 
-export const cartItemsConfig: Record<string, { name: string; price: number; type: 'curso' | 'libro' | 'plan'; visa: 'estudiante' | 'turista' }> = {
-  'curso-estudiante': { name: "Master class express - Visa de Estudiante F-1", price: 9.99, type: 'curso', visa: 'estudiante' },
-  'libro-estudiante': { name: "Libro Digital - Visa de Estudiante F-1", price: 29.99, type: 'libro', visa: 'estudiante' },
-  'curso-turista': { name: "Master class express - Visa de Turista B-2", price: 9.99, type: 'curso', visa: 'turista' },
-  'libro-turista': { name: "Libro Digital - Visa de Turista B-2", price: 29.99, type: 'libro', visa: 'turista' },
-  'proceso-estudiante': { name: "Asesoría Consular - Visa de Estudiante F-1", price: 380, type: 'plan', visa: 'estudiante' },
-  'proceso-turista': { name: "Asesoría Consular - Visa de Turista B-2", price: 380, type: 'plan', visa: 'turista' },
-  'plan-esencial': { name: "Plan 1: Esencial - F-1", price: 380, type: 'plan', visa: 'estudiante' },
-  'plan-pro': { name: "Plan 2: Pro - F-1", price: 550, type: 'plan', visa: 'estudiante' },
-  'plan-elite': { name: "Plan 3: Elite - F-1", price: 2500, type: 'plan', visa: 'estudiante' },
-  'plan-allinclusive': { name: "Plan 4: All-Inclusive - F-1", price: 10000, type: 'plan', visa: 'estudiante' },
-  'plan-turista-basico': { name: "Plan 1: Turista Básico - B-2", price: 380, type: 'plan', visa: 'turista' },
-  'plan-turista-premium': { name: "Plan 2: Turista Premium - B-2", price: 3500, type: 'plan', visa: 'turista' },
-  'plan-turista-vip': { name: "Plan 3: Experiencia VIP - B-2", price: 4990, type: 'plan', visa: 'turista' },
-};
 
 export const studentPlans = [
   {
@@ -131,7 +161,7 @@ export const studentPlans = [
   {
     id: "plan-elite",
     name: "PLAN 3: ELITE",
-    price: 2500,
+    price: 3250,
     originalPrice: "$3,250",
     description: "Soporte completo y alojamiento.",
     highlight: false,
@@ -151,7 +181,7 @@ export const studentPlans = [
   {
     id: "plan-allinclusive",
     name: "PLAN 4: ALL-INCLUSIVE",
-    price: 10000,
+    price: 13000,
     originalPrice: "$13,000",
     description: "La experiencia VIP definitiva.",
     highlight: false,
@@ -275,7 +305,7 @@ interface PortalContextType {
 
   // Functions
   getItemPrice: (itemId: string, method: 'card' | 'crypto' | null) => number;
-  getStripeLink: (items: string[]) => string;
+  getCartTotal: (method: 'card' | 'crypto' | null) => number;
   addToCart: (itemId: string) => void;
   removeFromCart: (itemId: string) => void;
   completeDatabasePurchase: (itemsToUnlock: string[]) => Promise<void>;
@@ -329,8 +359,9 @@ export function PortalProvider({ children }: { children: ReactNode }) {
     return false;
   });
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [cartHydrated, setCartHydrated] = useState(false);
 
-  const hasCryptoDisabled = cart.some(itemId => itemId === 'plan-elite' || itemId === 'plan-allinclusive');
+  const hasCryptoDisabled = !cartSupportsCrypto(cart);
 
   useEffect(() => {
     if (hasCryptoDisabled && checkoutMethod === 'crypto') {
@@ -346,36 +377,12 @@ export function PortalProvider({ children }: { children: ReactNode }) {
   };
 
   const getItemPrice = (itemId: string, method: 'card' | 'crypto' | null) => {
-    const basePrice = cartItemsConfig[itemId]?.price || 0;
-    if ((itemId === 'plan-esencial' || itemId === 'plan-turista-basico') && method === 'crypto') {
-      return 299.99;
-    }
-    if (itemId === 'plan-pro' && method === 'crypto') {
-      return 449.00;
-    }
-    return basePrice;
+    if (!method) return getItemPriceUsd(itemId, 'card');
+    return getItemPriceUsd(itemId, method);
   };
 
-  const getStripeLink = (items: string[]) => {
-    if (items.includes('plan-esencial') || items.includes('plan-turista-basico')) {
-      return "https://buy.stripe.com/00w4gzdoT734alQeqfenS0x";
-    }
-    if (items.includes('plan-pro')) {
-      return "https://buy.stripe.com/cNicN5ckPevw65AdmbenS0A";
-    }
-    if (items.includes('plan-elite')) {
-      return "https://buy.stripe.com/cNidR91GbevweC65TJenS0B";
-    }
-    if (items.includes('plan-allinclusive')) {
-      return "https://buy.stripe.com/fZu7sL1Gb8782To4PFenS0C";
-    }
-    if (items.includes('plan-turista-premium')) {
-      return "https://buy.stripe.com/00wdR93Ojafgdy2ci7enS0y";
-    }
-    if (items.includes('plan-turista-vip')) {
-      return "https://buy.stripe.com/bJe3cvfx1cnoeC6fujenS0z";
-    }
-    return "https://buy.stripe.com/00w4gzdoT734alQeqfenS0x";
+  const getCartTotal = (method: 'card' | 'crypto' | null) => {
+    return getCartTotalUsd(cart, method || 'card');
   };
 
   const addToCart = (itemId: string) => {
@@ -594,12 +601,43 @@ export function PortalProvider({ children }: { children: ReactNode }) {
     }
   }, [user, loading, router]);
 
-  // Adjust activeTopSection when pathname changes
+  // Sync visa context from URL when visiting plan or support routes
   useEffect(() => {
     if (pathname.includes('/soporte')) {
       setActiveTopSection('experto');
+    } else if (pathname.includes('/visa-turista')) {
+      setActiveTopSection('visa-turista');
+    } else if (pathname.includes('/visa-estudiante') || pathname.includes('/servicios')) {
+      setActiveTopSection('visa-estudiante');
     }
   }, [pathname]);
+
+  useEffect(() => {
+    if (!user?.uid) {
+      setCartHydrated(false);
+      return;
+    }
+    try {
+      const raw = localStorage.getItem(CART_STORAGE_PREFIX + user.uid);
+      if (raw) {
+        const parsed = JSON.parse(raw) as unknown;
+        if (Array.isArray(parsed)) {
+          const valid = parsed.filter(
+            (id): id is string => typeof id === 'string' && id in PRODUCT_CATALOG
+          );
+          setCart(valid);
+        }
+      }
+    } catch {
+      // ignore corrupt cart data
+    }
+    setCartHydrated(true);
+  }, [user?.uid]);
+
+  useEffect(() => {
+    if (!user?.uid || !cartHydrated) return;
+    localStorage.setItem(CART_STORAGE_PREFIX + user.uid, JSON.stringify(cart));
+  }, [cart, user?.uid, cartHydrated]);
 
   return (
     <PortalContext.Provider
@@ -652,7 +690,7 @@ export function PortalProvider({ children }: { children: ReactNode }) {
 
         // Functions
         getItemPrice,
-        getStripeLink,
+        getCartTotal,
         addToCart,
         removeFromCart,
         completeDatabasePurchase,

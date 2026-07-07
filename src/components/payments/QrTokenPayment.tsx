@@ -21,6 +21,7 @@ import { encodeCompactSolanaPayQrUrl } from '@/lib/payments/solana-pay';
 
 interface QrTokenPaymentProps {
   plan: string;
+  cartItems?: string[];
   priceUSD: number;
   paymentMethod: CryptoPaymentMethod;
   isProcessing: boolean;
@@ -83,6 +84,7 @@ function toUiAndRawAmount(value: number, decimals: number) {
 
 export default function QrTokenPayment({
   plan,
+  cartItems,
   priceUSD,
   paymentMethod,
   isProcessing,
@@ -224,13 +226,14 @@ export default function QrTokenPayment({
     return JSON.stringify({
       sessionId,
       plan,
+      cartItems: plan === 'cart' ? cartItems : undefined,
       paymentMethod,
       amount: preciseAmount.uiAmount,
       email: billingData.email,
       fullName: billingData.fullName,
       zipCode: billingData.zipCode,
     });
-  }, [billingData, isBillingValid, paymentMethod, plan, preciseAmount, sessionId]);
+  }, [billingData, cartItems, isBillingValid, paymentMethod, plan, preciseAmount, sessionId]);
 
   const handleGenerateQr = async (auto = false) => {
     if (!billingData || !isBillingValid) {
@@ -269,6 +272,7 @@ export default function QrTokenPayment({
         body: JSON.stringify({
           sessionId,
           plan,
+          items: plan === 'cart' && cartItems?.length ? cartItems : undefined,
           paymentMethod,
           chargeUSD: priceUSD,
           expectedAmountUi: preciseAmount.uiAmount,

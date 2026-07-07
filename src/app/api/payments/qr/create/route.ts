@@ -46,12 +46,16 @@ export async function POST(request: NextRequest) {
     }
 
     const planKey = String(plan).toLowerCase();
+    const normalizedItems = Array.isArray(items) ? items.filter((id: unknown) => typeof id === 'string') : [];
     let catalogPlanPriceUSD = 0;
+    let cartItemIds: string[] = [];
+
     if (planKey === 'cart') {
-      if (!Array.isArray(items) || items.length === 0) {
+      if (normalizedItems.length === 0) {
         return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
       }
-      for (const itemId of items) {
+      cartItemIds = normalizedItems;
+      for (const itemId of cartItemIds) {
         const itemPrice = VISA_PLAN_CATALOG_USD[itemId];
         if (!itemPrice) {
           return NextResponse.json({ error: `Invalid cart item: ${itemId}` }, { status: 400 });
@@ -59,6 +63,7 @@ export async function POST(request: NextRequest) {
         catalogPlanPriceUSD += itemPrice;
       }
     } else {
+      cartItemIds = [planKey];
       catalogPlanPriceUSD = VISA_PLAN_CATALOG_USD[planKey];
     }
 
@@ -107,6 +112,7 @@ export async function POST(request: NextRequest) {
       requestId,
       sessionId,
       planId: planKey,
+      cartItemIds: planKey === 'cart' ? cartItemIds : [planKey],
       paymentMethod,
       recipientWallet: TREASURY_WALLET,
       reference,

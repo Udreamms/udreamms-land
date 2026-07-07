@@ -51,7 +51,8 @@ export default function LockOverlay({ itemId }: LockOverlayProps) {
           {isProceso ? (
             <Button
               onClick={() => {
-                router.push('/portal/servicios');
+                const isTourist = itemId.includes('turista');
+                router.push(isTourist ? '/portal/visa-turista' : '/portal/visa-estudiante');
                 toast.info("Por favor, selecciona y añade un plan al carrito para desbloquear tu proceso de asesoría.");
               }}
               className="w-full h-10 md:h-12 rounded-full bg-transparent border border-white/40 text-white hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg text-xs font-normal tracking-widest uppercase flex items-center justify-center gap-2"
