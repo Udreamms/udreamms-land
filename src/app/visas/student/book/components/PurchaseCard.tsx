@@ -16,7 +16,7 @@ interface PurchaseCardProps {
 
 export default function PurchaseCard({ formData, setFormData, handleSubmit }: PurchaseCardProps) {
   return (
-    <div className="w-full px-4 md:px-12 lg:px-20 font-sans text-white" id="buy-now">
+    <div className="w-full max-w-5xl mx-auto px-4 font-sans text-white" id="buy-now">
 
         {/* Top Grid: Book Cover & Form */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center font-sans">
