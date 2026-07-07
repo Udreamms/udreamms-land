@@ -1,20 +1,4 @@
-import { User, Mail, Lock } from "lucide-react";
-
-interface PurchaseCardProps {
-  formData: {
-    nombre: string;
-    apellido: string;
-    email: string;
-  };
-  setFormData: React.Dispatch<React.SetStateAction<{
-    nombre: string;
-    apellido: string;
-    email: string;
-  }>>;
-  handleSubmit: (e: React.FormEvent) => void;
-}
-
-export default function PurchaseCard({ formData, setFormData, handleSubmit }: PurchaseCardProps) {
+export default function PurchaseCard() {
   return (
     <div className="w-full max-w-7xl mx-auto px-4 md:px-8 font-sans text-white" id="buy-now">
 
