@@ -10,10 +10,18 @@ export default function BookVideoSection() {
     const video = videoRef.current;
     if (!video) return;
 
+    let hasScrolled = false;
+
+    const handleScroll = () => {
+      hasScrolled = true;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting && hasScrolled) {
             video.play().catch((err) => {
               // Fail silently if browser blocks autoplay
               console.log("Autoplay prevented:", err);
@@ -29,6 +37,7 @@ export default function BookVideoSection() {
     observer.observe(video);
 
     return () => {
+      window.removeEventListener("scroll", handleScroll);
       observer.unobserve(video);
     };
   }, []);
