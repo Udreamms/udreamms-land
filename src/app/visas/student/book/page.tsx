@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/landing/Footer";
@@ -34,23 +34,14 @@ function BookHeader() {
           </span>
         </Link>
 
-        {/* GRUPO DERECHA: ACCIONES */}
-        <div className="flex items-center gap-3 font-sans">
+        {/* GRUPO DERECHA: CTA */}
+        <div className="flex items-center font-sans">
           <Button
             asChild
-            variant="ghost"
-            className="text-gray-300 hover:text-white hover:bg-white/10 rounded-full h-9 px-4 text-sm font-medium transition-all font-sans"
+            suppressHydrationWarning
+            className="bg-white/10 hover:bg-white/20 text-white font-semibold text-xs md:text-sm px-4 py-2 rounded-xl transition-all font-sans"
           >
-            <Link href="/login?mode=login">
-              Iniciar Sesión
-            </Link>
-          </Button>
-
-          <Button
-            asChild
-            className="bg-white text-slate-900 hover:bg-white/90 rounded-full h-9 px-5 font-semibold text-sm transition-all duration-300 hover:scale-105 shadow-md font-sans"
-          >
-            <Link href="/login?register=true">
+            <Link href="#buy-now" className="font-sans">
               Comenzar
             </Link>
           </Button>
@@ -61,6 +52,17 @@ function BookHeader() {
 }
 
 export default function StudentBookPage() {
+  const [formData, setFormData] = useState({
+    nombre: "",
+    apellido: "",
+    email: ""
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Form submitted", formData);
+  };
+
   return (
     <div className="student-book-page min-h-screen bg-black text-slate-100 font-sans flex flex-col relative">
       {/* Carga e inyección forzada de la tipografía Montserrat, espaciado de letras tracking-tighter y peso medium en todos los elementos */}
@@ -89,7 +91,11 @@ export default function StudentBookPage() {
 
         {/* CONTENIDO DE COMPRA Y BENEFICIOS */}
         <div className="w-full px-4 md:px-8 lg:px-12 py-20 md:py-28 flex flex-col space-y-12 font-sans bg-black">
-          <PurchaseCard />
+          <PurchaseCard 
+            formData={formData} 
+            setFormData={setFormData} 
+            handleSubmit={handleSubmit} 
+          />
         </div>
 
         {/* SECCIÓN DETALLE GUÍA Y BULLETS */}
