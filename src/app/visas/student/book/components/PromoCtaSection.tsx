@@ -4,7 +4,7 @@ import { Plane } from "lucide-react";
 
 export default function PromoCtaSection() {
   return (
-    <section className="w-full bg-black py-24 md:py-32 px-4 md:px-8 lg:px-12 font-sans border-b border-white/10 text-white flex flex-col items-center justify-center text-center relative overflow-hidden">
+    <section className="w-full bg-black py-24 md:py-32 px-4 md:px-8 lg:px-12 font-sans text-white flex flex-col items-center justify-center text-center relative overflow-hidden">
       <div className="w-full px-4 md:px-16 lg:px-[190px] flex flex-col items-center justify-center relative z-10 font-sans">
         <h2 className="text-2xl md:text-4xl font-extrabold text-white w-full tracking-tight leading-tight font-sans">
           ACCEDE AL INSTANTE A NUESTRO LIBRO DIGITAL: CÓMO OBTENER TU VISA DE ESTUDIANTE PASO A PASO EN 30 DÍAS.

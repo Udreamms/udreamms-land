@@ -22,31 +22,15 @@ export default function PurchaseCard({ formData, setFormData, handleSubmit }: Pu
         {/* Top Grid: Book Cover & Form */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center font-sans">
 
-          {/* Bloque Izquierdo: Libro y Precios */}
+          {/* Bloque Izquierdo: Libro */}
           <div className="lg:col-span-5 flex flex-col items-center justify-center font-sans mx-auto w-full">
-            <div className="flex flex-row items-center gap-6 justify-center w-full font-sans">
-              {/* Portada Libro */}
-              <div className="relative w-28 md:w-36 aspect-[3/4] rounded-xl overflow-hidden bg-slate-900 shadow-lg shrink-0">
-                <img
-                  src="/book-udreamms.jpeg"
-                  alt="Libro Digital Udreamms - Paso a paso para tu visa"
-                  className="w-full h-full object-cover scale-110 origin-center"
-                />
-              </div>
-
-              {/* Precios */}
-              <div className="flex flex-col justify-center text-left font-sans">
-                <span className="text-xs md:text-sm font-medium text-slate-500 line-through font-sans">
-                  Antes $49 USD
-                </span>
-                <div className="flex items-baseline gap-1 mt-1 font-sans">
-                  <span className="text-[10px] font-normal text-slate-400 uppercase font-sans">Hoy solo</span>
-                  <span className="text-3xl md:text-4xl font-medium text-white tracking-tight font-sans">
-                    $29.99
-                  </span>
-                  <span className="text-base font-normal text-slate-400 font-sans">USD</span>
-                </div>
-              </div>
+            {/* Portada Libro */}
+            <div className="relative w-28 md:w-36 aspect-[3/4] rounded-xl overflow-hidden bg-slate-900 shadow-lg shrink-0">
+              <img
+                src="/book-udreamms.jpeg"
+                alt="Libro Digital Udreamms - Paso a paso para tu visa"
+                className="w-full h-full object-cover scale-110 origin-center"
+              />
             </div>
           </div>
 

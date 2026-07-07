@@ -73,7 +73,7 @@ export default function StudentBookPage() {
   };
 
   return (
-    <div className="student-book-page min-h-screen bg-white text-slate-900 font-sans flex flex-col relative">
+    <div className="student-book-page min-h-screen bg-black text-slate-100 font-sans flex flex-col relative">
       {/* Carga e inyección forzada de la tipografía Montserrat, espaciado de letras tracking-tighter y peso medium en todos los elementos */}
       <style dangerouslySetInnerHTML={{
         __html: `
@@ -91,7 +91,7 @@ export default function StudentBookPage() {
 
       <BookHeader />
 
-      <main className="flex-1 w-full bg-white font-sans">
+      <main className="flex-1 w-full bg-black font-sans">
         {/* HERO SECTION */}
         <BookHero />
 
@@ -99,7 +99,7 @@ export default function StudentBookPage() {
         <BookVideoSection />
 
         {/* CONTENIDO DE COMPRA Y BENEFICIOS */}
-        <div className="w-full px-4 md:px-8 lg:px-12 py-20 md:py-28 flex flex-col space-y-12 font-sans bg-white">
+        <div className="w-full px-4 md:px-8 lg:px-12 py-20 md:py-28 flex flex-col space-y-12 font-sans bg-black">
           <PurchaseCard 
             formData={formData} 
             setFormData={setFormData} 

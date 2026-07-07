@@ -43,7 +43,7 @@ export default function BookVideoSection() {
   }, []);
 
   return (
-    <section className="w-full bg-[#050507] pb-16 md:pb-24 pt-4 md:pt-6 px-4 md:px-8 lg:px-12 font-sans border-t border-white/5 flex flex-col items-center justify-center -mt-10 md:-mt-16 relative z-30">
+    <section className="w-full bg-[#050507] pb-16 md:pb-24 pt-4 md:pt-6 px-4 md:px-8 lg:px-12 font-sans flex flex-col items-center justify-center -mt-10 md:-mt-16 relative z-30 overflow-hidden">
       <div className="max-w-6xl w-full mx-auto flex flex-col items-center gap-10">
         {/* Contenedor de Video */}
         <div className="w-full rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-slate-950">

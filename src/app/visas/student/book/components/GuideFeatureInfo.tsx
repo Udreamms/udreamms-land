@@ -2,7 +2,7 @@ import { Map, CheckSquare, ShieldCheck, Rocket, Plane } from "lucide-react";
 
 export default function GuideFeatureInfo() {
   return (
-    <section className="w-full bg-black py-24 md:py-32 px-4 md:px-8 lg:px-12 font-sans border-b border-white/10">
+    <section className="w-full bg-black py-24 md:py-32 px-4 md:px-8 lg:px-12 font-sans">
       {/* SVG Gradient Definition */}
       <svg className="w-0 h-0 absolute" aria-hidden="true" focusable="false">
         <defs>
