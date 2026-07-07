@@ -2,9 +2,9 @@ import { Map, CheckSquare, ShieldCheck } from "lucide-react";
 
 export default function BookChapters() {
   return (
-    <section className="w-full bg-[#f8fafc] py-16 px-4 md:px-8 lg:px-12 font-sans border-b border-slate-100">
+    <section className="w-full bg-[#f8fafc] py-24 md:py-32 px-4 md:px-8 lg:px-12 font-sans border-b border-slate-100">
       <div className="w-full px-4 md:px-16 lg:px-[190px] flex flex-col font-sans">
-        
+
         {/* Section Header */}
         <div className="text-center md:text-left flex flex-col space-y-4 font-sans">
           <span className="text-sm font-bold tracking-wider text-blue-600 uppercase font-sans">
@@ -16,9 +16,9 @@ export default function BookChapters() {
           <p className="text-base md:text-lg text-slate-600 leading-relaxed font-sans w-full">
             Dentro del libro de <strong className="text-blue-600 font-bold">Udreamms</strong> te compartiremos links oficiales y el proceso paso a paso para ayudarte a obtener tu visa de estudiante.
           </p>
-          
+
           <div className="w-20 h-[3px] bg-blue-600 rounded-full my-2" />
-          
+
           <h3 className="text-xl md:text-2xl font-bold text-[#0f2d59] font-sans pt-2">
             Aquí te compartimos algunos puntos de lo que encontrarás dentro de este libro:
           </h3>
@@ -35,7 +35,7 @@ export default function BookChapters() {
 
           {/* Questions / Points */}
           <div className="mt-8 space-y-8 font-sans">
-            
+
             {/* Point 1 */}
             <div className="flex flex-col font-sans">
               <div className="flex items-start gap-3 font-sans">

@@ -18,7 +18,7 @@ export default function PurchaseCard({ formData, setFormData, handleSubmit }: Pu
   return (
     <div className="w-full px-4 md:px-12 lg:px-20 font-sans" id="buy-now">
       <div className="bg-black rounded-3xl border border-slate-800 shadow-2xl p-6 md:p-10 w-full font-sans text-white">
-        
+
         {/* Top Grid: Book Cover & Form */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center font-sans">
 
@@ -129,7 +129,7 @@ export default function PurchaseCard({ formData, setFormData, handleSubmit }: Pu
 
         {/* Bottom content: 3 Columns Grid */}
         <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8 w-full font-sans text-center">
-          
+
           {/* Column 1: Características */}
           <div className="flex flex-col items-center space-y-3 text-slate-300 text-xs md:text-sm text-center">
             <p className="font-semibold text-white">• Aprende el proceso completo de la visa F1.</p>

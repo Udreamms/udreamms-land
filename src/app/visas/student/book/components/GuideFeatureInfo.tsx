@@ -2,7 +2,7 @@ import { Map, CheckSquare, ShieldCheck, Rocket, Plane } from "lucide-react";
 
 export default function GuideFeatureInfo() {
   return (
-    <section className="w-full bg-black py-16 px-4 md:px-8 lg:px-12 font-sans border-b border-white/10">
+    <section className="w-full bg-black py-24 md:py-32 px-4 md:px-8 lg:px-12 font-sans border-b border-white/10">
       {/* SVG Gradient Definition */}
       <svg className="w-0 h-0 absolute" aria-hidden="true" focusable="false">
         <defs>
@@ -14,13 +14,13 @@ export default function GuideFeatureInfo() {
       </svg>
 
       <div className="w-full px-4 md:px-16 lg:px-[190px] grid grid-cols-1 lg:grid-cols-12 gap-12 items-center font-sans">
-        
+
         {/* Left Column: Info & Bullets */}
         <div className="lg:col-span-7 flex flex-col space-y-6 font-sans">
           <h2 className="text-3xl md:text-4xl font-extrabold text-white leading-tight tracking-tight max-w-xl">
             ¿Y si existiera una guía <br /> que te mostrara exactamente cómo obtener tu visa F1?
           </h2>
-          
+
           <p className="text-base md:text-lg text-slate-300 leading-relaxed max-w-xl">
             En <strong className="font-extrabold bg-gradient-to-r from-[#c084fc] to-[#f472b6] bg-clip-text text-transparent">Udreamms</strong> transformamos procesos complejos en pasos simples y claros para que cumplas tu sueño de estudiar en Estados Unidos.
           </p>
@@ -87,7 +87,7 @@ export default function GuideFeatureInfo() {
                 alt="Estudiante en camino a estudiar en Estados Unidos"
                 className="w-full h-full object-cover"
               />
-              
+
               {/* Overlay Text on top of the image */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6 md:p-8 text-white">
                 <div className="flex items-start gap-4">

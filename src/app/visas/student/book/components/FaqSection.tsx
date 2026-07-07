@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 export default function FaqSection() {
   return (
-    <section className="w-full bg-[#f8fafc] py-16 px-4 md:px-8 lg:px-12 font-sans border-b border-slate-100 flex flex-col items-center">
+    <section className="w-full bg-[#f8fafc] py-24 md:py-32 px-4 md:px-8 lg:px-12 font-sans border-b border-slate-100 flex flex-col items-center">
       <div className="w-full px-4 md:px-16 lg:px-[190px] flex flex-col items-center font-sans">
         <h2 className="text-3xl md:text-5xl font-extrabold text-[#0f2d59] tracking-tight leading-tight text-center font-sans">
           Preguntas Frecuentes

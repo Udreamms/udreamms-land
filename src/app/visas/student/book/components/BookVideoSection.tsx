@@ -1,19 +1,51 @@
+"use client";
+
+import React, { useEffect, useRef } from "react";
 import { ShieldCheck, Target, Users, Clock } from "lucide-react";
 
 export default function BookVideoSection() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            video.play().catch((err) => {
+              // Fail silently if browser blocks autoplay
+              console.log("Autoplay prevented:", err);
+            });
+          } else {
+            video.pause();
+          }
+        });
+      },
+      { threshold: 0.5 } // Triggers when 50% of the video is visible
+    );
+
+    observer.observe(video);
+
+    return () => {
+      observer.unobserve(video);
+    };
+  }, []);
+
   return (
     <section className="w-full bg-[#050507] pb-16 md:pb-24 pt-4 md:pt-6 px-4 md:px-8 lg:px-12 font-sans border-t border-white/5 flex flex-col items-center justify-center -mt-10 md:-mt-16 relative z-30">
       <div className="max-w-6xl w-full mx-auto flex flex-col items-center gap-10">
         {/* Contenedor de Video */}
         <div className="w-full rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-slate-950">
-          {/* Elemento de Video (YouTube Embed) */}
           <div className="relative aspect-video w-full bg-black">
-            <iframe
-              className="absolute inset-0 w-full h-full border-0"
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-              title="YouTube video player"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
+            <video
+              ref={videoRef}
+              src="https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/Book%2FWhatsApp%20Video%202026-07-07%20at%203.28.30%20AM.mp4?alt=media&token=b970a7c7-3be5-4813-b9cf-644a039fbbdf"
+              controls
+              playsInline
+              preload="metadata"
+              className="absolute inset-0 w-full h-full object-cover"
             />
           </div>
         </div>

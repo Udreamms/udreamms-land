@@ -80,8 +80,12 @@ export default function StudentBookPage() {
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
         * {
           font-family: 'Montserrat', sans-serif !important;
-          letter-spacing: -0.05em !important;
+          letter-spacing: -0.02em !important;
           font-weight: 500 !important;
+          line-height: 1.625 !important;
+        }
+        h1, h2, h3, h4, h5, h6 {
+          line-height: 1.25 !important;
         }
       `}} />
 
@@ -95,7 +99,7 @@ export default function StudentBookPage() {
         <BookVideoSection />
 
         {/* CONTENIDO DE COMPRA Y BENEFICIOS */}
-        <div className="w-full px-4 md:px-8 lg:px-12 py-12 md:py-16 flex flex-col space-y-12 font-sans bg-white">
+        <div className="w-full px-4 md:px-8 lg:px-12 py-20 md:py-28 flex flex-col space-y-12 font-sans bg-white">
           <PurchaseCard 
             formData={formData} 
             setFormData={setFormData} 
