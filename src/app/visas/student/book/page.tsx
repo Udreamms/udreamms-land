@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/landing/Footer";
@@ -61,17 +61,6 @@ function BookHeader() {
 }
 
 export default function StudentBookPage() {
-  const [formData, setFormData] = useState({
-    nombre: "",
-    apellido: "",
-    email: ""
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted", formData);
-  };
-
   return (
     <div className="student-book-page min-h-screen bg-black text-slate-100 font-sans flex flex-col relative">
       {/* Carga e inyección forzada de la tipografía Montserrat, espaciado de letras tracking-tighter y peso medium en todos los elementos */}
@@ -100,11 +89,7 @@ export default function StudentBookPage() {
 
         {/* CONTENIDO DE COMPRA Y BENEFICIOS */}
         <div className="w-full px-4 md:px-8 lg:px-12 py-20 md:py-28 flex flex-col space-y-12 font-sans bg-black">
-          <PurchaseCard 
-            formData={formData} 
-            setFormData={setFormData} 
-            handleSubmit={handleSubmit} 
-          />
+          <PurchaseCard />
         </div>
 
         {/* SECCIÓN DETALLE GUÍA Y BULLETS */}
