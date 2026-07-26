@@ -19,7 +19,7 @@ import CheckoutForm from "./components/CheckoutForm";
 
 function BookHeader() {
   return (
-    <header className="absolute top-0 left-0 right-0 w-full bg-transparent border-b border-white/10 font-sans z-50">
+    <header className="fixed top-0 left-0 right-0 w-full bg-transparent backdrop-blur-sm font-sans z-50 transition-all duration-300">
       <div className="w-full px-4 md:px-8 lg:px-12 h-16 flex items-center justify-between">
         {/* GRUPO IZQUIERDA: LOGO + TITULO */}
         <Link href="/" className="flex items-center gap-2 shrink-0 group font-sans">
@@ -40,9 +40,9 @@ function BookHeader() {
           <Button
             asChild
             suppressHydrationWarning
-            className="bg-white/10 hover:bg-white/20 text-white font-semibold text-xs md:text-sm px-4 py-2 rounded-xl transition-all font-sans"
+            className="bg-white/10 hover:bg-white/20 text-white font-semibold text-xs md:text-sm px-4 py-2 rounded-xl transition-all font-sans cursor-pointer"
           >
-            <Link href="#buy-now" className="font-sans">
+            <Link href="#checkout-top" className="font-sans">
               Comenzar
             </Link>
           </Button>
@@ -75,6 +75,9 @@ export default function StudentBookPage() {
       <style dangerouslySetInnerHTML={{
         __html: `
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+        html {
+          scroll-behavior: smooth !important;
+        }
         * {
           font-family: 'Montserrat', sans-serif !important;
           letter-spacing: -0.02em !important;

@@ -80,7 +80,6 @@ export default function BookCheckoutFlow({ formData, autoStart = false, onReset 
   }, [email]);
 
   const handleStartStripeCheckout = useCallback(async () => {
-    if (!email.includes('@')) return;
     setStripeRedirecting(true);
     setStripeError(null);
     try {
@@ -92,7 +91,7 @@ export default function BookCheckoutFlow({ formData, autoStart = false, onReset 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email,
+          email: email || '',
           itemIds: ['libro-estudiante'],
           successUrl,
           cancelUrl,
@@ -153,7 +152,7 @@ export default function BookCheckoutFlow({ formData, autoStart = false, onReset 
         <p className="text-[10px] uppercase tracking-widest text-slate-500">Paso final</p>
         <h3 className="text-lg md:text-xl font-semibold text-white">Elige cómo quieres pagar $29.99 USD</h3>
         <p className="text-xs text-slate-400">
-          Usaremos <span className="text-slate-300">{email}</span> para desbloquear tu libro en el portal.
+          Obtén tu libro de inmediato en el portal tras completar tu pago.
         </p>
       </div>
 
@@ -181,8 +180,8 @@ export default function BookCheckoutFlow({ formData, autoStart = false, onReset 
           >
             <CreditCard className="w-6 h-6 text-blue-400" />
             <div>
-              <p className="font-semibold text-white">Pagar con Tarjeta</p>
-              <p className="text-xs text-slate-400 mt-1">Stripe · Visa · Mastercard · Amex</p>
+              <p className="font-semibold text-white">Pagar con Tarjeta (Stripe)</p>
+              <p className="text-xs text-slate-400 mt-1">Visa · Mastercard · Amex · Apple Pay</p>
             </div>
           </button>
         </div>
@@ -235,7 +234,7 @@ export default function BookCheckoutFlow({ formData, autoStart = false, onReset 
                       1. Haz clic en <strong className="text-white">Pagar en Stripe</strong> y completa el pago de $29.99 USD.
                     </p>
                     <p>
-                      2. Usa el correo <strong className="text-white">{email}</strong> en Stripe (ya está prellenado).
+                      2. Ingresa tu correo en Stripe para enviarte tu acceso al instante.
                     </p>
                     <p>
                       3. Al volver, confirmamos automáticamente y desbloqueamos tu libro en el portal.

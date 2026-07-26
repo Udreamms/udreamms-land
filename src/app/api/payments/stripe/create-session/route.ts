@@ -39,9 +39,6 @@ export async function POST(request: NextRequest) {
       return true;
     });
 
-    if (!email.includes('@')) {
-      return NextResponse.json({ error: 'Correo electrónico válido requerido' }, { status: 400 });
-    }
     if (validItemIds.length === 0) {
       return NextResponse.json({ error: 'El carrito no tiene productos válidos' }, { status: 400 });
     }
@@ -55,7 +52,7 @@ export async function POST(request: NextRequest) {
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
-      customer_email: email,
+      ...(email.includes('@') ? { customer_email: email } : {}),
       line_items: validItemIds.map((itemId) => {
         const entry = getProductEntry(itemId)!;
         return {

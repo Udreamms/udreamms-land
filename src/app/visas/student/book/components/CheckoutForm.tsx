@@ -17,9 +17,35 @@ export default function CheckoutForm({
   checkoutActive = false,
   onResetCheckout,
 }: CheckoutFormProps) {
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const [loadingStripe, setLoadingStripe] = React.useState(false);
+
+  const handleDirectStripeCheckout = async () => {
     onStartCheckout();
+    setLoadingStripe(true);
+    try {
+      const origin = window.location.origin;
+      const successUrl = `${origin}/visas/student/book?stripe=success&session_id={CHECKOUT_SESSION_ID}`;
+      const cancelUrl = `${origin}/visas/student/book?stripe=cancelled`;
+
+      const response = await fetch('/api/payments/stripe/create-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: '',
+          itemIds: ['libro-estudiante'],
+          successUrl,
+          cancelUrl,
+        }),
+      });
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setLoadingStripe(false);
+      }
+    } catch {
+      setLoadingStripe(false);
+    }
   };
 
   return (
@@ -55,68 +81,16 @@ export default function CheckoutForm({
             </div>
           </div>
 
-          {/* Bloque Derecho: Formulario y CTA */}
+          {/* Bloque Derecho: Únicamente el Botón Directo y Garantías */}
           <div className="lg:col-span-7 flex flex-col space-y-4 font-sans">
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-3 font-sans">
-              {/* Nombre */}
-              <div className="relative md:col-span-1 font-sans">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500 font-sans">
-                  <User className="w-4 h-4" />
-                </span>
-                <input
-                  type="text"
-                  placeholder="Nombre"
-                  required
-                  value={formData.nombre}
-                  onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                  suppressHydrationWarning
-                  className="w-full pl-9 pr-3 py-3 bg-transparent border border-white/20 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-white/20 transition-all placeholder:text-slate-500 text-white font-sans"
-                />
-              </div>
-
-              {/* Apellido */}
-              <div className="relative md:col-span-1 font-sans">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500 font-sans">
-                  <User className="w-4 h-4" />
-                </span>
-                <input
-                  type="text"
-                  placeholder="Apellido"
-                  required
-                  value={formData.apellido}
-                  onChange={(e) => setFormData({ ...formData, apellido: e.target.value })}
-                  suppressHydrationWarning
-                  className="w-full pl-9 pr-3 py-3 bg-transparent border border-white/20 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-white/20 transition-all placeholder:text-slate-500 text-white font-sans"
-                />
-              </div>
-
-              {/* Correo */}
-              <div className="relative md:col-span-1 font-sans">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500 font-sans">
-                  <Mail className="w-4 h-4" />
-                </span>
-                <input
-                  type="email"
-                  placeholder="Correo electrónico"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  suppressHydrationWarning
-                  className="w-full pl-9 pr-3 py-3 bg-transparent border border-white/20 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-white/20 transition-all placeholder:text-slate-500 text-white font-sans"
-                />
-              </div>
-
-              {/* Botón de Submit */}
-              <div className="md:col-span-3 mt-2 font-sans">
-                <button
-                  type="submit"
-                  suppressHydrationWarning
-                  className="w-full bg-white text-black hover:bg-white/90 transition-all duration-300 hover:scale-[1.01] active:scale-95 shadow-md text-center tracking-wide text-sm font-sans font-semibold py-4 px-6 rounded-xl"
-                >
-                  QUIERO MI LIBRO AHORA
-                </button>
-              </div>
-            </form>
+            <button
+              onClick={onStartCheckout}
+              type="button"
+              suppressHydrationWarning
+              className="w-full bg-white text-black hover:bg-white/90 transition-all duration-300 hover:scale-[1.01] active:scale-95 shadow-md text-center tracking-wider text-sm md:text-base font-sans font-semibold py-4 md:py-4.5 px-8 rounded-full flex items-center justify-center gap-2"
+            >
+              QUIERO MI LIBRO AHORA
+            </button>
 
             {/* Garantías de confianza */}
             <div className="flex items-center justify-center gap-3 text-[10px] md:text-xs text-slate-400 font-medium pt-2 border-t border-white/5 font-sans">
