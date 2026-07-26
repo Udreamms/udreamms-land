@@ -81,16 +81,17 @@ export default function CheckoutForm({
             </div>
           </div>
 
-          {/* Bloque Derecho: Únicamente el Botón Directo y Garantías */}
+          {/* Bloque Derecho: Únicamente el Botón Directo a Stripe Checkout y Garantías */}
           <div className="lg:col-span-7 flex flex-col space-y-4 font-sans">
-            <button
-              onClick={onStartCheckout}
-              type="button"
+            <a
+              href="https://buy.stripe.com/bJeeVdckP87851w2HxenS0D"
+              target="_blank"
+              rel="noopener noreferrer"
               suppressHydrationWarning
-              className="w-full bg-white text-black hover:bg-white/90 transition-all duration-300 hover:scale-[1.01] active:scale-95 shadow-md text-center tracking-wider text-sm md:text-base font-sans font-semibold py-4 md:py-4.5 px-8 rounded-full flex items-center justify-center gap-2"
+              className="w-full bg-white text-black hover:bg-white/90 transition-all duration-300 hover:scale-[1.01] active:scale-95 shadow-md text-center tracking-wider text-sm md:text-base font-sans font-semibold py-4 md:py-4.5 px-8 rounded-full flex items-center justify-center gap-2 cursor-pointer"
             >
               QUIERO MI LIBRO AHORA
-            </button>
+            </a>
 
             {/* Garantías de confianza */}
             <div className="flex items-center justify-center gap-3 text-[10px] md:text-xs text-slate-400 font-medium pt-2 border-t border-white/5 font-sans">
@@ -103,14 +104,6 @@ export default function CheckoutForm({
               <span>•</span>
               <span className="font-sans font-medium">Descarga digital</span>
             </div>
-
-            {checkoutActive ? (
-              <BookCheckoutFlow
-                formData={formData}
-                autoStart
-                onReset={onResetCheckout}
-              />
-            ) : null}
           </div>
 
         </div>

@@ -35,16 +35,21 @@ function BookHeader() {
           </span>
         </Link>
 
-        {/* GRUPO DERECHA: CTA */}
+        {/* GRUPO DERECHA: CTA DIRECTO A STRIPE */}
         <div className="flex items-center font-sans">
           <Button
             asChild
             suppressHydrationWarning
             className="bg-white/10 hover:bg-white/20 text-white font-semibold text-xs md:text-sm px-4 py-2 rounded-xl transition-all font-sans cursor-pointer"
           >
-            <Link href="#checkout-top" className="font-sans">
-              Comenzar
-            </Link>
+            <a
+              href="https://buy.stripe.com/bJeeVdckP87851w2HxenS0D"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-sans"
+            >
+              Quiero mi libro
+            </a>
           </Button>
         </div>
       </div>
