@@ -170,13 +170,7 @@ export default function Header() {
               </Link>
             )}
 
-            <Link href="/login?mode=login">
-              <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10 rounded-full h-8 px-3 text-xs font-medium border border-transparent hover:border-white/10 transition-all">
-                Iniciar Sesión
-              </Button>
-            </Link>
-
-            <Link href="/login?register=true">
+            <Link href="/login">
               <Button className="bg-white text-black hover:bg-white/90 rounded-full h-8 px-4 font-semibold text-xs transition-all duration-300 hover:scale-105 shadow-md">
                 Comenzar
               </Button>
@@ -365,13 +359,8 @@ export default function Header() {
                 ))}
 
                 <div className="pt-6 space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
-                    <Link href="/login?mode=login" onClick={() => setIsMobileMenuOpen(false)} className="w-full">
-                      <Button variant="ghost" className="w-full text-white hover:bg-white/10 h-12 text-sm font-medium border border-white/10 rounded-xl">
-                        Iniciar Sesión
-                      </Button>
-                    </Link>
-                    <Link href="/login?register=true" onClick={() => setIsMobileMenuOpen(false)} className="w-full">
+                  <div>
+                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="w-full block">
                       <Button className="w-full bg-white text-black hover:bg-white/90 h-12 text-sm font-semibold rounded-xl">
                         Comenzar
                       </Button>
