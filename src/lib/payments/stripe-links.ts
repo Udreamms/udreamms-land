@@ -1,13 +1,13 @@
 /** Stripe Payment Links — productos Udreamms */
 export const STRIPE_PAYMENT_LINKS = {
   libroEstudiante: 'https://buy.stripe.com/bJeeVdckP87851w2HxenS0D',
-  planEsencial: 'https://buy.stripe.com/00w4gzdoT734alQeqfenS0x',
-  planPro: 'https://buy.stripe.com/cNicN5ckPevw65AdmbenS0A',
-  planElite: 'https://buy.stripe.com/cNidR91GbevweC65TJenS0B',
-  planAllInclusive: 'https://buy.stripe.com/fZu7sL1Gb8782To4PFenS0C',
-  planTuristaBasico: 'https://buy.stripe.com/00w4gzdoT734alQeqfenS0x',
-  planTuristaPremium: 'https://buy.stripe.com/00wdR93Ojafgdy2ci7enS0y',
-  planTuristaVip: 'https://buy.stripe.com/bJe3cvfx1cnoeC6fujenS0z',
+  planEsencial: 'https://buy.stripe.com/6oU14n84zcnoalQci7enS0F',
+  planPro: 'https://buy.stripe.com/fZuaEX1GbcnoeC64PFenS0G',
+  planElite: 'https://buy.stripe.com/9B67sL3OjafgalQ2HxenS0H',
+  planAllInclusive: 'https://buy.stripe.com/bJeeVddoTafgeC695VenS0I',
+  planTuristaBasico: 'https://buy.stripe.com/6oU14n84zcnoalQci7enS0F',
+  planTuristaPremium: 'https://buy.stripe.com/9B67sL3OjafgalQ2HxenS0H',
+  planTuristaVip: 'https://buy.stripe.com/bJeeVddoTafgeC695VenS0I',
 } as const;
 
 /** Catálogo portal / carrito → Payment Link de Stripe */
@@ -32,8 +32,8 @@ export const STRIPE_ITEM_PRICE_CENTS: Record<string, number> = {
   'plan-pro': 55000,
   'plan-elite': 250000,
   'plan-allinclusive': 1000000,
-  'plan-turista-premium': 350000,
-  'plan-turista-vip': 499000,
+  'plan-turista-premium': 325000,
+  'plan-turista-vip': 1300000,
 };
 
 export const PORTAL_STRIPE_SUCCESS_URL =

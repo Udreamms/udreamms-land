@@ -35,8 +35,8 @@ const PLANS = [
     },
     {
         name: "TURISTA PREMIUM",
-        price: "$3,500",
-        originalPrice: "$4,550",
+        price: "$3,250",
+        originalPrice: "$4,225",
         discount: "30% OFF",
         description: "La experiencia completa y cómoda.",
         highlight: true,
@@ -53,8 +53,8 @@ const PLANS = [
     },
     {
         name: "EXPERIENCIA VIP",
-        price: "$4,990",
-        originalPrice: "$6,500",
+        price: "$13,000",
+        originalPrice: "$16,900",
         discount: "30% OFF",
         description: "Lujo y atención exclusiva.",
         highlight: false,

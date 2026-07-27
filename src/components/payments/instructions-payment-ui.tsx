@@ -4,36 +4,40 @@ import type { LucideIcon } from "lucide-react";
 
 /** Estilos alineados con /visas/tourist: fondo negro, tipografía ligera, iconos sin contenedor ni color. */
 export const instructionsPageClass = {
-  root: "min-h-screen bg-black font-sans text-white flex flex-col",
-  main: "flex-grow pt-28 pb-24 md:pb-32 relative z-10",
-  container: "container mx-auto px-6 max-w-5xl",
+  root: "min-h-screen bg-black font-sans text-white flex flex-col selection:bg-blue-500 selection:text-white",
+  main: "flex-grow pt-20 pb-16 relative z-10",
+  container: "container mx-auto px-4 sm:px-6 max-w-6xl",
   eyebrow:
-    "inline-flex items-center gap-2 px-2 py-1 rounded-full bg-white/10 text-slate-300 font-medium text-[10px] uppercase tracking-widest mb-6 border border-white/5",
-  h1: "text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-white leading-[1.1] mb-4",
-  h1Accent: "text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600",
-  lead: "text-sm md:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed font-normal",
+    "inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-slate-300 font-medium text-[10px] uppercase tracking-widest mb-4 border border-white/5 backdrop-blur-md",
+  h1: "text-2xl md:text-3xl lg:text-4xl font-medium tracking-tighter text-white leading-[1.15] mb-3",
+  h1Accent: "text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-blue-600",
+  lead: "text-xs md:text-sm text-slate-400 max-w-xl mx-auto leading-relaxed font-normal",
   planCard:
-    "relative p-6 md:p-8 rounded-[2rem] text-left transition-all duration-300 border-0 ring-1 w-full",
+    "relative p-3.5 sm:p-4 rounded-xl text-left transition-all duration-300 border w-full backdrop-blur-md",
   planCardCentered:
-    "relative p-6 md:p-8 lg:p-10 rounded-[2rem] text-center transition-all duration-300 border-0 ring-1 w-full flex flex-col items-center",
-  planCardDefault: "bg-black ring-white/5 hover:ring-white/15",
-  planCardSelected: "bg-black ring-slate-500/50 shadow-2xl",
+    "relative rounded-xl transition-all duration-300 border w-full backdrop-blur-md cursor-pointer flex flex-col justify-center items-center",
+  planCardDefault:
+    "bg-transparent border-white/10 hover:border-white/30 hover:bg-white/[0.02]",
+  planCardSelected:
+    "bg-transparent border-white/20 shadow-[0_0_35px_rgba(255,255,255,0.45)] backdrop-blur-md",
   paymentCard:
-    "relative p-6 md:p-8 rounded-[2rem] text-left transition-all duration-300 ring-1 w-full",
+    "relative p-3.5 sm:p-4 rounded-xl text-left transition-all duration-300 border w-full backdrop-blur-md",
   paymentCardCentered:
-    "relative p-6 md:p-8 lg:p-10 rounded-[2rem] text-center transition-all duration-300 ring-1 w-full flex flex-col items-center",
-  paymentCardDefault: "bg-black ring-white/5 hover:ring-white/15",
-  paymentCardSelected: "bg-black ring-slate-500/50",
-  instructionsWrap: "pt-4 md:pt-6",
+    "relative rounded-xl transition-all duration-300 border w-full backdrop-blur-md cursor-pointer flex flex-col justify-center items-center",
+  paymentCardDefault:
+    "bg-transparent border-white/10 hover:border-white/30 hover:bg-white/[0.02]",
+  paymentCardSelected:
+    "bg-transparent border-white/20 shadow-[0_0_35px_rgba(255,255,255,0.45)] backdrop-blur-md",
+  instructionsWrap: "pt-2",
   ctaPrimary:
-    "inline-flex items-center gap-3 px-8 py-3.5 rounded-full text-base font-normal text-white border border-white/40 hover:bg-blue-600 hover:border-blue-600 transition-all duration-300 hover:scale-[1.03]",
-  icon: "w-5 h-5 text-slate-400 shrink-0",
-  iconSm: "w-4 h-4 text-slate-400 shrink-0",
+    "inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-600/25 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 w-full",
+  icon: "w-5 h-5 text-white shrink-0",
+  iconSm: "w-4 h-4 text-white shrink-0",
 } as const;
 
 export function LimitedTimeTag() {
   return (
-    <div className="absolute top-0 right-0 bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] text-white text-[9px] sm:text-[10px] font-medium uppercase tracking-widest px-3 py-1.5 md:px-5 md:py-2 rounded-bl-3xl shadow-lg z-20 pointer-events-none animate-pulse">
+    <div className="absolute top-0 right-0 bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] text-white text-[9px] font-medium uppercase tracking-widest px-3 py-1 rounded-bl-2xl shadow-lg z-20 pointer-events-none animate-pulse">
       Por tiempo limitado
     </div>
   );
@@ -41,11 +45,11 @@ export function LimitedTimeTag() {
 
 export function StepHeader({ number, label }: { number: string; label: string }) {
   return (
-    <div className="flex items-center gap-3 mb-8">
-      <span className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-purple-800 to-purple-400 text-white font-medium text-sm">
-        {number}
-      </span>
-      <h2 className="text-xl md:text-2xl font-medium tracking-tight text-white">{label}</h2>
+    <div className="flex items-center gap-2 mb-6">
+      <h2 className="text-lg md:text-xl font-medium tracking-tight text-white">
+        <span className="text-white font-medium mr-2">{number}.</span>
+        {label}
+      </h2>
     </div>
   );
 }
@@ -60,7 +64,7 @@ export function InstructionGroup({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border-b border-white/5 pb-8 last:border-0 last:pb-0">
+    <section className="pb-8 last:pb-0">
       <h4 className="text-sm font-medium text-white mb-5 flex items-center gap-2.5 uppercase tracking-widest opacity-80">
         <Icon className={instructionsPageClass.icon} strokeWidth={1.5} />
         {title}

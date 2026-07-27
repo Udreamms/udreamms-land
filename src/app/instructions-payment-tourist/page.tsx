@@ -39,23 +39,23 @@ const planDetails: Record<PlanId, {
     title: "Plan Básico",
     subtitle: "Turismo esencial",
     icon: Plane,
-    stripeLink: "https://buy.stripe.com/00w4gzdoT734alQeqfenS0x",
+    stripeLink: "https://buy.stripe.com/6oU14n84zcnoalQci7enS0F",
   },
   premium: {
-    card: "$3,500",
+    card: "$3,250",
     crypto: null,
     title: "Plan Premium",
     subtitle: "Turismo completo",
     icon: Star,
-    stripeLink: "https://buy.stripe.com/00wdR93Ojafgdy2ci7enS0y",
+    stripeLink: "https://buy.stripe.com/9B67sL3OjafgalQ2HxenS0H",
   },
   vip: {
-    card: "$4,990",
+    card: "$13,000",
     crypto: null,
     title: "Experiencia VIP",
     subtitle: "Turismo de lujo",
     icon: Trophy,
-    stripeLink: "https://buy.stripe.com/bJe3cvfx1cnoeC6fujenS0z",
+    stripeLink: "https://buy.stripe.com/bJeeVddoTafgeC695VenS0I",
   },
 };
 
@@ -89,7 +89,7 @@ function InstructionsContent() {
     const planVal = normalizeTouristPlanParam(planParam);
     if (planVal) {
       setSelectedPlan(planVal);
-      setPaymentMethod(PLANS_WITH_CRYPTO.includes(planVal) ? null : 'card');
+      setPaymentMethod(null);
     }
   }, [planParam]);
 
@@ -99,7 +99,7 @@ function InstructionsContent() {
 
   const handlePlanSelect = (plan: PlanId) => {
     setSelectedPlan(plan);
-    setPaymentMethod(PLANS_WITH_CRYPTO.includes(plan) ? null : 'card');
+    setPaymentMethod(null);
     setCheckoutSessionId(null);
     setPaymentApproved(false);
     setApprovedOrder(null);
@@ -137,42 +137,43 @@ function InstructionsContent() {
           </motion.div>
         </div>
 
-        {/* ── Step 1: Select Plan (ancho completo) ── */}
-        <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="mb-20 w-full px-4 sm:px-6 lg:px-10">
-          <div className="max-w-[1600px] mx-auto">
+        {/* ── Step 1: Select Plan ── */}
+        <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="mb-24 md:mb-32 w-full px-4 sm:px-6 lg:px-10">
+          <div className="max-w-[1550px] mx-auto w-full">
             <StepHeader number="1" label="Confirma tu Plan" />
 
             <motion.div
               variants={stagger}
               initial="hidden"
               animate="visible"
-              className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5 lg:gap-6"
+              className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 w-full"
             >
               {(Object.entries(planDetails) as [PlanId, typeof planDetails[PlanId]][]).map(([id, plan]) => {
                 const isSelected = selectedPlan === id;
                 const Icon = plan.icon;
-                const cardClass = `${s.planCardCentered} h-full ${isSelected ? s.planCardSelected : s.planCardDefault}`;
+                const cardClass = `${s.planCardCentered} h-[250px] px-6 py-8 ${isSelected ? s.planCardSelected : s.planCardDefault}`;
 
                 return (
                   <motion.button
                     key={id}
                     variants={fadeInUp}
-                    whileHover={{ y: -4 }}
+                    whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handlePlanSelect(id)}
                     className={cardClass}
                   >
-                    <Icon className={`${s.icon} mb-4 mx-auto`} strokeWidth={1.5} />
-                    <h3 className="text-base md:text-lg font-medium mb-2 text-white leading-tight">{plan.title}</h3>
-                    <p className="text-slate-500 text-xs md:text-sm font-normal mb-6 flex-1">{plan.subtitle}</p>
-                    <div className="w-full">
-                      <p className="text-xs text-slate-500 mb-1">Desde</p>
-                      <p className="text-2xl md:text-3xl font-medium text-white tracking-tighter">{plan.card}</p>
+                    <div className="flex flex-col items-center justify-between h-full w-full py-1 text-center">
+                      <Icon className="w-8 h-8 text-white shrink-0" strokeWidth={1.5} />
+                      <div>
+                        <h3 className="text-lg font-medium text-white leading-tight">{plan.title}</h3>
+                        <p className="text-xs text-slate-400 font-normal mt-1">{plan.subtitle}</p>
+                      </div>
+
+                      <div className="text-center">
+                        <span className="text-[10px] text-slate-500 uppercase tracking-wider font-normal block mb-0.5">Desde</span>
+                        <span className="text-3xl md:text-4xl font-normal text-white tracking-tight">{plan.card}</span>
+                      </div>
                     </div>
-                    <span className={`mt-4 flex items-center justify-center gap-1.5 text-xs font-normal ${isSelected ? 'text-slate-200' : 'text-slate-500'}`}>
-                      {isSelected && <CheckCircle2 className={s.iconSm} strokeWidth={1.5} />}
-                      {isSelected ? 'Seleccionado' : 'Seleccionar'}
-                    </span>
                   </motion.button>
                 );
               })}
@@ -180,24 +181,24 @@ function InstructionsContent() {
           </div>
         </motion.div>
 
-        {/* ── Step 2: Payment Method (ancho completo) ── */}
+        {/* ── Step 2: Payment Method ── */}
         <AnimatePresence mode="wait">
           {selectedPlan && activePlan && (
             <motion.div
               key="payment-method-step"
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              className="mb-20 w-full px-4 sm:px-6 lg:px-10"
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="mb-24 md:mb-32 w-full px-4 sm:px-6 lg:px-10"
             >
-              <div className="max-w-[1600px] mx-auto">
+              <div className="max-w-[1550px] mx-auto w-full">
                 <StepHeader number="2" label="Elige tu Método de Pago" />
 
                 {supportsCrypto ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 lg:gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 w-full">
                     <motion.button
-                      whileHover={{ y: -4 }}
+                      whileHover={{ y: -2 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => {
                         setPaymentMethod('crypto');
@@ -205,62 +206,61 @@ function InstructionsContent() {
                         setApprovedOrder(null);
                         ensureCheckoutSession();
                       }}
-                      className={`${s.paymentCardCentered} overflow-hidden ${paymentMethod === 'crypto' ? s.paymentCardSelected : s.paymentCardDefault}`}
+                      className={`${s.paymentCardCentered} h-[250px] px-6 py-8 overflow-hidden ${paymentMethod === 'crypto' ? s.paymentCardSelected : s.paymentCardDefault}`}
                     >
                       <LimitedTimeTag />
-                      <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-4 flex items-center justify-center gap-1.5">
-                        <Zap className={s.iconSm} strokeWidth={1.5} /> Mejor precio con crypto
-                      </p>
-                      <Wallet className={`${s.icon} mb-4 mx-auto`} strokeWidth={1.5} />
-                      <h3 className="text-xl md:text-2xl font-medium text-white mb-3">Pagar con Crypto</h3>
-                      {paymentMethod === 'crypto' && (
-                        <CheckCircle2 className={`${s.icon} mb-3 mx-auto`} strokeWidth={1.5} />
-                      )}
-                      <p className="text-slate-500 text-sm mb-6 font-normal">USDC · USDT · SOL · LXR</p>
-                      <p className="text-xs text-slate-500 uppercase tracking-widest mb-1">Total a pagar hoy</p>
-                      <p className="text-3xl md:text-4xl font-medium text-white tracking-tighter">{activePlan.crypto}</p>
-                      <p className="text-slate-500 text-sm mt-2 line-through">{activePlan.card}</p>
+                      <div className="flex flex-col items-center justify-between h-full w-full py-1 text-center">
+                        <Wallet className="w-8 h-8 text-white shrink-0" strokeWidth={1.5} />
+                        <div>
+                          <h3 className="text-lg font-medium text-white leading-tight">Pagar con Crypto</h3>
+                          <p className="text-xs text-slate-400 mt-1">USDC · USDT · SOL · LXR</p>
+                        </div>
+
+                        <div className="text-center flex items-baseline justify-center gap-2">
+                          <span className="text-3xl md:text-4xl font-normal text-white tracking-tight">{activePlan.crypto}</span>
+                          <span className="text-xs text-slate-500 line-through font-normal">{activePlan.card}</span>
+                        </div>
+                      </div>
                     </motion.button>
 
                     <motion.button
-                      whileHover={{ y: -4 }}
+                      whileHover={{ y: -2 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => { setPaymentMethod('card'); setPaymentApproved(false); setApprovedOrder(null); }}
-                      className={`${s.paymentCardCentered} ${paymentMethod === 'card' ? s.paymentCardSelected : s.paymentCardDefault}`}
+                      className={`${s.paymentCardCentered} h-[250px] px-6 py-8 ${paymentMethod === 'card' ? s.paymentCardSelected : s.paymentCardDefault}`}
                     >
-                      <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-4 flex items-center justify-center gap-1.5">
-                        <ShieldCheck className={s.iconSm} strokeWidth={1.5} /> Pago seguro Stripe
-                      </p>
-                      <CreditCard className={`${s.icon} mb-4 mx-auto`} strokeWidth={1.5} />
-                      <h3 className="text-xl md:text-2xl font-medium text-white mb-3">Pagar con Tarjeta</h3>
-                      {paymentMethod === 'card' && (
-                        <CheckCircle2 className={`${s.icon} mb-3 mx-auto`} strokeWidth={1.5} />
-                      )}
-                      <p className="text-slate-500 text-sm mb-6 font-normal">Visa · Mastercard · American Express</p>
-                      <p className="text-xs text-slate-500 uppercase tracking-widest mb-1">Total a pagar hoy</p>
-                      <p className="text-3xl md:text-4xl font-medium text-white tracking-tighter">{activePlan.card}</p>
+                      <div className="flex flex-col items-center justify-between h-full w-full py-1 text-center">
+                        <CreditCard className="w-8 h-8 text-white shrink-0" strokeWidth={1.5} />
+                        <div>
+                          <h3 className="text-lg font-medium text-white leading-tight">Pagar con Tarjeta</h3>
+                          <p className="text-xs text-slate-400 mt-1">Visa · Mastercard · AMEX</p>
+                        </div>
+
+                        <div className="text-center">
+                          <span className="text-3xl md:text-4xl font-normal text-white tracking-tight">{activePlan.card}</span>
+                        </div>
+                      </div>
                     </motion.button>
                   </div>
                 ) : (
-                  <div className="max-w-3xl mx-auto">
+                  <div className="w-full">
                     <motion.div
                       initial={{ opacity: 0, y: 16 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className={`${s.paymentCardCentered} ${s.paymentCardSelected}`}
+                      className={`${s.paymentCardCentered} h-[250px] px-6 py-8 ${s.paymentCardSelected}`}
                     >
-                      <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-4 flex items-center justify-center gap-1.5">
-                        <ShieldCheck className={s.iconSm} strokeWidth={1.5} /> Pago seguro Stripe
-                      </p>
-                      <CreditCard className={`${s.icon} mb-4 mx-auto`} strokeWidth={1.5} />
-                      <h3 className="text-xl md:text-2xl font-medium text-white mb-3">Pagar con Tarjeta</h3>
-                      <CheckCircle2 className={`${s.icon} mb-3 mx-auto`} strokeWidth={1.5} />
-                      <p className="text-slate-500 text-sm mb-6 font-normal">Visa · Mastercard · American Express</p>
-                      <p className="text-xs text-slate-500 uppercase tracking-widest mb-1">Total a pagar hoy</p>
-                      <p className="text-3xl md:text-4xl font-medium text-white tracking-tighter">{activePlan.card}</p>
+                      <div className="flex flex-col items-center justify-between h-full w-full py-1 text-center">
+                        <CreditCard className="w-8 h-8 text-white shrink-0" strokeWidth={1.5} />
+                        <div>
+                          <h3 className="text-base font-medium text-white leading-tight">Pagar con Tarjeta</h3>
+                          <p className="text-xs text-slate-400 mt-1">Visa · Mastercard · AMEX</p>
+                        </div>
+
+                        <div className="text-center">
+                          <span className="text-3xl md:text-4xl font-normal text-white tracking-tight">{activePlan.card}</span>
+                        </div>
+                      </div>
                     </motion.div>
-                    <p className="mt-6 text-center text-sm text-slate-400 leading-relaxed max-w-2xl mx-auto font-normal">
-                      <span className="text-slate-300 font-medium">Nota:</span> antes de realizar el pago habla con tu asesor para recibir un descuento o beneficios si pagas con crypto.
-                    </p>
                   </div>
                 )}
               </div>
@@ -309,122 +309,178 @@ function InstructionsContent() {
               </motion.div>
             )}
           </AnimatePresence>
+        </div>
 
-          {/* ── Step 3: Instructions ── */}
-          <AnimatePresence mode="wait">
-            {paymentMethod && selectedPlan && !paymentApproved && (
-              <motion.div
-                key="instructions-step"
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.5, ease: "easeOut", delay: 0.15 }}
-              >
-                <StepHeader number="3" label="Sigue Estas Instrucciones" />
+        {/* ── Step 3: Instructions & Summary ── */}
+        <AnimatePresence mode="wait">
+          {paymentMethod && selectedPlan && activePlan && !paymentApproved && (
+            <motion.div
+              key="instructions-step"
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.5, ease: "easeOut", delay: 0.15 }}
+              className="mb-16 w-full px-4 sm:px-6 lg:px-10"
+            >
+              <div className="max-w-[1550px] mx-auto w-full">
+                <StepHeader number="3" label="Sigue Estas Instrucciones y Completa tu Pago" />
 
-                <div className={s.instructionsWrap}>
-                  <div className="flex items-center gap-3 mb-10 pb-6 border-b border-white/5">
-                    {paymentMethod === 'crypto'
-                      ? <Wallet className={s.icon} strokeWidth={1.5} />
-                      : <CreditCard className={s.icon} strokeWidth={1.5} />}
-                    <div>
-                      <h3 className="text-xl font-medium text-white tracking-tight">
-                        Pago vía {paymentMethod === 'crypto' ? 'Criptomonedas' : 'Tarjeta (Stripe)'}
-                      </h3>
-                      <p className="text-slate-400 text-sm font-normal mt-1">Sigue estos pasos para completar tu solicitud.</p>
-                    </div>
+                <div className="flex flex-col items-center justify-center text-center gap-2 mb-8 pb-2">
+                  {paymentMethod === 'crypto'
+                    ? <Wallet className={s.icon} strokeWidth={1.5} />
+                    : <CreditCard className={s.icon} strokeWidth={1.5} />}
+                  <div>
+                    <h3 className="text-lg md:text-xl font-medium text-white tracking-tight">
+                      Pago vía {paymentMethod === 'crypto' ? 'Criptomonedas' : 'Tarjeta (Stripe)'}
+                    </h3>
+                    <p className="text-slate-400 text-xs md:text-sm font-normal mt-0.5">Sigue estos pasos para completar tu solicitud de forma exitosa.</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+                  {/* Left Column: Instructions */}
+                  <div className="space-y-6">
+
+                    {paymentMethod === 'crypto' ? (
+                      <div className="space-y-6">
+                        <InstructionGroup icon={Smartphone} title="1. En tu Celular">
+                          <StepItem number="1" title="Descarga Phantom Wallet"
+                            description={<>Abre App Store o Google Play y descarga <strong className="text-white">Phantom</strong>. Crea una nueva billetera.</>} />
+                          <StepItem number="2" title="Recarga tu Cuenta"
+                            description={<>Fondea tu cuenta con <strong className="text-white">USDC, USDT, SOL o LXR</strong>.<br /><span className="text-xs text-slate-500 mt-1 block">Contrato LXR: <code className="bg-white/5 border border-white/10 px-2 py-0.5 rounded text-xs text-slate-300 font-mono">7Qm6qUCXGZfGBYYFzq2kTbwTDah5r3d9DcPJHRT8Wdth</code></span></>} />
+                        </InstructionGroup>
+
+                        <InstructionGroup icon={Monitor} title="2. En la Tarjeta a la Derecha">
+                          <StepItem number="3" title="Completa los Datos"
+                            description={<>Ingresa tu nombre y correo en el panel resumen. Se generará tu código QR automático para escanear.</>} />
+                        </InstructionGroup>
+
+                        <InstructionGroup icon={Smartphone} title="3. Escanea y Paga">
+                          <StepItem number="4" title="Confirmación rápida"
+                            description={<>En tu billetera selecciona <strong className="text-white">"Enviar"</strong>, escanea el QR y confirma el pago. Espera unos segundos para ver la pantalla verde de aprobación.</>} />
+                        </InstructionGroup>
+
+                        <InstructionGroup icon={CheckCircle2} title="4. Siguientes Pasos">
+                          <StepItem number="5" title="Comprobante Inmediato"
+                            description="Recibirás tu número de orden y comprobante oficial. Un asesor VIP te contactará en menos de 24h." />
+                        </InstructionGroup>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        <InstructionGroup icon={Monitor} title="1. Pasarela de Pago">
+                          <StepItem number="1" title="Haz clic en Pagar Plan"
+                            description={<>Haz clic en el botón <strong className="text-white">"Pagar {activePlan.title} ({activePlan.card})"</strong> situado en la tarjeta de resumen a la derecha.</>} />
+                          <StepItem number="2" title="Ingresa tus Datos en Stripe"
+                            description={<>Serás redirigido a Stripe para ingresar los datos de tu tarjeta de débito o crédito de manera 100% encriptada y segura.</>} />
+                        </InstructionGroup>
+
+                        <InstructionGroup icon={CheckCircle2} title="2. Confirmación Inmediata">
+                          <StepItem number="3" title="Procesamiento y Factura"
+                            description={<>Al completarse el pago recibirás la factura oficial de Stripe y tu comprobante oficial de Udreamms.</>} />
+                          <StepItem number="4" title="Contacto Asesor VIP"
+                            description={<>Un asesor de Udreamms se comunicará contigo vía WhatsApp o correo en menos de 24 horas para dar inicio a tu proceso de visa.</>} />
+                        </InstructionGroup>
+                      </div>
+                    )}
                   </div>
 
-                  {paymentMethod === 'crypto' ? (
-                    <div className="space-y-8">
-                      <InstructionGroup icon={Smartphone} title="1. En tu Celular">
-                        <StepItem number="1" title="Descarga Phantom Wallet"
-                          description={<>Abre la App Store o Google Play y descarga <strong className="text-white">Phantom</strong> (el ícono morado con un fantasma). Crea una nueva billetera o cuenta.</>} />
-                        <StepItem number="2" title="Recarga tu Cuenta"
-                          description={<>Fondea tu cuenta con la criptomoneda de tu preferencia (<strong className="text-white">USDC, USDT, SOL o LXR</strong>).<br /><span className="text-sm text-slate-500 mt-1 block">Si no encuentras LXR, usa el contrato: <code className="bg-white/5 border border-white/10 px-2 py-1 rounded-lg text-xs text-slate-300 font-mono">7Qm6qUCXGZfGBYYFzq2kTbwTDah5r3d9DcPJHRT8Wdth</code></span></>} />
-                      </InstructionGroup>
+                  {/* Right Column: Payment Box Summary */}
+                  <div className="lg:sticky lg:top-28">
+                    <div className="bg-transparent border border-white/10 rounded-3xl p-8 md:p-12 py-16 md:py-20 shadow-2xl backdrop-blur-md space-y-12 min-h-[580px] flex flex-col justify-between">
+                      <div className="flex items-center justify-between pb-4">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-widest text-slate-400 font-medium mb-1">Resumen de Pedido</p>
+                          <h4 className="text-lg md:text-xl font-medium text-white">{activePlan.title}</h4>
+                          <p className="text-xs text-slate-400 font-normal">{activePlan.subtitle}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-slate-500 uppercase tracking-widest mb-1">Total</p>
+                          <p className="text-2xl md:text-3xl font-medium text-white tracking-tight">
+                            {paymentMethod === 'crypto' ? activePlan.crypto : activePlan.card}
+                          </p>
+                          {paymentMethod === 'crypto' && (
+                            <p className="text-xs text-slate-500 line-through">{activePlan.card}</p>
+                          )}
+                        </div>
+                      </div>
 
-                      <InstructionGroup icon={Monitor} title="2. En esta Página">
-                        <StepItem number="3" title="Completa el formulario de pago"
-                          description={<>Ingresa tu nombre, correo y teléfono en el formulario de abajo. Elige la moneda (USDC, USDT, SOL o LXR) y se generará tu código QR automáticamente.</>} />
-                      </InstructionGroup>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between text-xs text-slate-400">
+                          <span>Método de pago:</span>
+                          <span className="text-slate-200 font-medium flex items-center gap-1.5">
+                            {paymentMethod === 'crypto' ? (
+                              <><Wallet className="w-3.5 h-3.5 text-white" /> Criptomonedas</>
+                            ) : (
+                              <><CreditCard className="w-3.5 h-3.5 text-white" /> Tarjeta (Stripe)</>
+                            )}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-slate-400">
+                          <span>Soporte e inicio:</span>
+                          <span className="text-slate-200 font-medium">Asesor VIP en &lt; 24h</span>
+                        </div>
+                      </div>
 
-                      {checkoutPlanId && checkoutSessionId && (
-                        <div className="mt-2 mb-8 max-w-4xl mx-auto">
-                          <CryptoCheckoutPanel
-                            planId={checkoutPlanId}
-                            sessionId={checkoutSessionId}
-                            onSuccess={handleCryptoPaymentSuccess}
-                            compact
-                            className="w-full"
-                          />
+                      {paymentMethod === 'card' ? (
+                        <div className="space-y-3 pt-2">
+                          <a
+                            href={activePlan.stripeLink}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={s.ctaPrimary}
+                          >
+                            <span>Pagar {activePlan.title} ({activePlan.card})</span>
+                            <ArrowRight className="w-4 h-4 ml-1" />
+                          </a>
+                          <p className="text-[11px] text-slate-400 text-center flex items-center justify-center gap-1 pt-1">
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                            Procesado de forma 100% segura por Stripe
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3 pt-2">
+                          <a
+                            href={`/crypto-pay?plan=${selectedPlan}`}
+                            className={s.ctaPrimary}
+                          >
+                            <span>Pagar {activePlan.title} ({activePlan.crypto})</span>
+                            <ArrowRight className="w-4 h-4 ml-1" />
+                          </a>
+                          <p className="text-[11px] text-slate-400 text-center flex items-center justify-center gap-1 pt-1">
+                            <ShieldCheck className="w-3.5 h-3.5 text-white shrink-0" />
+                            Procesado de forma 100% segura en la red Solana
+                          </p>
                         </div>
                       )}
 
-                      <InstructionGroup icon={Smartphone} title="3. De vuelta en tu Celular">
-                        <StepItem number="4" title="Escanea y Paga"
-                          description={<>En tu billetera, selecciona la moneda y busca el botón <strong className="text-white">"Enviar"</strong>. Usa la opción de escanear, escanea el QR y realiza tu pago. <strong className="text-white">Espera 5 segundos</strong> hasta la pantalla verde de "pago aprobado".</>} />
-                      </InstructionGroup>
-
-                      <InstructionGroup icon={CheckCircle2} title="4. Siguientes Pasos">
-                        <StepItem number="5" title="Revisa tu correo electrónico"
-                          description="Recibirás un comprobante digital oficial de Udreamms con tu número de orden." />
-                        <StepItem number="6" title="Contacto Inmediato"
-                          description="Un asesor VIP se comunicará contigo por WhatsApp o correo en menos de 24 horas para comenzar la auditoría." />
-                      </InstructionGroup>
-                    </div>
-                  ) : (
-                    <div className="space-y-8">
-                      <InstructionGroup icon={Monitor} title="1. En esta Página">
-                        <StepItem number="1" title="Ir a la Pasarela Segura"
-                          description={<>Haz clic en el botón de abajo <strong className="text-white">"Proceder al Pago Seguramente"</strong>. Serás redirigido a la plataforma encriptada de Stripe.</>} />
-                        <StepItem number="2" title="Ingresa tus Datos"
-                          description={<>Completa el formulario con la información de tu <strong className="text-white">tarjeta de crédito o débito</strong>. Tu pago es procesado bajo los más altos estándares de seguridad bancaria.</>} />
-                      </InstructionGroup>
-
-                      <InstructionGroup icon={CheckCircle2} title="2. Confirmación Inmediata">
-                        <StepItem number="3" title="Procesamiento Exitoso"
-                          description={<>Una vez que Stripe apruebe la transacción, verás una pantalla de confirmación. <strong className="text-white">No cierres la ventana</strong> hasta que se haya completado el proceso.</>} />
-                      </InstructionGroup>
-
-                      <InstructionGroup icon={Smartphone} title="3. Siguientes Pasos">
-                        <StepItem number="4" title="Revisa tu correo electrónico"
-                          description="Recibirás automáticamente la factura de Stripe y tu comprobante digital oficial de Udreamms." />
-                        <StepItem number="5" title="Contacto Inmediato"
-                          description="Un asesor VIP se comunicará contigo por WhatsApp o correo en menos de 24 horas para comenzar la auditoría y proceso formal." />
-                      </InstructionGroup>
-                    </div>
-                  )}
-
-                  <div className="mt-12 pt-8 border-t border-white/5 flex justify-center">
-                    {paymentMethod === 'card' && selectedPlan ? (
-                      <a href={planDetails[selectedPlan].stripeLink} target="_blank" rel="noreferrer" className={s.ctaPrimary}>
-                        <Lock className={s.icon} strokeWidth={1.5} />
-                        Proceder al Pago Seguramente
-                        <ArrowRight className={s.icon} strokeWidth={1.5} />
-                      </a>
-                    ) : null}
-                  </div>
-
-                  <div className="mt-10 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="text-center md:text-left">
-                      <p className="font-medium text-white mb-1">¿Tienes alguna duda con el pago?</p>
-                      <p className="text-sm text-slate-400 font-normal">Nuestro equipo está listo para ayudarte.</p>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                      <a href="https://wa.me/13858882799?text=Hola%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n" target="_blank" rel="noreferrer" className={s.ctaPrimary}>
-                        <MessageCircle className={s.iconSm} strokeWidth={1.5} /> WhatsApp
-                      </a>
-                      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=payments@udreamms.com" target="_blank" rel="noreferrer" className={s.ctaPrimary}>
-                        <Mail className={s.iconSm} strokeWidth={1.5} /> Correo
-                      </a>
+                      <div className="pt-4 text-center">
+                        <p className="text-xs text-slate-400 mb-3 font-normal">¿Tienes dudas antes de pagar?</p>
+                        <div className="flex justify-center gap-2">
+                          <a
+                            href="https://wa.me/13858882799?text=Hola%2C%20tengo%20dudas%20con%20mi%20pago"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-300 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1.5"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+                          </a>
+                          <a
+                            href="https://mail.google.com/mail/?view=cm&fs=1&to=payments@udreamms.com"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-300 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1.5"
+                          >
+                            <Mail className="w-3.5 h-3.5" /> Correo
+                          </a>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
       <Footer />
     </div>

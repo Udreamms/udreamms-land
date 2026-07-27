@@ -44,7 +44,8 @@ export default function CryptoCheckoutPanel({
 
   return (
     <div
-      className={`rounded-2xl ring-1 ring-white/10 text-white overflow-visible ${compact ? 'md:rounded-3xl' : 'md:rounded-[2rem]'} ${className}`}
+      className={`bg-transparent text-white overflow-visible ${className}`}
+      suppressHydrationWarning
     >
       <div className={`flex flex-col ${compact ? 'md:flex-row' : 'lg:flex-row'}`}>
         <div className={`w-full ${compact ? 'md:w-1/2 p-4 md:p-5 border-b md:border-b-0 md:border-r border-white/5' : 'lg:w-1/2 border-b lg:border-b-0 lg:border-r border-white/5 p-6 lg:p-8'}`}>
@@ -75,7 +76,7 @@ export default function CryptoCheckoutPanel({
                 USD {priceFormatted}
               </h2>
 
-              <div className="space-y-2 rounded-xl bg-white/5 border border-white/10 p-3">
+              <div className="space-y-2 rounded-xl bg-transparent border border-white/10 p-3">
                 <div className="flex justify-between items-center py-2 border-b border-white/10">
                   <span className="text-xs font-medium text-slate-400">{planTitle}</span>
                   <span className="text-xs font-medium text-slate-200">USD {priceFormatted}</span>

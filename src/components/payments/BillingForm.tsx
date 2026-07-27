@@ -90,10 +90,10 @@ export default function BillingForm({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" suppressHydrationWarning>
       <div>
         <p className="text-xs font-medium text-slate-400 mb-2">Datos de contacto</p>
-        <div className="rounded-lg border border-white/10 bg-white/5">
+        <div className="rounded-lg border border-white/10 bg-transparent">
           <div className="divide-y divide-white/10 overflow-hidden rounded-t-lg">
             <div className="flex items-center gap-2.5 px-4 h-11 focus-within:bg-white/[0.03]">
               <Mail className="w-4 h-4 text-slate-500 shrink-0" strokeWidth={1.5} />
@@ -138,7 +138,7 @@ export default function BillingForm({
 
       <div>
         <p className="text-xs font-medium text-slate-400 mb-2">Dirección de facturación</p>
-        <div className="rounded-lg border border-white/10 overflow-hidden bg-white/5 divide-y divide-white/10">
+        <div className="rounded-lg border border-white/10 overflow-hidden bg-transparent divide-y divide-white/10">
           <div className="relative flex items-center px-4 h-11">
             <select
               value={data.country}
