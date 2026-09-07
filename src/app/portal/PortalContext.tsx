@@ -493,6 +493,9 @@ export function PortalProvider({ children }: { children: ReactNode }) {
     if (typeof window !== 'undefined' && localStorage.getItem('udreamms_bypass') === '@Udreamms2026') {
       return true;
     }
+    if (user?.email && (user.email.toLowerCase().includes('udreamms') || user.email.toLowerCase().includes('udremmas'))) {
+      return true;
+    }
 
     if (!dbUser) return false;
     if (visa === 'estudiante') {

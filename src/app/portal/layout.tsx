@@ -201,10 +201,10 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center font-sans">
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex items-center justify-center font-sans">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 rounded-full border-t-2 border-purple-500 border-r-2 border-r-transparent animate-spin"></div>
-          <span className="text-xs tracking-widest text-white/40 uppercase font-normal">Cargando Portal...</span>
+          <div className="w-8 h-8 rounded-full border-t-2 border-slate-900 border-r-2 border-r-transparent animate-spin"></div>
+          <span className="text-xs tracking-widest text-slate-500 uppercase font-bold">Cargando Portal...</span>
         </div>
       </div>
     );
@@ -220,318 +220,38 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
   const checkoutTotal = getCartTotal(checkoutMethod);
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-purple-500/20 flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-500/20 flex flex-col relative overflow-hidden">
       
       {/* Background ambient glows */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-500/10 rounded-full blur-[120px] pointer-events-none z-0" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none z-0" />
-
-      {/* TOP NAVIGATION BAR */}
-      <header className="sticky top-0 z-40 bg-black/60 backdrop-blur-md border-b border-white/10 h-16 w-full shrink-0">
-        <div className="w-full px-4 md:px-8 h-full flex items-center justify-between">
-          
-          {/* Hamburger Menu & Logo */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              className="p-2 -ml-2 rounded-xl hover:bg-white/5 text-white/80 hover:text-white transition-colors cursor-pointer hidden md:flex items-center justify-center"
-              title="Colapsar Menú"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-            <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push('/')}>
-              <div className="w-7 h-7 relative">
-                <img src="/icons/new-icon-udreamms.png" alt="Udreamms" className="object-contain w-full h-full drop-shadow-[0_0_10px_rgba(168,85,247,0.4)]" />
-              </div>
-              <span className="text-lg font-normal tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">Udreamms</span>
-            </div>
-          </div>
-
-          {/* Menus (Desktop) */}
-          <nav className="hidden md:flex items-center gap-1">
-            <button
-              onClick={() => {
-                setActiveTopSection('visa-estudiante');
-                router.push('/portal/visa-estudiante');
-              }}
-              className={`relative px-4 py-2 text-xs font-normal tracking-wider uppercase rounded-full transition-all duration-300 ${
-                activeTopSection === 'visa-estudiante' ? "text-purple-400 bg-white/5" : "text-white/60 hover:text-white hover:bg-white/5"
-              }`}
-            >
-              Visa de Estudiante F-1
-              {activeTopSection === 'visa-estudiante' && (
-                <motion.div 
-                  layoutId="activeTabIndicator" 
-                  className="absolute bottom-0 left-4 right-4 h-[2px] bg-purple-500"
-                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                />
-              )}
-            </button>
-            <button
-              onClick={() => {
-                setActiveTopSection('visa-turista');
-                router.push('/portal/visa-turista');
-              }}
-              className={`relative px-4 py-2 text-xs font-normal tracking-wider uppercase rounded-full transition-all duration-300 ${
-                activeTopSection === 'visa-turista' ? "text-purple-400 bg-white/5" : "text-white/60 hover:text-white hover:bg-white/5"
-              }`}
-            >
-              Visa de Turista B-2
-              {activeTopSection === 'visa-turista' && (
-                <motion.div 
-                  layoutId="activeTabIndicator" 
-                  className="absolute bottom-0 left-4 right-4 h-[2px] bg-purple-500"
-                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                />
-              )}
-            </button>
-            <button
-              onClick={() => {
-                setActiveTopSection('experto');
-                router.push('/portal/soporte');
-              }}
-              className={`relative px-4 py-2 text-xs font-normal tracking-wider uppercase rounded-full transition-all duration-300 ${
-                activeTopSection === 'experto' ? "text-purple-400 bg-white/5" : "text-white/60 hover:text-white hover:bg-white/5"
-              }`}
-            >
-              Hablar con un experto
-              {activeTopSection === 'experto' && (
-                <motion.div 
-                  layoutId="activeTabIndicator" 
-                  className="absolute bottom-0 left-4 right-4 h-[2px] bg-purple-500"
-                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                />
-              )}
-            </button>
-          </nav>
-
-          {/* Right Header Area (Cart + Profile) */}
-          <div className="flex items-center gap-4 relative z-50">
-            
-            {/* Shopping Cart Button */}
-            <div className="relative">
-              <button
-                onClick={() => setIsCartOpen(!isCartOpen)}
-                className="relative w-9 h-9 rounded-full bg-white/5 border border-white/20 hover:border-purple-500/50 flex items-center justify-center cursor-pointer transition-colors shadow-inner text-white"
-              >
-                <ShoppingCart className="w-4 h-4" />
-                {cart.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-purple-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
-                    {cart.length}
-                  </span>
-                )}
-              </button>
-
-              {/* Cart Dropdown */}
-              <AnimatePresence>
-                {isCartOpen && (
-                  <>
-                    <div className="fixed inset-0 z-40 pointer-events-auto" onClick={() => setIsCartOpen(false)} />
-                    
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                      transition={{ duration: 0.15, ease: "easeOut" }}
-                      className="absolute right-0 mt-3 w-80 rounded-2xl bg-[#0d0d11]/95 backdrop-blur-xl border border-white/10 shadow-2xl p-4 z-50 space-y-4"
-                    >
-                      <div>
-                        <p className="text-xs font-normal tracking-widest text-white/40 uppercase mb-2">Carrito de Compras</p>
-                        {cart.length === 0 ? (
-                          <p className="text-xs text-white/50 py-4 text-center">Tu carrito está vacío</p>
-                        ) : (
-                          <div className="space-y-3 max-h-60 overflow-y-auto pr-1 no-scrollbar">
-                            {cart.map((itemId) => {
-                              const item = cartItemsConfig[itemId];
-                              if (!item) return null;
-                              return (
-                                <div key={itemId} className="flex justify-between items-center gap-2 p-2 rounded-xl bg-white/5 border border-white/5">
-                                  <div className="min-w-0">
-                                    <p className="text-xs font-normal truncate text-white">{item.name}</p>
-                                    <p className="text-[10px] text-purple-400 font-medium">${item.price.toFixed(2)} USD</p>
-                                  </div>
-                                  <button
-                                    onClick={() => removeFromCart(itemId)}
-                                    className="text-[10px] text-red-400 hover:text-red-300 uppercase tracking-wider font-semibold shrink-0"
-                                  >
-                                    Quitar
-                                  </button>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-
-                      {cart.length > 0 && (
-                        <>
-                          <div className="border-t border-white/5" />
-                          <div className="flex justify-between items-center px-1">
-                            <span className="text-xs text-white/50 uppercase tracking-wider">Total</span>
-                            <span className="text-sm font-semibold text-white">
-                              ${checkoutTotal.toFixed(2)} USD
-                            </span>
-                          </div>
-                          <Button
-                            onClick={handleCheckout}
-                            className="w-full h-11 rounded-full bg-transparent border border-white/40 text-white hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg text-xs font-normal tracking-widest uppercase flex items-center justify-center gap-2"
-                          >
-                            Realizar Pago
-                          </Button>
-                        </>
-                      )}
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* User profile dropdown button */}
-            <div className="relative">
-              <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="w-9 h-9 rounded-full overflow-hidden border border-white/20 hover:border-purple-500/50 cursor-pointer transition-colors relative flex items-center justify-center bg-white/5 shadow-inner"
-              >
-                {user.photoURL ? (
-                  <img 
-                    src={user.photoURL} 
-                    alt={user.displayName || "Usuario"} 
-                    className="w-full h-full object-cover" 
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-xs font-normal text-white uppercase tracking-wider">
-                    {userInitials}
-                  </div>
-                )}
-              </button>
-
-              {/* Dropdown Menu */}
-              <AnimatePresence>
-                {isDropdownOpen && (
-                  <>
-                    {/* Backdrop to close dropdown on outer click */}
-                    <div className="fixed inset-0 z-45 pointer-events-auto" onClick={() => setIsDropdownOpen(false)} />
-                    
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                      transition={{ duration: 0.15, ease: "easeOut" }}
-                      className="absolute right-0 mt-3 w-64 rounded-2xl bg-[#0d0d11]/95 backdrop-blur-xl border border-white/10 shadow-2xl p-4 z-50 space-y-3"
-                    >
-                      <div className="px-1 py-1">
-                        <p className="text-xs font-normal tracking-widest text-white/40 uppercase mb-1">Tu Cuenta</p>
-                        <p className="text-sm font-normal truncate text-white">{user.displayName || "Usuario Udreamms"}</p>
-                        <p className="text-xs truncate text-white/50">{user.email}</p>
-                      </div>
-
-                      <div className="border-t border-white/5" />
-
-                      <div className="space-y-1">
-                        <button
-                          onClick={() => {
-                            setIsDropdownOpen(false);
-                            setIsProfileModalOpen(true);
-                          }}
-                          className="w-full h-10 rounded-xl hover:bg-white/5 transition-colors flex items-center gap-3 px-3 text-left text-xs font-normal text-white/80 hover:text-white"
-                        >
-                          <Settings className="w-4 h-4 text-white" />
-                          Administrar Perfil
-                        </button>
-                        
-                        <button
-                          onClick={() => {
-                            setIsDropdownOpen(false);
-                            handleSignOut();
-                          }}
-                          className="w-full h-10 rounded-xl hover:bg-red-500/10 transition-colors flex items-center gap-3 px-3 text-left text-xs font-normal text-red-400 hover:text-red-300"
-                        >
-                          <LogOut className="w-4 h-4" />
-                          Cerrar Sesión
-                        </button>
-                      </div>
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-
-        </div>
-      </header>
-
-      {/* MOBILE NAV BAR */}
-      <div className="md:hidden w-full bg-[#070709] border-b border-white/5 overflow-x-auto no-scrollbar shrink-0 flex items-center py-2 px-4 gap-2 z-30">
-        <button
-          onClick={() => {
-            setActiveTopSection('visa-estudiante');
-            router.push('/portal/visa-estudiante');
-          }}
-          className={`px-4 py-1.5 text-[10px] font-normal tracking-widest uppercase rounded-full shrink-0 transition-all ${
-            activeTopSection === 'visa-estudiante' ? "text-purple-400 bg-transparent border border-purple-500/40" : "text-white/40 border border-transparent"
-          }`}
-        >
-          Visa de Estudiante F-1
-        </button>
-        <button
-          onClick={() => {
-            setActiveTopSection('visa-turista');
-            router.push('/portal/visa-turista');
-          }}
-          className={`px-4 py-1.5 text-[10px] font-normal tracking-widest uppercase rounded-full shrink-0 transition-all ${
-            activeTopSection === 'visa-turista' ? "text-purple-400 bg-transparent border border-purple-500/40" : "text-white/40 border border-transparent"
-          }`}
-        >
-          Visa de Turista B-2
-        </button>
-        <button
-          onClick={() => {
-            setActiveTopSection('experto');
-            router.push('/portal/soporte');
-          }}
-          className={`px-4 py-1.5 text-[10px] font-normal tracking-widest uppercase rounded-full shrink-0 transition-all ${
-            activeTopSection === 'experto' ? "text-purple-400 bg-transparent border border-purple-500/40" : "text-white/40 border border-transparent"
-          }`}
-        >
-          Experto
-        </button>
-      </div>
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-slate-200/40 rounded-full blur-[120px] pointer-events-none z-0" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-100/30 rounded-full blur-[120px] pointer-events-none z-0" />
 
       {/* DASHBOARD CONTENT BODY */}
-      <main className="flex-1 overflow-y-auto relative z-10 py-8 px-4 md:px-8 w-full">
-        <div className="flex flex-col md:flex-row gap-8 items-start w-full">
-          
-          {(activeTopSection === 'visa-estudiante' || activeTopSection === 'visa-turista') && (
-            <PortalSidebar
-              activeTopSection={activeTopSection}
-              activeSection={activeSection}
-              isSidebarCollapsed={isSidebarCollapsed}
-            />
-          )}
+      <main className="flex-1 relative z-10 pt-6 md:pt-8 pb-16 px-4 md:px-8 w-full min-h-screen">
+        <PortalSidebar
+          activeSection={activeSection}
+          isSidebarCollapsed={isSidebarCollapsed}
+          onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        />
 
-          {/* MAIN CONTENT AREA */}
-          <div className="flex-1 min-w-0 w-full">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeSection}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.25, ease: "easeOut" }}
-                className="w-full min-h-[400px]"
-              >
-                {children}
-              </motion.div>
-            </AnimatePresence>
-          </div>
+        {/* MAIN CONTENT AREA */}
+        <div className={`flex-1 min-w-0 w-full transition-all duration-300 ${
+          isSidebarCollapsed ? 'md:pl-24' : 'md:pl-[21.5rem]'
+        }`}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeSection}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="w-full min-h-[400px] max-w-7xl mx-auto"
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </main>
-
-      {/* FOOTER */}
-      <footer className="w-full shrink-0 border-t border-white/5 py-6 mt-12 relative z-10 text-center text-[10px] tracking-[0.2em] uppercase text-white/30">
-        Udreamms Portal © 2026. Todos los derechos reservados.
-      </footer>
 
       {/* ACCOUNT MANAGEMENT MODAL */}
       <AnimatePresence>

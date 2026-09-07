@@ -19,12 +19,12 @@ export default function CursoPage() {
   const unlocked = isUnlocked('curso', isStudent ? 'estudiante' : 'turista');
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-slate-900">
       <div>
-        <h2 className="text-2xl md:text-3xl font-normal tracking-tight">
+        <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">
           Master class express
         </h2>
-        <p className="text-sm text-white/50">Capacítate con nuestros videocursos prácticos dictados por mentores autorizados.</p>
+        <p className="text-sm text-slate-500">Capacítate con nuestros videocursos prácticos dictados por mentores autorizados.</p>
       </div>
 
       <div className="relative min-h-[450px]">
@@ -32,12 +32,12 @@ export default function CursoPage() {
           <LockOverlay itemId={isStudent ? 'curso-estudiante' : 'curso-turista'} />
         )}
 
-        <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 ${!unlocked ? 'filter blur-sm select-none pointer-events-none' : ''}`}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Video Player Area */}
-          <div className="lg:col-span-2 bg-[#0d0d11] border border-white/5 rounded-3xl overflow-hidden flex flex-col">
+          <div className="lg:col-span-2 bg-white border border-slate-200 shadow-xl rounded-3xl overflow-hidden flex flex-col">
             {isStudent ? (
-              <div className="aspect-video bg-zinc-950 w-full relative flex items-center justify-center border-b border-white/5">
+              <div className="aspect-video bg-slate-900 w-full relative flex items-center justify-center border-b border-slate-200">
                 <video
                   key={studentModules[activeStudentStep].videoUrl}
                   src={studentModules[activeStudentStep].videoUrl}
@@ -47,7 +47,7 @@ export default function CursoPage() {
               </div>
             ) : (
               touristModules[activeTouristStep].videoUrl ? (
-                <div className="aspect-video bg-zinc-950 w-full relative flex items-center justify-center border-b border-white/5">
+                <div className="aspect-video bg-slate-900 w-full relative flex items-center justify-center border-b border-slate-200">
                   <video
                     key={touristModules[activeTouristStep].videoUrl}
                     src={touristModules[activeTouristStep].videoUrl}
@@ -56,20 +56,19 @@ export default function CursoPage() {
                   />
                 </div>
               ) : (
-                <div className="aspect-video bg-zinc-950 w-full relative flex items-center justify-center border-b border-white/5 group">
-                  <div className="absolute inset-0 bg-purple-500/5 group-hover:bg-purple-500/0 transition-all pointer-events-none" />
-                  <Video className="w-16 h-16 text-white/40 group-hover:text-white transition-all cursor-pointer" />
-                  <span className="absolute bottom-4 left-4 px-3 py-1 rounded bg-black/60 backdrop-blur text-[10px] font-normal tracking-wider text-white/80">Vista previa del curso</span>
+                <div className="aspect-video bg-slate-900 w-full relative flex items-center justify-center border-b border-slate-200 group">
+                  <Video className="w-16 h-16 text-white/80 group-hover:text-white transition-all cursor-pointer" />
+                  <span className="absolute bottom-4 left-4 px-3 py-1 rounded-full bg-black/60 text-[10px] font-bold tracking-wider text-white uppercase">Vista previa del curso</span>
                 </div>
               )
             )}
             <div className="p-6 space-y-2">
-              <h3 className="text-lg font-normal">
+              <h3 className="text-lg font-bold text-slate-900">
                 {isStudent 
                   ? studentModules[activeStudentStep].title 
                   : touristModules[activeTouristStep].title}
               </h3>
-              <p className="text-xs text-white/50 leading-relaxed">
+              <p className="text-xs text-slate-600 leading-relaxed">
                 {isStudent
                   ? studentModules[activeStudentStep].description
                   : touristModules[activeTouristStep].description}
@@ -78,10 +77,10 @@ export default function CursoPage() {
           </div>
 
           {/* Modules List */}
-          <div className="bg-[#0d0d11]/80 backdrop-blur-md border border-white/5 rounded-3xl p-6 space-y-4">
-            <h3 className="text-md font-normal tracking-wide border-b border-white/5 pb-2">Módulos del Curso</h3>
+          <div className="bg-white border border-slate-200 shadow-xl rounded-3xl p-6 space-y-4">
+            <h3 className="text-md font-bold text-slate-900 tracking-wide border-b border-slate-100 pb-3">Módulos del Curso</h3>
             
-            <div className="space-y-2 overflow-y-auto max-h-[350px] pr-2 no-scrollbar">
+            <div className="space-y-2 overflow-y-auto max-h-[350px] pr-2">
               {isStudent ? (
                 studentModules.map((mod, index) => {
                   const isActive = activeStudentStep === index;
@@ -91,15 +90,15 @@ export default function CursoPage() {
                       onClick={() => setActiveStudentStep(index)}
                       className={`p-3 rounded-2xl transition-all flex items-center justify-between cursor-pointer group ${
                         isActive 
-                          ? "bg-purple-500/10 border border-purple-500/20" 
-                          : "hover:bg-white/5 border border-transparent"
+                          ? "bg-blue-50 border border-blue-200 text-blue-700" 
+                          : "hover:bg-slate-50 border border-slate-100 text-slate-700"
                       }`}
                     >
-                      <span className={`text-xs ${isActive ? "font-normal text-purple-400" : "text-white/80 group-hover:text-white"}`}>
+                      <span className={`text-xs font-medium ${isActive ? "font-bold text-blue-700" : "text-slate-700 group-hover:text-slate-900"}`}>
                         {mod.title}
                       </span>
                       {isActive && (
-                        <span className="text-[10px] font-normal text-purple-400 bg-purple-500/20 px-2 py-0.5 rounded uppercase">
+                        <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded-full uppercase">
                           Viendo
                         </span>
                       )}
@@ -115,15 +114,15 @@ export default function CursoPage() {
                       onClick={() => setActiveTouristStep(index)}
                       className={`p-3 rounded-2xl transition-all flex items-center justify-between cursor-pointer group ${
                         isActive 
-                          ? "bg-purple-500/10 border border-purple-500/20" 
-                          : "hover:bg-white/5 border border-transparent"
+                          ? "bg-blue-50 border border-blue-200 text-blue-700" 
+                          : "hover:bg-slate-50 border border-slate-100 text-slate-700"
                       }`}
                     >
-                      <span className={`text-xs ${isActive ? "font-normal text-purple-400" : "text-white/80 group-hover:text-white"}`}>
+                      <span className={`text-xs font-medium ${isActive ? "font-bold text-blue-700" : "text-slate-700 group-hover:text-slate-900"}`}>
                         {mod.title}
                       </span>
                       {isActive && (
-                        <span className="text-[10px] font-normal text-purple-400 bg-purple-500/20 px-2 py-0.5 rounded uppercase">
+                        <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded-full uppercase">
                           Viendo
                         </span>
                       )}

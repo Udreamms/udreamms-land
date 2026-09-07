@@ -1,120 +1,384 @@
 'use client';
 
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   GraduationCap,
-  Briefcase,
   BookOpen,
   Video,
   Download,
   Home,
   ShoppingBag,
+  Menu,
+  Headphones,
+  ShoppingCart,
+  Settings,
+  LogOut,
 } from 'lucide-react';
+import { usePortal, cartItemsConfig } from '../PortalContext';
+import { Button } from '@/components/ui/button';
 
 interface PortalSidebarProps {
-  activeTopSection: 'visa-estudiante' | 'visa-turista' | 'experto';
+  activeTopSection?: string;
   activeSection: string;
   isSidebarCollapsed: boolean;
+  onToggleSidebar?: () => void;
 }
 
 export default function PortalSidebar({
-  activeTopSection,
   activeSection,
   isSidebarCollapsed,
+  onToggleSidebar,
 }: PortalSidebarProps) {
-  if (activeTopSection !== 'visa-estudiante' && activeTopSection !== 'visa-turista') {
-    return null;
-  }
+  const {
+    user,
+    cart,
+    isCartOpen,
+    setIsCartOpen,
+    isDropdownOpen,
+    setIsDropdownOpen,
+    setIsProfileModalOpen,
+    handleSignOut,
+    removeFromCart,
+    getCartTotal,
+    handleCheckout,
+    checkoutMethod,
+  } = usePortal();
 
-  const isStudent = activeTopSection === 'visa-estudiante';
-  const plansHref = isStudent ? '/portal/visa-estudiante' : '/portal/visa-turista';
-  const plansLabel = isStudent ? 'Planes Visa F-1' : 'Planes Visa B-2';
-  const procesoLabel = isStudent ? 'Mi proceso de admisión' : 'Mi proceso de solicitud';
-  const sectionLabel = isStudent ? 'Visa de Estudiante F-1' : 'Visa de Turista B-2';
-  const landingHref = isStudent
-    ? 'https://www.udreamms.com/visas/student'
-    : 'https://www.udreamms.com/visas/tourist';
+  const userInitials = user?.displayName
+    ? user.displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
+    : user?.email
+    ? user.email.slice(0, 2).toUpperCase()
+    : 'UD';
+
+  const checkoutTotal = getCartTotal(checkoutMethod);
 
   const linkClass = (isActive: boolean) =>
-    `px-4 py-2.5 md:py-3 text-[10px] md:text-xs font-normal tracking-widest md:tracking-wider uppercase rounded-full md:rounded-xl shrink-0 transition-all duration-300 flex items-center gap-3 ${
+    `px-4 py-2.5 md:py-3 text-[10px] md:text-xs tracking-widest md:tracking-wider uppercase rounded-full md:rounded-xl shrink-0 transition-all duration-300 flex items-center gap-3 ${
       isSidebarCollapsed ? 'justify-center' : 'justify-start text-left'
     } ${
       isActive
-        ? 'text-purple-400 bg-white/5 border border-purple-500/30'
-        : 'text-white/60 hover:text-white hover:bg-white/5 border border-transparent'
+        ? 'text-white bg-slate-900 font-bold shadow-md'
+        : 'text-slate-600 hover:text-black hover:bg-slate-100 border border-transparent font-medium'
     }`;
 
   return (
     <aside
-      className={`shrink-0 flex flex-row md:flex-col gap-2 overflow-x-auto no-scrollbar pb-2 md:pb-0 border-b md:border-b-0 md:border-r border-white/5 transition-all duration-300 ${
-        isSidebarCollapsed ? 'w-full md:w-20 md:pr-2' : 'w-full md:w-64 md:pr-6'
+      className={`shrink-0 fixed top-[18px] left-[18px] z-40 flex flex-col justify-between h-[calc(100vh-36px)] bg-white border border-slate-200 rounded-3xl p-3 md:p-4 shadow-[0_10px_35px_rgba(0,0,0,0.06)] text-black overflow-y-auto no-scrollbar transition-all duration-300 ${
+        isSidebarCollapsed ? 'w-20' : 'w-80'
       }`}
     >
-      {!isSidebarCollapsed && (
-        <div className="hidden md:block px-3 py-1.5 text-[10px] font-semibold tracking-widest text-white/40 uppercase mb-2">
-          {sectionLabel}
-        </div>
-      )}
-
-      <Link
-        href="/portal/proceso"
-        title={isSidebarCollapsed ? procesoLabel : undefined}
-        className={linkClass(activeSection === 'proceso')}
-      >
-        {isStudent ? (
-          <GraduationCap className="w-4 h-4 shrink-0" />
+      <div className="flex flex-col gap-2">
+        {/* Header with Udreamms Logo & Hamburger Toggle */}
+        {isSidebarCollapsed ? (
+          <div className="hidden md:flex flex-col items-center gap-3 mb-4 pb-3 border-b border-slate-100 px-1">
+            <button
+              onClick={onToggleSidebar}
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-black border border-slate-200 transition-all duration-200 cursor-pointer flex items-center justify-center shadow-sm"
+              title="Expandir menú"
+            >
+              <Menu className="w-4 h-4 shrink-0 text-black" />
+            </button>
+            <Link href="/" title="Udreamms" className="w-7 h-7 relative cursor-pointer group">
+              <img
+                src="/icons/new-icon-udreamms.png"
+                alt="Udreamms"
+                className="object-contain w-full h-full group-hover:scale-110 transition-transform"
+              />
+            </Link>
+          </div>
         ) : (
-          <Briefcase className="w-4 h-4 shrink-0" />
+          <div className="hidden md:flex items-center justify-between mb-4 pb-3 border-b border-slate-100 px-2">
+            <Link href="/" className="flex items-center gap-2 cursor-pointer group">
+              <div className="w-7 h-7 relative shrink-0">
+                <img
+                  src="/icons/new-icon-udreamms.png"
+                  alt="Udreamms"
+                  className="object-contain w-full h-full group-hover:scale-105 transition-transform"
+                />
+              </div>
+              <span className="text-lg font-bold tracking-tight text-black">
+                Udreamms
+              </span>
+            </Link>
+            <button
+              onClick={onToggleSidebar}
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-black border border-slate-200 transition-all duration-200 cursor-pointer flex items-center justify-center shadow-sm shrink-0"
+              title="Colapsar menú"
+            >
+              <Menu className="w-4 h-4 shrink-0 text-black" />
+            </button>
+          </div>
         )}
-        {!isSidebarCollapsed && <span>{procesoLabel}</span>}
-      </Link>
 
-      <Link
-        href={plansHref}
-        title={isSidebarCollapsed ? plansLabel : undefined}
-        className={linkClass(activeSection === 'visa-estudiante' || activeSection === 'visa-turista')}
-      >
-        <ShoppingBag className="w-4 h-4 shrink-0" />
-        {!isSidebarCollapsed && <span>{plansLabel}</span>}
-      </Link>
+        <Link
+          href="/portal/proceso"
+          title={isSidebarCollapsed ? 'Mi proceso' : undefined}
+          className={linkClass(activeSection === 'proceso')}
+        >
+          <GraduationCap className={`w-4 h-4 shrink-0 ${activeSection === 'proceso' ? 'text-white' : 'text-black'}`} />
+          {!isSidebarCollapsed && <span>Mi proceso</span>}
+        </Link>
 
-      <Link
-        href="/portal/curso"
-        title={isSidebarCollapsed ? 'Master class express' : undefined}
-        className={linkClass(activeSection === 'curso')}
-      >
-        <Video className="w-4 h-4 shrink-0" />
-        {!isSidebarCollapsed && <span>Master class express</span>}
-      </Link>
+        <Link
+          href="/portal/planes"
+          title={isSidebarCollapsed ? 'Planes' : undefined}
+          className={linkClass(
+            activeSection === 'planes' ||
+              activeSection === 'visa-estudiante' ||
+              activeSection === 'visa-turista'
+          )}
+        >
+          <ShoppingBag className={`w-4 h-4 shrink-0 ${activeSection === 'planes' || activeSection === 'visa-estudiante' || activeSection === 'visa-turista' ? 'text-white' : 'text-black'}`} />
+          {!isSidebarCollapsed && <span>Planes</span>}
+        </Link>
 
-      <Link
-        href="/portal/libro"
-        title={isSidebarCollapsed ? 'Libro digital' : undefined}
-        className={linkClass(activeSection === 'libro')}
-      >
-        <BookOpen className="w-4 h-4 shrink-0" />
-        {!isSidebarCollapsed && <span>Libro digital</span>}
-      </Link>
+        <Link
+          href="/portal/curso"
+          title={isSidebarCollapsed ? 'Master class express' : undefined}
+          className={linkClass(activeSection === 'curso')}
+        >
+          <Video className={`w-4 h-4 shrink-0 ${activeSection === 'curso' ? 'text-white' : 'text-black'}`} />
+          {!isSidebarCollapsed && <span>Master class express</span>}
+        </Link>
 
-      <Link
-        href="/portal/recursos"
-        title={isSidebarCollapsed ? 'Recursos adicionales' : undefined}
-        className={linkClass(activeSection === 'recursos')}
-      >
-        <Download className="w-4 h-4 shrink-0" />
-        {!isSidebarCollapsed && <span>Recursos adicionales</span>}
-      </Link>
+        <Link
+          href="/portal/libro"
+          title={isSidebarCollapsed ? 'Libro digital' : undefined}
+          className={linkClass(activeSection === 'libro')}
+        >
+          <BookOpen className={`w-4 h-4 shrink-0 ${activeSection === 'libro' ? 'text-white' : 'text-black'}`} />
+          {!isSidebarCollapsed && <span>Libro digital</span>}
+        </Link>
 
-      <a
-        href={landingHref}
-        target="_blank"
-        rel="noopener noreferrer"
-        title={isSidebarCollapsed ? 'Sitio web' : undefined}
-        className={`${linkClass(false)} opacity-80`}
-      >
-        <Home className="w-4 h-4 shrink-0" />
-        {!isSidebarCollapsed && <span>Sitio web</span>}
-      </a>
+        <Link
+          href="/portal/recursos"
+          title={isSidebarCollapsed ? 'Recursos adicionales' : undefined}
+          className={linkClass(activeSection === 'recursos')}
+        >
+          <Download className={`w-4 h-4 shrink-0 ${activeSection === 'recursos' ? 'text-white' : 'text-black'}`} />
+          {!isSidebarCollapsed && <span>Recursos adicionales</span>}
+        </Link>
+
+        <Link
+          href="/portal/soporte"
+          title={isSidebarCollapsed ? 'Hablar con un experto' : undefined}
+          className={linkClass(activeSection === 'soporte')}
+        >
+          <Headphones className={`w-4 h-4 shrink-0 ${activeSection === 'soporte' ? 'text-white' : 'text-black'}`} />
+          {!isSidebarCollapsed && <span>Hablar con un experto</span>}
+        </Link>
+
+        <a
+          href="https://www.udreamms.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          title={isSidebarCollapsed ? 'Sitio web' : undefined}
+          className={linkClass(false)}
+        >
+          <Home className="w-4 h-4 shrink-0 text-black" />
+          {!isSidebarCollapsed && <span>Sitio web</span>}
+        </a>
+      </div>
+
+      {/* Bottom Footer Section: Cart & User Account */}
+      <div className="mt-8 pt-4 border-t border-slate-100 flex flex-col gap-2 relative">
+        {/* Shopping Cart Button */}
+        <div className="relative">
+          <button
+            onClick={() => setIsCartOpen(!isCartOpen)}
+            className={`w-full py-2.5 px-3 rounded-xl border border-slate-200 hover:border-slate-400 bg-slate-50 hover:bg-slate-100 transition-all duration-200 flex items-center gap-3 cursor-pointer text-black ${
+              isSidebarCollapsed ? 'justify-center' : 'justify-between'
+            }`}
+            title="Carrito de Compras"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="relative shrink-0">
+                <ShoppingCart className="w-4 h-4 text-black" />
+                {cart.length > 0 && (
+                  <span className="absolute -top-1.5 -right-2 bg-slate-900 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                    {cart.length}
+                  </span>
+                )}
+              </div>
+              {!isSidebarCollapsed && (
+                <span className="text-xs font-semibold tracking-wider uppercase text-slate-800">Carrito</span>
+              )}
+            </div>
+
+            {!isSidebarCollapsed && cart.length > 0 && (
+              <span className="bg-slate-900 text-white border border-slate-900 px-2 py-0.5 rounded-full text-[9px] font-bold">
+                {cart.length}
+              </span>
+            )}
+          </button>
+
+          {/* Cart Dropdown */}
+          <AnimatePresence>
+            {isCartOpen && (
+              <>
+                <div className="fixed inset-0 z-40 pointer-events-auto" onClick={() => setIsCartOpen(false)} />
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                  transition={{ duration: 0.15, ease: 'easeOut' }}
+                  className={`absolute z-50 w-80 rounded-2xl bg-white border border-slate-200 shadow-2xl p-4 space-y-4 text-black ${
+                    isSidebarCollapsed ? 'left-full bottom-0 ml-3' : 'left-0 bottom-full mb-3'
+                  }`}
+                >
+                  <div>
+                    <p className="text-xs font-bold tracking-widest text-slate-500 uppercase mb-2">
+                      Carrito de Compras
+                    </p>
+                    {cart.length === 0 ? (
+                      <p className="text-xs text-slate-500 py-4 text-center">Tu carrito está vacío</p>
+                    ) : (
+                      <div className="space-y-3 max-h-60 overflow-y-auto pr-1 no-scrollbar">
+                        {cart.map((itemId) => {
+                          const item = cartItemsConfig[itemId];
+                          if (!item) return null;
+                          return (
+                            <div
+                              key={itemId}
+                              className="flex justify-between items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200"
+                            >
+                              <div className="min-w-0">
+                                <p className="text-xs font-bold truncate text-black">{item.name}</p>
+                                <p className="text-[10px] text-slate-700 font-bold">
+                                  ${item.price.toFixed(2)} USD
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => removeFromCart(itemId)}
+                                className="text-[10px] text-slate-600 hover:text-black uppercase tracking-wider font-bold shrink-0"
+                              >
+                                Quitar
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {cart.length > 0 && (
+                    <>
+                      <div className="border-t border-slate-100" />
+                      <div className="flex justify-between items-center px-1">
+                        <span className="text-xs text-slate-600 uppercase tracking-wider font-semibold">Total</span>
+                        <span className="text-sm font-bold text-black">
+                          ${checkoutTotal.toFixed(2)} USD
+                        </span>
+                      </div>
+                      <Button
+                        onClick={handleCheckout}
+                        className="w-full h-11 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 text-xs font-bold tracking-widest uppercase flex items-center justify-center gap-2 transition-all duration-300"
+                      >
+                        Realizar Pago
+                      </Button>
+                    </>
+                  )}
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* User Account Profile Button */}
+        {user && (
+          <div className="relative">
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className={`w-full p-2 rounded-xl border border-slate-200 hover:border-slate-400 bg-slate-50 hover:bg-slate-100 transition-all duration-200 flex items-center gap-3 cursor-pointer text-black ${
+                isSidebarCollapsed ? 'justify-center' : 'justify-start'
+              }`}
+              title={user.displayName || user.email || 'Mi Cuenta'}
+            >
+              <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-300 shrink-0 relative flex items-center justify-center bg-slate-900 shadow-sm text-white font-bold">
+                {user.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt={user.displayName || 'Usuario'}
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <span className="text-[10px] font-bold text-white uppercase tracking-wider">
+                    {userInitials}
+                  </span>
+                )}
+              </div>
+
+              {!isSidebarCollapsed && (
+                <div className="min-w-0 text-left flex-1">
+                  <p className="text-xs font-bold text-black truncate leading-tight">
+                    {user.displayName || 'Usuario Udreamms'}
+                  </p>
+                  <p className="text-[10px] text-slate-500 truncate leading-tight mt-0.5 font-medium">
+                    {user.email}
+                  </p>
+                </div>
+              )}
+            </button>
+
+            {/* Profile Dropdown */}
+            <AnimatePresence>
+              {isDropdownOpen && (
+                <>
+                  <div className="fixed inset-0 z-40 pointer-events-auto" onClick={() => setIsDropdownOpen(false)} />
+
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                    transition={{ duration: 0.15, ease: 'easeOut' }}
+                    className={`absolute z-50 w-64 rounded-2xl bg-white border border-slate-200 shadow-2xl p-4 space-y-3 text-black ${
+                      isSidebarCollapsed ? 'left-full bottom-0 ml-3' : 'left-0 bottom-full mb-3'
+                    }`}
+                  >
+                    <div className="px-1 py-1">
+                      <p className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-1">
+                        Tu Cuenta
+                      </p>
+                      <p className="text-sm font-bold truncate text-black">
+                        {user.displayName || 'Usuario Udreamms'}
+                      </p>
+                      <p className="text-xs truncate text-slate-500 font-medium">{user.email}</p>
+                    </div>
+
+                    <div className="border-t border-slate-100" />
+
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => {
+                          setIsDropdownOpen(false);
+                          setIsProfileModalOpen(true);
+                        }}
+                        className="w-full h-10 rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-3 px-3 text-left text-xs font-semibold text-slate-700 hover:text-black"
+                      >
+                        <Settings className="w-4 h-4 text-black" />
+                        Administrar Perfil
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setIsDropdownOpen(false);
+                          handleSignOut();
+                        }}
+                        className="w-full h-10 rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-3 px-3 text-left text-xs font-semibold text-slate-600 hover:text-black"
+                      >
+                        <LogOut className="w-4 h-4 text-black" />
+                        Cerrar Sesión
+                      </button>
+                    </div>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+      </div>
     </aside>
   );
 }

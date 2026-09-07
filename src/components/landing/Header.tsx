@@ -165,8 +165,8 @@ export default function Header() {
           <div className="hidden lg:flex items-center gap-3 z-50">
             {/* Solo mostrar Staff si NO es landing de visa, o podrías dejarlo oculto si quieres algo más limpio */}
             {!isVisaLandingPage && (
-              <Link href="/portal" className="text-[10px] font-medium text-gray-400 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1.5 opacity-80 hover:opacity-100 mr-1">
-                <Lock className="w-3 h-3" /> Staff
+              <Link href="/staff" className="text-[10px] font-medium text-gray-400 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1.5 opacity-80 hover:opacity-100 mr-1">
+                <Lock className="w-3 h-3 text-white" /> Staff
               </Link>
             )}
 
