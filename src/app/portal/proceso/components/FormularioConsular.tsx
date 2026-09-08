@@ -25,12 +25,13 @@ import { usePortal } from "../../PortalContext";
 
 interface FormularioConsularProps {
   isStudent: boolean;
+  applicantId?: string;
   onNameChange?: (name: string) => void;
 }
 
-export default function FormularioConsular({ isStudent, onNameChange }: FormularioConsularProps) {
+export default function FormularioConsular({ isStudent, applicantId, onNameChange }: FormularioConsularProps) {
   const { user } = usePortal();
-  const storageKey = `udreamms_form_${isStudent ? 'f1' : 'b2'}`;
+  const storageKey = applicantId ? `udreamms_form_${isStudent ? 'f1' : 'b2'}_${applicantId}` : `udreamms_form_${isStudent ? 'f1' : 'b2'}`;
 
   // Form State initialized from localStorage if available
   const [formData, setFormData] = useState<Record<string, string>>(() => {
@@ -43,13 +44,28 @@ export default function FormularioConsular({ isStudent, onNameChange }: Formular
     return {};
   });
 
+  // Reload formData when switching applicants or visa types
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setFormData(parsed);
+          return;
+        } catch (e) {}
+      }
+      setFormData({});
+    }
+  }, [storageKey]);
+
   // Background sync to cloud/Firebase
   useEffect(() => {
     if (Object.keys(formData).length === 0) return;
 
     const timer = setTimeout(async () => {
       try {
-        const photoKey = isStudent ? 'udreamms_photo_f1' : 'udreamms_photo_b2';
+        const photoKey = applicantId ? `udreamms_photo_${isStudent ? 'f1' : 'b2'}_${applicantId}` : `udreamms_photo_${isStudent ? 'f1' : 'b2'}`;
         const photoUrl = typeof window !== 'undefined' ? localStorage.getItem(photoKey) : null;
 
         await fetch('/api/portal/submission', {
@@ -57,6 +73,7 @@ export default function FormularioConsular({ isStudent, onNameChange }: Formular
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             visaType: isStudent ? 'F-1' : 'B-2',
+            applicantId: applicantId || '1',
             formData,
             photoUrl,
             userEmail: user?.email || formData.email_contacto || '',
@@ -70,7 +87,7 @@ export default function FormularioConsular({ isStudent, onNameChange }: Formular
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [formData, isStudent, user]);
+  }, [formData, isStudent, applicantId, user]);
 
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     sec1: true,

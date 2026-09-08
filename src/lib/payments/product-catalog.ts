@@ -10,10 +10,22 @@ export interface ProductCatalogEntry {
 }
 
 export const PRODUCT_CATALOG: Record<string, ProductCatalogEntry> = {
+  'sevis': {
+    name: 'Tarifa SEVIS (I-901)',
+    cardPriceUsd: 368,
+    cryptoPriceUsd: 368,
+    stripePaymentLink: null,
+  },
+  'entrevista-embajada': {
+    name: 'Cita para la Entrevista en la Embajada (MRV)',
+    cardPriceUsd: 195,
+    cryptoPriceUsd: 195,
+    stripePaymentLink: null,
+  },
   'curso-estudiante': {
     name: 'Master class express - Visa de Estudiante F-1',
-    cardPriceUsd: 9.99,
-    cryptoPriceUsd: 9.99,
+    cardPriceUsd: 99.99,
+    cryptoPriceUsd: 99.99,
     stripePaymentLink: null,
   },
   'libro-estudiante': {
@@ -24,8 +36,8 @@ export const PRODUCT_CATALOG: Record<string, ProductCatalogEntry> = {
   },
   'curso-turista': {
     name: 'Master class express - Visa de Turista B-2',
-    cardPriceUsd: 9.99,
-    cryptoPriceUsd: 9.99,
+    cardPriceUsd: 99.99,
+    cryptoPriceUsd: 99.99,
     stripePaymentLink: null,
   },
   'libro-turista': {

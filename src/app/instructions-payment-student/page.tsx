@@ -212,7 +212,7 @@ function InstructionsContent() {
                       <div className="flex flex-col items-center justify-between h-full w-full py-1 text-center">
                         <Wallet className="w-8 h-8 text-white shrink-0" strokeWidth={1.5} />
                         <div>
-                          <h3 className="text-lg font-medium text-white leading-tight">Pagar con Crypto</h3>
+                          <h3 className="text-lg font-medium text-white leading-tight">Pagar con Stablecoin</h3>
                           <p className="text-xs text-slate-400 mt-1">USDC · USDT · SOL · LXR</p>
                         </div>
 

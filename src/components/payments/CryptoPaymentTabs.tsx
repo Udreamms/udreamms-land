@@ -22,6 +22,8 @@ interface CryptoPaymentTabsProps {
   onSuccess: (details: { requestId: string; paymentSignature?: string | null }) => void;
   compact?: boolean;
   accent?: 'blue' | 'purple';
+  theme?: 'light' | 'dark';
+  userId?: string;
 }
 
 export default function CryptoPaymentTabs({
@@ -36,9 +38,13 @@ export default function CryptoPaymentTabs({
   onSuccess,
   compact = false,
   accent = 'blue',
+  theme = 'dark',
+  userId,
 }: CryptoPaymentTabsProps) {
   const { ready: lxrReady } = useLxrPaymentReady();
   const lxrLaunchLabel = getLxrLaunchLabel();
+  const isLight = theme === 'light';
+
   const activeAccent =
     accent === 'purple'
       ? 'data-[state=active]:bg-purple-600 data-[state=active]:text-white'
@@ -55,13 +61,19 @@ export default function CryptoPaymentTabs({
   return (
     <Tabs defaultValue="usdc" className="w-full">
       <TabsList
-        className={`grid w-full bg-white/5 border border-white/10 rounded-xl p-1 mb-4 ${compact ? 'h-9' : 'h-10'} ${paymentMethods.length === 4 ? 'grid-cols-4' : 'grid-cols-3'}`}
+        className={`grid w-full rounded-xl p-1 mb-3 ${compact ? 'h-8.5' : 'h-10'} ${
+          isLight
+            ? 'bg-slate-100 border border-slate-200/80 shadow-2xs'
+            : 'bg-white/5 border border-white/10'
+        } ${paymentMethods.length === 4 ? 'grid-cols-4' : 'grid-cols-3'}`}
       >
         {paymentMethods.map((method) => (
           <TabsTrigger
             key={method}
             value={method}
-            className={`${activeAccent} text-xs font-bold rounded-lg text-slate-400`}
+            className={`${activeAccent} text-xs font-semibold rounded-lg ${
+              isLight ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400'
+            }`}
           >
             {method.toUpperCase()}
           </TabsTrigger>
@@ -69,7 +81,7 @@ export default function CryptoPaymentTabs({
       </TabsList>
 
       {!lxrReady ? (
-        <p className="text-xs text-slate-500 text-center mb-4">
+        <p className="text-xs text-slate-500 text-center mb-3">
           LXR estará disponible en {lxrLaunchLabel}.
         </p>
       ) : null}
@@ -88,6 +100,8 @@ export default function CryptoPaymentTabs({
             billingData={billingData}
             isBillingValid={isBillingValid}
             compact={compact}
+            theme={theme}
+            userId={userId}
           />
         </TabsContent>
       ))}

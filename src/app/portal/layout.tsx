@@ -95,6 +95,10 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
     getItemPrice,
     getCartTotal,
     removeFromCart,
+    addToCart,
+    decreaseQuantity,
+    getCartItemQuantity,
+    getUniqueCartItems,
     completeDatabasePurchase,
     handleCheckout,
     handleApplyUnlockCode,
@@ -125,7 +129,11 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
       const response = await fetch('/api/payments/stripe/create-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, itemIds: cart }),
+        body: JSON.stringify({
+          email,
+          userId: user?.uid || '',
+          itemIds: cart,
+        }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -137,7 +145,7 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
       toast.error(message);
       setStripeRedirecting(false);
     }
-  }, [cart, checkoutEmail]);
+  }, [cart, checkoutEmail, user]);
 
   useEffect(() => {
     if (loading || !user || stripeReturnHandled.current) {
@@ -413,40 +421,40 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
-              className="bg-[#0d0d11] border border-white/10 rounded-3xl p-6 md:p-8 w-full max-w-4xl shadow-2xl relative z-10 space-y-6 max-h-[90vh] overflow-y-auto"
+              className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 md:p-10 w-full max-w-5xl lg:max-w-6xl shadow-[0_25px_70px_rgba(0,0,0,0.18)] relative z-10 space-y-6 min-h-[680px] sm:min-h-[740px] max-h-[94vh] overflow-y-auto text-slate-900 flex flex-col justify-between"
             >
               {/* Header */}
-              <div className="flex justify-between items-start border-b border-white/5 pb-4">
-                <div>
-                  <h3 className="text-xl font-normal text-white">Pasarela de Pago Segura</h3>
-                  <p className="text-xs text-white/40">Sigue los pasos para completar tu orden.</p>
+              <div className="flex justify-between items-start border-b border-slate-100 pb-4">
+                <div className="space-y-1">
+                  <h3 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">Pasarela de Pago Segura</h3>
+                  <p className="text-xs sm:text-sm text-slate-500 font-normal">Sigue los pasos para completar tu orden.</p>
                 </div>
                 {!isProcessingCrypto && !paymentApproved && (
                   <button
                     onClick={() => setIsCheckoutOpen(false)}
-                    className="text-xs text-white/40 hover:text-white uppercase tracking-wider font-semibold"
+                    className="text-xs text-slate-400 hover:text-slate-900 uppercase tracking-wider font-semibold px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
                   >
-                    Cerrar
+                    Cerrar ✕
                   </button>
                 )}
               </div>
 
               {/* Success Screen */}
               {paymentApproved && approvedOrder ? (
-                <div className="text-center py-8 space-y-6">
-                  <CheckCircle2 className="w-16 h-16 text-purple-400 mx-auto animate-pulse" />
+                <div className="text-center py-8 space-y-6 my-auto">
+                  <CheckCircle2 className="w-16 h-16 text-emerald-600 mx-auto animate-pulse" />
                   <div className="space-y-2">
-                    <h4 className="text-2xl font-normal text-white">¡Pago aprobado con éxito!</h4>
-                    <p className="text-xs text-white/50 max-w-md mx-auto">
+                    <h4 className="text-2xl font-semibold text-slate-900">¡Pago aprobado con éxito!</h4>
+                    <p className="text-xs text-slate-500 max-w-md mx-auto">
                       Tu transacción fue confirmada y tus servicios han sido desbloqueados en la plataforma.
                     </p>
                   </div>
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-4 max-w-md mx-auto text-left space-y-2">
-                    <p className="text-[10px] uppercase tracking-widest text-white/40">ID de Orden</p>
-                    <p className="text-xs font-mono text-white/80 break-all">{approvedOrder.requestId}</p>
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 max-w-md mx-auto text-left space-y-2">
+                    <p className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">ID de Orden</p>
+                    <p className="text-xs font-mono text-slate-800 break-all">{approvedOrder.requestId}</p>
                     {approvedOrder.email && (
-                      <p className="text-xs text-white/40">
-                        Comprobante enviado a: <span className="text-white/80">{approvedOrder.email}</span>
+                      <p className="text-xs text-slate-500">
+                        Comprobante enviado a: <span className="text-slate-800 font-semibold">{approvedOrder.email}</span>
                       </p>
                     )}
                   </div>
@@ -457,98 +465,130 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
                       setApprovedOrder(null);
                       router.push('/portal/proceso');
                     }}
-                    className="h-11 px-8 rounded-full bg-transparent border border-white/40 text-white hover:bg-gradient-to-r hover:from-[#2d1b4e] hover:to-[#9b4dca] hover:border-[#2d1b4e] text-xs font-normal uppercase"
+                    className="h-11 px-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold uppercase tracking-wider shadow-md shadow-blue-500/20 transition-all cursor-pointer"
                   >
                     Ir a mi proceso
                   </Button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start flex-1">
                   
-                  {/* Left Column: Cart Overview & Method Selector */}
-                  <div className="space-y-6">
-                    <div className="space-y-3">
-                      <p className="text-[10px] font-normal tracking-widest text-white/40 uppercase">Resumen del Carrito</p>
-                      <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                        {cart.map((itemId) => {
-                          const item = cartItemsConfig[itemId];
-                          if (!item) return null;
-                          return (
-                            <div key={itemId} className="flex justify-between items-center p-3 rounded-2xl bg-white/5 border border-white/5">
-                              <div>
-                                <p className="text-xs font-normal text-white">{item.name}</p>
-                                <p className="text-[10px] text-purple-400 font-semibold">${getItemPrice(itemId, checkoutMethod).toFixed(2)} USD</p>
+                    {/* Left Column: Cart Overview & Method Selector & Contact Info if Crypto */}
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <p className="text-xs font-semibold tracking-wider text-slate-400 uppercase">Resumen del Carrito</p>
+                        <div className="space-y-2 max-h-40 overflow-y-auto pr-1 no-scrollbar">
+                          {getUniqueCartItems().map((itemId) => {
+                            const item = cartItemsConfig[itemId];
+                            if (!item) return null;
+                            const qty = getCartItemQuantity(itemId);
+                            return (
+                              <div key={itemId} className="flex justify-between items-center p-3 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-2xs">
+                                <div className="space-y-0.5">
+                                  <p className="text-xs sm:text-sm font-semibold text-slate-900 leading-snug">{item.name}</p>
+                                  <p className="text-xs text-blue-600 font-semibold">
+                                    ${(getItemPrice(itemId, checkoutMethod) * qty).toFixed(2)} USD
+                                    {qty > 1 && <span className="text-slate-400 font-normal ml-1">(${getItemPrice(itemId, checkoutMethod).toFixed(2)} c/u)</span>}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-2 bg-white border border-slate-300 rounded-lg px-2 py-0.5 shadow-2xs">
+                                  <button
+                                    onClick={() => decreaseQuantity(itemId)}
+                                    className="text-slate-600 hover:text-black font-semibold text-xs px-1 cursor-pointer transition-colors"
+                                    title="Restar una unidad"
+                                  >
+                                    -
+                                  </button>
+                                  <span className="text-xs font-semibold text-slate-900 min-w-[14px] text-center">
+                                    {qty}
+                                  </span>
+                                  <button
+                                    onClick={() => addToCart(itemId)}
+                                    className="text-slate-600 hover:text-black font-semibold text-xs px-1 cursor-pointer transition-colors"
+                                    title="Sumar una unidad"
+                                  >
+                                    +
+                                  </button>
+                                </div>
                               </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div className="pt-2 border-t border-white/5 flex justify-between items-center">
-                        <span className="text-xs text-white/50 uppercase tracking-wider">Total a pagar</span>
-                        <span className="text-lg font-semibold text-white">
-                          ${cart.reduce((total, itemId) => total + (getItemPrice(itemId, checkoutMethod) || 0), 0).toFixed(2)} USD
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <p className="text-[10px] font-normal tracking-widest text-white/40 uppercase">Método de Pago</p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <button
-                          onClick={() => !hasCryptoDisabled && setCheckoutMethod('crypto')}
-                          disabled={hasCryptoDisabled}
-                          className={`p-4 rounded-2xl border text-left space-y-2 transition-all ${
-                            hasCryptoDisabled
-                              ? 'opacity-40 cursor-not-allowed border-white/5 bg-white/[0.01]'
-                              : checkoutMethod === 'crypto'
-                              ? 'border-purple-500 bg-purple-500/5 shadow-[0_0_15px_rgba(168,85,247,0.1)]'
-                              : 'border-white/10 bg-white/5 hover:border-white/20'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <Wallet className={`w-4 h-4 ${hasCryptoDisabled ? 'text-white/25' : 'text-purple-400'}`} />
-                            <span className={`text-xs font-semibold ${hasCryptoDisabled ? 'text-white/40' : 'text-white'}`}>Pagar con Crypto</span>
-                          </div>
-                          <p className="text-[9px] text-white/50 leading-relaxed font-light">
-                            {hasCryptoDisabled ? "No disponible para este plan" : "USDC, USDT, SOL, LXR"}
-                          </p>
-                        </button>
-
-                        <button
-                          onClick={() => setCheckoutMethod('card')}
-                          className={`p-4 rounded-2xl border text-left space-y-2 transition-all ${
-                            checkoutMethod === 'card'
-                              ? 'border-purple-500 bg-purple-500/5 shadow-[0_0_15px_rgba(168,85,247,0.1)]'
-                              : 'border-white/10 bg-white/5 hover:border-white/20'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <CreditCard className="w-4 h-4 text-purple-400" />
-                            <span className="text-xs font-semibold text-white">Pagar con Tarjeta</span>
-                          </div>
-                          <p className="text-[9px] text-white/50 leading-relaxed">Visa, Mastercard, Amex</p>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right Column: Dynamic Payment Steps & Forms */}
-                  <div className="border-t lg:border-t-0 lg:border-l border-white/5 pt-6 lg:pt-0 lg:pl-8 min-h-[350px]">
-                    {!checkoutMethod ? (
-                      <div className="flex flex-col items-center justify-center h-full text-center py-12 text-white/40 space-y-3">
-                        <ShieldCheck className="w-10 h-10 text-white/20" />
-                        <p className="text-xs">Selecciona un método de pago a la izquierda para continuar.</p>
-                      </div>
-                    ) : checkoutMethod === 'crypto' ? (
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <p className="text-xs font-semibold text-white">1. Datos de Contacto</p>
-                          <BillingForm initialEmail={user.email || ''} onDataChange={setBillingData} onValidChange={setIsBillingValid} />
+                            );
+                          })}
                         </div>
+                        <div className="pt-2 border-t border-slate-100 flex justify-between items-center px-1">
+                          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total a pagar</span>
+                          <span className="text-lg font-semibold text-slate-900">
+                            ${getCartTotal(checkoutMethod).toFixed(2)} USD
+                          </span>
+                        </div>
+                      </div>
 
-                        {checkoutSessionId && (
-                          <div className="space-y-2 pt-2">
-                            <p className="text-xs font-semibold text-white">2. Escanea y Realiza el Pago</p>
+                      <div className="space-y-2">
+                        <p className="text-xs font-semibold tracking-wider text-slate-400 uppercase">Método de Pago</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          <button
+                            onClick={() => !hasCryptoDisabled && setCheckoutMethod('crypto')}
+                            disabled={hasCryptoDisabled}
+                            className={`p-3.5 rounded-2xl border text-left space-y-1 transition-all cursor-pointer ${
+                              hasCryptoDisabled
+                                ? 'opacity-40 cursor-not-allowed border-slate-100 bg-slate-50'
+                                : checkoutMethod === 'crypto'
+                                ? 'border-blue-600 bg-blue-50/60 shadow-sm ring-1 ring-blue-600'
+                                : 'border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <Wallet className={`w-4 h-4 ${hasCryptoDisabled ? 'text-slate-300' : 'text-blue-600'}`} />
+                              <span className={`text-xs sm:text-sm font-semibold ${hasCryptoDisabled ? 'text-slate-400' : 'text-slate-900'}`}>Pagar con Stablecoin</span>
+                            </div>
+                            <p className="text-[11px] text-slate-500 leading-relaxed font-normal">
+                              {hasCryptoDisabled ? "No disponible para este plan" : "USDC, USDT, SOL, LXR"}
+                            </p>
+                          </button>
+
+                          <button
+                            onClick={() => setCheckoutMethod('card')}
+                            className={`p-3.5 rounded-2xl border text-left space-y-1 transition-all cursor-pointer ${
+                              checkoutMethod === 'card'
+                                ? 'border-blue-600 bg-blue-50/60 shadow-sm ring-1 ring-blue-600'
+                                : 'border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <CreditCard className="w-4 h-4 text-blue-600" />
+                              <span className="text-xs sm:text-sm font-semibold text-slate-900">Pagar con Tarjeta</span>
+                            </div>
+                            <p className="text-[11px] text-slate-500 leading-relaxed font-normal">Visa, Mastercard, Amex</p>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* When Crypto is selected, place Contact & Billing Address right here */}
+                      {checkoutMethod === 'crypto' && (
+                        <div className="pt-2 border-t border-slate-100">
+                          <BillingForm
+                            initialEmail={user.email || ''}
+                            onDataChange={setBillingData}
+                            onValidChange={setIsBillingValid}
+                            theme="light"
+                            compact={true}
+                            showAddress={true}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right Column: Dynamic Payment Steps & Forms */}
+                    <div className="border-t lg:border-t-0 lg:border-l border-slate-100 pt-6 lg:pt-0 lg:pl-8 min-h-[460px] flex flex-col justify-start">
+                      {!checkoutMethod ? (
+                        <div className="flex flex-col items-center justify-center h-full my-auto text-center py-16 text-slate-400 space-y-3">
+                          <div className="w-14 h-14 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center">
+                            <ShieldCheck className="w-7 h-7 text-slate-400" />
+                          </div>
+                          <p className="text-xs sm:text-sm text-slate-500 font-normal max-w-xs">Selecciona un método de pago a la izquierda para continuar.</p>
+                        </div>
+                      ) : checkoutMethod === 'crypto' ? (
+                        <div className="space-y-3">
+                          {checkoutSessionId && (
                             <CryptoPaymentTabs
                               plan={cryptoCheckoutPlan}
                               cartItems={cart.length > 1 ? cart : undefined}
@@ -566,37 +606,48 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
                                 });
                                 completeDatabasePurchase(cart);
                               }}
-                              accent="purple"
+                              accent="blue"
+                              compact={true}
+                              theme="light"
+                              userId={user?.uid}
                             />
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="space-y-6">
-                        <div className="space-y-2">
-                          <p className="text-xs font-semibold text-white font-medium">Pago con Tarjeta a través de Stripe</p>
-                          <p className="text-xs text-white/50 leading-relaxed">
-                            Haz clic en el botón inferior para ser redirigido a la pasarela encriptada oficial de Stripe y realizar tu pago de manera segura.
+                          )}
+                        </div>
+                      ) : (
+                      <div className="space-y-5">
+                        <div className="space-y-1.5">
+                          <h4 className="text-xs sm:text-sm font-semibold text-slate-900">Pago Seguro con Tarjeta vía Stripe</h4>
+                          <p className="text-xs text-slate-500 leading-relaxed font-normal">
+                            Haz clic en el botón inferior para ser redirigido a la pasarela oficial encriptada de Stripe y completar tu transacción.
                           </p>
                         </div>
 
-                        <div className="bg-white/5 border border-white/5 rounded-2xl p-4 space-y-4">
-                          <p className="text-[10px] font-normal tracking-widest text-white/40 uppercase">Instrucciones</p>
-                          <div className="space-y-2 text-xs text-white/70">
-                            <p>1. Presiona "Pagar en Stripe".</p>
-                            <p>2. Completa el pago con el mismo correo de tu cuenta.</p>
-                            <p>3. Al regresar, confirmamos automáticamente y desbloqueamos tu acceso.</p>
+                        <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 space-y-2.5">
+                          <p className="text-[10px] font-semibold tracking-widest text-slate-400 uppercase">Instrucciones</p>
+                          <div className="space-y-2 text-xs text-slate-600 font-normal">
+                            <p className="flex items-center gap-2">
+                              <span className="w-4 h-4 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-semibold text-[10px]">1</span>
+                              <span>Presiona <strong>"Pagar en Stripe"</strong> abajo.</span>
+                            </p>
+                            <p className="flex items-center gap-2">
+                              <span className="w-4 h-4 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-semibold text-[10px]">2</span>
+                              <span>Completa los datos de tu tarjeta de crédito o débito.</span>
+                            </p>
+                            <p className="flex items-center gap-2">
+                              <span className="w-4 h-4 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-semibold text-[10px]">3</span>
+                              <span>Al finalizar, tu servicio se desbloquea automáticamente en el portal.</span>
+                            </p>
                           </div>
                         </div>
 
-                        <div className="flex flex-col gap-3 pt-4">
+                        <div className="flex flex-col gap-2.5 pt-2">
                           <Button
                             onClick={() => void handleStartStripeCheckout()}
                             disabled={stripeRedirecting || cart.length === 0}
-                            className="w-full h-11 rounded-full bg-gradient-to-r from-[#2d1b4e] to-[#9b4dca] hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg text-xs font-normal uppercase flex items-center justify-center gap-2 text-white"
+                            className="w-full h-11 sm:h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm uppercase tracking-wider shadow-md shadow-blue-500/20 transition-all cursor-pointer flex items-center justify-center gap-2"
                           >
-                            <Lock className="w-4 h-4" />
-                            {stripeRedirecting ? 'Redirigiendo a Stripe...' : `Pagar $${checkoutTotal.toFixed(2)} en Stripe`}
+                            <Lock className="w-4 h-4 text-white" />
+                            {stripeRedirecting ? 'Redirigiendo a Stripe...' : `Pagar $${checkoutTotal.toFixed(2)} USD en Stripe`}
                           </Button>
                         </div>
                       </div>

@@ -18,6 +18,104 @@ export function getStripeClient() {
   return stripeClient;
 }
 
+export function matchItemFromDescriptionOrAmount(description: string, amountCents?: number | null): string | null {
+  const desc = (description || '').toLowerCase();
+  
+  if (desc.includes('sevis') || amountCents === 36800 || amountCents === 35000) {
+    return 'sevis';
+  }
+  if (desc.includes('entrevista') || desc.includes('cita') || desc.includes('mrv') || desc.includes('simulacro') || amountCents === 19500 || amountCents === 18500 || amountCents === 4999) {
+    return 'entrevista-embajada';
+  }
+  if (desc.includes('esencial') || (desc.includes('f-1') && amountCents === 38000)) {
+    return 'plan-esencial';
+  }
+  if (desc.includes('plan 2') || desc.includes('plan-pro') || (desc.includes('pro') && !desc.includes('proceso')) || (amountCents === 55000)) {
+    return 'plan-pro';
+  }
+  if (desc.includes('elite') || (amountCents === 325000 || amountCents === 250000)) {
+    return 'plan-elite';
+  }
+  if (desc.includes('all-inclusive') || desc.includes('allinclusive') || (amountCents === 1300000 || amountCents === 1000000)) {
+    return 'plan-allinclusive';
+  }
+  if (desc.includes('turista') && (desc.includes('básico') || desc.includes('basico') || desc.includes('plan 1') || amountCents === 38000)) {
+    return 'plan-turista-basico';
+  }
+  if (desc.includes('turista') && (desc.includes('premium') || desc.includes('plan 2') || amountCents === 350000 || amountCents === 325000)) {
+    return 'plan-turista-premium';
+  }
+  if (desc.includes('vip') || (desc.includes('turista') && (desc.includes('plan 3') || amountCents === 499000))) {
+    return 'plan-turista-vip';
+  }
+  if (desc.includes('libro') || amountCents === 2999) {
+    if (desc.includes('turista') || desc.includes('b-2')) return 'libro-turista';
+    return 'libro-estudiante';
+  }
+  if (desc.includes('master class') || desc.includes('curso') || amountCents === 9999 || amountCents === 999) {
+    if (desc.includes('turista') || desc.includes('b-2')) return 'curso-turista';
+    return 'curso-estudiante';
+  }
+  
+  return null;
+}
+
+export async function resolveItemIdsFromCheckoutSessionAsync(
+  session: Stripe.Checkout.Session,
+  preferredItemId?: string
+): Promise<string[]> {
+  const results = new Set<string>();
+
+  // 1. Try metadata
+  const metaItem = resolveItemIdFromStripeMetadata(session.metadata || undefined);
+  if (metaItem) {
+    results.add(metaItem);
+  }
+  if (session.metadata?.item_ids) {
+    session.metadata.item_ids.split(',').forEach((s) => {
+      const trimmed = s.trim();
+      if (trimmed) results.add(trimmed);
+    });
+  }
+
+  // 2. Try line items inspection (essential for Stripe Payment Links)
+  const stripe = getStripeClient();
+  if (stripe && session.id) {
+    try {
+      const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 20 });
+      for (const item of lineItems.data) {
+        const desc = item.description || '';
+        const amt = item.amount_total ?? item.price?.unit_amount ?? null;
+        const matched = matchItemFromDescriptionOrAmount(desc, amt);
+        if (matched) {
+          results.add(matched);
+        }
+      }
+    } catch (err) {
+      console.warn('[Stripe] Could not fetch line items for session', session.id, err);
+    }
+  }
+
+  // 3. Fallback by preferred item and amount
+  if (results.size === 0 && preferredItemId && session.amount_total === STRIPE_ITEM_PRICE_CENTS[preferredItemId]) {
+    results.add(preferredItemId);
+  }
+
+  // 4. Fallback by amount total matching
+  if (results.size === 0 && session.amount_total != null) {
+    const matches = resolveItemIdsFromAmountCents(session.amount_total);
+    if (matches.length === 1) {
+      results.add(matches[0]);
+    } else if (preferredItemId && matches.includes(preferredItemId)) {
+      results.add(preferredItemId);
+    } else if (matches.includes('plan-esencial')) {
+      results.add('plan-esencial');
+    }
+  }
+
+  return Array.from(results);
+}
+
 export function resolveItemIdFromCheckoutSession(
   session: Stripe.Checkout.Session,
   preferredItemId?: string

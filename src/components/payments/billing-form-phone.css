@@ -100,3 +100,48 @@
   margin-right: 0 !important;
   transform: scale(1.05);
 }
+
+/* Light Mode Styles */
+.billing-phone-field.light .form-control {
+  color: #0f172a !important;
+}
+
+.billing-phone-field.light .form-control::placeholder {
+  color: #94a3b8 !important;
+}
+
+.billing-phone-field.light .selected-flag:hover,
+.billing-phone-field.light .selected-flag:focus,
+.billing-phone-field.light .selected-flag.open {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+.billing-phone-field.light .country-list {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+.billing-phone-field.light .country-list .search {
+  background: #ffffff !important;
+}
+
+.billing-phone-field.light .country-list .search-box {
+  color: #0f172a !important;
+  background: #f8fafc !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+.billing-phone-field.light .country-list .country {
+  color: #1e293b !important;
+}
+
+.billing-phone-field.light .country-list .country:hover,
+.billing-phone-field.light .country-list .country.highlight {
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+}
+
+.billing-phone-field.light .country-list .country .dial-code {
+  color: #64748b !important;
+}

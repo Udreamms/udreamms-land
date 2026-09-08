@@ -4,21 +4,40 @@ export const PENDING_PURCHASES_COLLECTION = 'pendingPurchases';
 
 /** Firestore user fields unlocked per catalog item id */
 export const PURCHASE_FIELD_BY_ITEM: Record<string, string> = {
+  'sevis': 'purchased_sevis',
+  'entrevista-embajada': 'purchased_entrevista_embajada',
   'curso-estudiante': 'purchased_curso_estudiante',
   'libro-estudiante': 'purchased_libro_estudiante',
   'curso-turista': 'purchased_curso_turista',
   'libro-turista': 'purchased_libro_turista',
+  
+  // Student Plans
   'plan-esencial': 'purchased_plan_esencial',
   'plan-pro': 'purchased_plan_pro',
   'plan-elite': 'purchased_plan_elite',
   'plan-allinclusive': 'purchased_plan_allinclusive',
+  'esencial': 'purchased_plan_esencial',
+  'pro': 'purchased_plan_pro',
+  'elite': 'purchased_plan_elite',
+  'allinclusive': 'purchased_plan_allinclusive',
+  'student-basic': 'purchased_plan_esencial',
+  'student-pro': 'purchased_plan_pro',
+  'student-elite': 'purchased_plan_elite',
+  'student-allinclusive': 'purchased_plan_allinclusive',
+
+  // Tourist Plans
   'plan-turista-basico': 'purchased_plan_turista_basico',
   'plan-turista-premium': 'purchased_plan_turista_premium',
   'plan-turista-vip': 'purchased_plan_turista_vip',
-  esencial: 'purchased_plan_esencial',
-  pro: 'purchased_plan_pro',
-  elite: 'purchased_plan_elite',
-  allinclusive: 'purchased_plan_allinclusive',
+  'turista-basico': 'purchased_plan_turista_basico',
+  'turista-premium': 'purchased_plan_turista_premium',
+  'turista-vip': 'purchased_plan_turista_vip',
+  'basico': 'purchased_plan_turista_basico',
+  'premium': 'purchased_plan_turista_premium',
+  'vip': 'purchased_plan_turista_vip',
+  'tourist-basic': 'purchased_plan_turista_basico',
+  'tourist-premium': 'purchased_plan_turista_premium',
+  'tourist-vip': 'purchased_plan_turista_vip',
 };
 
 export function normalizePurchaseEmail(email: string) {
@@ -29,7 +48,7 @@ export function pendingPurchaseDocId(email: string) {
   return normalizePurchaseEmail(email).replace(/[^a-z0-9]/g, '_');
 }
 
-function buildUnlockUpdates(itemIds: string[]) {
+export function buildUnlockUpdates(itemIds: string[]) {
   const updates: Record<string, boolean> = {};
   for (const itemId of itemIds) {
     const field = PURCHASE_FIELD_BY_ITEM[itemId];
@@ -38,6 +57,34 @@ function buildUnlockUpdates(itemIds: string[]) {
     }
   }
   return updates;
+}
+
+export async function unlockPurchasesByUserId(
+  userId: string,
+  itemIds: string[],
+  source: { type: 'crypto' | 'stripe' | 'manual'; referenceId?: string }
+) {
+  if (!userId || itemIds.length === 0) return { unlocked: false };
+  const updates = buildUnlockUpdates(itemIds);
+  if (Object.keys(updates).length === 0) return { unlocked: false };
+
+  try {
+    const db = requireAdminDb();
+    await db.doc(`users/${userId}`).set(
+      {
+        ...updates,
+        last_payment_source: source.type,
+        last_payment_reference: source.referenceId || null,
+        last_payment_at: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      { merge: true }
+    );
+    return { unlocked: true, userId, updates };
+  } catch (error) {
+    console.error(`[unlockPurchase] Error updating user by ID ${userId}:`, error);
+    return { unlocked: false, error };
+  }
 }
 
 async function findUserDocsByEmail(email: string) {

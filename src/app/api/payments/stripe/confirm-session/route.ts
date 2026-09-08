@@ -1,19 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getStripeClient } from '@/backend/payments/stripe';
+import { getStripeClient, resolveItemIdsFromCheckoutSessionAsync } from '@/backend/payments/stripe';
 import { unlockPurchasesByEmail } from '@/backend/payments/unlock-purchase';
 import { PRODUCT_CATALOG } from '@/lib/payments/product-catalog';
-
-function parseItemIds(metadata: Record<string, string> | null | undefined): string[] {
-  if (!metadata) return [];
-  if (metadata.item_ids) {
-    return metadata.item_ids.split(',').map((s) => s.trim()).filter((id) => PRODUCT_CATALOG[id]);
-  }
-  const single = metadata.product_id || metadata.productId;
-  if (single && single !== 'cart' && PRODUCT_CATALOG[single]) {
-    return [single];
-  }
-  return [];
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -45,9 +33,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No se encontró correo en la sesión de Stripe' }, { status: 400 });
     }
 
-    const itemIds = parseItemIds(session.metadata);
+    const itemIds = await resolveItemIdsFromCheckoutSessionAsync(session);
     if (itemIds.length === 0) {
       return NextResponse.json({ error: 'No se identificaron productos en el pago' }, { status: 400 });
+    }
+
+    const userId = session.metadata?.user_id || '';
+    if (userId) {
+      const { unlockPurchasesByUserId } = await import('@/backend/payments/unlock-purchase');
+      await unlockPurchasesByUserId(userId, itemIds, {
+        type: 'stripe',
+        referenceId: session.id,
+      });
     }
 
     const unlock = await unlockPurchasesByEmail(email, itemIds, {
@@ -59,6 +56,7 @@ export async function POST(request: NextRequest) {
       verified: true,
       sessionId: session.id,
       email: email.trim().toLowerCase(),
+      userId: userId || null,
       itemIds,
       unlock,
     });

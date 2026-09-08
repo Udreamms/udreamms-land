@@ -25,8 +25,12 @@ export const STRIPE_ITEM_LINKS: Record<string, string> = {
 
 /** Precio en centavos USD (tarjeta) para verificación Stripe */
 export const STRIPE_ITEM_PRICE_CENTS: Record<string, number> = {
+  'sevis': 36800,
+  'entrevista-embajada': 19500,
   'libro-estudiante': 2999,
   'libro-turista': 2999,
+  'curso-estudiante': 9999,
+  'curso-turista': 9999,
   'plan-esencial': 38000,
   'plan-turista-basico': 38000,
   'plan-pro': 55000,

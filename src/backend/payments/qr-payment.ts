@@ -269,6 +269,16 @@ export async function fulfillVisaOrderFromPayment(
         : [order.planId];
 
     const unlockIds = itemIds.length > 0 ? itemIds : [order.planId];
+    const orderUserId = (order as { userId?: string }).userId;
+
+    if (orderUserId && unlockIds.length > 0) {
+      const { unlockPurchasesByUserId } = await import('./unlock-purchase');
+      await unlockPurchasesByUserId(orderUserId, unlockIds, {
+        type: 'crypto',
+        referenceId: order.requestId,
+      });
+    }
+
     for (const itemId of unlockIds) {
       if (itemId && itemId !== 'cart') {
         await unlockPurchaseForPlan(comprobante.billingEmail, itemId, {

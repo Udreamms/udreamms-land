@@ -1,21 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getStripeClient } from '@/backend/payments/stripe';
+import { getStripeClient, resolveItemIdsFromCheckoutSessionAsync } from '@/backend/payments/stripe';
 import { unlockPurchasesByEmail } from '@/backend/payments/unlock-purchase';
 import { PRODUCT_CATALOG } from '@/lib/payments/product-catalog';
 
 export const runtime = 'nodejs';
-
-function parseItemIdsFromMetadata(metadata: Record<string, string> | null | undefined): string[] {
-  if (!metadata) return [];
-  if (metadata.item_ids) {
-    return metadata.item_ids.split(',').map((s) => s.trim()).filter((id) => PRODUCT_CATALOG[id]);
-  }
-  const single = metadata.product_id || metadata.productId;
-  if (single && single !== 'cart' && PRODUCT_CATALOG[single]) {
-    return [single];
-  }
-  return [];
-}
 
 export async function POST(request: NextRequest) {
   const stripe = getStripeClient();
@@ -46,15 +34,29 @@ export async function POST(request: NextRequest) {
       const email =
         session.customer_details?.email ||
         session.metadata?.billing_email ||
+        session.customer_email ||
         '';
 
-      const itemIds = parseItemIdsFromMetadata(session.metadata);
+      const itemIds = await resolveItemIdsFromCheckoutSessionAsync(session);
+      const userId = session.metadata?.user_id || '';
+
+      console.log(`[Stripe Webhook] Received checkout.session.completed: userId=${userId}, email=${email}, session=${session.id}, items=${itemIds.join(',')}`);
+
+      if (userId && itemIds.length > 0) {
+        const { unlockPurchasesByUserId } = await import('@/backend/payments/unlock-purchase');
+        await unlockPurchasesByUserId(userId, itemIds, {
+          type: 'stripe',
+          referenceId: session.id,
+        });
+      }
 
       if (email && itemIds.length > 0) {
         await unlockPurchasesByEmail(email, itemIds, {
           type: 'stripe',
           referenceId: session.id,
         });
+      } else if (!userId) {
+        console.warn(`[Stripe Webhook] Could not unlock: email=${email}, itemIds=${JSON.stringify(itemIds)}`);
       }
     }
 

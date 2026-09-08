@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
       expectedAmountRaw,
       billingData,
       items,
+      userId,
     } = await request.json();
 
     if (!sessionId || !plan || !paymentMethod || !expectedAmountUi || !expectedAmountRaw) {
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
       for (const itemId of cartItemIds) {
         const itemPrice = VISA_PLAN_CATALOG_USD[itemId];
         if (!itemPrice) {
-          return NextResponse.json({ error: `Invalid cart item: ${itemId}` }, { status: 400 });
+          return NextResponse.json({ error: `Invalid item in cart: ${itemId}` }, { status: 400 });
         }
         catalogPlanPriceUSD += itemPrice;
       }
@@ -111,6 +112,7 @@ export async function POST(request: NextRequest) {
     await db.doc(getVisaCryptoPaymentRequestPath(sessionId, requestId)).set({
       requestId,
       sessionId,
+      userId: userId || null,
       planId: planKey,
       cartItemIds: planKey === 'cart' ? cartItemIds : [planKey],
       paymentMethod,

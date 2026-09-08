@@ -1,106 +1,243 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { GraduationCap, Briefcase, Check, ArrowRight, ArrowLeft, ShieldCheck, Lock, Camera, Upload, Trash2, User } from "lucide-react";
+import {
+  GraduationCap,
+  Briefcase,
+  Check,
+  ArrowRight,
+  ArrowLeft,
+  ShieldCheck,
+  Lock,
+  Camera,
+  Upload,
+  Trash2,
+  User,
+  Plus,
+  Users,
+  FileCheck,
+  AlertCircle
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePortal } from "../PortalContext";
 import LockOverlay from "../components/LockOverlay";
 import FormularioConsular from "./components/FormularioConsular";
 import { toast } from "sonner";
 
+interface ApplicantInfo {
+  id: string;
+  name: string;
+  photoUrl: string | null;
+  status: 'completado' | 'en_progreso' | 'pendiente';
+}
+
+interface ActiveApplicantState {
+  visaType: 'estudiante' | 'turista';
+  applicantId: string;
+}
+
 export default function ProcesoPage() {
   const router = useRouter();
-  const { activeTopSection, setActiveTopSection, isUnlocked, user } = usePortal();
-  
-  // Selected process card state: 'estudiante' | 'turista' | null
-  const [selectedCard, setSelectedCard] = useState<'estudiante' | 'turista' | null>(null);
+  const { isUnlocked, user, dbUser } = usePortal();
 
-  // Applicant Names State
-  const [f1Name, setF1Name] = useState<string>('');
-  const [b2Name, setB2Name] = useState<string>('');
+  // Active applicant selected for detailed form editing (null = viewing main cards grid)
+  const [activeApplicant, setActiveApplicant] = useState<ActiveApplicantState | null>(null);
 
-  // Photo upload states
-  const [studentPhoto, setStudentPhoto] = useState<string | null>(null);
-  const [touristPhoto, setTouristPhoto] = useState<string | null>(null);
+  // Multi-applicants list for Student Visa (F-1)
+  const [studentApplicants, setStudentApplicants] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('udreamms_applicants_f1');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return ['1'];
+  });
+
+  // Multi-applicants list for Tourist Visa (B-2)
+  const [touristApplicants, setTouristApplicants] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('udreamms_applicants_b2');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return ['1'];
+  });
+
+  // Detailed info per applicant cache
+  const [applicantsData, setApplicantsData] = useState<Record<string, ApplicantInfo>>({});
+
+  // Filter state for cards: 'all' | 'estudiante' | 'turista'
+  const [visaFilter, setVisaFilter] = useState<'all' | 'estudiante' | 'turista'>('all');
 
   const unlockedStudent = isUnlocked('proceso', 'estudiante');
   const unlockedTourist = isUnlocked('proceso', 'turista');
+  const hasUnlockedProcess = unlockedStudent || unlockedTourist;
 
-  // Read applicant names & photos from saved form data
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const savedF1 = localStorage.getItem('udreamms_form_f1');
-        if (savedF1) {
-          const parsed = JSON.parse(savedF1);
-          const fullName = `${parsed.nombres || ''} ${parsed.apellidos || ''}`.trim();
-          if (fullName) setF1Name(fullName);
-        }
-        const savedB2 = localStorage.getItem('udreamms_form_b2');
-        if (savedB2) {
-          const parsed = JSON.parse(savedB2);
-          const fullName = `${parsed.nombres || ''} ${parsed.apellidos || ''}`.trim();
-          if (fullName) setB2Name(fullName);
-        }
-
-        const savedPhotoF1 = localStorage.getItem('udreamms_photo_f1');
-        if (savedPhotoF1) setStudentPhoto(savedPhotoF1);
-
-        const savedPhotoB2 = localStorage.getItem('udreamms_photo_b2');
-        if (savedPhotoB2) setTouristPhoto(savedPhotoB2);
-      } catch (e) {
-        // ignore parse error
-      }
+  const getPlanName = (isStudent: boolean) => {
+    if (isStudent) {
+      if (dbUser?.purchased_plan_allinclusive) return 'Plan 4: All-Inclusive';
+      if (dbUser?.purchased_plan_elite) return 'Plan 3: Elite';
+      if (dbUser?.purchased_plan_pro) return 'Plan 2: VIP';
+      if (dbUser?.purchased_plan_esencial) return 'Plan 1: Esencial';
+      return 'Plan 1: Esencial';
+    } else {
+      if (dbUser?.purchased_plan_turista_vip) return 'Plan 3: Experiencia VIP';
+      if (dbUser?.purchased_plan_turista_premium) return 'Plan 2: Turista Premium';
+      if (dbUser?.purchased_plan_turista_basico) return 'Plan 1: Turista Básico';
+      return 'Plan 1: Turista Básico';
     }
-  }, [selectedCard]);
-
-  // Handle card click
-  const handleSelectProcess = (type: 'estudiante' | 'turista') => {
-    setSelectedCard(type);
-    setActiveTopSection(type === 'estudiante' ? 'visa-estudiante' : 'visa-turista');
   };
 
-  const currentType = selectedCard || (activeTopSection === 'visa-estudiante' ? 'estudiante' : 'turista');
-  const isStudent = currentType === 'estudiante';
-  const unlocked = isStudent ? unlockedStudent : unlockedTourist;
+  const refreshApplicantsData = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const cache: Record<string, ApplicantInfo> = {};
 
-  const currentPhoto = isStudent ? studentPhoto : touristPhoto;
+    // Load F1 cache
+    studentApplicants.forEach((id) => {
+      let name = '';
+      let status: 'completado' | 'en_progreso' | 'pendiente' = 'pendiente';
+      let photoUrl: string | null = null;
+
+      try {
+        const rawForm = localStorage.getItem(`udreamms_form_f1_${id}`) || (id === '1' ? localStorage.getItem('udreamms_form_f1') : null);
+        if (rawForm) {
+          const parsed = JSON.parse(rawForm);
+          const fullName = `${parsed.nombres || ''} ${parsed.apellidos || ''}`.trim();
+          if (fullName) name = fullName;
+          const filledFields = Object.values(parsed).filter(Boolean).length;
+          if (filledFields > 15) status = 'completado';
+          else if (filledFields > 2) status = 'en_progreso';
+        }
+
+        photoUrl = localStorage.getItem(`udreamms_photo_f1_${id}`) || (id === '1' ? localStorage.getItem('udreamms_photo_f1') : null);
+      } catch (e) {}
+
+      cache[`f1_${id}`] = { id, name, photoUrl, status };
+    });
+
+    // Load B2 cache
+    touristApplicants.forEach((id) => {
+      let name = '';
+      let status: 'completado' | 'en_progreso' | 'pendiente' = 'pendiente';
+      let photoUrl: string | null = null;
+
+      try {
+        const rawForm = localStorage.getItem(`udreamms_form_b2_${id}`) || (id === '1' ? localStorage.getItem('udreamms_form_b2') : null);
+        if (rawForm) {
+          const parsed = JSON.parse(rawForm);
+          const fullName = `${parsed.nombres || ''} ${parsed.apellidos || ''}`.trim();
+          if (fullName) name = fullName;
+          const filledFields = Object.values(parsed).filter(Boolean).length;
+          if (filledFields > 15) status = 'completado';
+          else if (filledFields > 2) status = 'en_progreso';
+        }
+
+        photoUrl = localStorage.getItem(`udreamms_photo_b2_${id}`) || (id === '1' ? localStorage.getItem('udreamms_photo_b2') : null);
+      } catch (e) {}
+
+      cache[`b2_${id}`] = { id, name, photoUrl, status };
+    });
+
+    setApplicantsData(cache);
+  }, [studentApplicants, touristApplicants]);
+
+  useEffect(() => {
+    refreshApplicantsData();
+  }, [refreshApplicantsData, activeApplicant]);
+
+  // Save applicants list to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('udreamms_applicants_f1', JSON.stringify(studentApplicants));
+    }
+  }, [studentApplicants]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('udreamms_applicants_b2', JSON.stringify(touristApplicants));
+    }
+  }, [touristApplicants]);
+
+  // Add a new applicant card
+  const handleAddApplicant = (visaType: 'estudiante' | 'turista') => {
+    const isStudent = visaType === 'estudiante';
+    const list = isStudent ? studentApplicants : touristApplicants;
+    const nextId = String(Date.now());
+    const nextList = [...list, nextId];
+    if (isStudent) setStudentApplicants(nextList);
+    else setTouristApplicants(nextList);
+    toast.success(`¡Nueva tarjeta de postulante agregada (#${nextList.length}) para ${isStudent ? 'Visa de Estudiante F-1' : 'Visa de Turista B-2'}!`);
+  };
+
+  // Remove an applicant
+  const handleRemoveApplicant = (visaType: 'estudiante' | 'turista', idToRemove: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const isStudent = visaType === 'estudiante';
+    const list = isStudent ? studentApplicants : touristApplicants;
+    if (list.length <= 1) {
+      const prefix = isStudent ? 'f1' : 'b2';
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(`udreamms_form_${prefix}_${idToRemove}`);
+        localStorage.removeItem(`udreamms_form_${prefix}`);
+        localStorage.removeItem(`udreamms_photo_${prefix}_${idToRemove}`);
+        localStorage.removeItem(`udreamms_photo_${prefix}`);
+      }
+      refreshApplicantsData();
+      toast.info(`Datos del formulario de ${isStudent ? 'Visa de Estudiante F-1' : 'Visa de Turista B-2'} reiniciados.`);
+      return;
+    }
+    const nextList = list.filter((id) => id !== idToRemove);
+    if (isStudent) setStudentApplicants(nextList);
+    else setTouristApplicants(nextList);
+    toast.info("Tarjeta removida del proceso.");
+  };
+
+  // Current active applicant data
+  const isSelectedStudent = activeApplicant?.visaType === 'estudiante';
+  const activeApplicantKey = activeApplicant ? `${isSelectedStudent ? 'f1' : 'b2'}_${activeApplicant.applicantId}` : '';
+  const currentApplicantData = activeApplicantKey ? applicantsData[activeApplicantKey] : null;
+  const currentPhoto = currentApplicantData?.photoUrl || null;
+
   const setCurrentPhoto = async (photo: string | null) => {
-    const photoKey = isStudent ? 'udreamms_photo_f1' : 'udreamms_photo_b2';
+    if (!activeApplicant) return;
+    const prefix = isSelectedStudent ? 'f1' : 'b2';
+    const applicantId = activeApplicant.applicantId;
+    const photoKey = `udreamms_photo_${prefix}_${applicantId}`;
+
     if (photo) {
       if (typeof window !== 'undefined') localStorage.setItem(photoKey, photo);
-      if (isStudent) setStudentPhoto(photo);
-      else setTouristPhoto(photo);
     } else {
       if (typeof window !== 'undefined') localStorage.removeItem(photoKey);
-      if (isStudent) setStudentPhoto(null);
-      else setTouristPhoto(null);
     }
 
+    refreshApplicantsData();
+
     try {
-      const storageKey = `udreamms_form_${isStudent ? 'f1' : 'b2'}`;
+      const storageKey = `udreamms_form_${prefix}_${applicantId}`;
       const savedForm = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null;
       const parsedForm = savedForm ? JSON.parse(savedForm) : {};
-      
+
       await fetch('/api/portal/submission', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          visaType: isStudent ? 'F-1' : 'B-2',
+          visaType: isSelectedStudent ? 'F-1' : 'B-2',
+          applicantId,
           formData: parsedForm,
           photoUrl: photo,
           userEmail: user?.email || parsedForm.email_contacto || '',
           userName: user?.displayName || `${parsedForm.nombres || ''} ${parsedForm.apellidos || ''}`.trim(),
           userId: user?.uid || '',
-        })
+        }),
       });
     } catch (err) {
       console.error('Error syncing photo with cloud:', err);
     }
   };
 
-  // Handle Photo File Upload
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -115,11 +252,41 @@ export default function ProcesoPage() {
       if (event.target?.result) {
         const photoData = event.target.result as string;
         setCurrentPhoto(photoData);
-        toast.success("¡Fotografía oficial cargada y guardada automáticamente!");
+        toast.success("¡Fotografía oficial cargada y guardada!");
       }
     };
     reader.readAsDataURL(file);
   };
+
+  // Collect all independent cards to display
+  const allCards: Array<{
+    visaType: 'estudiante' | 'turista';
+    applicantId: string;
+    index: number;
+    totalInType: number;
+  }> = [];
+
+  if (unlockedStudent && (visaFilter === 'all' || visaFilter === 'estudiante')) {
+    studentApplicants.forEach((id, idx) => {
+      allCards.push({
+        visaType: 'estudiante',
+        applicantId: id,
+        index: idx,
+        totalInType: studentApplicants.length,
+      });
+    });
+  }
+
+  if (unlockedTourist && (visaFilter === 'all' || visaFilter === 'turista')) {
+    touristApplicants.forEach((id, idx) => {
+      allCards.push({
+        visaType: 'turista',
+        applicantId: id,
+        index: idx,
+        totalInType: touristApplicants.length,
+      });
+    });
+  }
 
   return (
     <div className="space-y-6 text-slate-900">
@@ -131,26 +298,47 @@ export default function ProcesoPage() {
             Mi Proceso
           </h2>
           <p className="text-sm text-slate-500">
-            {selectedCard 
-              ? `Gestionando tu ${isStudent ? "Visa de Estudiante F-1" : "Visa de Turista B-2"}`
-              : "Selecciona el servicio de visa que deseas gestionar."}
+            {activeApplicant
+              ? `Formulario Consular y Foto de ${currentApplicantData?.name || `Postulante #${(isSelectedStudent ? studentApplicants : touristApplicants).indexOf(activeApplicant.applicantId) + 1}`}`
+              : "Gestiona los trámites, formularios DS-160 y fotografías oficiales de cada solicitud o familiar."}
           </p>
         </div>
 
-        {selectedCard && (
+        {activeApplicant ? (
           <Button
-            onClick={() => setSelectedCard(null)}
-            className="self-start sm:self-auto h-10 px-5 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 text-xs font-bold flex items-center gap-2 transition-all"
+            onClick={() => setActiveApplicant(null)}
+            className="self-start sm:self-auto h-10 px-5 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 text-xs font-bold flex items-center gap-2 transition-all cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4 text-white" />
-            Volver a mis procesos
+            Volver a todas las tarjetas
           </Button>
+        ) : hasUnlockedProcess && (
+          <div className="flex items-center gap-2">
+            {unlockedStudent && (
+              <Button
+                onClick={() => router.push('/portal/planes?tab=estudiante')}
+                className="h-10 px-4 rounded-full bg-slate-900 hover:bg-black text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-sm cursor-pointer"
+              >
+                <Plus className="w-4 h-4 text-white" />
+                <span>Tarjeta Estudiante</span>
+              </Button>
+            )}
+            {unlockedTourist && (
+              <Button
+                onClick={() => router.push('/portal/planes?tab=turista')}
+                className="h-10 px-4 rounded-full bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-sm cursor-pointer"
+              >
+                <Plus className="w-4 h-4 text-white" />
+                <span>Tarjeta Turista</span>
+              </Button>
+            )}
+          </div>
         )}
       </div>
 
-      {/* VIEW 1: PROCESS CARDS SELECTION */}
-      {!selectedCard ? (
-        !unlockedStudent && !unlockedTourist ? (
+      {/* VIEW 1: INDEPENDENT CARDS GRID */}
+      {!activeApplicant ? (
+        !hasUnlockedProcess ? (
           /* Empty State: No active visa processes purchased */
           <div className="bg-white border border-slate-200 shadow-sm rounded-3xl p-10 md:p-14 text-center space-y-4 max-w-2xl mx-auto mt-4">
             <div className="w-16 h-16 rounded-3xl bg-slate-100 border border-slate-200 flex items-center justify-center mx-auto shadow-sm">
@@ -161,154 +349,214 @@ export default function ProcesoPage() {
                 No tienes ningún proceso consular activo
               </h3>
               <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
-                Cuando adquieras tu proceso de <strong>Visa de Estudiante (F-1)</strong> o <strong>Visa de Turista (B-2)</strong>, aparecerán aquí las tarjetas de gestión y el formulario consular para cada familiar.
+                Cuando adquieras tu plan de <strong>Visa de Estudiante (F-1)</strong> o <strong>Visa de Turista (B-2)</strong>, aparecerán aquí las tarjetas independientes de cada solicitud para que llenes los datos y cargues las fotos.
               </p>
             </div>
             <div className="pt-2">
               <Button 
-                onClick={() => router.push('/portal')}
-                className="h-11 px-6 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-md shadow-blue-500/20 transition-all"
+                onClick={() => router.push('/portal/planes')}
+                className="h-11 px-6 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-md shadow-blue-500/20 transition-all cursor-pointer"
               >
-                Ver Servicios Disponibles
+                Ver Planes Disponibles
               </Button>
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+          <div className="space-y-6">
             
-            {/* Card 1: Visa de Estudiante F-1 (Only if purchased) */}
-            {unlockedStudent && (
-              <div 
-                onClick={() => handleSelectProcess('estudiante')}
-                className="group bg-white border border-slate-200 shadow-xl rounded-3xl p-6 md:p-8 flex flex-col justify-between space-y-6 hover:shadow-2xl hover:border-blue-300 transition-all duration-300 cursor-pointer relative overflow-hidden"
-              >
-                <div className="space-y-4 relative z-10">
-                  <div className="flex justify-between items-start">
-                    <div className="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-                      <GraduationCap className="w-7 h-7 text-black" />
-                    </div>
-                    <span className="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                      Servicio Activo
-                    </span>
-                  </div>
-
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-                      Visa de Estudiante (F-1)
-                    </h3>
-                    
-                    {/* Dynamic Applicant Name */}
-                    <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold border transition-all ${
-                      f1Name 
-                        ? "bg-blue-50 border-blue-200 text-blue-900 shadow-sm" 
-                        : "bg-slate-100 border-slate-200 text-slate-500"
-                    }`}>
-                      <User className={`w-4 h-4 ${f1Name ? "text-blue-600" : "text-black"}`} />
-                      <span>Postulante: <span className={f1Name ? "text-slate-900 font-extrabold" : "font-normal text-slate-500"}>{f1Name || 'Sin asignar (Ingresar datos)'}</span></span>
-                    </div>
-
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      Seguimiento de trámite escolar, emisión de I-20, formulario DS-160 y simulacros de entrevista consular F-1.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
-                  <span className="text-xs font-semibold text-slate-500">
-                    Acceso completo
-                  </span>
-                  <Button className="h-10 px-5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold tracking-wider uppercase flex items-center gap-2 group-hover:translate-x-1 transition-all shadow-md shadow-blue-500/20">
-                    Abrir Proceso
-                    <ArrowRight className="w-4 h-4 text-white" />
-                  </Button>
-                </div>
+            {/* Filter Tabs if user has both types */}
+            {unlockedStudent && unlockedTourist && (
+              <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
+                <button
+                  onClick={() => setVisaFilter('all')}
+                  className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    visaFilter === 'all'
+                      ? 'bg-slate-900 text-white shadow-sm'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  Todas ({studentApplicants.length + touristApplicants.length})
+                </button>
+                <button
+                  onClick={() => setVisaFilter('estudiante')}
+                  className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    visaFilter === 'estudiante'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  Estudiante F-1 ({studentApplicants.length})
+                </button>
+                <button
+                  onClick={() => setVisaFilter('turista')}
+                  className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    visaFilter === 'turista'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  Turista B-2 ({touristApplicants.length})
+                </button>
               </div>
             )}
 
-            {/* Card 2: Visa de Turista B-2 (Only if purchased) */}
-            {unlockedTourist && (
-              <div 
-                onClick={() => handleSelectProcess('turista')}
-                className="group bg-white border border-slate-200 shadow-xl rounded-3xl p-6 md:p-8 flex flex-col justify-between space-y-6 hover:shadow-2xl hover:border-blue-300 transition-all duration-300 cursor-pointer relative overflow-hidden"
-              >
-                <div className="space-y-4 relative z-10">
-                  <div className="flex justify-between items-start">
-                    <div className="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-                      <Briefcase className="w-7 h-7 text-black" />
+            {/* Grid of Independent Cards */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
+              {allCards.map((card) => {
+                const isStudent = card.visaType === 'estudiante';
+                const prefix = isStudent ? 'f1' : 'b2';
+                const key = `${prefix}_${card.applicantId}`;
+                const data = applicantsData[key];
+                const applicantName = data?.name || '';
+                const applicantPhoto = data?.photoUrl || null;
+                const isPrincipal = card.index === 0;
+
+                return (
+                  <div
+                    key={`${card.visaType}_${card.applicantId}`}
+                    onClick={() => setActiveApplicant({ visaType: card.visaType, applicantId: card.applicantId })}
+                    className="group bg-white border border-slate-200 hover:border-blue-400 shadow-xl hover:shadow-2xl rounded-3xl p-6 md:p-8 flex flex-col justify-between space-y-6 hover:-translate-y-1 transition-all duration-300 cursor-pointer relative overflow-hidden"
+                  >
+                    <div className="space-y-5 relative z-10">
+                      {/* Top Row: Icon/Photo & Badges */}
+                      <div className="flex justify-between items-start gap-3">
+                        <div className="flex items-center gap-3.5">
+                          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 flex items-center justify-center shadow-sm overflow-hidden group-hover:scale-105 transition-transform shrink-0">
+                            {applicantPhoto ? (
+                              <img src={applicantPhoto} alt="Foto" className="w-full h-full object-cover" />
+                            ) : isStudent ? (
+                              <GraduationCap className="w-8 h-8 text-black" />
+                            ) : (
+                              <Briefcase className="w-8 h-8 text-black" />
+                            )}
+                          </div>
+
+                          <div className="space-y-1">
+                            <span className="inline-block px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide bg-blue-50 text-blue-900 border border-blue-200">
+                              {getPlanName(isStudent)}
+                            </span>
+                            <h3 className="text-xl md:text-2xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-tight">
+                              {isStudent ? "Visa de Estudiante (F-1)" : "Visa de Turista (B-2)"}
+                            </h3>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            onClick={(e) => handleRemoveApplicant(card.visaType, card.applicantId, e)}
+                            className="opacity-0 group-hover:opacity-100 transition-all duration-200 h-8 w-8 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 text-red-600 flex items-center justify-center cursor-pointer shadow-2xs group/del"
+                            title={`Eliminar tarjeta de ${isStudent ? 'Visa de Estudiante F-1' : 'Visa de Turista B-2'}`}
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600 group-hover/del:scale-110 transition-transform" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Applicant Name Banner */}
+                      <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="w-7 h-7 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-2xs">
+                            <User className="w-4 h-4 text-blue-600" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold text-slate-900 truncate">
+                              {applicantName || "Nombre sin asignar (Pendiente)"}
+                            </p>
+                            <p className="text-[10px] text-slate-500 truncate">
+                              {applicantName ? "Información consular en registro" : "Haz clic para llenar los datos de este postulante"}
+                            </p>
+                          </div>
+                        </div>
+
+                        {data?.status === 'completado' ? (
+                          <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase shrink-0 flex items-center gap-1">
+                            <Check className="w-3 h-3 text-emerald-700" />
+                            Listo
+                          </span>
+                        ) : data?.status === 'en_progreso' ? (
+                          <span className="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-[10px] font-bold uppercase shrink-0 flex items-center gap-1">
+                            <AlertCircle className="w-3 h-3 text-amber-700" />
+                            En curso
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-1 rounded-lg bg-slate-200 text-slate-700 text-[10px] font-bold uppercase shrink-0">
+                            Pendiente
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Description & Included Features */}
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        {isStudent 
+                          ? "Seguimiento de trámite escolar, emisión de I-20, formulario oficial consular DS-160 y preparación para entrevista F-1."
+                          : "Evaluación de perfil turístico, estrategia de arraigo laboral/familiar, DS-160 oficial y simulacro de entrevista consular B-2."}
+                      </p>
+
+                      <div className="flex items-center gap-2 flex-wrap pt-1">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold uppercase tracking-wider shadow-2xs">
+                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                          Servicio Activo
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-semibold">
+                          <FileCheck className="w-3 h-3 text-slate-600" />
+                          Formulario DS-160
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-semibold">
+                          <Camera className="w-3 h-3 text-slate-600" />
+                          Foto Oficial 5x5
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-semibold">
+                          <ShieldCheck className="w-3 h-3 text-slate-600" />
+                          Asesoría Consular
+                        </span>
+                      </div>
                     </div>
-                    <span className="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                      Servicio Activo
-                    </span>
-                  </div>
 
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-                      Visa de Turista (B-2)
-                    </h3>
-
-                    {/* Dynamic Applicant Name */}
-                    <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold border transition-all ${
-                      b2Name 
-                        ? "bg-blue-50 border-blue-200 text-blue-900 shadow-sm" 
-                        : "bg-slate-100 border-slate-200 text-slate-500"
-                    }`}>
-                      <User className={`w-4 h-4 ${b2Name ? "text-blue-600" : "text-black"}`} />
-                      <span>Postulante: <span className={b2Name ? "text-slate-900 font-extrabold" : "font-normal text-slate-500"}>{b2Name || 'Sin asignar (Ingresar datos)'}</span></span>
+                    {/* Card Footer Button */}
+                    <div className="pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
+                      <span className="text-xs font-semibold text-slate-500">
+                        {data?.status === 'completado' ? 'Formulario guardado' : 'Requiere completar datos'}
+                      </span>
+                      <Button className="h-11 px-6 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold tracking-wider uppercase flex items-center gap-2 group-hover:translate-x-1 transition-all shadow-md shadow-blue-500/20 cursor-pointer">
+                        <span>Llenar Formulario y Foto</span>
+                        <ArrowRight className="w-4 h-4 text-white" />
+                      </Button>
                     </div>
-
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      Evaluación de perfil turístico, estrategia de arraigo, DS-160 y preparación para entrevista consular B-2.
-                    </p>
                   </div>
-                </div>
-
-                <div className="pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
-                  <span className="text-xs font-semibold text-slate-500">
-                    Acceso completo
-                  </span>
-                  <Button className="h-10 px-5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold tracking-wider uppercase flex items-center gap-2 group-hover:translate-x-1 transition-all shadow-md shadow-blue-500/20">
-                    Abrir Proceso
-                    <ArrowRight className="w-4 h-4 text-white" />
-                  </Button>
-                </div>
-              </div>
-            )}
-
+                );
+              })}
+            </div>
           </div>
         )
       ) : (
 
-        /* VIEW 2: DETAILED PROCESS STEPPER & PHOTO UPLOADER */
+        /* VIEW 2: DETAILED PROCESS FORM & PHOTO FOR SELECTED APPLICANT */
         <div className="relative min-h-[450px]">
-          {!unlocked && (
-            <LockOverlay itemId={isStudent ? 'proceso-estudiante' : 'proceso-turista'} />
-          )}
-
           <div className="w-full bg-white border border-slate-200 shadow-xl rounded-3xl p-6 md:p-8 space-y-8">
             
             {/* Process Header */}
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-300 text-slate-900 text-[10px] font-bold uppercase tracking-widest">
-                    {unlocked ? "Servicio Activo" : "Servicio Bloqueado"}
+                    Servicio Activo
                   </span>
                   <span className="px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-900 text-xs font-extrabold flex items-center gap-1.5 shadow-sm">
                     <User className="w-3.5 h-3.5 text-blue-600" />
-                    Postulante: {isStudent ? (f1Name || 'Sin asignar') : (b2Name || 'Sin asignar')}
+                    {currentApplicantData?.name || 'Nombre sin asignar'}
                   </span>
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 pt-1">
-                  {isStudent ? "Asesoría de Visa de Estudiante F-1" : "Asesoría de Visa de Turista B-2"}
+                  {isSelectedStudent ? "Formulario Consular — Visa de Estudiante F-1" : "Formulario Consular — Visa de Turista B-2"}
                 </h3>
               </div>
-              {isStudent ? (
-                <GraduationCap className="w-8 h-8 text-black shrink-0" />
-              ) : (
-                <Briefcase className="w-8 h-8 text-black shrink-0" />
-              )}
+              <div className="flex items-center gap-2">
+                {isSelectedStudent ? (
+                  <GraduationCap className="w-8 h-8 text-black shrink-0" />
+                ) : (
+                  <Briefcase className="w-8 h-8 text-black shrink-0" />
+                )}
+              </div>
             </div>
 
             {/* SECCIÓN DE CARGA DE FOTOGRAFÍA OFICIAL */}
@@ -336,7 +584,9 @@ export default function ProcesoPage() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <Camera className="w-4 h-4 text-black" />
-                      <h4 className="text-sm font-bold text-slate-900">Fotografía Oficial para el Trámite</h4>
+                      <h4 className="text-sm font-bold text-slate-900">
+                        Fotografía Oficial del Postulante
+                      </h4>
                     </div>
                     <p className="text-xs text-slate-500 leading-relaxed max-w-md">
                       Sube una fotografía reciente en fondo blanco (tipo pasaporte, 5x5 cm / 2x2 pulg) requerida para la postulación y el formulario DS-160.
@@ -371,7 +621,7 @@ export default function ProcesoPage() {
                         toast.info("Fotografía removida.");
                       }}
                       variant="outline"
-                      className="h-10 w-10 p-0 rounded-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex items-center justify-center shrink-0 transition-all"
+                      className="h-10 w-10 p-0 rounded-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex items-center justify-center shrink-0 transition-all cursor-pointer"
                       title="Eliminar fotografía"
                     >
                       <Trash2 className="w-4 h-4 text-red-600" />
@@ -384,11 +634,9 @@ export default function ProcesoPage() {
 
             {/* FORMULARIO CONSULAR OFICIAL */}
             <FormularioConsular 
-              isStudent={isStudent} 
-              onNameChange={(name) => {
-                if (isStudent) setF1Name(name);
-                else setB2Name(name);
-              }}
+              isStudent={isSelectedStudent} 
+              applicantId={activeApplicant.applicantId}
+              onNameChange={() => refreshApplicantsData()}
             />
 
           </div>

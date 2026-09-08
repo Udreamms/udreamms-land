@@ -31,6 +31,8 @@ interface QrTokenPaymentProps {
   billingData: BillingData | null;
   isBillingValid: boolean;
   compact?: boolean;
+  theme?: 'light' | 'dark';
+  userId?: string;
 }
 
 interface PaymentRequestState {
@@ -94,7 +96,10 @@ export default function QrTokenPayment({
   billingData,
   isBillingValid,
   compact = false,
+  theme = 'dark',
+  userId,
 }: QrTokenPaymentProps) {
+  const isLight = theme === 'light';
   const config = useMemo(() => getPaymentConfig(paymentMethod), [paymentMethod]);
   const needsPriceFeed = paymentMethod !== 'usdc' && paymentMethod !== 'usdt';
   const priceMint = paymentMethod === 'sol' ? SOL_MINT : config.mint;
@@ -219,33 +224,36 @@ export default function QrTokenPayment({
   }, [onSuccess, paymentRequest, sessionId]);
 
   const generationKey = useMemo(() => {
-    if (!billingData || !isBillingValid || !preciseAmount) {
+    if (!isBillingValid || !billingData || priceUSD <= 0 || !preciseAmount) {
       return null;
     }
 
-    return JSON.stringify({
+    return [
       sessionId,
       plan,
-      cartItems: plan === 'cart' ? cartItems : undefined,
+      plan === 'cart' && cartItems?.length ? cartItems.join(',') : '',
       paymentMethod,
-      amount: preciseAmount.uiAmount,
-      email: billingData.email,
-      fullName: billingData.fullName,
-      zipCode: billingData.zipCode,
-    });
-  }, [billingData, cartItems, isBillingValid, paymentMethod, plan, preciseAmount, sessionId]);
+      priceUSD.toFixed(2),
+      preciseAmount.uiAmount,
+      billingData.email.trim().toLowerCase(),
+      billingData.fullName.trim(),
+      `${billingData.phonePrefix}${billingData.phone}`.trim(),
+      billingData.country,
+      billingData.addressLine1.trim(),
+      (billingData.addressLine2 || '').trim(),
+      billingData.city.trim(),
+      billingData.zipCode.trim(),
+    ].join('::');
+  }, [billingData, cartItems, isBillingValid, paymentMethod, plan, preciseAmount, priceUSD, sessionId]);
 
   const handleGenerateQr = async (auto = false) => {
-    if (!billingData || !isBillingValid) {
-      if (!auto) {
-        toast.error('Completa tu nombre, correo y teléfono primero');
-      }
+    if (isProcessing) {
       return;
     }
 
-    if (!sessionId) {
+    if (!isBillingValid) {
       if (!auto) {
-        toast.error('Sesión de pago no válida. Recarga la página e intenta de nuevo.');
+        toast.error('Completa los datos de contacto para continuar');
       }
       return;
     }
@@ -278,6 +286,7 @@ export default function QrTokenPayment({
           expectedAmountUi: preciseAmount.uiAmount,
           expectedAmountRaw: preciseAmount.rawAmount,
           billingData: billingData || null,
+          userId: userId || undefined,
         }),
       });
 
@@ -347,49 +356,52 @@ export default function QrTokenPayment({
   }, [generationKey, isProcessing, lastGenerationKey]);
 
   const showPriceLoader = needsPriceFeed && loadingPrice;
-  const qrSize = compact ? 300 : 340;
+  const qrSize = compact ? 165 : 240;
   const walletAddress = paymentRequest?.recipientWallet || TREASURY_WALLET;
 
   return (
-    <div className="space-y-3">
+    <div className={compact ? 'space-y-2.5' : 'space-y-3'}>
       {showPriceLoader ? (
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="w-5 h-5 animate-spin text-blue-400 mr-2" />
-          <span className="text-sm text-slate-400">Obteniendo precio de {config.label}...</span>
+        <div className="flex items-center justify-center py-6">
+          <Loader2 className="w-4 h-4 animate-spin text-blue-600 mr-2" />
+          <span className="text-xs text-slate-500">Obteniendo precio de {config.label}...</span>
         </div>
       ) : preciseAmount ? (
         <>
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl px-3 py-2.5 flex items-center gap-2">
-            <Clock className="w-3.5 h-3.5 text-blue-400" />
-            <p className="text-xs text-blue-400 font-medium">
-              {paymentMethod === 'usdc' || paymentMethod === 'usdt'
-                ? 'Monto fijo en stablecoin'
-                : `Cotización actualizada cada ${secondsRemaining}s`}
-            </p>
-          </div>
-
-          <div className="bg-white/5 border border-white/10 rounded-xl p-3 space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-xs text-slate-500">Monto en USD</span>
-              <span className="text-sm font-medium text-white">${priceUSD.toFixed(2)}</span>
+          <div className="flex items-center justify-between gap-2">
+            <div className={`rounded-xl px-2.5 py-1.5 flex items-center gap-1.5 text-xs font-semibold ${
+              isLight ? 'bg-blue-50 text-blue-700 border border-blue-100' : 'bg-blue-500/10 border border-blue-500/20 text-blue-400'
+            }`}>
+              <Clock className="w-3.5 h-3.5" />
+              <span>
+                {paymentMethod === 'usdc' || paymentMethod === 'usdt'
+                  ? 'Monto exacto en stablecoin'
+                  : `Cotización: ${secondsRemaining}s`}
+              </span>
             </div>
-            <div className="h-px bg-white/10" />
-            <div className="flex justify-between items-center">
-              <span className="text-xs text-slate-500 font-medium">Escanea y paga</span>
-              <span className="text-lg font-medium text-blue-400">
+
+            <div className={`px-2.5 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 ${
+              isLight ? 'bg-slate-50 border-slate-200 text-slate-900' : 'bg-white/5 border-white/10 text-white'
+            }`}>
+              <span className="text-slate-400 font-normal">Pagas:</span>
+              <span className={isLight ? 'text-blue-600 font-bold' : 'text-blue-400 font-bold'}>
                 {preciseAmount.uiAmount} {config.label}
               </span>
             </div>
           </div>
 
-          <div className="rounded-2xl ring-1 ring-white/10 p-4 space-y-3">
+          <div className={`rounded-2xl p-3 sm:p-3.5 space-y-2.5 ${
+            isLight ? 'bg-slate-50 border border-slate-200/90 shadow-2xs' : 'rounded-2xl ring-1 ring-white/10'
+          }`}>
             {paymentRequest ? (
               <>
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center justify-between gap-2">
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-white">QR listo</p>
-                    <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                      Escanea con Phantom en tu celular para completar el pago en Solana mainnet.
+                    <p className={`text-xs font-bold uppercase tracking-wider ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                      Código QR Listo
+                    </p>
+                    <p className={`text-[11px] leading-tight ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+                      Escanea con tu billetera Phantom (Solana mainnet).
                     </p>
                   </div>
                   {!paymentRequest.isLocalFallback && (
@@ -401,92 +413,98 @@ export default function QrTokenPayment({
                         handleGenerateQr(false);
                       }}
                       disabled={isProcessing}
-                      className="h-8 px-3 text-xs text-slate-400 hover:text-blue-400 hover:bg-white/10"
+                      className={`h-7 px-2.5 text-xs cursor-pointer ${
+                        isLight ? 'text-slate-500 hover:text-blue-600 hover:bg-slate-200/60' : 'text-slate-400 hover:text-blue-400 hover:bg-white/10'
+                      }`}
                     >
-                      <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                      <RefreshCw className="w-3 h-3 mr-1" />
                       Actualizar
                     </Button>
                   )}
                 </div>
 
-                <div className="flex flex-col items-center gap-3">
+                <div className="flex justify-center py-0.5">
                   <BrandedQrCode value={paymentRequest.qrUrl} size={qrSize} />
                 </div>
 
                 {!paymentRequest.isLocalFallback && (
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-                      <p className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Estado</p>
-                      <div className="mt-1.5 flex items-center gap-2 text-xs font-medium text-slate-200">
+                  <div className="grid gap-2 grid-cols-2">
+                    <div className={`rounded-xl p-2 border ${
+                      isLight ? 'bg-white border-slate-200/80' : 'border-white/10 bg-white/5'
+                    }`}>
+                      <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Estado</p>
+                      <div className={`mt-0.5 flex items-center gap-1.5 text-xs font-semibold ${
+                        isLight ? 'text-slate-900' : 'text-slate-200'
+                      }`}>
                         {paymentRequest.status === 'paid' ? (
                           <>
-                            <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
-                            Pago confirmado
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                            <span>Confirmado</span>
                           </>
                         ) : paymentRequest.status === 'expired' ? (
                           <>
-                            <AlertCircle className="w-3.5 h-3.5 text-red-500" />
-                            QR expirado
+                            <AlertCircle className="w-3 h-3 text-red-500" />
+                            <span>Expirado</span>
                           </>
                         ) : (
                           <>
-                            <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-400" />
-                            Esperando pago en Phantom
+                            <Loader2 className="w-3 h-3 animate-spin text-blue-600" />
+                            <span className="text-[11px]">Esperando pago</span>
                           </>
                         )}
                       </div>
                     </div>
 
-                    <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-                      <p className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Expira</p>
-                      <p className="mt-1.5 text-xs font-medium text-slate-200">
-                        {secondsUntilExpiry > 0 ? `${secondsUntilExpiry}s restantes` : 'Expirado'}
+                    <div className={`rounded-xl p-2 border ${
+                      isLight ? 'bg-white border-slate-200/80' : 'border-white/10 bg-white/5'
+                    }`}>
+                      <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Expira en</p>
+                      <p className={`mt-0.5 text-xs font-semibold ${isLight ? 'text-slate-900' : 'text-slate-200'}`}>
+                        {secondsUntilExpiry > 0 ? `${secondsUntilExpiry}s` : 'Expirado'}
                       </p>
                     </div>
                   </div>
                 )}
               </>
             ) : (
-              <div className="bg-white/5 rounded-2xl p-4 flex items-center justify-center min-h-[180px] border border-white/10">
+              <div className={`rounded-xl p-5 flex items-center justify-center min-h-[160px] border ${
+                isLight ? 'bg-white border-slate-200 text-slate-600' : 'bg-white/5 border-white/10 text-slate-400'
+              }`}>
                 {isProcessing ? (
                   <div className="flex flex-col items-center gap-2 text-center">
-                    <Loader2 className="w-5 h-5 animate-spin text-blue-400" />
-                    <p className="text-xs text-slate-400">Generando tu código QR único...</p>
+                    <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                    <p className="text-xs font-semibold text-slate-700">Generando tu código QR...</p>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center gap-2 text-center px-4">
-                    <Smartphone className="w-6 h-6 text-slate-500" />
-                    <p className="text-xs text-slate-400">
+                    <Smartphone className={`w-6 h-6 ${isLight ? 'text-slate-400' : 'text-slate-500'}`} />
+                    <p className="text-xs font-medium text-slate-500">
                       {isBillingValid
-                        ? 'Preparando tu QR automáticamente...'
-                        : 'Completa nombre, correo y teléfono para generar el QR'}
+                        ? 'Generando tu código QR de pago...'
+                        : 'Completa tu nombre, correo y teléfono para generar el código QR.'}
                     </p>
                   </div>
                 )}
               </div>
             )}
-
           </div>
-
         </>
       ) : paymentMethod === 'lxr' && !loadingPrice && !quotedTokenPrice ? (
-        <div className="rounded-xl border border-purple-500/25 bg-purple-500/10 p-4 text-center space-y-2">
-          <p className="text-sm font-medium text-purple-200">
+        <div className="rounded-xl border border-purple-200 bg-purple-50 p-3.5 text-center space-y-1.5">
+          <p className="text-xs font-semibold text-purple-900">
             LXR — disponible en {getLxrLaunchLabel()}
           </p>
-          <p className="text-xs text-slate-400 leading-relaxed max-w-sm mx-auto">
-            El token aún no cotiza en Jupiter. Cuando salga al público, el precio y el código QR se
-            activarán solos cada 60 segundos, igual que con SOL.
+          <p className="text-[11px] text-slate-600 leading-relaxed max-w-sm mx-auto">
+            Por ahora puedes pagar con USDC, USDT o SOL.
           </p>
-          <p className="text-xs text-slate-500">Por ahora puedes pagar con USDC, USDT o SOL.</p>
         </div>
       ) : (
-        <div className="text-center text-red-400 py-4 space-y-2">
-          <p className="font-medium">Error al cargar el precio de {config.label}</p>
+        <div className="text-center text-red-600 py-3 space-y-1">
+          <p className="text-xs font-semibold">Error al calcular el precio de {config.label}</p>
         </div>
       )}
 
-      <WalletCopyButton address={walletAddress} />
+      <WalletCopyButton address={walletAddress} theme={theme} />
     </div>
   );
 }

@@ -40,8 +40,12 @@ function buildCartItemsConfig() {
     'curso-turista': 'curso',
     'libro-estudiante': 'libro',
     'libro-turista': 'libro',
+    'sevis': 'plan',
+    'entrevista-embajada': 'plan',
   };
   const visaMap: Record<string, 'estudiante' | 'turista'> = {
+    'sevis': 'estudiante',
+    'entrevista-embajada': 'estudiante',
     'curso-estudiante': 'estudiante',
     'libro-estudiante': 'estudiante',
     'plan-esencial': 'estudiante',
@@ -306,14 +310,18 @@ interface PortalContextType {
   // Functions
   getItemPrice: (itemId: string, method: 'card' | 'crypto' | null) => number;
   getCartTotal: (method: 'card' | 'crypto' | null) => number;
-  addToCart: (itemId: string) => void;
+  addToCart: (itemId: string, count?: number) => void;
   removeFromCart: (itemId: string) => void;
+  decreaseQuantity: (itemId: string) => void;
+  updateQuantity: (itemId: string, quantity: number) => void;
+  getCartItemQuantity: (itemId: string) => number;
+  getUniqueCartItems: () => string[];
   completeDatabasePurchase: (itemsToUnlock: string[]) => Promise<void>;
   handleCheckout: () => void;
   handleApplyUnlockCode: () => void;
   handleClearBypass: () => void;
   handleResetDbPurchased: () => void;
-  isUnlocked: (type: 'curso' | 'libro' | 'proceso', visa: 'estudiante' | 'turista') => boolean;
+  isUnlocked: (type: 'curso' | 'libro' | 'proceso' | 'recursos', visa: 'estudiante' | 'turista') => boolean;
   isPlanPurchased: (planId: string) => boolean;
   handleSignOut: () => Promise<void>;
   handleUpdateProfile: (e: React.FormEvent) => Promise<void>;
@@ -385,18 +393,45 @@ export function PortalProvider({ children }: { children: ReactNode }) {
     return getCartTotalUsd(cart, method || 'card');
   };
 
-  const addToCart = (itemId: string) => {
-    if (cart.includes(itemId)) {
-      toast.info("Ya está en el carrito");
-      return;
-    }
-    setCart((prev) => [...prev, itemId]);
+  const addToCart = (itemId: string, count: number = 1) => {
+    const toAdd = Array(count).fill(itemId);
+    setCart((prev) => [...prev, ...toAdd]);
     toast.success("Agregado al carrito");
   };
 
   const removeFromCart = (itemId: string) => {
     setCart((prev) => prev.filter((id) => id !== itemId));
     toast.success("Eliminado del carrito");
+  };
+
+  const decreaseQuantity = (itemId: string) => {
+    setCart((prev) => {
+      const idx = prev.lastIndexOf(itemId);
+      if (idx === -1) return prev;
+      const next = [...prev];
+      next.splice(idx, 1);
+      return next;
+    });
+  };
+
+  const updateQuantity = (itemId: string, targetQty: number) => {
+    if (targetQty <= 0) {
+      removeFromCart(itemId);
+      return;
+    }
+    setCart((prev) => {
+      const otherItems = prev.filter((id) => id !== itemId);
+      const newItems = Array(targetQty).fill(itemId);
+      return [...otherItems, ...newItems];
+    });
+  };
+
+  const getCartItemQuantity = (itemId: string) => {
+    return cart.filter((id) => id === itemId).length;
+  };
+
+  const getUniqueCartItems = () => {
+    return Array.from(new Set(cart));
   };
 
   const completeDatabasePurchase = async (itemsToUnlock: string[]) => {
@@ -407,6 +442,8 @@ export function PortalProvider({ children }: { children: ReactNode }) {
       const updates: Record<string, boolean> = {};
       
       itemsToUnlock.forEach((itemId) => {
+        if (itemId === 'sevis') updates.purchased_sevis = true;
+        if (itemId === 'entrevista-embajada') updates.purchased_entrevista_embajada = true;
         if (itemId === 'curso-estudiante') updates.purchased_curso_estudiante = true;
         if (itemId === 'libro-estudiante') updates.purchased_libro_estudiante = true;
         if (itemId === 'curso-turista') updates.purchased_curso_turista = true;
@@ -488,7 +525,7 @@ export function PortalProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const isUnlocked = (type: 'curso' | 'libro' | 'proceso', visa: 'estudiante' | 'turista') => {
+  const isUnlocked = (type: 'curso' | 'libro' | 'proceso' | 'recursos', visa: 'estudiante' | 'turista') => {
     if (isBypassActive) return true;
     if (typeof window !== 'undefined' && localStorage.getItem('udreamms_bypass') === '@Udreamms2026') {
       return true;
@@ -498,33 +535,46 @@ export function PortalProvider({ children }: { children: ReactNode }) {
     }
 
     if (!dbUser) return false;
+
+    const hasStudentPlan = !!(
+      dbUser.purchased_plan_esencial ||
+      dbUser.purchased_plan_pro ||
+      dbUser.purchased_plan_elite ||
+      dbUser.purchased_plan_allinclusive
+    );
+
+    const hasTouristPlan = !!(
+      dbUser.purchased_plan_turista_basico ||
+      dbUser.purchased_plan_turista_premium ||
+      dbUser.purchased_plan_turista_vip
+    );
+
+    // Recursos adicionales se liberan EXCLUSIVAMENTE con planes de Udreamms
+    if (type === 'recursos') {
+      return visa === 'estudiante' ? hasStudentPlan : hasTouristPlan;
+    }
+
     if (visa === 'estudiante') {
+      // El curso o libro se desbloquean ÚNICAMENTE si se pagaron individualmente (99.99 o 29.99)
       if (type === 'curso') return !!dbUser.purchased_curso_estudiante;
       if (type === 'libro') return !!dbUser.purchased_libro_estudiante;
-      if (type === 'proceso') {
-        return (
-          !!dbUser.purchased_plan_esencial ||
-          !!dbUser.purchased_plan_pro ||
-          !!dbUser.purchased_plan_elite ||
-          !!dbUser.purchased_plan_allinclusive
-        );
-      }
+      if (type === 'proceso') return hasStudentPlan;
     } else {
       if (type === 'curso') return !!dbUser.purchased_curso_turista;
       if (type === 'libro') return !!dbUser.purchased_libro_turista;
-      if (type === 'proceso') {
-        return (
-          !!dbUser.purchased_plan_turista_basico ||
-          !!dbUser.purchased_plan_turista_premium ||
-          !!dbUser.purchased_plan_turista_vip
-        );
-      }
+      if (type === 'proceso') return hasTouristPlan;
     }
     return false;
   };
 
   const isPlanPurchased = (planId: string) => {
     if (!dbUser) return false;
+    if (planId === 'sevis') return !!dbUser.purchased_sevis;
+    if (planId === 'entrevista-embajada') return !!dbUser.purchased_entrevista_embajada;
+    if (planId === 'curso-estudiante') return !!dbUser.purchased_curso_estudiante;
+    if (planId === 'libro-estudiante') return !!dbUser.purchased_libro_estudiante;
+    if (planId === 'curso-turista') return !!dbUser.purchased_curso_turista;
+    if (planId === 'libro-turista') return !!dbUser.purchased_libro_turista;
     if (planId === 'plan-esencial') return !!dbUser.purchased_plan_esencial;
     if (planId === 'plan-pro') return !!dbUser.purchased_plan_pro;
     if (planId === 'plan-elite') return !!dbUser.purchased_plan_elite;
@@ -579,6 +629,19 @@ export function PortalProvider({ children }: { children: ReactNode }) {
         }, (err) => {
           console.error("Error listening to user document:", err);
         });
+
+        // Automatically sync any pending purchases made via Stripe / Crypto
+        currentUser.getIdToken().then((token) => {
+          fetch('/api/payments/apply-pending', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          }).catch((err) => {
+            console.warn('Silent apply-pending check failed:', err);
+          });
+        }).catch(() => {});
       } else {
         setUser(null);
         setDbUser(null);
@@ -696,6 +759,10 @@ export function PortalProvider({ children }: { children: ReactNode }) {
         getCartTotal,
         addToCart,
         removeFromCart,
+        decreaseQuantity,
+        updateQuantity,
+        getCartItemQuantity,
+        getUniqueCartItems,
         completeDatabasePurchase,
         handleCheckout,
         handleApplyUnlockCode,

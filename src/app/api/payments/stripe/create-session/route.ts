@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const email = typeof body.email === 'string' ? body.email.trim() : '';
+    const userId = typeof body.userId === 'string' ? body.userId.trim() : '';
     const itemIds = Array.isArray(body.itemIds)
       ? body.itemIds.filter((id: unknown): id is string => typeof id === 'string')
       : [];
@@ -32,16 +33,19 @@ export async function POST(request: NextRequest) {
         ? body.cancelUrl
         : null;
 
-    const seen = new Set<string>();
-    const validItemIds = itemIds.filter((id) => {
-      if (!(id in PRODUCT_CATALOG) || seen.has(id)) return false;
-      seen.add(id);
-      return true;
-    });
+    const counts: Record<string, number> = {};
+    for (const id of itemIds) {
+      if (id in PRODUCT_CATALOG) {
+        counts[id] = (counts[id] || 0) + 1;
+      }
+    }
+    const uniqueItemIds = Object.keys(counts);
 
-    if (validItemIds.length === 0) {
+    if (uniqueItemIds.length === 0) {
       return NextResponse.json({ error: 'El carrito no tiene productos válidos' }, { status: 400 });
     }
+
+    const allValidItems = itemIds.filter((id) => id in PRODUCT_CATALOG);
 
     const origin = request.nextUrl.origin;
     const successBase =
@@ -53,10 +57,11 @@ export async function POST(request: NextRequest) {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       ...(email.includes('@') ? { customer_email: email } : {}),
-      line_items: validItemIds.map((itemId) => {
+      line_items: uniqueItemIds.map((itemId) => {
         const entry = getProductEntry(itemId)!;
+        const qty = counts[itemId] || 1;
         return {
-          quantity: 1,
+          quantity: qty,
           price_data: {
             currency: 'usd',
             unit_amount: Math.round(getItemPriceUsd(itemId, 'card') * 100),
@@ -68,10 +73,11 @@ export async function POST(request: NextRequest) {
         };
       }),
       metadata: {
-        item_ids: validItemIds.join(','),
-        product_id: validItemIds.length === 1 ? validItemIds[0] : 'cart',
+        user_id: userId || '',
+        item_ids: allValidItems.join(','),
+        product_id: uniqueItemIds.length === 1 && counts[uniqueItemIds[0]] === 1 ? uniqueItemIds[0] : 'cart',
         billing_email: email.toLowerCase(),
-        charge_usd: String(getCartTotalUsd(validItemIds, 'card')),
+        charge_usd: String(getCartTotalUsd(allValidItems, 'card')),
       },
       success_url: `${successBase}${successBase.includes('?') ? '&' : '?'}session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl,
@@ -84,8 +90,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       url: session.url,
       sessionId: session.id,
-      itemIds: validItemIds,
-      totalUsd: getCartTotalUsd(validItemIds, 'card'),
+      itemIds: allValidItems,
+      totalUsd: getCartTotalUsd(allValidItems, 'card'),
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Error al crear sesión de Stripe';

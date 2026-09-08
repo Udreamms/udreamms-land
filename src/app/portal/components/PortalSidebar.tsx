@@ -12,6 +12,7 @@ import {
   Menu,
   Headphones,
   ShoppingCart,
+  ArrowRight,
   Settings,
   LogOut,
 } from 'lucide-react';
@@ -40,6 +41,10 @@ export default function PortalSidebar({
     setIsProfileModalOpen,
     handleSignOut,
     removeFromCart,
+    addToCart,
+    decreaseQuantity,
+    getCartItemQuantity,
+    getUniqueCartItems,
     getCartTotal,
     handleCheckout,
     checkoutMethod,
@@ -183,104 +188,153 @@ export default function PortalSidebar({
 
       {/* Bottom Footer Section: Cart & User Account */}
       <div className="mt-8 pt-4 border-t border-slate-100 flex flex-col gap-2 relative">
-        {/* Shopping Cart Button */}
-        <div className="relative">
+        {/* Shopping Cart Button & Inline Panel */}
+        <div className="flex flex-col gap-2">
           <button
-            onClick={() => setIsCartOpen(!isCartOpen)}
+            onClick={() => {
+              if (isSidebarCollapsed) {
+                if (cart.length > 0) {
+                  handleCheckout();
+                } else if (onToggleSidebar) {
+                  onToggleSidebar();
+                }
+              } else {
+                setIsCartOpen(!isCartOpen);
+              }
+            }}
             className={`w-full py-2.5 px-3 rounded-xl border border-slate-200 hover:border-slate-400 bg-slate-50 hover:bg-slate-100 transition-all duration-200 flex items-center gap-3 cursor-pointer text-black ${
               isSidebarCollapsed ? 'justify-center' : 'justify-between'
-            }`}
+            } ${isCartOpen && !isSidebarCollapsed ? 'border-slate-900 ring-1 ring-slate-900/10' : ''}`}
             title="Carrito de Compras"
           >
             <div className="flex items-center gap-3 min-w-0">
               <div className="relative shrink-0">
                 <ShoppingCart className="w-4 h-4 text-black" />
                 {cart.length > 0 && (
-                  <span className="absolute -top-1.5 -right-2 bg-slate-900 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1.5 -right-2 bg-slate-900 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center shadow-xs">
                     {cart.length}
                   </span>
                 )}
               </div>
               {!isSidebarCollapsed && (
-                <span className="text-xs font-semibold tracking-wider uppercase text-slate-800">Carrito</span>
+                <span className="text-xs font-semibold tracking-wider uppercase text-slate-800">
+                  Carrito
+                </span>
               )}
             </div>
 
-            {!isSidebarCollapsed && cart.length > 0 && (
-              <span className="bg-slate-900 text-white border border-slate-900 px-2 py-0.5 rounded-full text-[9px] font-bold">
-                {cart.length}
-              </span>
+            {!isSidebarCollapsed && (
+              <div className="flex items-center gap-2">
+                {cart.length > 0 && (
+                  <span className="bg-slate-900 text-white border border-slate-900 px-2 py-0.5 rounded-full text-[9px] font-bold">
+                    {cart.length}
+                  </span>
+                )}
+                <span className="text-[10px] text-slate-400">
+                  {isCartOpen ? '▲' : '▼'}
+                </span>
+              </div>
             )}
           </button>
 
-          {/* Cart Dropdown */}
+          {/* Inline Cart Drawer within Sidebar Flow */}
           <AnimatePresence>
-            {isCartOpen && (
-              <>
-                <div className="fixed inset-0 z-40 pointer-events-auto" onClick={() => setIsCartOpen(false)} />
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                  transition={{ duration: 0.15, ease: 'easeOut' }}
-                  className={`absolute z-50 w-80 rounded-2xl bg-white border border-slate-200 shadow-2xl p-4 space-y-4 text-black ${
-                    isSidebarCollapsed ? 'left-full bottom-0 ml-3' : 'left-0 bottom-full mb-3'
-                  }`}
-                >
-                  <div>
-                    <p className="text-xs font-bold tracking-widest text-slate-500 uppercase mb-2">
-                      Carrito de Compras
-                    </p>
-                    {cart.length === 0 ? (
-                      <p className="text-xs text-slate-500 py-4 text-center">Tu carrito está vacío</p>
-                    ) : (
-                      <div className="space-y-3 max-h-60 overflow-y-auto pr-1 no-scrollbar">
-                        {cart.map((itemId) => {
-                          const item = cartItemsConfig[itemId];
-                          if (!item) return null;
-                          return (
-                            <div
-                              key={itemId}
-                              className="flex justify-between items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200"
+            {isCartOpen && !isSidebarCollapsed && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden rounded-2xl bg-slate-50 border border-slate-200 p-3.5 space-y-3 shadow-inner text-black"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+                    Tu Carrito ({cart.length})
+                  </p>
+                  <button
+                    onClick={() => setIsCartOpen(false)}
+                    className="text-slate-400 hover:text-slate-700 text-xs px-1.5 py-0.5 rounded-md hover:bg-slate-200/60 transition-colors cursor-pointer"
+                    title="Cerrar carrito"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {cart.length === 0 ? (
+                  <p className="text-xs text-slate-500 py-3 text-center">Tu carrito está vacío</p>
+                ) : (
+                  <div className="space-y-2 max-h-52 overflow-y-auto pr-0.5 no-scrollbar">
+                    {getUniqueCartItems().map((itemId) => {
+                      const item = cartItemsConfig[itemId];
+                      if (!item) return null;
+                      const qty = getCartItemQuantity(itemId);
+                      return (
+                        <div
+                          key={itemId}
+                          className="p-2.5 rounded-xl bg-white border border-slate-200 space-y-1.5 shadow-2xs"
+                        >
+                          <div className="flex justify-between items-start gap-1.5">
+                            <p className="text-[11px] font-bold text-slate-900 leading-tight line-clamp-1">
+                              {item.name}
+                            </p>
+                            <button
+                              onClick={() => removeFromCart(itemId)}
+                              className="text-[9px] text-slate-400 hover:text-red-500 uppercase tracking-wider font-bold shrink-0 transition-colors cursor-pointer"
+                              title="Quitar"
                             >
-                              <div className="min-w-0">
-                                <p className="text-xs font-bold truncate text-black">{item.name}</p>
-                                <p className="text-[10px] text-slate-700 font-bold">
-                                  ${item.price.toFixed(2)} USD
-                                </p>
-                              </div>
+                              Quitar
+                            </button>
+                          </div>
+
+                          <div className="flex justify-between items-center pt-1 border-t border-slate-100">
+                            <span className="text-[11px] font-bold text-slate-900">
+                              ${(item.price * qty).toFixed(2)} USD
+                            </span>
+
+                            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 rounded-lg px-1.5 py-0.5">
                               <button
-                                onClick={() => removeFromCart(itemId)}
-                                className="text-[10px] text-slate-600 hover:text-black uppercase tracking-wider font-bold shrink-0"
+                                onClick={() => decreaseQuantity(itemId)}
+                                className="text-slate-600 hover:text-black font-bold text-xs px-1 cursor-pointer"
+                                title="Restar"
                               >
-                                Quitar
+                                -
+                              </button>
+                              <span className="text-[10px] font-bold text-slate-900 min-w-[14px] text-center">
+                                {qty}
+                              </span>
+                              <button
+                                onClick={() => addToCart(itemId)}
+                                className="text-slate-600 hover:text-black font-bold text-xs px-1 cursor-pointer"
+                                title="Sumar"
+                              >
+                                +
                               </button>
                             </div>
-                          );
-                        })}
-                      </div>
-                    )}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
+                )}
 
-                  {cart.length > 0 && (
-                    <>
-                      <div className="border-t border-slate-100" />
-                      <div className="flex justify-between items-center px-1">
-                        <span className="text-xs text-slate-600 uppercase tracking-wider font-semibold">Total</span>
-                        <span className="text-sm font-bold text-black">
-                          ${checkoutTotal.toFixed(2)} USD
-                        </span>
-                      </div>
-                      <Button
-                        onClick={handleCheckout}
-                        className="w-full h-11 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 text-xs font-bold tracking-widest uppercase flex items-center justify-center gap-2 transition-all duration-300"
-                      >
-                        Realizar Pago
-                      </Button>
-                    </>
-                  )}
-                </motion.div>
-              </>
+                {cart.length > 0 && (
+                  <div className="pt-2.5 border-t border-slate-200 space-y-2.5">
+                    <div className="flex justify-between items-center px-0.5">
+                      <span className="text-[11px] text-slate-600 uppercase tracking-wider font-semibold">Total</span>
+                      <span className="text-xs font-bold text-black">
+                        ${checkoutTotal.toFixed(2)} USD
+                      </span>
+                    </div>
+                    <Button
+                      onClick={handleCheckout}
+                      className="w-full h-9 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 text-[11px] font-bold tracking-wider uppercase flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer"
+                    >
+                      <span>Realizar Pago</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-white" />
+                    </Button>
+                  </div>
+                )}
+              </motion.div>
             )}
           </AnimatePresence>
         </div>
