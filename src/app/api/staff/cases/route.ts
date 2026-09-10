@@ -97,6 +97,8 @@ export async function GET(req: NextRequest) {
     }
 
     const realCases: any[] = [];
+    const existingCaseKeys = new Set<string>();
+
     snapshot.forEach(doc => {
       const data = doc.data();
       const formData = data.formData || {};
@@ -107,6 +109,11 @@ export async function GET(req: NextRequest) {
         'Postulante';
 
       const emailKey = (data.email || formData.email_contacto || '').toLowerCase().trim();
+      const typeKey = data.visaType === 'B-2' ? 'b2' : 'f1';
+      if (emailKey) {
+        existingCaseKeys.add(`${emailKey}_${typeKey}`);
+      }
+
       const chatInfo = chatMap[emailKey] || { unreadByStaff: 0, lastMessage: '' };
 
       realCases.push({
@@ -134,6 +141,87 @@ export async function GET(req: NextRequest) {
         lastChatMessage: chatInfo.lastMessage || '',
       });
     });
+
+    // Cross-reference users collection: guarantee any client who purchased a plan appears immediately in Staff
+    try {
+      const usersSnap = await db.collection('users').get();
+      usersSnap.forEach(uDoc => {
+        const uData = uDoc.data();
+        const uEmail = (uData.email || '').toLowerCase().trim();
+        if (!uEmail) return;
+
+        const hasStudent = Boolean(
+          uData.purchased_plan_esencial ||
+          uData.purchased_plan_pro ||
+          uData.purchased_plan_elite ||
+          uData.purchased_plan_allinclusive
+        );
+
+        const hasTourist = Boolean(
+          uData.purchased_plan_turista_basico ||
+          uData.purchased_plan_turista_premium ||
+          uData.purchased_plan_turista_vip
+        );
+
+        if (hasStudent && !existingCaseKeys.has(`${uEmail}_f1`)) {
+          const chatInfo = chatMap[uEmail] || { unreadByStaff: 0, lastMessage: '' };
+          existingCaseKeys.add(`${uEmail}_f1`);
+          realCases.push({
+            id: `case_${uEmail.replace(/[^a-zA-Z0-9]/g, '_')}_f1`,
+            name: uData.displayName || uData.name || uEmail.split('@')[0] || 'Postulante F-1',
+            email: uEmail,
+            phone: uData.phone || uData.phoneNumber || '',
+            visaType: 'F-1',
+            schoolState: 'Utah',
+            schoolName: 'Lumos Language School (Salt Lake City)',
+            status: 'nuevos',
+            submittedAt: uData.createdAt ? uData.createdAt.split('T')[0] : (uData.last_payment_at ? uData.last_payment_at.split('T')[0] : new Date().toISOString().split('T')[0]),
+            updatedAt: uData.updatedAt || uData.last_payment_at || new Date().toISOString(),
+            photoUrl: uData.photoURL || '',
+            passportDoc: null,
+            bankStatementDoc: null,
+            formData: {
+              email_contacto: uEmail,
+              nombres: (uData.displayName || uData.name || '').split(' ')[0] || '',
+              apellidos: (uData.displayName || uData.name || '').split(' ').slice(1).join(' ') || '',
+            },
+            notes: 'Plan F-1 adquirido. Expediente pendiente de llenado.',
+            unreadCount: chatInfo.unreadByStaff || 0,
+            lastChatMessage: chatInfo.lastMessage || '',
+          });
+        }
+
+        if (hasTourist && !existingCaseKeys.has(`${uEmail}_b2`)) {
+          const chatInfo = chatMap[uEmail] || { unreadByStaff: 0, lastMessage: '' };
+          existingCaseKeys.add(`${uEmail}_b2`);
+          realCases.push({
+            id: `case_${uEmail.replace(/[^a-zA-Z0-9]/g, '_')}_b2`,
+            name: uData.displayName || uData.name || uEmail.split('@')[0] || 'Postulante B-2',
+            email: uEmail,
+            phone: uData.phone || uData.phoneNumber || '',
+            visaType: 'B-2',
+            schoolState: 'Utah',
+            schoolName: 'N/A (Turismo B-2)',
+            status: 'nuevos',
+            submittedAt: uData.createdAt ? uData.createdAt.split('T')[0] : (uData.last_payment_at ? uData.last_payment_at.split('T')[0] : new Date().toISOString().split('T')[0]),
+            updatedAt: uData.updatedAt || uData.last_payment_at || new Date().toISOString(),
+            photoUrl: uData.photoURL || '',
+            passportDoc: null,
+            bankStatementDoc: null,
+            formData: {
+              email_contacto: uEmail,
+              nombres: (uData.displayName || uData.name || '').split(' ')[0] || '',
+              apellidos: (uData.displayName || uData.name || '').split(' ').slice(1).join(' ') || '',
+            },
+            notes: 'Plan B-2 adquirido. Expediente pendiente de llenado.',
+            unreadCount: chatInfo.unreadByStaff || 0,
+            lastChatMessage: chatInfo.lastMessage || '',
+          });
+        }
+      });
+    } catch (usersErr) {
+      console.warn('Could not cross-reference users collection:', usersErr);
+    }
 
     // Sort by unread messages first, then updatedAt or submittedAt desc
     realCases.sort((a, b) => {
