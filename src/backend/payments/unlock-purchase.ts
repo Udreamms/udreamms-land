@@ -4,6 +4,23 @@ export const PENDING_PURCHASES_COLLECTION = 'pendingPurchases';
 
 /** Firestore user fields unlocked per catalog item id */
 export const PURCHASE_FIELD_BY_ITEM: Record<string, string> = {
+  'aplicacion-escuela': 'purchased_aplicacion_escuela',
+  'aplicacion-escuela-lumos-slc': 'purchased_aplicacion_escuela',
+  'aplicacion-escuela-lumos-orem': 'purchased_aplicacion_escuela',
+  'aplicacion-escuela-uceda': 'purchased_aplicacion_escuela',
+  'aplicacion-escuela-language-on': 'purchased_aplicacion_escuela',
+  'aplicacion-escuela-internexus-1': 'purchased_aplicacion_escuela',
+  'aplicacion-escuela-internexus-2': 'purchased_aplicacion_escuela',
+  'aplicacion-escuela-american-one': 'purchased_aplicacion_escuela',
+  'aplicacion-escuela-inx': 'purchased_aplicacion_escuela',
+  'aplicacion-escuela-pace': 'purchased_aplicacion_escuela',
+  'aplicacion-escuela-us-ling': 'purchased_aplicacion_escuela',
+  'aplicacion-escuela-byu': 'purchased_aplicacion_escuela',
+  'aplicacion-escuela-uvu': 'purchased_aplicacion_escuela',
+  'aplicacion-escuela-uofu': 'purchased_aplicacion_escuela',
+  'aplicacion-escuela-usu': 'purchased_aplicacion_escuela',
+  'aplicacion-escuela-slcc': 'purchased_aplicacion_escuela',
+  'aplicacion-escuela-otra': 'purchased_aplicacion_escuela',
   'sevis': 'purchased_sevis',
   'entrevista-embajada': 'purchased_entrevista_embajada',
   'curso-estudiante': 'purchased_curso_estudiante',

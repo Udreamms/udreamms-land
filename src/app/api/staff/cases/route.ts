@@ -78,13 +78,68 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ cases: defaultCases });
     }
 
+    // Query portal_chats collection to attach unread counts in real-time
+    let chatMap: Record<string, { unreadByStaff: number; lastMessage: string }> = {};
+    try {
+      const chatSnap = await db.collection('portal_chats').get();
+      chatSnap.forEach(cDoc => {
+        const cData = cDoc.data();
+        const emailKey = (cData.clientEmail || '').toLowerCase().trim();
+        if (emailKey) {
+          chatMap[emailKey] = {
+            unreadByStaff: cData.unreadByStaff || 0,
+            lastMessage: cData.lastMessage || '',
+          };
+        }
+      });
+    } catch (chatErr) {
+      console.warn('Could not fetch portal_chats map:', chatErr);
+    }
+
     const realCases: any[] = [];
     snapshot.forEach(doc => {
-      realCases.push({ id: doc.id, ...doc.data() });
+      const data = doc.data();
+      const formData = data.formData || {};
+      const fullName =
+        data.name ||
+        `${formData.nombres || ''} ${formData.apellidos || ''}`.trim() ||
+        data.email ||
+        'Postulante';
+
+      const emailKey = (data.email || formData.email_contacto || '').toLowerCase().trim();
+      const chatInfo = chatMap[emailKey] || { unreadByStaff: 0, lastMessage: '' };
+
+      realCases.push({
+        id: doc.id,
+        name: fullName,
+        email: data.email || formData.email_contacto || '',
+        phone: data.phone || formData.celular_contacto || '',
+        visaType: data.visaType === 'B-2' ? 'B-2' : 'F-1',
+        schoolState: data.schoolState || formData.estado_estudio_usa || 'Utah',
+        schoolName:
+          data.schoolName ||
+          formData.nombre_escuela ||
+          (data.visaType === 'B-2' ? 'N/A (Turismo B-2)' : 'Sin escuela seleccionada'),
+        status: data.status || 'nuevos',
+        submittedAt:
+          data.submittedAt ||
+          (data.createdAt ? data.createdAt.split('T')[0] : new Date().toISOString().split('T')[0]),
+        updatedAt: data.updatedAt || data.createdAt || new Date().toISOString(),
+        photoUrl: data.photoUrl || '',
+        passportDoc: data.passportDoc || null,
+        bankStatementDoc: data.bankStatementDoc || null,
+        formData: formData,
+        notes: data.notes || '',
+        unreadCount: chatInfo.unreadByStaff || 0,
+        lastChatMessage: chatInfo.lastMessage || '',
+      });
     });
 
-    // Sort by updatedAt or submittedAt desc
+    // Sort by unread messages first, then updatedAt or submittedAt desc
     realCases.sort((a, b) => {
+      if ((b.unreadCount || 0) !== (a.unreadCount || 0)) {
+        return (b.unreadCount || 0) - (a.unreadCount || 0);
+      }
       const timeA = new Date(a.updatedAt || a.submittedAt || 0).getTime();
       const timeB = new Date(b.updatedAt || b.submittedAt || 0).getTime();
       return timeB - timeA;
@@ -93,7 +148,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ cases: realCases });
   } catch (error: any) {
     console.error('Error fetching staff cases:', error);
-    return NextResponse.json({ cases: defaultCases, error: error?.message });
+    return NextResponse.json({ cases: [], error: error?.message });
   }
 }
 

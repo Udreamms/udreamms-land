@@ -43,9 +43,7 @@ function BookHeader() {
             className="bg-white/10 hover:bg-white/20 text-white font-semibold text-xs md:text-sm px-4 py-2 rounded-xl transition-all font-sans cursor-pointer"
           >
             <a
-              href="https://buy.stripe.com/bJeeVdckP87851w2HxenS0D"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#checkout-top"
               className="font-sans"
             >
               Quiero mi libro

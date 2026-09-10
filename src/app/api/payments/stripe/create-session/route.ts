@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripeClient } from '@/backend/payments/stripe';
 import {
+  calculateStripeGrossTotal,
+  calculateStripeProcessingFee,
   getCartTotalUsd,
   getItemPriceUsd,
   getProductEntry,
@@ -46,6 +48,9 @@ export async function POST(request: NextRequest) {
     }
 
     const allValidItems = itemIds.filter((id) => id in PRODUCT_CATALOG);
+    const subtotalUsd = getCartTotalUsd(allValidItems, 'card');
+    const processingFeeUsd = calculateStripeProcessingFee(subtotalUsd);
+    const grossTotalUsd = calculateStripeGrossTotal(subtotalUsd);
 
     const origin = request.nextUrl.origin;
     const successBase =
@@ -57,27 +62,42 @@ export async function POST(request: NextRequest) {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       ...(email.includes('@') ? { customer_email: email } : {}),
-      line_items: uniqueItemIds.map((itemId) => {
-        const entry = getProductEntry(itemId)!;
-        const qty = counts[itemId] || 1;
-        return {
-          quantity: qty,
+      line_items: [
+        ...uniqueItemIds.map((itemId) => {
+          const entry = getProductEntry(itemId)!;
+          const qty = counts[itemId] || 1;
+          return {
+            quantity: qty,
+            price_data: {
+              currency: 'usd',
+              unit_amount: Math.round(getItemPriceUsd(itemId, 'card') * 100),
+              product_data: {
+                name: entry.name,
+                metadata: { item_id: itemId },
+              },
+            },
+          };
+        }),
+        ...(processingFeeUsd > 0 ? [{
+          quantity: 1,
           price_data: {
             currency: 'usd',
-            unit_amount: Math.round(getItemPriceUsd(itemId, 'card') * 100),
+            unit_amount: Math.round(processingFeeUsd * 100),
             product_data: {
-              name: entry.name,
-              metadata: { item_id: itemId },
+              name: 'Comisión de Procesamiento y Pasarela (Stripe)',
+              description: 'Tarifa por procesamiento y gestión de transacción bancaria internacional con tarjeta',
             },
           },
-        };
-      }),
+        }] : []),
+      ],
       metadata: {
         user_id: userId || '',
         item_ids: allValidItems.join(','),
         product_id: uniqueItemIds.length === 1 && counts[uniqueItemIds[0]] === 1 ? uniqueItemIds[0] : 'cart',
         billing_email: email.toLowerCase(),
-        charge_usd: String(getCartTotalUsd(allValidItems, 'card')),
+        subtotal_usd: String(subtotalUsd),
+        processing_fee_usd: String(processingFeeUsd),
+        charge_usd: String(grossTotalUsd),
       },
       success_url: `${successBase}${successBase.includes('?') ? '&' : '?'}session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl,
@@ -91,7 +111,9 @@ export async function POST(request: NextRequest) {
       url: session.url,
       sessionId: session.id,
       itemIds: allValidItems,
-      totalUsd: getCartTotalUsd(allValidItems, 'card'),
+      subtotalUsd,
+      processingFeeUsd,
+      totalUsd: grossTotalUsd,
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Error al crear sesión de Stripe';

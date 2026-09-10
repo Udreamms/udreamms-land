@@ -569,6 +569,7 @@ export function PortalProvider({ children }: { children: ReactNode }) {
 
   const isPlanPurchased = (planId: string) => {
     if (!dbUser) return false;
+    if (planId === 'aplicacion-escuela' || planId.startsWith('aplicacion-escuela')) return !!dbUser.purchased_aplicacion_escuela;
     if (planId === 'sevis') return !!dbUser.purchased_sevis;
     if (planId === 'entrevista-embajada') return !!dbUser.purchased_entrevista_embajada;
     if (planId === 'curso-estudiante') return !!dbUser.purchased_curso_estudiante;

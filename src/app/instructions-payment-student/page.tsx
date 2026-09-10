@@ -110,6 +110,43 @@ function InstructionsContent() {
     setApprovedOrder(details);
   }, []);
 
+  const [stripeLoading, setStripeLoading] = useState(false);
+
+  const handleStartStripeCheckout = async () => {
+    if (!selectedPlan) return;
+    setStripeLoading(true);
+    const planIdToItemId: Record<PlanId, string> = {
+      esencial: 'plan-esencial',
+      pro: 'plan-pro',
+      elite: 'plan-elite',
+      allinclusive: 'plan-allinclusive',
+    };
+    const itemId = planIdToItemId[selectedPlan];
+    try {
+      const origin = window.location.origin;
+      const successUrl = `${origin}/portal?stripe=success&session_id={CHECKOUT_SESSION_ID}`;
+      const cancelUrl = `${origin}/instructions-payment-student?plan=${selectedPlan}&stripe=cancelled`;
+      const response = await fetch('/api/payments/stripe/create-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemIds: [itemId],
+          email: '',
+          successUrl,
+          cancelUrl,
+        }),
+      });
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setStripeLoading(false);
+      }
+    } catch {
+      setStripeLoading(false);
+    }
+  };
+
   const checkoutPlanId = useMemo(() => selectedPlan, [selectedPlan]);
   const supportsCrypto = selectedPlan ? PLANS_WITH_CRYPTO.includes(selectedPlan) : false;
   const activePlan = selectedPlan ? planDetails[selectedPlan] : null;
@@ -423,15 +460,15 @@ function InstructionsContent() {
 
                       {paymentMethod === 'card' ? (
                         <div className="space-y-3 pt-2">
-                          <a
-                            href={activePlan.stripeLink}
-                            target="_blank"
-                            rel="noreferrer"
-                            className={s.ctaPrimary}
+                          <button
+                            type="button"
+                            onClick={handleStartStripeCheckout}
+                            disabled={stripeLoading}
+                            className={`${s.ctaPrimary} cursor-pointer disabled:opacity-60 justify-center w-full`}
                           >
-                            <span>Pagar {activePlan.title} ({activePlan.card})</span>
+                            <span>{stripeLoading ? 'Redirigiendo a Stripe...' : `Pagar ${activePlan.title} (${activePlan.card})`}</span>
                             <ArrowRight className="w-4 h-4 ml-1" />
-                          </a>
+                          </button>
                           <p className="text-[11px] text-slate-400 text-center flex items-center justify-center gap-1 pt-1">
                             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                             Procesado de forma 100% segura por Stripe

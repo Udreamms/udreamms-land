@@ -9,17 +9,157 @@ export interface ProductCatalogEntry {
   stripePaymentLink: string | null;
 }
 
+export interface SchoolProductInfo {
+  id: string;
+  name: string;
+  schoolName: string;
+  state: string;
+  price: number;
+}
+
+export const UTAH_SCHOOLS_CATALOG: SchoolProductInfo[] = [
+  {
+    id: 'aplicacion-escuela-lumos-slc',
+    name: 'Aplicación - Lumos Language School (Salt Lake City)',
+    schoolName: 'Lumos Language School (Salt Lake City)',
+    state: 'Utah',
+    price: 100,
+  },
+  {
+    id: 'aplicacion-escuela-lumos-orem',
+    name: 'Aplicación - Lumos Language School (Orem)',
+    schoolName: 'Lumos Language School (Orem)',
+    state: 'Utah',
+    price: 100,
+  },
+  {
+    id: 'aplicacion-escuela-uceda',
+    name: 'Aplicación - Uceda School of Utah (Provo)',
+    schoolName: 'Uceda School of Utah (Provo)',
+    state: 'Utah',
+    price: 150,
+  },
+  {
+    id: 'aplicacion-escuela-language-on',
+    name: 'Aplicación - LANGUAGE ON (Salt Lake City)',
+    schoolName: 'LANGUAGE ON (Salt Lake City)',
+    state: 'Utah',
+    price: 100,
+  },
+  {
+    id: 'aplicacion-escuela-internexus-1',
+    name: 'Aplicación - Internexus Provo (Campus 1)',
+    schoolName: 'Internexus Provo (Campus 1 - Provo)',
+    state: 'Utah',
+    price: 100,
+  },
+  {
+    id: 'aplicacion-escuela-internexus-2',
+    name: 'Aplicación - Internexus Provo (Campus 2)',
+    schoolName: 'Internexus Provo (Campus 2 - Provo)',
+    state: 'Utah',
+    price: 100,
+  },
+  {
+    id: 'aplicacion-escuela-american-one',
+    name: 'Aplicación - American One English Schools',
+    schoolName: 'American One English Schools INC (West Valley)',
+    state: 'Utah',
+    price: 100,
+  },
+  {
+    id: 'aplicacion-escuela-inx',
+    name: 'Aplicación - INX Academy (Salt Lake City)',
+    schoolName: 'INX Academy (Salt Lake City)',
+    state: 'Utah',
+    price: 100,
+  },
+  {
+    id: 'aplicacion-escuela-pace',
+    name: 'Aplicación - PACE International Academy',
+    schoolName: 'PACE International Academy (Orem)',
+    state: 'Utah',
+    price: 100,
+  },
+  {
+    id: 'aplicacion-escuela-us-ling',
+    name: 'Aplicación - U.S. Ling Institute (Murray)',
+    schoolName: 'U.S. Ling Institute (Murray)',
+    state: 'Utah',
+    price: 100,
+  },
+  {
+    id: 'aplicacion-escuela-byu',
+    name: 'Aplicación - Brigham Young University',
+    schoolName: 'Brigham Young University - Provo',
+    state: 'Utah',
+    price: 100,
+  },
+  {
+    id: 'aplicacion-escuela-uvu',
+    name: 'Aplicación - Utah Valley University',
+    schoolName: 'Utah Valley University (Orem)',
+    state: 'Utah',
+    price: 115,
+  },
+  {
+    id: 'aplicacion-escuela-uofu',
+    name: 'Aplicación - University of Utah',
+    schoolName: 'University of Utah (Salt Lake City)',
+    state: 'Utah',
+    price: 135,
+  },
+  {
+    id: 'aplicacion-escuela-usu',
+    name: 'Aplicación - Utah State University',
+    schoolName: 'Utah State University (Logan)',
+    state: 'Utah',
+    price: 110,
+  },
+  {
+    id: 'aplicacion-escuela-slcc',
+    name: 'Aplicación - Salt Lake Community College',
+    schoolName: 'Salt Lake Community College',
+    state: 'Utah',
+    price: 100,
+  },
+  {
+    id: 'aplicacion-escuela-otra',
+    name: 'Aplicación - Otra Escuela (Utah)',
+    schoolName: 'Otra Escuela (Utah)',
+    state: 'Utah',
+    price: 100,
+  },
+];
+
 export const PRODUCT_CATALOG: Record<string, ProductCatalogEntry> = {
+  'aplicacion-escuela': {
+    name: 'Aplicación a la Escuela (I-20)',
+    cardPriceUsd: 100,
+    cryptoPriceUsd: 100,
+    stripePaymentLink: null,
+  },
+  ...Object.fromEntries(
+    UTAH_SCHOOLS_CATALOG.map((sch) => [
+      sch.id,
+      {
+        name: sch.name,
+        cardPriceUsd: sch.price,
+        cryptoPriceUsd: sch.price,
+        stripePaymentLink: null,
+      },
+    ])
+  ),
   'sevis': {
     name: 'Tarifa SEVIS (I-901)',
-    cardPriceUsd: 368,
-    cryptoPriceUsd: 368,
+    cardPriceUsd: 350,
+    cryptoPriceUsd: 350,
     stripePaymentLink: null,
   },
   'entrevista-embajada': {
     name: 'Cita para la Entrevista en la Embajada (MRV)',
-    cardPriceUsd: 195,
-    cryptoPriceUsd: 195,
+    cardPriceUsd: 185,
+    cryptoPriceUsd: 185,
     stripePaymentLink: null,
   },
   'curso-estudiante': {
@@ -134,3 +274,25 @@ export function buildLegacyCardCatalogUsd(): Record<string, number> {
   }
   return map;
 }
+
+/**
+ * Parámetros oficiales de comisión por procesamiento con tarjeta en Stripe (3.5% + $0.30 USD internacional).
+ * Permite que al pagar con tarjeta, la pasarela añada la comisión de procesamiento y Udreamms reciba el valor neto real del servicio.
+ */
+export const STRIPE_FEE_PERCENT = 0.035; // 3.5%
+export const STRIPE_FEE_FIXED_USD = 0.30; // $0.30 USD
+
+export function calculateStripeProcessingFee(netAmountUsd: number): number {
+  if (netAmountUsd <= 0) return 0;
+  // Fórmula: Total = (Neto + Fijo) / (1 - Porcentaje) -> Comisión = Total - Neto
+  const gross = (netAmountUsd + STRIPE_FEE_FIXED_USD) / (1 - STRIPE_FEE_PERCENT);
+  const fee = gross - netAmountUsd;
+  return Number(fee.toFixed(2));
+}
+
+export function calculateStripeGrossTotal(netAmountUsd: number): number {
+  if (netAmountUsd <= 0) return 0;
+  const fee = calculateStripeProcessingFee(netAmountUsd);
+  return Number((netAmountUsd + fee).toFixed(2));
+}
+

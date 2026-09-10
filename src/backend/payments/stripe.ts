@@ -21,6 +21,25 @@ export function getStripeClient() {
 export function matchItemFromDescriptionOrAmount(description: string, amountCents?: number | null): string | null {
   const desc = (description || '').toLowerCase();
   
+  if (desc.includes('escuela') || desc.includes('i-20') || desc.includes('aplicación') || desc.includes('aplicacion')) {
+    if (desc.includes('uceda')) return 'aplicacion-escuela-uceda';
+    if (desc.includes('lumos') && desc.includes('orem')) return 'aplicacion-escuela-lumos-orem';
+    if (desc.includes('lumos')) return 'aplicacion-escuela-lumos-slc';
+    if (desc.includes('language on')) return 'aplicacion-escuela-language-on';
+    if (desc.includes('internexus') && desc.includes('2')) return 'aplicacion-escuela-internexus-2';
+    if (desc.includes('internexus')) return 'aplicacion-escuela-internexus-1';
+    if (desc.includes('american one')) return 'aplicacion-escuela-american-one';
+    if (desc.includes('inx')) return 'aplicacion-escuela-inx';
+    if (desc.includes('pace')) return 'aplicacion-escuela-pace';
+    if (desc.includes('ling')) return 'aplicacion-escuela-us-ling';
+    if (desc.includes('byu') || desc.includes('brigham')) return 'aplicacion-escuela-byu';
+    if (desc.includes('uvu') || desc.includes('utah valley')) return 'aplicacion-escuela-uvu';
+    if (desc.includes('uofu') || desc.includes('university of utah')) return 'aplicacion-escuela-uofu';
+    if (desc.includes('usu') || desc.includes('utah state')) return 'aplicacion-escuela-usu';
+    if (desc.includes('slcc') || desc.includes('salt lake community')) return 'aplicacion-escuela-slcc';
+    return 'aplicacion-escuela';
+  }
+
   if (desc.includes('sevis') || amountCents === 36800 || amountCents === 35000) {
     return 'sevis';
   }

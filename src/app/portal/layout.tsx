@@ -44,7 +44,12 @@ import {
   readStripeCheckoutIntent,
   saveStripeCheckoutIntent,
 } from "@/lib/payments/portal-stripe-checkout";
+import {
+  calculateStripeGrossTotal,
+  calculateStripeProcessingFee,
+} from "@/lib/payments/product-catalog";
 import PortalSidebar from "./components/PortalSidebar";
+import PortalLiveChat from "@/components/portal/PortalLiveChat";
 import { toast } from "sonner";
 
 const IS_DEV = process.env.NODE_ENV === 'development';
@@ -52,6 +57,7 @@ const IS_DEV = process.env.NODE_ENV === 'development';
 function PortalLayoutContent({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isLiveChatOpen, setIsLiveChatOpen] = useState(false);
   const {
     user,
     dbUser,
@@ -226,6 +232,9 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
 
   const cryptoCheckoutPlan = cart.length === 1 ? cart[0] : 'cart';
   const checkoutTotal = getCartTotal(checkoutMethod);
+  const cardSubtotal = getCartTotal('card');
+  const cardProcessingFee = calculateStripeProcessingFee(cardSubtotal);
+  const cardGrossTotal = calculateStripeGrossTotal(cardSubtotal);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-500/20 flex flex-col relative overflow-hidden">
@@ -240,6 +249,8 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
           activeSection={activeSection}
           isSidebarCollapsed={isSidebarCollapsed}
           onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          isLiveChatOpen={isLiveChatOpen}
+          onToggleLiveChat={() => setIsLiveChatOpen(prev => !prev)}
         />
 
         {/* MAIN CONTENT AREA */}
@@ -514,11 +525,31 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
                             );
                           })}
                         </div>
-                        <div className="pt-2 border-t border-slate-100 flex justify-between items-center px-1">
-                          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total a pagar</span>
-                          <span className="text-lg font-semibold text-slate-900">
-                            ${getCartTotal(checkoutMethod).toFixed(2)} USD
-                          </span>
+                        <div className="pt-2 border-t border-slate-100 space-y-1.5 px-1">
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                              {checkoutMethod === 'card' ? 'Subtotal neto' : 'Total a pagar'}
+                            </span>
+                            <span className="text-sm font-semibold text-slate-900">
+                              ${(checkoutMethod === 'crypto' ? getCartTotal('crypto') : cardSubtotal).toFixed(2)} USD
+                            </span>
+                          </div>
+                          {checkoutMethod === 'card' && (
+                            <>
+                              <div className="flex justify-between items-center text-slate-500 text-xs">
+                                <span>Comisión pasarela Stripe (~3.5% + $0.30)</span>
+                                <span className="font-medium text-slate-700">
+                                  +${cardProcessingFee.toFixed(2)} USD
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-center pt-1.5 border-t border-slate-100">
+                                <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">Total a pagar</span>
+                                <span className="text-lg font-bold text-blue-600">
+                                  ${cardGrossTotal.toFixed(2)} USD
+                                </span>
+                              </div>
+                            </>
+                          )}
                         </div>
                       </div>
 
@@ -647,7 +678,7 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
                             className="w-full h-11 sm:h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm uppercase tracking-wider shadow-md shadow-blue-500/20 transition-all cursor-pointer flex items-center justify-center gap-2"
                           >
                             <Lock className="w-4 h-4 text-white" />
-                            {stripeRedirecting ? 'Redirigiendo a Stripe...' : `Pagar $${checkoutTotal.toFixed(2)} USD en Stripe`}
+                            {stripeRedirecting ? 'Redirigiendo a Stripe...' : `Pagar $${cardGrossTotal.toFixed(2)} USD en Stripe`}
                           </Button>
                         </div>
                       </div>
@@ -659,6 +690,14 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
           </div>
         )}
       </AnimatePresence>
+
+      {/* CLIENT LIVE CHAT DRAWER */}
+      <PortalLiveChat
+        isOpen={isLiveChatOpen}
+        onClose={() => setIsLiveChatOpen(false)}
+        userEmail={user?.email || ''}
+        userName={user?.displayName || user?.email || 'Cliente'}
+      />
 
     </div>
   );

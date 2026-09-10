@@ -16,7 +16,7 @@ import {
   Save, 
   ChevronDown, 
   ChevronUp,
-  CloudCheck
+  Building2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,8 +65,25 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
 
     const timer = setTimeout(async () => {
       try {
-        const photoKey = applicantId ? `udreamms_photo_${isStudent ? 'f1' : 'b2'}_${applicantId}` : `udreamms_photo_${isStudent ? 'f1' : 'b2'}`;
+        const prefix = isStudent ? 'f1' : 'b2';
+        const photoKey = applicantId ? `udreamms_photo_${prefix}_${applicantId}` : `udreamms_photo_${prefix}`;
+        const passportKey = applicantId ? `udreamms_passport_${prefix}_${applicantId}` : `udreamms_passport_${prefix}`;
+        const bankKey = applicantId ? `udreamms_bank_${prefix}_${applicantId}` : `udreamms_bank_${prefix}`;
+
         const photoUrl = typeof window !== 'undefined' ? localStorage.getItem(photoKey) : null;
+        let passportDoc = null;
+        let bankStatementDoc = null;
+
+        if (typeof window !== 'undefined') {
+          try {
+            const rawPassport = localStorage.getItem(passportKey);
+            if (rawPassport) passportDoc = JSON.parse(rawPassport);
+          } catch (e) {}
+          try {
+            const rawBank = localStorage.getItem(bankKey);
+            if (rawBank) bankStatementDoc = JSON.parse(rawBank);
+          } catch (e) {}
+        }
 
         await fetch('/api/portal/submission', {
           method: 'POST',
@@ -76,6 +93,8 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
             applicantId: applicantId || '1',
             formData,
             photoUrl,
+            passportDoc,
+            bankStatementDoc,
             userEmail: user?.email || formData.email_contacto || '',
             userName: user?.displayName || `${formData.nombres || ''} ${formData.apellidos || ''}`.trim(),
             userId: user?.uid || '',
@@ -127,15 +146,78 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
     });
   };
 
+  const [isSavingManual, setIsSavingManual] = useState(false);
+
+  const handleManualSave = async () => {
+    setIsSavingManual(true);
+    try {
+      const prefix = isStudent ? 'f1' : 'b2';
+      const photoKey = applicantId ? `udreamms_photo_${prefix}_${applicantId}` : `udreamms_photo_${prefix}`;
+      const passportKey = applicantId ? `udreamms_passport_${prefix}_${applicantId}` : `udreamms_passport_${prefix}`;
+      const bankKey = applicantId ? `udreamms_bank_${prefix}_${applicantId}` : `udreamms_bank_${prefix}`;
+
+      const photoUrl = typeof window !== 'undefined' ? localStorage.getItem(photoKey) : null;
+      let passportDoc = null;
+      let bankStatementDoc = null;
+
+      if (typeof window !== 'undefined') {
+        try {
+          const rawPassport = localStorage.getItem(passportKey);
+          if (rawPassport) passportDoc = JSON.parse(rawPassport);
+        } catch (e) {}
+        try {
+          const rawBank = localStorage.getItem(bankKey);
+          if (rawBank) bankStatementDoc = JSON.parse(rawBank);
+        } catch (e) {}
+      }
+
+      const res = await fetch('/api/portal/submission', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          visaType: isStudent ? 'F-1' : 'B-2',
+          applicantId: applicantId || '1',
+          formData,
+          photoUrl,
+          passportDoc,
+          bankStatementDoc,
+          userEmail: user?.email || formData.email_contacto || '',
+          userName: user?.displayName || `${formData.nombres || ''} ${formData.apellidos || ''}`.trim(),
+          userId: user?.uid || '',
+        })
+      });
+
+      if (res.ok) {
+        toast.success("¡Expediente guardado y sincronizado con el Staff de Udreamms con éxito!");
+      } else {
+        toast.info("Datos guardados en tu navegador.");
+      }
+    } catch (err) {
+      console.error('Error saving:', err);
+      toast.success("Datos guardados localmente.");
+    } finally {
+      setIsSavingManual(false);
+    }
+  };
+
   return (
     <div className="space-y-6 pt-2">
       
-      {/* Auto-save Status Indicator */}
-      <div className="flex justify-end items-center">
-        <div className="flex items-center gap-2 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full shadow-sm">
-          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-          Guardado automático activado
+      {/* Auto-save Status & Manual Save Toolbar */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-50 border border-slate-200 p-3.5 rounded-2xl">
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>Tus datos se respaldan automáticamente mientras escribes.</span>
         </div>
+        <Button
+          type="button"
+          onClick={handleManualSave}
+          disabled={isSavingManual}
+          className="h-9 px-4 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 shadow-sm shrink-0"
+        >
+          <Save className="w-3.5 h-3.5 text-white" />
+          {isSavingManual ? 'Guardando...' : 'Guardar Datos del Proceso'}
+        </Button>
       </div>
 
       {/* SECCIÓN 1: INFORMACIÓN PERSONAL */}
@@ -478,6 +560,16 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
 
         {openSections.sec4 && (
           <div className="p-5 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2 p-3.5 rounded-xl bg-blue-50/80 border border-blue-200/80 text-blue-950 text-xs flex items-start gap-2.5">
+              <CreditCard className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+              <div>
+                <strong className="font-bold">Documento de Pasaporte Requerido:</strong>
+                <p className="text-[11px] text-blue-900/80 mt-0.5 leading-relaxed">
+                  Recuerda adjuntar el escaneo o fotografía de la página de datos de tu pasaporte (<strong>preferiblemente escaneado en formato PDF</strong>) en la sección superior de <em>Documentos y Archivos Oficiales</em>.
+                </p>
+              </div>
+            </div>
+
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-700 block">Número de Pasaporte</label>
               <Input placeholder="Número oficial de pasaporte" value={formData['num_pasaporte'] || ''} onChange={e => handleChange('num_pasaporte', e.target.value)} className="bg-white border-slate-300 text-xs h-10" />
@@ -594,6 +686,16 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
 
         {openSections.sec6 && (
           <div className="p-5 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2 p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-200/80 text-emerald-950 text-xs flex items-start gap-2.5">
+              <Building2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <div>
+                <strong className="font-bold">Solvencia Económica y Estado de Cuenta:</strong>
+                <p className="text-[11px] text-emerald-900/80 mt-0.5 leading-relaxed">
+                  Recuerda adjuntar el <strong>Estado de Cuenta Bancario oficial (preferiblemente escaneado en PDF)</strong> del postulante o de su patrocinador en la sección superior de <em>Documentos y Archivos Oficiales</em>.
+                </p>
+              </div>
+            </div>
+
             <div className="space-y-1 md:col-span-2">
               <label className="text-xs font-bold text-slate-700 block">¿Tienes Patrocinador / Sponsor?</label>
               <select value={formData['tiene_patrocinador'] || ''} onChange={e => handleChange('tiene_patrocinador', e.target.value)} className="w-full h-10 px-3 rounded-md border border-slate-300 bg-white text-xs text-slate-900 font-medium">
@@ -1147,6 +1249,27 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
 
           </div>
         )}
+      </div>
+
+      {/* BOTTOM SAVE & SEND BANNER */}
+      <div className="bg-white border-2 border-blue-200 rounded-3xl p-6 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="space-y-1 text-center sm:text-left">
+          <h4 className="text-sm font-bold text-slate-900">
+            ¿Terminaste de completar tus datos o deseas guardar tu avance?
+          </h4>
+          <p className="text-xs text-slate-500">
+            Al guardar, el equipo consular de Udreamms podrá revisar tu información inmediatamente para preparar tu DS-160.
+          </p>
+        </div>
+        <Button
+          type="button"
+          onClick={handleManualSave}
+          disabled={isSavingManual}
+          className="h-11 px-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-blue-500/20 shrink-0 transition-all duration-300"
+        >
+          <Save className="w-4 h-4 text-white" />
+          {isSavingManual ? 'Guardando...' : 'Guardar y Enviar al Staff'}
+        </Button>
       </div>
 
     </div>

@@ -24,14 +24,14 @@ export default function CheckoutForm({
     setLoadingStripe(true);
     try {
       const origin = window.location.origin;
-      const successUrl = `${origin}/visas/student/book?stripe=success&session_id={CHECKOUT_SESSION_ID}`;
+      const successUrl = `${origin}/portal?stripe=success&session_id={CHECKOUT_SESSION_ID}`;
       const cancelUrl = `${origin}/visas/student/book?stripe=cancelled`;
 
       const response = await fetch('/api/payments/stripe/create-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: '',
+          email: formData.email || '',
           itemIds: ['libro-estudiante'],
           successUrl,
           cancelUrl,
@@ -59,39 +59,46 @@ export default function CheckoutForm({
               {/* Portada Libro */}
               <div className="relative w-28 md:w-40 aspect-[3/4] rounded-xl overflow-hidden shadow-lg shrink-0">
                 <img
-                  src="https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/Book%2FMuckup%20(1).png?alt=media&token=90d03452-cb19-47fc-9e75-1d84cf6ba50c"
-                  alt="Libro Digital Udreamms - Paso a paso para tu visa"
-                  className="w-full h-full object-contain origin-center"
+                  src="https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/Libro%20Digital%20F1.png?alt=media&token=8e9bc7e6-1469-42b7-a36c-941da7247738"
+                  alt="Libro Digital Visa de Estudiante F-1"
+                  className="w-full h-full object-cover"
                 />
               </div>
 
-              {/* Precios */}
-              <div className="flex flex-col justify-center text-left font-sans">
-                <span className="text-xs md:text-sm font-medium text-slate-500 line-through font-sans">
-                  Antes $49 USD
+              {/* Información y Precio */}
+              <div className="flex flex-col justify-center font-sans text-left">
+                <span className="text-emerald-400 font-bold text-xs uppercase tracking-wider mb-1 font-sans">
+                  Guía Oficial Udreamms
                 </span>
-                <div className="flex items-baseline gap-1 mt-1 font-sans">
-                  <span className="text-[10px] font-normal text-slate-400 uppercase font-sans">Hoy solo</span>
-                  <span className="text-2xl md:text-3xl font-medium text-white tracking-tight font-sans">
+                <h3 className="text-lg md:text-xl font-bold text-white leading-snug font-sans">
+                  Visa de Estudiante F-1
+                </h3>
+                <p className="text-xs text-slate-400 mt-1 mb-2 font-sans font-medium">
+                  Ebook digital de descarga inmediata
+                </p>
+                <div className="flex items-baseline gap-2 font-sans">
+                  <span className="text-2xl md:text-3xl font-extrabold text-white font-sans tracking-tight">
                     $29.99
                   </span>
-                  <span className="text-base font-normal text-slate-400 font-sans">USD</span>
+                  <span className="text-xs font-semibold text-slate-400 uppercase font-sans">USD</span>
+                  <span className="text-xs text-slate-500 line-through font-sans ml-1">$49.99</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Bloque Derecho: Únicamente el Botón Directo a Stripe Checkout y Garantías */}
+          {/* Bloque Derecho: Botón Directo a Stripe Checkout y Garantías */}
           <div className="lg:col-span-7 flex flex-col space-y-4 font-sans">
-            <a
-              href="https://buy.stripe.com/bJeeVdckP87851w2HxenS0D"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              onClick={handleDirectStripeCheckout}
+              disabled={loadingStripe}
               suppressHydrationWarning
-              className="w-full bg-white text-black hover:bg-white/90 transition-all duration-300 hover:scale-[1.01] active:scale-95 shadow-md text-center tracking-wider text-sm md:text-base font-sans font-semibold py-4 md:py-4.5 px-8 rounded-full flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full bg-white text-black hover:bg-white/90 transition-all duration-300 hover:scale-[1.01] active:scale-95 shadow-md text-center tracking-wider text-sm md:text-base font-sans font-semibold py-4 md:py-4.5 px-8 rounded-full flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
             >
-              QUIERO MI LIBRO AHORA
-            </a>
+              <Lock className="w-4 h-4 text-black" />
+              {loadingStripe ? 'Conectando con Stripe...' : 'QUIERO MI LIBRO AHORA'}
+            </button>
 
             {/* Garantías de confianza */}
             <div className="flex items-center justify-center gap-3 text-[10px] md:text-xs text-slate-400 font-medium pt-2 border-t border-white/5 font-sans">

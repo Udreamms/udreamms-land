@@ -4,7 +4,7 @@ import { admin, db } from '@/backend/firebase/admin';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { visaType, formData, photoUrl, userEmail, userName, userId } = body;
+    const { visaType, formData, photoUrl, passportDoc, bankStatementDoc, userEmail, userName, userId } = body;
 
     if (!visaType || !formData) {
       return NextResponse.json({ error: 'Faltan datos obligatorios (visaType, formData)' }, { status: 400 });
@@ -27,6 +27,8 @@ export async function POST(req: NextRequest) {
       submittedAt: new Date().toISOString().split('T')[0],
       updatedAt: new Date().toISOString(),
       photoUrl: photoUrl || '',
+      passportDoc: passportDoc || null,
+      bankStatementDoc: bankStatementDoc || null,
       formData: formData,
     };
 
@@ -54,5 +56,35 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error('Error saving consular submission:', error);
     return NextResponse.json({ error: error?.message || 'Error al guardar la postulación' }, { status: 500 });
+  }
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const email = searchParams.get('email');
+    const visaType = searchParams.get('visaType') || 'F-1';
+
+    if (!email) {
+      return NextResponse.json({ error: 'Email requerido' }, { status: 400 });
+    }
+
+    if (!db) {
+      return NextResponse.json({ case: null });
+    }
+
+    const emailKey = email.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_');
+    const typeKey = visaType === 'B-2' ? 'b2' : 'f1';
+    const docId = `case_${emailKey}_${typeKey}`;
+
+    const doc = await db.collection('solicitudes_visas').doc(docId).get();
+    if (!doc.exists) {
+      return NextResponse.json({ case: null });
+    }
+
+    return NextResponse.json({ case: doc.data() });
+  } catch (error: any) {
+    console.error('Error fetching submission:', error);
+    return NextResponse.json({ error: error?.message || 'Error al obtener postulación' }, { status: 500 });
   }
 }
