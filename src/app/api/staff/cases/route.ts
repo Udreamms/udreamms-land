@@ -66,15 +66,58 @@ const defaultCases = [
   }
 ];
 
+function parseDateSafe(val: any): string {
+  if (!val) return new Date().toISOString().split('T')[0];
+  if (typeof val === 'string') {
+    if (val.includes('T')) return val.split('T')[0];
+    return val;
+  }
+  if (typeof val === 'object') {
+    if (typeof val.toDate === 'function') {
+      return val.toDate().toISOString().split('T')[0];
+    }
+    if (val._seconds) {
+      return new Date(val._seconds * 1000).toISOString().split('T')[0];
+    }
+    if (val.seconds) {
+      return new Date(val.seconds * 1000).toISOString().split('T')[0];
+    }
+  }
+  if (val instanceof Date) {
+    return val.toISOString().split('T')[0];
+  }
+  if (typeof val === 'number') {
+    return new Date(val).toISOString().split('T')[0];
+  }
+  return new Date().toISOString().split('T')[0];
+}
+
+function parseDateTimeSafe(val: any): string {
+  if (!val) return new Date().toISOString();
+  if (typeof val === 'string') return val;
+  if (typeof val === 'object') {
+    if (typeof val.toDate === 'function') {
+      return val.toDate().toISOString();
+    }
+    if (val._seconds) {
+      return new Date(val._seconds * 1000).toISOString();
+    }
+    if (val.seconds) {
+      return new Date(val.seconds * 1000).toISOString();
+    }
+  }
+  if (val instanceof Date) {
+    return val.toISOString();
+  }
+  if (typeof val === 'number') {
+    return new Date(val).toISOString();
+  }
+  return new Date().toISOString();
+}
+
 export async function GET(req: NextRequest) {
   try {
     if (!db) {
-      return NextResponse.json({ cases: defaultCases });
-    }
-
-    const snapshot = await db.collection('solicitudes_visas').get();
-    
-    if (snapshot.empty) {
       return NextResponse.json({ cases: defaultCases });
     }
 
@@ -99,50 +142,54 @@ export async function GET(req: NextRequest) {
     const realCases: any[] = [];
     const existingCaseKeys = new Set<string>();
 
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const formData = data.formData || {};
-      const fullName =
-        data.name ||
-        `${formData.nombres || ''} ${formData.apellidos || ''}`.trim() ||
-        data.email ||
-        'Postulante';
+    // 1. Fetch from solicitudes_visas (Clients who filled or started their consular forms)
+    try {
+      const snapshot = await db.collection('solicitudes_visas').get();
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const formData = data.formData || {};
+        const fullName =
+          data.name ||
+          `${formData.nombres || ''} ${formData.apellidos || ''}`.trim() ||
+          data.email ||
+          'Postulante';
 
-      const emailKey = (data.email || formData.email_contacto || '').toLowerCase().trim();
-      const typeKey = data.visaType === 'B-2' ? 'b2' : 'f1';
-      if (emailKey) {
-        existingCaseKeys.add(`${emailKey}_${typeKey}`);
-      }
+        const emailKey = (data.email || formData.email_contacto || '').toLowerCase().trim();
+        const typeKey = data.visaType === 'B-2' ? 'b2' : 'f1';
+        if (emailKey) {
+          existingCaseKeys.add(`${emailKey}_${typeKey}`);
+        }
 
-      const chatInfo = chatMap[emailKey] || { unreadByStaff: 0, lastMessage: '' };
+        const chatInfo = chatMap[emailKey] || { unreadByStaff: 0, lastMessage: '' };
 
-      realCases.push({
-        id: doc.id,
-        name: fullName,
-        email: data.email || formData.email_contacto || '',
-        phone: data.phone || formData.celular_contacto || '',
-        visaType: data.visaType === 'B-2' ? 'B-2' : 'F-1',
-        schoolState: data.schoolState || formData.estado_estudio_usa || 'Utah',
-        schoolName:
-          data.schoolName ||
-          formData.nombre_escuela ||
-          (data.visaType === 'B-2' ? 'N/A (Turismo B-2)' : 'Sin escuela seleccionada'),
-        status: data.status || 'nuevos',
-        submittedAt:
-          data.submittedAt ||
-          (data.createdAt ? data.createdAt.split('T')[0] : new Date().toISOString().split('T')[0]),
-        updatedAt: data.updatedAt || data.createdAt || new Date().toISOString(),
-        photoUrl: data.photoUrl || '',
-        passportDoc: data.passportDoc || null,
-        bankStatementDoc: data.bankStatementDoc || null,
-        formData: formData,
-        notes: data.notes || '',
-        unreadCount: chatInfo.unreadByStaff || 0,
-        lastChatMessage: chatInfo.lastMessage || '',
+        realCases.push({
+          id: doc.id,
+          name: fullName,
+          email: data.email || formData.email_contacto || '',
+          phone: data.phone || formData.celular_contacto || '',
+          visaType: data.visaType === 'B-2' ? 'B-2' : 'F-1',
+          schoolState: data.schoolState || formData.estado_estudio_usa || 'Utah',
+          schoolName:
+            data.schoolName ||
+            formData.nombre_escuela ||
+            (data.visaType === 'B-2' ? 'N/A (Turismo B-2)' : 'Sin escuela seleccionada'),
+          status: data.status || 'nuevos',
+          submittedAt: parseDateSafe(data.submittedAt || data.createdAt),
+          updatedAt: parseDateTimeSafe(data.updatedAt || data.createdAt),
+          photoUrl: data.photoUrl || '',
+          passportDoc: data.passportDoc || null,
+          bankStatementDoc: data.bankStatementDoc || null,
+          formData: formData,
+          notes: data.notes || '',
+          unreadCount: chatInfo.unreadByStaff || 0,
+          lastChatMessage: chatInfo.lastMessage || '',
+        });
       });
-    });
+    } catch (solErr) {
+      console.warn('Could not fetch solicitudes_visas:', solErr);
+    }
 
-    // Cross-reference users collection: guarantee any client who purchased a plan appears immediately in Staff
+    // 2. Cross-reference users collection: guarantee any registered client or purchaser appears in Staff
     try {
       const usersSnap = await db.collection('users').get();
       usersSnap.forEach(uDoc => {
@@ -163,29 +210,34 @@ export async function GET(req: NextRequest) {
           uData.purchased_plan_turista_vip
         );
 
+        const userDisplayName = uData.displayName || uData.name || (uEmail.split('@')[0] || 'Cliente Registrado');
+        const userPhone = uData.phone || uData.phoneNumber || '';
+        const userSubmittedAt = parseDateSafe(uData.createdAt || uData.last_payment_at || uData.lastLogin);
+        const userUpdatedAt = parseDateTimeSafe(uData.updatedAt || uData.last_payment_at || uData.lastLogin || uData.createdAt);
+
         if (hasStudent && !existingCaseKeys.has(`${uEmail}_f1`)) {
           const chatInfo = chatMap[uEmail] || { unreadByStaff: 0, lastMessage: '' };
           existingCaseKeys.add(`${uEmail}_f1`);
           realCases.push({
             id: `case_${uEmail.replace(/[^a-zA-Z0-9]/g, '_')}_f1`,
-            name: uData.displayName || uData.name || uEmail.split('@')[0] || 'Postulante F-1',
+            name: userDisplayName,
             email: uEmail,
-            phone: uData.phone || uData.phoneNumber || '',
+            phone: userPhone,
             visaType: 'F-1',
             schoolState: 'Utah',
             schoolName: 'Lumos Language School (Salt Lake City)',
             status: 'nuevos',
-            submittedAt: uData.createdAt ? uData.createdAt.split('T')[0] : (uData.last_payment_at ? uData.last_payment_at.split('T')[0] : new Date().toISOString().split('T')[0]),
-            updatedAt: uData.updatedAt || uData.last_payment_at || new Date().toISOString(),
+            submittedAt: userSubmittedAt,
+            updatedAt: userUpdatedAt,
             photoUrl: uData.photoURL || '',
             passportDoc: null,
             bankStatementDoc: null,
             formData: {
               email_contacto: uEmail,
-              nombres: (uData.displayName || uData.name || '').split(' ')[0] || '',
-              apellidos: (uData.displayName || uData.name || '').split(' ').slice(1).join(' ') || '',
+              nombres: userDisplayName.split(' ')[0] || '',
+              apellidos: userDisplayName.split(' ').slice(1).join(' ') || '',
             },
-            notes: 'Plan F-1 adquirido. Expediente pendiente de llenado.',
+            notes: 'Plan Estudiante F-1 adquirido. Expediente pendiente de llenado consular.',
             unreadCount: chatInfo.unreadByStaff || 0,
             lastChatMessage: chatInfo.lastMessage || '',
           });
@@ -196,24 +248,24 @@ export async function GET(req: NextRequest) {
           existingCaseKeys.add(`${uEmail}_b2`);
           realCases.push({
             id: `case_${uEmail.replace(/[^a-zA-Z0-9]/g, '_')}_b2`,
-            name: uData.displayName || uData.name || uEmail.split('@')[0] || 'Postulante B-2',
+            name: userDisplayName,
             email: uEmail,
-            phone: uData.phone || uData.phoneNumber || '',
+            phone: userPhone,
             visaType: 'B-2',
             schoolState: 'Utah',
             schoolName: 'N/A (Turismo B-2)',
             status: 'nuevos',
-            submittedAt: uData.createdAt ? uData.createdAt.split('T')[0] : (uData.last_payment_at ? uData.last_payment_at.split('T')[0] : new Date().toISOString().split('T')[0]),
-            updatedAt: uData.updatedAt || uData.last_payment_at || new Date().toISOString(),
+            submittedAt: userSubmittedAt,
+            updatedAt: userUpdatedAt,
             photoUrl: uData.photoURL || '',
             passportDoc: null,
             bankStatementDoc: null,
             formData: {
               email_contacto: uEmail,
-              nombres: (uData.displayName || uData.name || '').split(' ')[0] || '',
-              apellidos: (uData.displayName || uData.name || '').split(' ').slice(1).join(' ') || '',
+              nombres: userDisplayName.split(' ')[0] || '',
+              apellidos: userDisplayName.split(' ').slice(1).join(' ') || '',
             },
-            notes: 'Plan B-2 adquirido. Expediente pendiente de llenado.',
+            notes: 'Plan Turista B-2 adquirido. Expediente pendiente de llenado consular.',
             unreadCount: chatInfo.unreadByStaff || 0,
             lastChatMessage: chatInfo.lastMessage || '',
           });
@@ -221,6 +273,10 @@ export async function GET(req: NextRequest) {
       });
     } catch (usersErr) {
       console.warn('Could not cross-reference users collection:', usersErr);
+    }
+
+    if (realCases.length === 0) {
+      return NextResponse.json({ cases: defaultCases });
     }
 
     // Sort by unread messages first, then updatedAt or submittedAt desc
@@ -236,7 +292,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ cases: realCases });
   } catch (error: any) {
     console.error('Error fetching staff cases:', error);
-    return NextResponse.json({ cases: [], error: error?.message });
+    return NextResponse.json({ cases: defaultCases, error: error?.message });
   }
 }
 

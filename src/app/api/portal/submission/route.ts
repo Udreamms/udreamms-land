@@ -1,6 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { admin, db } from '@/backend/firebase/admin';
 
+function sanitizeDocForFirestore(doc: any): any {
+  if (!doc) return null;
+  // If dataUrl exceeds 450KB, truncate dataUrl to prevent Firestore 1MB doc limit error while keeping metadata
+  const copy = { ...doc };
+  if (copy.dataUrl && typeof copy.dataUrl === 'string' && copy.dataUrl.length > 450000) {
+    copy.dataUrl = copy.dataUrl.substring(0, 500) + '...[truncated_due_to_size]';
+    copy.sizeNote = 'Archivo cargado localmente en el navegador del postulante';
+  }
+  return copy;
+}
+
+function sanitizePhotoUrl(url: any): string {
+  if (!url || typeof url !== 'string') return '';
+  if (url.startsWith('data:') && url.length > 450000) {
+    return ''; // Oversized base64 photo - keep metadata clean
+  }
+  return url;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -10,33 +29,38 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Faltan datos obligatorios (visaType, formData)' }, { status: 400 });
     }
 
-    const emailKey = (userEmail || formData.email_contacto || 'anonimo').toLowerCase().replace(/[^a-zA-Z0-9]/g, '_');
+    const email = userEmail || formData.email_contacto || 'anonimo';
+    const emailKey = email.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_');
     const typeKey = visaType === 'B-2' ? 'b2' : 'f1';
     const docId = `case_${emailKey}_${typeKey}`;
 
     const fullName = `${formData.nombres || ''} ${formData.apellidos || ''}`.trim() || userName || userEmail || 'Postulante';
 
-    const caseData = {
+    const cleanPassport = sanitizeDocForFirestore(passportDoc);
+    const cleanBank = sanitizeDocForFirestore(bankStatementDoc);
+    const cleanPhoto = sanitizePhotoUrl(photoUrl);
+
+    const caseData: any = {
       id: docId,
       name: fullName,
-      email: userEmail || formData.email_contacto || '',
+      email: email,
       phone: formData.celular_contacto || '',
       visaType: visaType === 'B-2' ? 'B-2' : 'F-1',
       schoolState: formData.estado_estudio_usa || 'Utah',
       schoolName: formData.nombre_escuela || (visaType === 'B-2' ? 'N/A (Turismo B-2)' : 'Sin escuela seleccionada'),
       submittedAt: new Date().toISOString().split('T')[0],
       updatedAt: new Date().toISOString(),
-      photoUrl: photoUrl || '',
-      passportDoc: passportDoc || null,
-      bankStatementDoc: bankStatementDoc || null,
+      photoUrl: cleanPhoto,
       formData: formData,
     };
+
+    if (cleanPassport) caseData.passportDoc = cleanPassport;
+    if (cleanBank) caseData.bankStatementDoc = cleanBank;
 
     if (db) {
       const docRef = db.collection('solicitudes_visas').doc(docId);
       const existing = await docRef.get();
       if (existing.exists) {
-        // Keep existing status unless newly set
         const existingData = existing.data();
         await docRef.set({
           ...caseData,
@@ -49,6 +73,20 @@ export async function POST(req: NextRequest) {
           status: 'nuevos',
           createdAt: new Date().toISOString(),
         });
+      }
+
+      // Also update user document if userId or email matches
+      if (userId) {
+        try {
+          await db.collection('users').doc(userId).set({
+            name: fullName,
+            displayName: fullName,
+            phone: formData.celular_contacto || '',
+            updatedAt: new Date().toISOString(),
+          }, { merge: true });
+        } catch (uErr) {
+          // non-blocking
+        }
       }
     }
 

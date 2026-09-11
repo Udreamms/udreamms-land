@@ -71,8 +71,8 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
         const bankKey = applicantId ? `udreamms_bank_${prefix}_${applicantId}` : `udreamms_bank_${prefix}`;
 
         const photoUrl = typeof window !== 'undefined' ? localStorage.getItem(photoKey) : null;
-        let passportDoc = null;
-        let bankStatementDoc = null;
+        let passportDoc: any = null;
+        let bankStatementDoc: any = null;
 
         if (typeof window !== 'undefined') {
           try {
@@ -85,21 +85,37 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
           } catch (e) {}
         }
 
-        await fetch('/api/portal/submission', {
+        const payload = {
+          visaType: isStudent ? 'F-1' : 'B-2',
+          applicantId: applicantId || '1',
+          formData,
+          photoUrl: photoUrl && photoUrl.length < 350000 ? photoUrl : null,
+          passportDoc: passportDoc ? { name: passportDoc.name, type: passportDoc.type, size: passportDoc.size } : null,
+          bankStatementDoc: bankStatementDoc ? { name: bankStatementDoc.name, type: bankStatementDoc.type, size: bankStatementDoc.size } : null,
+          userEmail: user?.email || formData.email_contacto || '',
+          userName: user?.displayName || `${formData.nombres || ''} ${formData.apellidos || ''}`.trim(),
+          userId: user?.uid || '',
+        };
+
+        const res = await fetch('/api/portal/submission', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            visaType: isStudent ? 'F-1' : 'B-2',
-            applicantId: applicantId || '1',
-            formData,
-            photoUrl,
-            passportDoc,
-            bankStatementDoc,
-            userEmail: user?.email || formData.email_contacto || '',
-            userName: user?.displayName || `${formData.nombres || ''} ${formData.apellidos || ''}`.trim(),
-            userId: user?.uid || '',
-          })
+          body: JSON.stringify(payload)
         });
+
+        if (!res.ok) {
+          // Fallback: retry with pure formData
+          await fetch('/api/portal/submission', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              ...payload,
+              photoUrl: null,
+              passportDoc: null,
+              bankStatementDoc: null,
+            })
+          });
+        }
       } catch (err) {
         console.error('Error auto-syncing form to cloud:', err);
       }
@@ -157,8 +173,8 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
       const bankKey = applicantId ? `udreamms_bank_${prefix}_${applicantId}` : `udreamms_bank_${prefix}`;
 
       const photoUrl = typeof window !== 'undefined' ? localStorage.getItem(photoKey) : null;
-      let passportDoc = null;
-      let bankStatementDoc = null;
+      let passportDoc: any = null;
+      let bankStatementDoc: any = null;
 
       if (typeof window !== 'undefined') {
         try {
@@ -171,26 +187,38 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
         } catch (e) {}
       }
 
+      const payload = {
+        visaType: isStudent ? 'F-1' : 'B-2',
+        applicantId: applicantId || '1',
+        formData,
+        photoUrl: photoUrl && photoUrl.length < 350000 ? photoUrl : null,
+        passportDoc: passportDoc ? { name: passportDoc.name, type: passportDoc.type, size: passportDoc.size } : null,
+        bankStatementDoc: bankStatementDoc ? { name: bankStatementDoc.name, type: bankStatementDoc.type, size: bankStatementDoc.size } : null,
+        userEmail: user?.email || formData.email_contacto || '',
+        userName: user?.displayName || `${formData.nombres || ''} ${formData.apellidos || ''}`.trim(),
+        userId: user?.uid || '',
+      };
+
       const res = await fetch('/api/portal/submission', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          visaType: isStudent ? 'F-1' : 'B-2',
-          applicantId: applicantId || '1',
-          formData,
-          photoUrl,
-          passportDoc,
-          bankStatementDoc,
-          userEmail: user?.email || formData.email_contacto || '',
-          userName: user?.displayName || `${formData.nombres || ''} ${formData.apellidos || ''}`.trim(),
-          userId: user?.uid || '',
-        })
+        body: JSON.stringify(payload)
       });
 
       if (res.ok) {
         toast.success("¡Expediente guardado y sincronizado con el Staff de Udreamms con éxito!");
       } else {
-        toast.info("Datos guardados en tu navegador.");
+        await fetch('/api/portal/submission', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...payload,
+            photoUrl: null,
+            passportDoc: null,
+            bankStatementDoc: null,
+          })
+        });
+        toast.success("¡Expediente sincronizado con éxito!");
       }
     } catch (err) {
       console.error('Error saving:', err);

@@ -621,8 +621,35 @@ export default function StaffPortalPage() {
                             </div>
                           </div>
 
-                          {/* Row 3: Document Attachment Status Badges */}
+                          {/* Row 3: Document Attachment Status Badges & Form Progress */}
                           <div className="flex items-center gap-2 flex-wrap pt-0.5">
+                            {/* Form completion badge */}
+                            {(() => {
+                              const filledCount = Object.values(student.formData || {}).filter(Boolean).length;
+                              if (filledCount >= 10) {
+                                return (
+                                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold flex items-center gap-1 border bg-emerald-50 text-emerald-800 border-emerald-300 shadow-2xs">
+                                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                    {filledCount} Datos Consulares Llenos
+                                  </span>
+                                );
+                              } else if (filledCount > 0) {
+                                return (
+                                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold flex items-center gap-1 border bg-amber-50 text-amber-800 border-amber-300">
+                                    <Sparkles className="w-3 h-3 text-amber-600" />
+                                    {filledCount} Datos en Proceso
+                                  </span>
+                                );
+                              } else {
+                                return (
+                                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold flex items-center gap-1 border bg-slate-100 text-slate-600 border-slate-200">
+                                    <User className="w-3 h-3 text-slate-500" />
+                                    Cliente Registrado
+                                  </span>
+                                );
+                              }
+                            })()}
+
                             {/* Photo 5x5 badge */}
                             <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold flex items-center gap-1 border ${
                               hasPhoto 
@@ -655,6 +682,13 @@ export default function StaffPortalPage() {
                               </span>
                             )}
                           </div>
+
+                          {/* Notes if available */}
+                          {student.notes && (
+                            <p className="text-[11px] text-slate-500 italic truncate max-w-xl">
+                              {student.notes}
+                            </p>
+                          )}
 
                         </div>
                       </div>
@@ -853,6 +887,28 @@ export default function StaffPortalPage() {
             {/* Modal Body: All 13 Sections */}
             <div className="p-6 md:p-8 overflow-y-auto space-y-6 text-slate-900">
               
+              {/* Expediente Overview Banner */}
+              <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border border-blue-200/80 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-blue-900">
+                      Progreso del Expediente:
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-600 text-white shadow-2xs">
+                      {Object.values(selectedCaseModal.formData || {}).filter(Boolean).length} datos registrados
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600">
+                    {selectedCaseModal.notes || 'Datos sincronizados en tiempo real con la nube de Firebase.'}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
+                  <Calendar className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Registrado: {selectedCaseModal.submittedAt || 'Reciente'}</span>
+                </div>
+              </div>
+
               {/* SECCIÓN DOCUMENTOS Y ARCHIVOS ADJUNTOS */}
               {(selectedCaseModal.photoUrl || selectedCaseModal.passportDoc || selectedCaseModal.bankStatementDoc) && (
                 <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 md:p-6 space-y-4">

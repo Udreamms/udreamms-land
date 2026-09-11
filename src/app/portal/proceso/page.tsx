@@ -339,6 +339,53 @@ export default function ProcesoPage() {
       }
     };
 
+    // 1. Immediately push any existing local data (from previous offline/failed attempts) up to cloud
+    const pushLocalToCloud = async () => {
+      if (typeof window === 'undefined') return;
+      for (const prefix of ['f1', 'b2'] as const) {
+        const defaultId = '1';
+        const storageKey = `udreamms_form_${prefix}_${defaultId}`;
+        const rawForm = localStorage.getItem(storageKey);
+        const photoKey = `udreamms_photo_${prefix}_${defaultId}`;
+        const rawPhoto = localStorage.getItem(photoKey) || localStorage.getItem(`udreamms_photo_${prefix}`);
+        const passportKey = `udreamms_passport_${prefix}_${defaultId}`;
+        const rawPassport = localStorage.getItem(passportKey) || localStorage.getItem(`udreamms_passport_${prefix}`);
+        const bankKey = `udreamms_bank_${prefix}_${defaultId}`;
+        const rawBank = localStorage.getItem(bankKey) || localStorage.getItem(`udreamms_bank_${prefix}`);
+
+        if (rawForm) {
+          try {
+            const parsedForm = JSON.parse(rawForm);
+            if (Object.keys(parsedForm).length > 0) {
+              let passportDoc: any = null;
+              let bankDoc: any = null;
+              if (rawPassport) try { passportDoc = JSON.parse(rawPassport); } catch (e) {}
+              if (rawBank) try { bankDoc = JSON.parse(rawBank); } catch (e) {}
+
+              await fetch('/api/portal/submission', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  visaType: prefix === 'f1' ? 'F-1' : 'B-2',
+                  applicantId: defaultId,
+                  formData: parsedForm,
+                  photoUrl: rawPhoto && rawPhoto.length < 350000 ? rawPhoto : null,
+                  passportDoc: passportDoc ? { name: passportDoc.name, type: passportDoc.type, size: passportDoc.size } : null,
+                  bankStatementDoc: bankDoc ? { name: bankDoc.name, type: bankDoc.type, size: bankDoc.size } : null,
+                  userEmail: user?.email || parsedForm.email_contacto || '',
+                  userName: user?.displayName || `${parsedForm.nombres || ''} ${parsedForm.apellidos || ''}`.trim(),
+                  userId: user?.uid || '',
+                })
+              });
+            }
+          } catch (e) {
+            console.warn('Error auto-pushing local data to cloud:', e);
+          }
+        }
+      }
+    };
+
+    void pushLocalToCloud();
     void hydrateFromCloud('F-1');
     void hydrateFromCloud('B-2');
 
@@ -412,6 +459,45 @@ export default function ProcesoPage() {
   const currentPassport = currentApplicantData?.passportDoc || null;
   const currentBankStatement = currentApplicantData?.bankStatementDoc || null;
 
+  // Helper to compress images on client side to guarantee fast uploads and prevent Firestore quota limits
+  const compressImageFile = (file: File, maxDim = 600, quality = 0.8): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onerror = () => resolve(e.target?.result as string);
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+          if (width > height) {
+            if (width > maxDim) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            }
+          } else {
+            if (height > maxDim) {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            resolve(e.target?.result as string);
+            return;
+          }
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   // Cloud sync helper
   const syncToCloud = async (
     photo: string | null,
@@ -427,21 +513,37 @@ export default function ProcesoPage() {
       const savedForm = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null;
       const parsedForm = savedForm ? JSON.parse(savedForm) : {};
 
-      await fetch('/api/portal/submission', {
+      const payload = {
+        visaType: isSelectedStudent ? 'F-1' : 'B-2',
+        applicantId,
+        formData: parsedForm,
+        photoUrl: photo,
+        passportDoc: passport,
+        bankStatementDoc: bankStatement,
+        userEmail: user?.email || parsedForm.email_contacto || '',
+        userName: user?.displayName || `${parsedForm.nombres || ''} ${parsedForm.apellidos || ''}`.trim(),
+        userId: user?.uid || '',
+      };
+
+      const res = await fetch('/api/portal/submission', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          visaType: isSelectedStudent ? 'F-1' : 'B-2',
-          applicantId,
-          formData: parsedForm,
-          photoUrl: photo,
-          passportDoc: passport,
-          bankStatementDoc: bankStatement,
-          userEmail: user?.email || parsedForm.email_contacto || '',
-          userName: user?.displayName || `${parsedForm.nombres || ''} ${parsedForm.apellidos || ''}`.trim(),
-          userId: user?.uid || '',
-        }),
+        body: JSON.stringify(payload),
       });
+
+      if (!res.ok) {
+        // Fallback: send clean formData to ensure no textual fields are ever dropped
+        await fetch('/api/portal/submission', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...payload,
+            photoUrl: photo && photo.length < 300000 ? photo : null,
+            passportDoc: passport ? { name: passport.name, type: passport.type, size: passport.size } : null,
+            bankStatementDoc: bankStatement ? { name: bankStatement.name, type: bankStatement.type, size: bankStatement.size } : null,
+          }),
+        });
+      }
     } catch (err) {
       console.error('Error syncing documents with cloud:', err);
     }
@@ -510,8 +612,8 @@ export default function ProcesoPage() {
     await syncToCloud(currentPhoto, currentPassport, doc);
   };
 
-  // Handlers for Photo file input
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handlers for Photo file input with automatic compression
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -520,24 +622,18 @@ export default function ProcesoPage() {
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("El archivo excede el límite recomendado de 10MB.");
-      return;
+    try {
+      const compressedDataUrl = await compressImageFile(file, 600, 0.82);
+      await setCurrentPhoto(compressedDataUrl);
+      toast.success("¡Fotografía oficial 5x5 optimizada y guardada en la nube con éxito!");
+    } catch (err) {
+      console.error('Error compressing photo:', err);
+      toast.error("Hubo un problema al procesar la fotografía.");
     }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        const photoData = event.target.result as string;
-        setCurrentPhoto(photoData);
-        toast.success("¡Fotografía oficial 5x5 cargada y guardada con éxito!");
-      }
-    };
-    reader.readAsDataURL(file);
   };
 
   // Handlers for Passport file upload (PDF or Image)
-  const handlePassportUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePassportUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -554,25 +650,35 @@ export default function ProcesoPage() {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        const doc: AttachedDoc = {
-          name: file.name,
-          type: file.type || (isPdf ? 'application/pdf' : 'image/jpeg'),
-          dataUrl: event.target.result as string,
-          size: file.size,
-          uploadedAt: new Date().toISOString()
-        };
-        setCurrentPassportDoc(doc);
-        toast.success(`¡Pasaporte cargado correctamente! (${isPdf ? 'Documento PDF' : 'Imagen'})`);
+    try {
+      let dataUrlToStore = '';
+      if (isImage) {
+        dataUrlToStore = await compressImageFile(file, 1000, 0.75);
+      } else {
+        const reader = new FileReader();
+        dataUrlToStore = await new Promise((resolve) => {
+          reader.onload = (event) => resolve(event.target?.result as string);
+          reader.readAsDataURL(file);
+        });
       }
-    };
-    reader.readAsDataURL(file);
+
+      const doc: AttachedDoc = {
+        name: file.name,
+        type: file.type || (isPdf ? 'application/pdf' : 'image/jpeg'),
+        dataUrl: dataUrlToStore,
+        size: file.size,
+        uploadedAt: new Date().toISOString()
+      };
+      await setCurrentPassportDoc(doc);
+      toast.success(`¡Pasaporte guardado con éxito! (${isPdf ? 'Documento PDF' : 'Imagen'})`);
+    } catch (err) {
+      console.error('Error uploading passport:', err);
+      toast.error("Error al procesar el archivo del pasaporte.");
+    }
   };
 
   // Handlers for Bank Statement file upload (PDF or Image)
-  const handleBankStatementUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBankStatementUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -589,21 +695,31 @@ export default function ProcesoPage() {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        const doc: AttachedDoc = {
-          name: file.name,
-          type: file.type || (isPdf ? 'application/pdf' : 'image/jpeg'),
-          dataUrl: event.target.result as string,
-          size: file.size,
-          uploadedAt: new Date().toISOString()
-        };
-        setCurrentBankStatementDoc(doc);
-        toast.success(`¡Estado de cuenta bancario cargado correctamente! (${isPdf ? 'Documento PDF' : 'Imagen'})`);
+    try {
+      let dataUrlToStore = '';
+      if (isImage) {
+        dataUrlToStore = await compressImageFile(file, 1000, 0.75);
+      } else {
+        const reader = new FileReader();
+        dataUrlToStore = await new Promise((resolve) => {
+          reader.onload = (event) => resolve(event.target?.result as string);
+          reader.readAsDataURL(file);
+        });
       }
-    };
-    reader.readAsDataURL(file);
+
+      const doc: AttachedDoc = {
+        name: file.name,
+        type: file.type || (isPdf ? 'application/pdf' : 'image/jpeg'),
+        dataUrl: dataUrlToStore,
+        size: file.size,
+        uploadedAt: new Date().toISOString()
+      };
+      await setCurrentBankStatementDoc(doc);
+      toast.success(`¡Estado de cuenta bancario guardado con éxito! (${isPdf ? 'Documento PDF' : 'Imagen'})`);
+    } catch (err) {
+      console.error('Error uploading bank statement:', err);
+      toast.error("Error al procesar el estado de cuenta.");
+    }
   };
 
   const formatFileSize = (bytes?: number) => {
