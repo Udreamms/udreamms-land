@@ -114,7 +114,7 @@ export default function StaffPortalPage() {
         if (data.cases && Array.isArray(data.cases)) {
           setStudentCases(data.cases);
         }
-        setDbConnectionError(data.dbConnected === false ? data.error : null);
+        setDbConnectionError(data.error || null);
       }
     } catch (error) {
       console.error('Error fetching staff cases:', error);

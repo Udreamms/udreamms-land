@@ -90,6 +90,7 @@ export async function GET(req: NextRequest) {
 
     const realCases: any[] = [];
     const existingCaseKeys = new Set<string>();
+    const fetchErrors: string[] = [];
 
     // 1. Fetch from solicitudes_visas (Clients who filled or started their consular forms)
     try {
@@ -137,8 +138,9 @@ export async function GET(req: NextRequest) {
           lastChatMessage: chatInfo.lastMessage || '',
         });
       });
-    } catch (solErr) {
+    } catch (solErr: any) {
       console.warn('Could not fetch solicitudes_visas:', solErr);
+      fetchErrors.push(`solicitudes_visas: ${solErr?.message || solErr}`);
     }
 
     // 2. Cross-reference users collection: guarantee any registered client or purchaser appears in Staff
@@ -226,12 +228,19 @@ export async function GET(req: NextRequest) {
           });
         }
       });
-    } catch (usersErr) {
+    } catch (usersErr: any) {
       console.warn('Could not cross-reference users collection:', usersErr);
+      fetchErrors.push(`users: ${usersErr?.message || usersErr}`);
     }
 
     if (realCases.length === 0) {
-      return NextResponse.json({ cases: [] });
+      return NextResponse.json({
+        cases: [],
+        dbConnected: true,
+        error: fetchErrors.length > 0
+          ? `Firestore conectó pero las consultas fallaron (probable problema de permisos/credenciales del service account): ${fetchErrors.join(' | ')}`
+          : undefined,
+      });
     }
 
     // Sort by unread messages first, then updatedAt or submittedAt desc
