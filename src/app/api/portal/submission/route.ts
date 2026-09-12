@@ -23,7 +23,7 @@ function sanitizePhotoUrl(url: any): string {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { visaType, formData, photoUrl, passportDoc, bankStatementDoc, userEmail, userName, userId } = body;
+    const { visaType, formData, photoUrl, passportDoc, bankStatementDoc, userEmail, userName, userId, applicantId } = body;
 
     if (!visaType || !formData) {
       return NextResponse.json({ error: 'Faltan datos obligatorios (visaType, formData)' }, { status: 400 });
@@ -32,7 +32,13 @@ export async function POST(req: NextRequest) {
     const email = userEmail || formData.email_contacto || 'anonimo';
     const emailKey = email.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_');
     const typeKey = visaType === 'B-2' ? 'b2' : 'f1';
-    const docId = `case_${emailKey}_${typeKey}`;
+    // Applicant '1' (the default, single-applicant case) keeps the legacy doc id so
+    // existing expedientes keep merging into the same document. Additional applicants
+    // under the same account get their own suffixed id so they never overwrite each other.
+    const normalizedApplicantId = applicantId || '1';
+    const docId = normalizedApplicantId === '1'
+      ? `case_${emailKey}_${typeKey}`
+      : `case_${emailKey}_${typeKey}_${normalizedApplicantId}`;
 
     const fullName = `${formData.nombres || ''} ${formData.apellidos || ''}`.trim() || userName || userEmail || 'Postulante';
 
@@ -42,6 +48,7 @@ export async function POST(req: NextRequest) {
 
     const caseData: any = {
       id: docId,
+      applicantId: normalizedApplicantId,
       name: fullName,
       email: email,
       phone: formData.celular_contacto || '',
@@ -102,18 +109,21 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const email = searchParams.get('email');
     const visaType = searchParams.get('visaType') || 'F-1';
+    const applicantId = searchParams.get('applicantId') || '1';
 
     if (!email) {
       return NextResponse.json({ error: 'Email requerido' }, { status: 400 });
     }
 
     if (!db) {
-      return NextResponse.json({ case: null });
+      return NextResponse.json({ case: null, dbConnected: false });
     }
 
     const emailKey = email.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_');
     const typeKey = visaType === 'B-2' ? 'b2' : 'f1';
-    const docId = `case_${emailKey}_${typeKey}`;
+    const docId = applicantId === '1'
+      ? `case_${emailKey}_${typeKey}`
+      : `case_${emailKey}_${typeKey}_${applicantId}`;
 
     const doc = await db.collection('solicitudes_visas').doc(docId).get();
     if (!doc.exists) {

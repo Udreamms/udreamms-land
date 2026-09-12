@@ -37,7 +37,9 @@ import {
   MessageSquare,
   MessageCircle,
   Send,
-  Sparkles
+  Sparkles,
+  Trash2,
+  AlertTriangle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,6 +91,8 @@ export default function StaffPortalPage() {
   const [chatInput, setChatInput] = useState<string>("");
   const [isSendingChat, setIsSendingChat] = useState<boolean>(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+  const [dbConnectionError, setDbConnectionError] = useState<string | null>(null);
+  const [deletingCaseId, setDeletingCaseId] = useState<string | null>(null);
 
   // Check auth session on load
   useEffect(() => {
@@ -110,12 +114,41 @@ export default function StaffPortalPage() {
         if (data.cases && Array.isArray(data.cases)) {
           setStudentCases(data.cases);
         }
+        setDbConnectionError(data.dbConnected === false ? data.error : null);
       }
     } catch (error) {
       console.error('Error fetching staff cases:', error);
       toast.error('No se pudieron actualizar los casos desde la nube.');
     } finally {
       setIsLoadingCases(false);
+    }
+  };
+
+  // Delete a client's expediente permanently from the Staff panel
+  const handleDeleteCase = async (caseItem: StudentCase) => {
+    const confirmed = typeof window !== 'undefined'
+      ? window.confirm(`¿Eliminar el expediente de "${caseItem.name}" (${caseItem.email})? Esta acción no se puede deshacer.`)
+      : false;
+    if (!confirmed) return;
+
+    setDeletingCaseId(caseItem.id);
+    try {
+      const res = await fetch(`/api/staff/cases?caseId=${encodeURIComponent(caseItem.id)}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setStudentCases(prev => prev.filter(c => c.id !== caseItem.id));
+        if (selectedCaseModal?.id === caseItem.id) setSelectedCaseModal(null);
+        toast.success(`Expediente de "${caseItem.name}" eliminado.`);
+      } else {
+        const errBody = await res.json().catch(() => ({}));
+        toast.error(errBody?.error || 'No se pudo eliminar el expediente.');
+      }
+    } catch (err) {
+      console.error('Error deleting case:', err);
+      toast.error('No se pudo eliminar el expediente.');
+    } finally {
+      setDeletingCaseId(null);
     }
   };
 
@@ -504,6 +537,16 @@ export default function StaffPortalPage() {
             </div>
           </div>
 
+          {dbConnectionError && (
+            <div className="bg-red-50 border border-red-300 rounded-2xl p-4 flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+              <div className="text-xs text-red-800">
+                <p className="font-bold mb-0.5">Sin conexión a la base de datos</p>
+                <p>{dbConnectionError}</p>
+              </div>
+            </div>
+          )}
+
           {/* Cases List */}
           <div className="space-y-3.5 w-full">
             {filteredCases.length === 0 ? (
@@ -759,6 +802,19 @@ export default function StaffPortalPage() {
                           >
                             <Eye className="w-3.5 h-3.5 text-white" />
                             <span>Ver Expediente Completo</span>
+                          </Button>
+
+                          <Button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteCase(student);
+                            }}
+                            disabled={deletingCaseId === student.id}
+                            className="h-9 w-9 p-0 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center shadow-xs shrink-0 cursor-pointer"
+                            title={`Eliminar expediente de ${student.name || 'este cliente'}`}
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600" />
                           </Button>
                         </div>
                       </div>

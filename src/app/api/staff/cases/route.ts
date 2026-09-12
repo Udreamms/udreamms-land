@@ -53,7 +53,21 @@ function parseDateTimeSafe(val: any): string {
 export async function GET(req: NextRequest) {
   try {
     if (!db) {
-      return NextResponse.json({ cases: [] });
+      return NextResponse.json({
+        cases: [],
+        dbConnected: false,
+        error: 'Firebase Admin no está inicializado en este entorno. Verifica que FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL y FIREBASE_PRIVATE_KEY estén configuradas correctamente en las variables de entorno de Vercel (Production) y vuelve a desplegar.',
+      });
+    }
+
+    // Cases hidden/deleted by staff should never resurface, even if they are
+    // re-derived from the `users` collection cross-reference below.
+    let hiddenIds = new Set<string>();
+    try {
+      const hiddenSnap = await db.collection('staff_hidden_cases').get();
+      hiddenSnap.forEach(hDoc => hiddenIds.add(hDoc.id));
+    } catch (hiddenErr) {
+      console.warn('Could not fetch staff_hidden_cases:', hiddenErr);
     }
 
     // Query portal_chats collection to attach unread counts in real-time
@@ -94,6 +108,8 @@ export async function GET(req: NextRequest) {
         if (emailKey) {
           existingCaseKeys.add(`${emailKey}_${typeKey}`);
         }
+
+        if (hiddenIds.has(doc.id)) return;
 
         const chatInfo = chatMap[emailKey] || { unreadByStaff: 0, lastMessage: '' };
         const cleanPhotoUrl = (data.photoUrl && !data.photoUrl.includes('unsplash.com')) ? data.photoUrl : '';
@@ -151,11 +167,14 @@ export async function GET(req: NextRequest) {
         const userSubmittedAt = parseDateSafe(uData.createdAt || uData.last_payment_at || uData.lastLogin);
         const userUpdatedAt = parseDateTimeSafe(uData.updatedAt || uData.last_payment_at || uData.lastLogin || uData.createdAt);
 
-        if (hasStudent && !existingCaseKeys.has(`${uEmail}_f1`)) {
+        const syntheticF1Id = `case_${uEmail.replace(/[^a-zA-Z0-9]/g, '_')}_f1`;
+        const syntheticB2Id = `case_${uEmail.replace(/[^a-zA-Z0-9]/g, '_')}_b2`;
+
+        if (hasStudent && !existingCaseKeys.has(`${uEmail}_f1`) && !hiddenIds.has(syntheticF1Id)) {
           const chatInfo = chatMap[uEmail] || { unreadByStaff: 0, lastMessage: '' };
           existingCaseKeys.add(`${uEmail}_f1`);
           realCases.push({
-            id: `case_${uEmail.replace(/[^a-zA-Z0-9]/g, '_')}_f1`,
+            id: syntheticF1Id,
             name: userDisplayName,
             email: uEmail,
             phone: userPhone,
@@ -179,11 +198,11 @@ export async function GET(req: NextRequest) {
           });
         }
 
-        if (hasTourist && !existingCaseKeys.has(`${uEmail}_b2`)) {
+        if (hasTourist && !existingCaseKeys.has(`${uEmail}_b2`) && !hiddenIds.has(syntheticB2Id)) {
           const chatInfo = chatMap[uEmail] || { unreadByStaff: 0, lastMessage: '' };
           existingCaseKeys.add(`${uEmail}_b2`);
           realCases.push({
-            id: `case_${uEmail.replace(/[^a-zA-Z0-9]/g, '_')}_b2`,
+            id: syntheticB2Id,
             name: userDisplayName,
             email: uEmail,
             phone: userPhone,
@@ -229,6 +248,32 @@ export async function GET(req: NextRequest) {
   } catch (error: any) {
     console.error('Error fetching staff cases:', error);
     return NextResponse.json({ cases: [], error: error?.message });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const caseId = searchParams.get('caseId');
+
+    if (!caseId) {
+      return NextResponse.json({ error: 'caseId es requerido' }, { status: 400 });
+    }
+
+    if (db) {
+      // Remove the actual expediente document if one exists...
+      await db.collection('solicitudes_visas').doc(caseId).delete().catch(() => {});
+      // ...and blocklist the id so it never resurfaces from the users cross-reference,
+      // without touching the client's payment/plan status in the `users` collection.
+      await db.collection('staff_hidden_cases').doc(caseId).set({
+        hiddenAt: new Date().toISOString(),
+      });
+    }
+
+    return NextResponse.json({ success: true, caseId });
+  } catch (error: any) {
+    console.error('Error deleting staff case:', error);
+    return NextResponse.json({ error: error?.message || 'Error al eliminar el expediente' }, { status: 500 });
   }
 }
 

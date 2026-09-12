@@ -97,15 +97,15 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
           userId: user?.uid || '',
         };
 
-        const res = await fetch('/api/portal/submission', {
+        let res = await fetch('/api/portal/submission', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
 
         if (!res.ok) {
-          // Fallback: retry with pure formData
-          await fetch('/api/portal/submission', {
+          // Fallback: retry with pure formData (drop attachments in case they were the issue)
+          res = await fetch('/api/portal/submission', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -116,8 +116,15 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
             })
           });
         }
+
+        if (!res.ok) {
+          const errBody = await res.json().catch(() => ({}));
+          console.error('Auto-sync to cloud failed:', errBody);
+          toast.error('No se pudo sincronizar tu expediente con el servidor. Revisa tu conexión o usa "Guardar" manualmente.');
+        }
       } catch (err) {
         console.error('Error auto-syncing form to cloud:', err);
+        toast.error('No se pudo sincronizar tu expediente con el servidor. Revisa tu conexión.');
       }
     }, 1000);
 
@@ -199,7 +206,7 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
         userId: user?.uid || '',
       };
 
-      const res = await fetch('/api/portal/submission', {
+      let res = await fetch('/api/portal/submission', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -208,7 +215,7 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
       if (res.ok) {
         toast.success("¡Expediente guardado y sincronizado con el Staff de Udreamms con éxito!");
       } else {
-        await fetch('/api/portal/submission', {
+        res = await fetch('/api/portal/submission', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -218,11 +225,18 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
             bankStatementDoc: null,
           })
         });
-        toast.success("¡Expediente sincronizado con éxito!");
+
+        if (res.ok) {
+          toast.success("¡Expediente sincronizado con éxito! (sin adjuntos, vuelve a intentar subirlos)");
+        } else {
+          const errBody = await res.json().catch(() => ({}));
+          console.error('Manual save failed:', errBody);
+          toast.error("No se pudo guardar en el servidor. Tus datos quedaron solo en este dispositivo — intenta de nuevo o avisa a soporte.");
+        }
       }
     } catch (err) {
       console.error('Error saving:', err);
-      toast.success("Datos guardados localmente.");
+      toast.error("No se pudo conectar con el servidor. Tus datos quedaron solo en este dispositivo.");
     } finally {
       setIsSavingManual(false);
     }
