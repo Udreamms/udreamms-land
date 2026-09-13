@@ -998,38 +998,10 @@ export default function ProcesoPage() {
                         </div>
                       </div>
 
-                      {/* Applicant Name Banner */}
-                      <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-7 h-7 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-2xs">
-                            <User className="w-4 h-4 text-blue-600" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-xs font-bold text-slate-900 truncate">
-                              {applicantName || "Nombre sin asignar (Pendiente)"}
-                            </p>
-                            <p className="text-[10px] text-slate-500 truncate">
-                              {applicantName ? "Expediente consular en registro" : "Haz clic para llenar los datos y adjuntar documentos"}
-                            </p>
-                          </div>
-                        </div>
-
-                        {data?.status === 'completado' && hasPassport && (!isStudent || hasBank) && applicantPhoto ? (
-                          <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase shrink-0 flex items-center gap-1">
-                            <Check className="w-3 h-3 text-emerald-700" />
-                            Expediente Completo
-                          </span>
-                        ) : data?.status === 'en_progreso' || hasPassport || (isStudent && hasBank) || applicantPhoto ? (
-                          <span className="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-[10px] font-bold uppercase shrink-0 flex items-center gap-1">
-                            <AlertCircle className="w-3 h-3 text-amber-700" />
-                            En Registro
-                          </span>
-                        ) : (
-                          <span className="px-2.5 py-1 rounded-lg bg-slate-200 text-slate-700 text-[10px] font-bold uppercase shrink-0">
-                            Pendiente
-                          </span>
-                        )}
-                      </div>
+                      {/* Applicant Name */}
+                      <p className="text-sm font-bold text-slate-900 truncate">
+                        {applicantName || "Nombre sin asignar (Pendiente)"}
+                      </p>
 
                       {/* Real-time Stage Progression Banner from Staff */}
                       {(() => {
@@ -1062,38 +1034,6 @@ export default function ProcesoPage() {
                           : "Evaluación de perfil turístico, estrategia de arraigo, formulario oficial DS-160, pasaporte y simulacro de entrevista consular B-2."}
                       </p>
 
-                      {/* Checklist / Attached Badges */}
-                      <div className={`grid gap-2 pt-1 ${isStudent ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-1 sm:grid-cols-3'}`}>
-                        <div className={`px-2.5 py-1.5 rounded-xl border text-[10px] font-semibold flex items-center justify-between gap-1.5 ${
-                          isFormComplete ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-slate-50 border-slate-200 text-slate-600'
-                        }`}>
-                          <span className="truncate">Formulario DS-160</span>
-                          {isFormComplete ? <Check className="w-3 h-3 text-emerald-600 shrink-0" /> : <span className="text-[9px] text-slate-400">Pend.</span>}
-                        </div>
-
-                        <div className={`px-2.5 py-1.5 rounded-xl border text-[10px] font-semibold flex items-center justify-between gap-1.5 ${
-                          applicantPhoto ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-slate-50 border-slate-200 text-slate-600'
-                        }`}>
-                          <span className="truncate">Foto Oficial 5x5</span>
-                          {applicantPhoto ? <Check className="w-3 h-3 text-emerald-600 shrink-0" /> : <span className="text-[9px] text-slate-400">Pend.</span>}
-                        </div>
-
-                        <div className={`px-2.5 py-1.5 rounded-xl border text-[10px] font-semibold flex items-center justify-between gap-1.5 ${
-                          hasPassport ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-slate-50 border-slate-200 text-slate-600'
-                        }`}>
-                          <span className="truncate">Pasaporte</span>
-                          {hasPassport ? <Check className="w-3 h-3 text-emerald-600 shrink-0" /> : <span className="text-[9px] text-slate-400">Pend.</span>}
-                        </div>
-
-                        {isStudent && (
-                          <div className={`px-2.5 py-1.5 rounded-xl border text-[10px] font-semibold flex items-center justify-between gap-1.5 ${
-                            hasBank ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-slate-50 border-slate-200 text-slate-600'
-                          }`}>
-                            <span className="truncate">Estado Cuenta</span>
-                            {hasBank ? <Check className="w-3 h-3 text-emerald-600 shrink-0" /> : <span className="text-[9px] text-slate-400">Pend.</span>}
-                          </div>
-                        )}
-                      </div>
                     </div>
 
                     {/* Card Footer Button */}
