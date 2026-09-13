@@ -309,28 +309,37 @@ export default function ProcesoPage() {
             }));
           }
           
+          // Text form fields: local wins when present, since the user may be mid-edit and
+          // we don't want a page reload to clobber keystrokes with a slightly older cloud copy.
           if (data.case.formData && typeof window !== 'undefined') {
             const currentLocalForm = localStorage.getItem(`udreamms_form_${prefix}_${defaultId}`);
             if (!currentLocalForm) {
               localStorage.setItem(`udreamms_form_${prefix}_${defaultId}`, JSON.stringify(data.case.formData));
             }
           }
-          if (data.case.photoUrl && typeof window !== 'undefined') {
-            const currentLocalPhoto = localStorage.getItem(`udreamms_photo_${prefix}_${defaultId}`);
-            if (!currentLocalPhoto) {
+
+          // Files (photo/passport/bank statement): the cloud is the source of truth here.
+          // Uploading or removing a file is a discrete, deliberate action (not something typed
+          // char-by-char), so there's no "mid-edit" case to protect — and treating local as
+          // authoritative meant a stale or corrected value in the cloud (e.g. a photo removed,
+          // or fixed by staff) could never reach the browser once something was cached locally.
+          // Always sync local to match the cloud on load, clearing it locally when the cloud
+          // has none.
+          if (typeof window !== 'undefined') {
+            if (data.case.photoUrl) {
               localStorage.setItem(`udreamms_photo_${prefix}_${defaultId}`, data.case.photoUrl);
+            } else {
+              localStorage.removeItem(`udreamms_photo_${prefix}_${defaultId}`);
             }
-          }
-          if (data.case.passportDoc && typeof window !== 'undefined') {
-            const currentLocalPassport = localStorage.getItem(`udreamms_passport_${prefix}_${defaultId}`);
-            if (!currentLocalPassport) {
+            if (data.case.passportDoc) {
               localStorage.setItem(`udreamms_passport_${prefix}_${defaultId}`, JSON.stringify(data.case.passportDoc));
+            } else {
+              localStorage.removeItem(`udreamms_passport_${prefix}_${defaultId}`);
             }
-          }
-          if (data.case.bankStatementDoc && typeof window !== 'undefined') {
-            const currentLocalBank = localStorage.getItem(`udreamms_bank_${prefix}_${defaultId}`);
-            if (!currentLocalBank) {
+            if (data.case.bankStatementDoc) {
               localStorage.setItem(`udreamms_bank_${prefix}_${defaultId}`, JSON.stringify(data.case.bankStatementDoc));
+            } else {
+              localStorage.removeItem(`udreamms_bank_${prefix}_${defaultId}`);
             }
           }
           refreshApplicantsData();
@@ -386,9 +395,14 @@ export default function ProcesoPage() {
       }
     };
 
-    void pushLocalToCloud();
-    void hydrateFromCloud('F-1');
-    void hydrateFromCloud('B-2');
+    // Push first, then hydrate — hydration now treats the cloud as authoritative for files,
+    // so it must run after any pending local-only upload has actually reached the cloud,
+    // otherwise hydration could immediately erase it locally again.
+    void (async () => {
+      await pushLocalToCloud();
+      await hydrateFromCloud('F-1');
+      await hydrateFromCloud('B-2');
+    })();
 
     // Poll every 12 seconds to reflect staff status changes in real-time
     const interval = setInterval(() => {
