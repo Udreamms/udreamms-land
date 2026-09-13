@@ -309,13 +309,15 @@ export default function ProcesoPage() {
             }));
           }
           
-          // Text form fields: local wins when present, since the user may be mid-edit and
-          // we don't want a page reload to clobber keystrokes with a slightly older cloud copy.
-          if (data.case.formData && typeof window !== 'undefined') {
-            const currentLocalForm = localStorage.getItem(`udreamms_form_${prefix}_${defaultId}`);
-            if (!currentLocalForm) {
-              localStorage.setItem(`udreamms_form_${prefix}_${defaultId}`, JSON.stringify(data.case.formData));
-            }
+          // Text form fields: the cloud wins here too, so staff corrections made from the
+          // Staff dossier actually reach the client. This is safe for an actively open form:
+          // FormularioConsular keeps its own React state once mounted and only re-reads
+          // localStorage when the applicant/visa tab changes, so overwriting this cache
+          // mid-keystroke doesn't touch what's on screen — it only affects what loads on the
+          // next open, which is exactly where a staff edit (or the client's own last save)
+          // should show up.
+          if (typeof window !== 'undefined' && data.case.formData) {
+            localStorage.setItem(`udreamms_form_${prefix}_${defaultId}`, JSON.stringify(data.case.formData));
           }
 
           // Files (photo/passport/bank statement): the cloud is the source of truth here.

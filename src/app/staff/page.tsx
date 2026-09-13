@@ -217,6 +217,62 @@ export default function StaffPortalPage() {
     }
   };
 
+  // Same fixed option lists the client's own form uses for these fields (FormularioConsular.tsx).
+  // Kept in sync manually — if a dropdown's choices change there, mirror the change here so
+  // staff can only ever set a value the client's form could also produce.
+  const SI_NO_OPTIONS = [{ value: 'No', label: 'No' }, { value: 'Sí', label: 'Sí' }];
+  const FIELD_SELECT_OPTIONS: Record<string, { value: string; label: string }[]> = {
+    otra_nacionalidad: SI_NO_OPTIONS,
+    residente_otro_pais: SI_NO_OPTIONS,
+    rechazo_estudiante_previo: SI_NO_OPTIONS,
+    perdio_pasaporte: SI_NO_OPTIONS,
+    tiene_visa_turista: SI_NO_OPTIONS,
+    tiene_patrocinador: SI_NO_OPTIONS,
+    trabajo_anterior_si: SI_NO_OPTIONS,
+    cambio_celular_5anos: SI_NO_OPTIONS,
+    familia_en_usa: SI_NO_OPTIONS,
+    servicio_militar: SI_NO_OPTIONS,
+    duracion_estudio: [
+      { value: '3 meses', label: '3 meses' },
+      { value: '6 meses', label: '6 meses' },
+      { value: '12 meses', label: '12 meses' },
+    ],
+    horario_estudio: [
+      { value: 'Mañana', label: 'Mañana' },
+      { value: 'Tarde', label: 'Tarde' },
+      { value: 'Noche', label: 'Noche' },
+    ],
+    semestre_inicio: [
+      { value: 'Enero', label: 'Enero' },
+      { value: 'Mayo', label: 'Mayo' },
+      { value: 'Septiembre', label: 'Septiembre' },
+    ],
+    estado_civil: [
+      { value: 'Soltero', label: 'Soltero / Soltera' },
+      { value: 'Casado', label: 'Casado / Casada' },
+      { value: 'Divorciado', label: 'Divorciado / Divorciada' },
+      { value: 'Viudo', label: 'Viudo / Viuda' },
+      { value: 'Unión Libre', label: 'Unión Libre' },
+    ],
+    hijos_count: Array.from({ length: 11 }, (_, n) => ({ value: String(n), label: n === 0 ? '0 (Ninguno)' : `${n} Hijo${n > 1 ? 's' : ''}` })),
+    nombre_escuela: [
+      'Uceda School of Utah (Provo)', 'LANGUAGE ON (Salt Lake City)', 'Internexus Provo (Campus 1 - Provo)',
+      'Internexus Provo (Campus 2 - Provo)', 'American One English Schools INC (West Valley)',
+      'Lumos Language School (Salt Lake City)', 'Lumos Language School (Orem)', 'INX Academy (Salt Lake City)',
+      'PACE International Academy (Orem)', 'U.S. Ling Institute (Murray)', 'Brigham Young University - Provo',
+      'BYU Salt Lake Center (Salt Lake City)', 'Utah Valley University (Orem)', 'UVU School of Aviation Science (Provo)',
+      'University of Utah (Salt Lake City)', 'Utah State University (Logan)', 'Utah State University Eastern (Price)',
+      'Utah State University Flight Training (Logan)', 'Utah State Univ. Eastern Flight Training (Price)',
+      'Southern Utah University (Cedar City)', 'Southern Utah University Aviation (Cedar City)',
+      'Weber State University (Ogden)', 'Weber State University Davis (Layton)', 'Utah Tech University (St. George)',
+      'Snow College', 'Salt Lake Community College (Taylorsville Redwood Campus)',
+      'Salt Lake Community College (South City Campus)', 'Salt Lake Community College (Jordan Campus)',
+      'Salt Lake Community College (Miller Campus)', 'Salt Lake Community College (Library Square Center)',
+      'Salt Lake Community College (Meadowbrook Campus)', 'Salt Lake Community College (Westpointe Center)',
+      'Salt Lake Community College (International Aerospace/Aviation)', 'Otra Escuela',
+    ].map(v => ({ value: v, label: v })),
+  };
+
   // A doc entry only counts as "attached" if it actually has a usable link. Guards against
   // legacy records where a large PDF got truncated to a broken placeholder string before
   // the Storage-based upload pipeline existed.
@@ -270,10 +326,22 @@ export default function StaffPortalPage() {
       );
     }
     const value = editedFormData[formKey] ?? '';
+    const options = FIELD_SELECT_OPTIONS[formKey];
     return (
       <div className={className}>
         <label className="text-slate-500 font-semibold block mb-0.5">{label}:</label>
-        {multiline ? (
+        {options ? (
+          <select
+            value={value}
+            onChange={(e) => setEditedFormData(prev => ({ ...prev, [formKey]: e.target.value }))}
+            className="w-full h-8 px-2 rounded-md border border-blue-300 bg-white text-xs text-slate-900 font-medium focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="">Selecciona...</option>
+            {options.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        ) : multiline ? (
           <textarea
             value={value}
             onChange={(e) => setEditedFormData(prev => ({ ...prev, [formKey]: e.target.value }))}
