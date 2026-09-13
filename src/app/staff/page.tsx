@@ -39,7 +39,8 @@ import {
   Send,
   Sparkles,
   Trash2,
-  AlertTriangle
+  AlertTriangle,
+  Save
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -94,6 +95,9 @@ export default function StaffPortalPage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [dbConnectionError, setDbConnectionError] = useState<string | null>(null);
   const [deletingCaseId, setDeletingCaseId] = useState<string | null>(null);
+  const [isEditingDossier, setIsEditingDossier] = useState<boolean>(false);
+  const [editedFormData, setEditedFormData] = useState<Record<string, string>>({});
+  const [isSavingDossier, setIsSavingDossier] = useState<boolean>(false);
 
   // Check auth session on load
   useEffect(() => {
@@ -247,6 +251,94 @@ export default function StaffPortalPage() {
   const scrollToDossierSection = (anchor: string) => {
     if (typeof document === 'undefined') return;
     document.getElementById(anchor)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  // A single field in the dossier: renders as static text normally, and swaps to a real
+  // input the moment staff clicks "Editar Expediente" — bound to `editedFormData` so nothing
+  // is written to Firestore until "Guardar Cambios" is pressed.
+  const EditableField = ({
+    formKey, label, mono, multiline, className,
+  }: { formKey: string; label: string; mono?: boolean; multiline?: boolean; className?: string }) => {
+    if (!selectedCaseModal) return null;
+    if (!isEditingDossier) {
+      const value = selectedCaseModal.formData?.[formKey];
+      return (
+        <div className={className}>
+          <span className="text-slate-500 font-semibold block">{label}:</span>
+          <strong className={`text-slate-900 block ${mono ? 'font-mono' : ''}`}>{value || '-'}</strong>
+        </div>
+      );
+    }
+    const value = editedFormData[formKey] ?? '';
+    return (
+      <div className={className}>
+        <label className="text-slate-500 font-semibold block mb-0.5">{label}:</label>
+        {multiline ? (
+          <textarea
+            value={value}
+            onChange={(e) => setEditedFormData(prev => ({ ...prev, [formKey]: e.target.value }))}
+            rows={2}
+            className="w-full px-2 py-1.5 rounded-md border border-blue-300 bg-white text-xs text-slate-900 font-medium focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+        ) : (
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => setEditedFormData(prev => ({ ...prev, [formKey]: e.target.value }))}
+            className={`w-full h-8 px-2 rounded-md border border-blue-300 bg-white text-xs text-slate-900 font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 ${mono ? 'font-mono' : ''}`}
+          />
+        )}
+      </div>
+    );
+  };
+
+  // Used to gate conditional sub-fields (e.g. cónyuge fields only when estado_civil is
+  // "Casado"). Reads from the in-progress edit while editing, so toggling a dropdown
+  // immediately shows/hides its dependent fields instead of waiting for a save.
+  const getFieldValue = (key: string): string =>
+    (isEditingDossier ? editedFormData[key] : selectedCaseModal?.formData?.[key]) || '';
+
+  const startEditingDossier = () => {
+    if (!selectedCaseModal) return;
+    setEditedFormData({ ...selectedCaseModal.formData });
+    setIsEditingDossier(true);
+  };
+
+  const cancelEditingDossier = () => {
+    setIsEditingDossier(false);
+    setEditedFormData({});
+  };
+
+  const saveDossierEdits = async () => {
+    if (!selectedCaseModal) return;
+    setIsSavingDossier(true);
+    try {
+      const res = await fetch('/api/staff/cases', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          caseId: selectedCaseModal.id,
+          formData: editedFormData,
+          email: selectedCaseModal.email,
+          name: selectedCaseModal.name,
+          visaType: selectedCaseModal.visaType,
+        }),
+      });
+      if (res.ok) {
+        setStudentCases(prev => prev.map(c => c.id === selectedCaseModal.id ? { ...c, formData: editedFormData } : c));
+        setSelectedCaseModal(prev => prev ? { ...prev, formData: editedFormData } : null);
+        setIsEditingDossier(false);
+        toast.success('Expediente actualizado correctamente.');
+      } else {
+        const errBody = await res.json().catch(() => ({}));
+        toast.error(errBody?.error || 'No se pudo guardar el expediente.');
+      }
+    } catch (err) {
+      console.error('Error saving dossier edits:', err);
+      toast.error('No se pudo guardar el expediente. Revisa tu conexión.');
+    } finally {
+      setIsSavingDossier(false);
+    }
   };
 
   const SectionStatusBadge = ({ filled }: { filled: boolean }) => (
@@ -643,28 +735,28 @@ export default function StaffPortalPage() {
                         <div className="space-y-1.5 min-w-0 flex-1">
                           
                           {/* Row 1: Full Name + Visa Badge + Case ID */}
-                          <div className="flex items-center gap-2.5 flex-wrap">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <h4 className="text-base md:text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
                               {student.name || 'Postulante sin nombre registrado'}
                             </h4>
-                            
-                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1 shadow-xs ${
+
+                            <span className={`h-6 px-2.5 rounded-full text-[10px] font-semibold uppercase tracking-wide inline-flex items-center gap-1 ${
                               student.visaType === 'F-1'
                                 ? 'bg-blue-600 text-white'
                                 : 'bg-indigo-600 text-white'
                             }`}>
-                              {student.visaType === 'F-1' ? '🎓 Visa Estudiante F-1' : '✈️ Visa Turista B-2'}
+                              {student.visaType === 'F-1' ? '🎓 F-1 Estudiante' : '✈️ B-2 Turista'}
                             </span>
 
-                            <span className="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200 font-mono">
-                              ID: {student.id}
+                            <span className="h-6 px-2.5 rounded-full text-[10px] font-semibold text-slate-600 bg-slate-100 border border-slate-200 font-mono inline-flex items-center">
+                              {student.id}
                             </span>
                           </div>
 
                           {/* Row 2: Contact Info & School (Email, Phone, School) */}
                           <div className="flex items-center gap-x-4 gap-y-1 text-xs text-slate-600 flex-wrap">
                             {/* Email */}
-                            <div className="flex items-center gap-1.5 font-medium text-slate-800">
+                            <div className="flex items-center gap-1.5 font-medium text-slate-700">
                               <Mail className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                               <span className="truncate">{student.email || 'Sin correo'}</span>
                               {student.email && (
@@ -684,7 +776,7 @@ export default function StaffPortalPage() {
 
                             {/* Phone */}
                             {student.phone ? (
-                              <div className="flex items-center gap-1.5 font-medium text-slate-800">
+                              <div className="flex items-center gap-1.5 font-medium text-slate-700">
                                 <Phone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                                 <span className="truncate">{student.phone}</span>
                                 <button
@@ -704,34 +796,34 @@ export default function StaffPortalPage() {
                             )}
 
                             {/* School / State */}
-                            <div className="flex items-center gap-1.5 font-semibold text-slate-700 bg-slate-50 border border-slate-200 px-2.5 py-0.5 rounded-md text-xs">
+                            <div className="h-6 flex items-center gap-1.5 font-semibold text-slate-700 bg-slate-50 border border-slate-200 px-2.5 rounded-full text-xs">
                               <School className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                               <span className="truncate">{student.schoolName || student.schoolState || 'Utah'}</span>
                             </div>
                           </div>
 
-                          {/* Row 3: Document Attachment Status Badges & Form Progress */}
-                          <div className="flex items-center gap-2 flex-wrap pt-0.5">
+                          {/* Row 3: Document Attachment Status Badges & Form Progress — all the same pill size */}
+                          <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
                             {/* Form completion badge */}
                             {(() => {
                               const filledCount = Object.values(student.formData || {}).filter(Boolean).length;
                               if (filledCount >= 10) {
                                 return (
-                                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold flex items-center gap-1 border bg-emerald-50 text-emerald-800 border-emerald-300 shadow-2xs">
+                                  <span className="h-6 px-2.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1 border bg-emerald-50 text-emerald-800 border-emerald-200">
                                     <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                                     {filledCount} Datos Consulares Llenos
                                   </span>
                                 );
                               } else if (filledCount > 0) {
                                 return (
-                                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold flex items-center gap-1 border bg-amber-50 text-amber-800 border-amber-300">
+                                  <span className="h-6 px-2.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1 border bg-amber-50 text-amber-800 border-amber-200">
                                     <Sparkles className="w-3 h-3 text-amber-600" />
                                     {filledCount} Datos en Proceso
                                   </span>
                                 );
                               } else {
                                 return (
-                                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold flex items-center gap-1 border bg-slate-100 text-slate-600 border-slate-200">
+                                  <span className="h-6 px-2.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1 border bg-slate-100 text-slate-600 border-slate-200">
                                     <User className="w-3 h-3 text-slate-500" />
                                     Cliente Registrado
                                   </span>
@@ -740,34 +832,34 @@ export default function StaffPortalPage() {
                             })()}
 
                             {/* Photo 5x5 badge */}
-                            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold flex items-center gap-1 border ${
-                              hasPhoto 
-                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                            <span className={`h-6 px-2.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1 border ${
+                              hasPhoto
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                                 : 'bg-slate-100 text-slate-400 border-slate-200'
                             }`}>
                               <Camera className="w-3 h-3" />
-                              {hasPhoto ? 'Foto 5x5 Adjunta ✓' : 'Sin Foto 5x5'}
+                              {hasPhoto ? 'Foto 5x5 ✓' : 'Sin Foto 5x5'}
                             </span>
 
                             {/* Passport badge */}
-                            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold flex items-center gap-1 border ${
-                              hasPassport 
-                                ? 'bg-indigo-50 text-indigo-700 border-indigo-200' 
+                            <span className={`h-6 px-2.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1 border ${
+                              hasPassport
+                                ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
                                 : 'bg-slate-100 text-slate-400 border-slate-200'
                             }`}>
                               <CreditCard className="w-3 h-3" />
-                              {hasPassport ? 'Pasaporte Adjunto ✓' : 'Sin Pasaporte'}
+                              {hasPassport ? 'Pasaporte ✓' : 'Sin Pasaporte'}
                             </span>
 
                             {/* Bank statement badge (mainly for F-1) */}
                             {student.visaType === 'F-1' && (
-                              <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold flex items-center gap-1 border ${
-                                hasBankStatement 
-                                  ? 'bg-blue-50 text-blue-700 border-blue-200' 
+                              <span className={`h-6 px-2.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1 border ${
+                                hasBankStatement
+                                  ? 'bg-blue-50 text-blue-700 border-blue-200'
                                   : 'bg-slate-100 text-slate-400 border-slate-200'
                               }`}>
                                 <Building className="w-3 h-3" />
-                                {hasBankStatement ? 'Estado de Cuenta Adjunto ✓' : 'Sin Estado de Cuenta'}
+                                {hasBankStatement ? 'Edo. Cuenta ✓' : 'Sin Edo. Cuenta'}
                               </span>
                             )}
                           </div>
@@ -783,19 +875,19 @@ export default function StaffPortalPage() {
                       </div>
 
                       {/* Right side: 5-State Selector + Full Dossier Button */}
-                      <div 
-                        className="flex flex-col sm:flex-row xl:flex-col items-stretch sm:items-center xl:items-end gap-2.5 w-full xl:w-auto shrink-0 border-t xl:border-t-0 pt-3 xl:pt-0 border-slate-100"
+                      <div
+                        className="flex flex-col sm:flex-row xl:flex-col items-stretch sm:items-center xl:items-end gap-2 w-full xl:w-auto shrink-0 border-t xl:border-t-0 pt-3 xl:pt-0 border-slate-100"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {/* State selector dropdown */}
                         <div className="flex items-center gap-2 w-full sm:w-auto">
-                          <label className="text-xs font-bold text-slate-600 shrink-0">
+                          <label className="text-xs font-semibold text-slate-600 shrink-0">
                             Estado:
                           </label>
                           <select
                             value={student.status}
                             onChange={(e) => handleMoveStatus(student.id, e.target.value as StaffTabType)}
-                            className="h-9 px-3 py-1 rounded-xl border border-slate-300 bg-slate-50 hover:bg-white text-slate-900 text-xs font-bold transition-all cursor-pointer focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 shadow-2xs w-full sm:w-auto"
+                            className="h-9 px-3 rounded-xl border border-slate-300 bg-slate-50 hover:bg-white text-slate-900 text-xs font-semibold transition-all cursor-pointer focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 shadow-2xs w-full sm:w-auto"
                             title="Cambiar estado del trámite"
                           >
                             <option value="nuevos">📥 1. Procesos Nuevos</option>
@@ -813,41 +905,39 @@ export default function StaffPortalPage() {
 
                         {/* Buttons row: Chat bubble with live notification dot + View Full Expediente */}
                         <div className="flex items-center gap-2 w-full sm:w-auto">
-                          <div className="relative shrink-0">
-                            <Button
-                              type="button"
-                              onClick={() => {
-                                setStudentCases(prev => prev.map(item => item.id === student.id ? { ...item, unreadCount: 0 } : item));
-                                setActiveChatStudent(student);
-                              }}
-                              className={`relative h-9 w-9 p-0 rounded-xl border font-bold transition-all shrink-0 flex items-center justify-center shadow-xs cursor-pointer ${
-                                (student.unreadCount || 0) > 0
-                                  ? 'border-red-300 bg-red-50 hover:bg-red-100 text-red-600 ring-2 ring-red-400/30'
-                                  : 'border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700'
-                              }`}
-                              title={(student.unreadCount || 0) > 0 ? `¡${student.unreadCount} mensaje(s) nuevo(s) de ${student.name || 'este cliente'}!` : `Chatear en vivo con ${student.name || 'el postulante'}`}
-                            >
-                              <MessageCircle className={`w-4 h-4 ${(student.unreadCount || 0) > 0 ? 'text-red-600' : 'text-blue-600'}`} />
-                              
-                              {/* Live Unread Notification Dot / Badge */}
-                              {(student.unreadCount || 0) > 0 && (
-                                <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center">
-                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-red-600 text-[8px] font-black text-white items-center justify-center border-2 border-white shadow-xs">
-                                    {student.unreadCount! > 9 ? '9+' : student.unreadCount}
-                                  </span>
+                          <Button
+                            type="button"
+                            onClick={() => {
+                              setStudentCases(prev => prev.map(item => item.id === student.id ? { ...item, unreadCount: 0 } : item));
+                              setActiveChatStudent(student);
+                            }}
+                            className={`relative h-9 w-9 p-0 rounded-xl border font-semibold transition-all shrink-0 flex items-center justify-center shadow-xs cursor-pointer ${
+                              (student.unreadCount || 0) > 0
+                                ? 'border-red-300 bg-red-50 hover:bg-red-100 text-red-600 ring-2 ring-red-400/30'
+                                : 'border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700'
+                            }`}
+                            title={(student.unreadCount || 0) > 0 ? `¡${student.unreadCount} mensaje(s) nuevo(s) de ${student.name || 'este cliente'}!` : `Chatear en vivo con ${student.name || 'el postulante'}`}
+                          >
+                            <MessageCircle className={`w-4 h-4 ${(student.unreadCount || 0) > 0 ? 'text-red-600' : 'text-blue-600'}`} />
+
+                            {/* Live Unread Notification Dot / Badge */}
+                            {(student.unreadCount || 0) > 0 && (
+                              <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-red-600 text-[8px] font-black text-white items-center justify-center border-2 border-white shadow-xs">
+                                  {student.unreadCount! > 9 ? '9+' : student.unreadCount}
                                 </span>
-                              )}
-                            </Button>
-                          </div>
+                              </span>
+                            )}
+                          </Button>
 
                           <Button
                             type="button"
                             onClick={() => setSelectedCaseModal(student)}
-                            className="h-9 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 transition-all flex-1 sm:flex-initial cursor-pointer"
+                            className="h-9 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs uppercase tracking-wide flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 transition-all flex-1 sm:flex-initial cursor-pointer"
                           >
                             <Eye className="w-3.5 h-3.5 text-white" />
-                            <span>Ver Expediente Completo</span>
+                            <span>Ver Expediente</span>
                           </Button>
 
                           <Button
@@ -980,6 +1070,48 @@ export default function StaffPortalPage() {
                     {getStatusLabel(st)}
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* Edit Dossier Toolbar */}
+            <div className="px-6 py-3 bg-amber-50/60 border-b border-amber-200/60 shrink-0 flex items-center justify-between gap-3">
+              <span className="text-[11px] font-semibold text-amber-800">
+                {isEditingDossier
+                  ? 'Editando el expediente — los cambios no se guardan hasta que le des a "Guardar Cambios".'
+                  : 'Puedes corregir o completar cualquier dato del expediente en nombre del cliente.'}
+              </span>
+              <div className="flex items-center gap-2 shrink-0">
+                {isEditingDossier ? (
+                  <>
+                    <Button
+                      type="button"
+                      onClick={cancelEditingDossier}
+                      disabled={isSavingDossier}
+                      variant="outline"
+                      className="h-8 px-3 rounded-lg text-xs font-semibold border-slate-300 text-slate-700"
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={saveDossierEdits}
+                      disabled={isSavingDossier}
+                      className="h-8 px-3 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5"
+                    >
+                      <Save className="w-3.5 h-3.5 text-white" />
+                      {isSavingDossier ? 'Guardando...' : 'Guardar Cambios'}
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={startEditingDossier}
+                    className="h-8 px-3 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-white" />
+                    Editar Expediente
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -1203,55 +1335,22 @@ export default function StaffPortalPage() {
               <div id="sec-1" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
                 <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
                   <span className="flex items-center gap-2"><User className="w-4 h-4 text-black" />1. Información Personal</span>
-                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[0].fields)} />
+                  {SectionStatusBadge({ filled: isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[0].fields) })}
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 text-xs">
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Apellidos:</span>
-                    <strong className="text-slate-900 text-sm">{selectedCaseModal.formData.apellidos || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Nombres:</span>
-                    <strong className="text-slate-900 text-sm">{selectedCaseModal.formData.nombres || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Fecha de Nacimiento:</span>
-                    <strong className="text-slate-900 text-sm">{selectedCaseModal.formData.fecha_nacimiento || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Lugar de Nacimiento:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.lugar_nacimiento || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Ciudad de Nacimiento:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.ciudad_nacimiento || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Estado / Provincia Nacimiento:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.estado_nacimiento || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">País de Nacimiento:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.pais_nacimiento || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">¿Otra nacionalidad?:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.otra_nacionalidad || 'No'} {selectedCaseModal.formData.cuales_nacionalidades ? `(${selectedCaseModal.formData.cuales_nacionalidades})` : ''}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">¿Residente permanente otro país?:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.residente_otro_pais || 'No'} {selectedCaseModal.formData.que_pais_residencia ? `(${selectedCaseModal.formData.que_pais_residencia})` : ''}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">N° Documento Nacional (DNI / CURP):</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.num_identificacion_nacional || '-'}</strong>
-                  </div>
-                  <div className="sm:col-span-2 md:col-span-3 lg:col-span-4 xl:col-span-5">
-                    <span className="text-slate-500 font-semibold block">¿Rechazo de visa previo?:</span>
-                    <p className="text-slate-900 font-medium bg-slate-50 p-2.5 rounded-lg border border-slate-200 mt-1">
-                      {selectedCaseModal.formData.rechazo_visa_detalle || 'Ninguno reportado.'}
-                    </p>
-                  </div>
+                  {EditableField({ formKey: "apellidos", label: "Apellidos" })}
+                  {EditableField({ formKey: "nombres", label: "Nombres" })}
+                  {EditableField({ formKey: "fecha_nacimiento", label: "Fecha de Nacimiento" })}
+                  {EditableField({ formKey: "lugar_nacimiento", label: "Lugar de Nacimiento" })}
+                  {EditableField({ formKey: "ciudad_nacimiento", label: "Ciudad de Nacimiento" })}
+                  {EditableField({ formKey: "estado_nacimiento", label: "Estado / Provincia Nacimiento" })}
+                  {EditableField({ formKey: "pais_nacimiento", label: "País de Nacimiento" })}
+                  {EditableField({ formKey: "otra_nacionalidad", label: "¿Otra nacionalidad?" })}
+                  {EditableField({ formKey: "cuales_nacionalidades", label: "¿Cuáles nacionalidades?" })}
+                  {EditableField({ formKey: "residente_otro_pais", label: "¿Residente permanente otro país?" })}
+                  {EditableField({ formKey: "que_pais_residencia", label: "¿Qué país de residencia?" })}
+                  {EditableField({ formKey: "num_identificacion_nacional", label: "N° Documento Nacional (DNI / CURP)" })}
+                  {EditableField({ formKey: "rechazo_visa_detalle", label: "¿Rechazo de visa previo?", multiline: true, className: "sm:col-span-2 md:col-span-3 lg:col-span-4 xl:col-span-5" })}
                 </div>
               </div>
 
@@ -1259,37 +1358,18 @@ export default function StaffPortalPage() {
               <div id="sec-2" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
                 <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
                   <span className="flex items-center gap-2"><School className="w-4 h-4 text-black" />2. Información Adicional (Sólo para Estudiantes)</span>
-                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[1].fields)} />
+                  {SectionStatusBadge({ filled: isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[1].fields) })}
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-xs">
-                  <div className="sm:col-span-2 md:col-span-3 lg:col-span-4">
-                    <span className="text-slate-500 font-semibold block">¿Por qué quieres estudiar inglés?:</span>
-                    <p className="text-slate-900 font-medium bg-slate-50 p-2.5 rounded-lg border border-slate-200 mt-1">
-                      {selectedCaseModal.formData.motivo_estudio_ingles || '-'}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Duración de Estudio:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.duracion_estudio || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Horario de Estudio:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.horario_estudio || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Semestre de Inicio:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.semestre_inicio || '-'}</strong>
-                  </div>
+                  {EditableField({ formKey: "motivo_estudio_ingles", label: "¿Por qué quieres estudiar inglés?", multiline: true, className: "sm:col-span-2 md:col-span-3 lg:col-span-4" })}
+                  {EditableField({ formKey: "duracion_estudio", label: "Duración de Estudio" })}
+                  {EditableField({ formKey: "horario_estudio", label: "Horario de Estudio" })}
+                  {EditableField({ formKey: "semestre_inicio", label: "Semestre de Inicio" })}
                   <div>
                     <span className="text-slate-500 font-semibold block">Estado de Estudio USA:</span>
                     <strong className="text-slate-900">Utah</strong>
                   </div>
-                  <div className="sm:col-span-2 lg:col-span-4">
-                    <span className="text-slate-500 font-semibold block">Nombre de la Escuela Seleccionada:</span>
-                    <strong className="text-blue-700 text-sm font-bold">
-                      {selectedCaseModal.formData.nombre_escuela || selectedCaseModal.formData.escuela_manual_nombre || '-'}
-                    </strong>
-                  </div>
+                  {EditableField({ formKey: "nombre_escuela", label: "Nombre de la Escuela Seleccionada", className: "sm:col-span-2 lg:col-span-4" })}
                 </div>
               </div>
 
@@ -1297,31 +1377,17 @@ export default function StaffPortalPage() {
               <div id="sec-3" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
                 <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
                   <span className="flex items-center gap-2"><Heart className="w-4 h-4 text-black" />3. Estado Civil</span>
-                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[2].fields)} />
+                  {SectionStatusBadge({ filled: isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[2].fields) })}
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-xs">
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Estado Civil:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.estado_civil || '-'}</strong>
-                  </div>
-                  {selectedCaseModal.formData.estado_civil === 'Casado' && (
+                  {EditableField({ formKey: "estado_civil", label: "Estado Civil" })}
+                  {getFieldValue('estado_civil') === 'Casado' && (
                     <>
-                      <div>
-                        <span className="text-slate-500 font-semibold block">Nombre del Cónyuge:</span>
-                        <strong className="text-slate-900">{selectedCaseModal.formData.nombre_conyuge || '-'}</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 font-semibold block">Fecha de Matrimonio:</span>
-                        <strong className="text-slate-900">{selectedCaseModal.formData.fecha_matrimonio || '-'}</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 font-semibold block">Nacimiento Cónyuge:</span>
-                        <strong className="text-slate-900">{selectedCaseModal.formData.fecha_nacimiento_conyuge || '-'}</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 font-semibold block">Lugar / Ciudad Cónyuge:</span>
-                        <strong className="text-slate-900">{selectedCaseModal.formData.ciudad_conyuge || '-'}, {selectedCaseModal.formData.pais_conyuge || '-'}</strong>
-                      </div>
+                      {EditableField({ formKey: "nombre_conyuge", label: "Nombre del Cónyuge" })}
+                      {EditableField({ formKey: "fecha_matrimonio", label: "Fecha de Matrimonio" })}
+                      {EditableField({ formKey: "fecha_nacimiento_conyuge", label: "Nacimiento Cónyuge" })}
+                      {EditableField({ formKey: "ciudad_conyuge", label: "Ciudad Cónyuge" })}
+                      {EditableField({ formKey: "pais_conyuge", label: "País Cónyuge" })}
                     </>
                   )}
                 </div>
@@ -1331,33 +1397,15 @@ export default function StaffPortalPage() {
               <div id="sec-4" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
                 <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
                   <span className="flex items-center gap-2"><CreditCard className="w-4 h-4 text-black" />4. Pasaporte</span>
-                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[3].fields)} />
+                  {SectionStatusBadge({ filled: isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[3].fields) })}
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-xs">
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Número de Pasaporte:</span>
-                    <strong className="text-slate-900 text-sm font-mono">{selectedCaseModal.formData.num_pasaporte || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Ciudad de Emisión:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.ciudad_pasaporte || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Estado de Emisión:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.estado_pasaporte || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Fecha de Emisión:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.fecha_emision_pasaporte || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Fecha de Expiración:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.fecha_expiracion_pasaporte || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">¿Ha extraviado pasaporte antes?:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.perdio_pasaporte || 'No'}</strong>
-                  </div>
+                  {EditableField({ formKey: "num_pasaporte", label: "Número de Pasaporte", mono: true })}
+                  {EditableField({ formKey: "ciudad_pasaporte", label: "Ciudad de Emisión" })}
+                  {EditableField({ formKey: "estado_pasaporte", label: "Estado de Emisión" })}
+                  {EditableField({ formKey: "fecha_emision_pasaporte", label: "Fecha de Emisión" })}
+                  {EditableField({ formKey: "fecha_expiracion_pasaporte", label: "Fecha de Expiración" })}
+                  {EditableField({ formKey: "perdio_pasaporte", label: "¿Ha extraviado pasaporte antes?" })}
                 </div>
               </div>
 
@@ -1365,37 +1413,16 @@ export default function StaffPortalPage() {
               <div id="sec-5" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
                 <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
                   <span className="flex items-center gap-2"><Home className="w-4 h-4 text-black" />5. Dirección de Domicilio Actual</span>
-                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[4].fields)} />
+                  {SectionStatusBadge({ filled: isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[4].fields) })}
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 text-xs">
-                  <div className="sm:col-span-2">
-                    <span className="text-slate-500 font-semibold block">Dirección:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.direccion_domicilio || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Ciudad:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.ciudad_domicilio || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Estado / Provincia:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.estado_domicilio || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">País:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.pais_domicilio || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Código Postal:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.cp_domicilio || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Celular:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.celular_contacto || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Email:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.email_contacto || '-'}</strong>
-                  </div>
+                  {EditableField({ formKey: "direccion_domicilio", label: "Dirección", className: "sm:col-span-2" })}
+                  {EditableField({ formKey: "ciudad_domicilio", label: "Ciudad" })}
+                  {EditableField({ formKey: "estado_domicilio", label: "Estado / Provincia" })}
+                  {EditableField({ formKey: "pais_domicilio", label: "País" })}
+                  {EditableField({ formKey: "cp_domicilio", label: "Código Postal" })}
+                  {EditableField({ formKey: "celular_contacto", label: "Celular" })}
+                  {EditableField({ formKey: "email_contacto", label: "Email" })}
                 </div>
               </div>
 
@@ -1403,35 +1430,18 @@ export default function StaffPortalPage() {
               <div id="sec-6" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
                 <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
                   <span className="flex items-center gap-2"><Users className="w-4 h-4 text-black" />6. Patrocinador / Sponsor</span>
-                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[5].fields)} />
+                  {SectionStatusBadge({ filled: isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[5].fields) })}
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-xs">
-                  <div>
-                    <span className="text-slate-500 font-semibold block">¿Tiene Patrocinador?:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.tiene_patrocinador || 'No'}</strong>
-                  </div>
-                  {selectedCaseModal.formData.tiene_patrocinador === 'Sí' && (
+                  {EditableField({ formKey: "tiene_patrocinador", label: "¿Tiene Patrocinador?" })}
+                  {getFieldValue('tiene_patrocinador') === 'Sí' && (
                     <>
-                      <div>
-                        <span className="text-slate-500 font-semibold block">Nombre Completo:</span>
-                        <strong className="text-slate-900">{selectedCaseModal.formData.sponsor_nombres || ''} {selectedCaseModal.formData.sponsor_apellidos || ''}</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 font-semibold block">Parentesco:</span>
-                        <strong className="text-slate-900">{selectedCaseModal.formData.sponsor_parentesco || '-'}</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 font-semibold block">Teléfono:</span>
-                        <strong className="text-slate-900">{selectedCaseModal.formData.sponsor_celular || '-'}</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 font-semibold block">Email:</span>
-                        <strong className="text-slate-900">{selectedCaseModal.formData.sponsor_email || '-'}</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 font-semibold block">Dirección Sponsor:</span>
-                        <strong className="text-slate-900">{selectedCaseModal.formData.sponsor_direccion || '-'}</strong>
-                      </div>
+                      {EditableField({ formKey: "sponsor_nombres", label: "Nombres" })}
+                      {EditableField({ formKey: "sponsor_apellidos", label: "Apellidos" })}
+                      {EditableField({ formKey: "sponsor_parentesco", label: "Parentesco" })}
+                      {EditableField({ formKey: "sponsor_celular", label: "Teléfono" })}
+                      {EditableField({ formKey: "sponsor_email", label: "Email" })}
+                      {EditableField({ formKey: "sponsor_direccion", label: "Dirección Sponsor" })}
                     </>
                   )}
                 </div>
@@ -1441,25 +1451,17 @@ export default function StaffPortalPage() {
               <div id="sec-7" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
                 <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
                   <span className="flex items-center gap-2"><Users className="w-4 h-4 text-black" />7. Hijos ({selectedCaseModal.formData.hijos_count || '0'} Hijos Registrados)</span>
-                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[6].fields)} />
+                  {SectionStatusBadge({ filled: isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[6].fields) })}
                 </h4>
                 <div className="space-y-3">
                   {Array.from({ length: parseInt(selectedCaseModal.formData.hijos_count || '0', 10) || 0 }).map((_, i) => {
                     const hNum = i + 1;
                     return (
                       <div key={hNum} className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-                        <div>
-                          <span className="text-slate-500 font-semibold block">Hijo N° {hNum}:</span>
-                          <strong className="text-slate-900">{selectedCaseModal.formData[`hijo${hNum}_nombres`] || ''} {selectedCaseModal.formData[`hijo${hNum}_apellidos`] || ''}</strong>
-                        </div>
-                        <div>
-                          <span className="text-slate-500 font-semibold block">Fecha de Nacimiento:</span>
-                          <strong className="text-slate-900">{selectedCaseModal.formData[`hijo${hNum}_fecha_nac`] || '-'}</strong>
-                        </div>
-                        <div>
-                          <span className="text-slate-500 font-semibold block">Pasaporte:</span>
-                          <strong className="text-slate-900 font-mono">{selectedCaseModal.formData[`hijo${hNum}_pasaporte`] || '-'}</strong>
-                        </div>
+                        {EditableField({ formKey: `hijo${hNum}_nombres`, label: `Hijo N° ${hNum} - Nombres` })}
+                        {EditableField({ formKey: `hijo${hNum}_apellidos`, label: "Apellidos" })}
+                        {EditableField({ formKey: `hijo${hNum}_fecha_nac`, label: "Fecha de Nacimiento" })}
+                        {EditableField({ formKey: `hijo${hNum}_pasaporte`, label: "Pasaporte", mono: true })}
                       </div>
                     );
                   })}
@@ -1473,19 +1475,13 @@ export default function StaffPortalPage() {
               <div id="sec-8" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
                 <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
                   <span className="flex items-center gap-2"><Users className="w-4 h-4 text-black" />8. Nombre de los Padres</span>
-                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[7].fields)} />
+                  {SectionStatusBadge({ filled: isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[7].fields) })}
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Nombre Completo Mamá:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.nombre_mama || '-'}</strong>
-                    <span className="text-slate-500 text-[11px] block mt-0.5">Fecha Nac: {selectedCaseModal.formData.fecha_nac_mama || '-'}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Nombre Completo Papá:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.nombre_papa || '-'}</strong>
-                    <span className="text-slate-500 text-[11px] block mt-0.5">Fecha Nac: {selectedCaseModal.formData.fecha_nac_papa || '-'}</span>
-                  </div>
+                  {EditableField({ formKey: "nombre_mama", label: "Nombre Completo Mamá" })}
+                  {EditableField({ formKey: "fecha_nac_mama", label: "Fecha Nac. Mamá" })}
+                  {EditableField({ formKey: "nombre_papa", label: "Nombre Completo Papá" })}
+                  {EditableField({ formKey: "fecha_nac_papa", label: "Fecha Nac. Papá" })}
                 </div>
               </div>
 
@@ -1493,59 +1489,30 @@ export default function StaffPortalPage() {
               <div id="sec-9" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
                 <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
                   <span className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-black" />9. Información de Trabajo</span>
-                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[8].fields)} />
+                  {SectionStatusBadge({ filled: isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[8].fields) })}
                 </h4>
                 <div className="space-y-4 text-xs">
                   <div>
                     <span className="text-xs font-bold text-blue-700 uppercase tracking-wider block">Empleo Actual</span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 pt-2">
-                      <div>
-                        <span className="text-slate-500 font-semibold block">Empresa:</span>
-                        <strong className="text-slate-900">{selectedCaseModal.formData.trabajo_empresa || '-'}</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 font-semibold block">Dirección:</span>
-                        <strong className="text-slate-900">{selectedCaseModal.formData.trabajo_direccion || '-'}</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 font-semibold block">Ciudad / País:</span>
-                        <strong className="text-slate-900">{selectedCaseModal.formData.trabajo_ciudad || '-'}, {selectedCaseModal.formData.trabajo_pais || '-'}</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 font-semibold block">Teléfono Empresa:</span>
-                        <strong className="text-slate-900">{selectedCaseModal.formData.trabajo_telefono || '-'}</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 font-semibold block">Fecha de Inicio:</span>
-                        <strong className="text-slate-900">{selectedCaseModal.formData.trabajo_fecha_inicio || '-'}</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 font-semibold block">Salario Mensual:</span>
-                        <strong className="text-emerald-700 font-bold">{selectedCaseModal.formData.trabajo_salario || '-'}</strong>
-                      </div>
-                      <div className="sm:col-span-2 md:col-span-3 lg:col-span-6">
-                        <span className="text-slate-500 font-semibold block">Descripción de Labores:</span>
-                        <p className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 mt-1">{selectedCaseModal.formData.trabajo_descripcion || '-'}</p>
-                      </div>
+                      {EditableField({ formKey: "trabajo_empresa", label: "Empresa" })}
+                      {EditableField({ formKey: "trabajo_direccion", label: "Dirección" })}
+                      {EditableField({ formKey: "trabajo_ciudad", label: "Ciudad" })}
+                      {EditableField({ formKey: "trabajo_pais", label: "País" })}
+                      {EditableField({ formKey: "trabajo_telefono", label: "Teléfono Empresa" })}
+                      {EditableField({ formKey: "trabajo_fecha_inicio", label: "Fecha de Inicio" })}
+                      {EditableField({ formKey: "trabajo_salario", label: "Salario Mensual" })}
+                      {EditableField({ formKey: "trabajo_descripcion", label: "Descripción de Labores", multiline: true, className: "sm:col-span-2 md:col-span-3 lg:col-span-6" })}
                     </div>
                   </div>
 
-                  {selectedCaseModal.formData.trabajo_anterior_si === 'Sí' && (
+                  {getFieldValue('trabajo_anterior_si') === 'Sí' && (
                     <div className="border-t border-slate-100 pt-3">
                       <span className="text-xs font-bold text-amber-700 uppercase tracking-wider block">Empleo Anterior</span>
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 pt-2">
-                        <div>
-                          <span className="text-slate-500 font-semibold block">Empresa Anterior:</span>
-                          <strong className="text-slate-900">{selectedCaseModal.formData.trabajo_ant_empresa || '-'}</strong>
-                        </div>
-                        <div>
-                          <span className="text-slate-500 font-semibold block">Cargo Desempeñado:</span>
-                          <strong className="text-slate-900">{selectedCaseModal.formData.trabajo_ant_cargo || '-'}</strong>
-                        </div>
-                        <div>
-                          <span className="text-slate-500 font-semibold block">Supervisor:</span>
-                          <strong className="text-slate-900">{selectedCaseModal.formData.trabajo_ant_supervisor || '-'}</strong>
-                        </div>
+                        {EditableField({ formKey: "trabajo_ant_empresa", label: "Empresa Anterior" })}
+                        {EditableField({ formKey: "trabajo_ant_cargo", label: "Cargo Desempeñado" })}
+                        {EditableField({ formKey: "trabajo_ant_supervisor", label: "Supervisor" })}
                       </div>
                     </div>
                   )}
@@ -1556,21 +1523,23 @@ export default function StaffPortalPage() {
               <div id="sec-10" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
                 <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
                   <span className="flex items-center gap-2"><GraduationCap className="w-4 h-4 text-black" />10 & 11. Historial Educativo</span>
-                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[9].fields)} />
+                  {SectionStatusBadge({ filled: isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[9].fields) })}
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
                     <strong className="text-slate-900 text-xs uppercase block border-b border-slate-200 pb-1">Educación Secundaria</strong>
-                    <div><span className="text-slate-500 font-semibold">Institución:</span> <strong className="text-slate-900">{selectedCaseModal.formData.secundaria_nombre || '-'}</strong></div>
-                    <div><span className="text-slate-500 font-semibold">Programa / Título:</span> <strong className="text-slate-900">{selectedCaseModal.formData.secundaria_programa || '-'}</strong></div>
-                    <div><span className="text-slate-500 font-semibold">Fechas:</span> <strong className="text-slate-900">{selectedCaseModal.formData.secundaria_fecha_inicio || '-'} a {selectedCaseModal.formData.secundaria_fecha_fin || '-'}</strong></div>
+                    {EditableField({ formKey: "secundaria_nombre", label: "Institución" })}
+                    {EditableField({ formKey: "secundaria_programa", label: "Programa / Título" })}
+                    {EditableField({ formKey: "secundaria_fecha_inicio", label: "Fecha Inicio" })}
+                    {EditableField({ formKey: "secundaria_fecha_fin", label: "Fecha Fin" })}
                   </div>
 
                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
                     <strong className="text-slate-900 text-xs uppercase block border-b border-slate-200 pb-1">Universidad / Instituto</strong>
-                    <div><span className="text-slate-500 font-semibold">Institución:</span> <strong className="text-slate-900">{selectedCaseModal.formData.universidad_nombre || '-'}</strong></div>
-                    <div><span className="text-slate-500 font-semibold">Carrera / Programa:</span> <strong className="text-slate-900">{selectedCaseModal.formData.universidad_programa || '-'}</strong></div>
-                    <div><span className="text-slate-500 font-semibold">Fechas:</span> <strong className="text-slate-900">{selectedCaseModal.formData.universidad_fecha_inicio || '-'} a {selectedCaseModal.formData.universidad_fecha_fin || '-'}</strong></div>
+                    {EditableField({ formKey: "universidad_nombre", label: "Institución" })}
+                    {EditableField({ formKey: "universidad_programa", label: "Carrera / Programa" })}
+                    {EditableField({ formKey: "universidad_fecha_inicio", label: "Fecha Inicio" })}
+                    {EditableField({ formKey: "universidad_fecha_fin", label: "Fecha Fin" })}
                   </div>
                 </div>
               </div>
@@ -1579,37 +1548,17 @@ export default function StaffPortalPage() {
               <div id="sec-12" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
                 <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
                   <span className="flex items-center gap-2"><Plane className="w-4 h-4 text-black" />12. Información requerida antes de entrar a EE.UU.</span>
-                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[10].fields)} />
+                  {SectionStatusBadge({ filled: isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[10].fields) })}
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-xs">
-                  <div className="sm:col-span-2 lg:col-span-3">
-                    <span className="text-slate-500 font-semibold block">Dirección de Hospedaje en EE.UU.:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.usa_hospedaje_direccion || '-'}</strong>
-                  </div>
-                  <div className="sm:col-span-1 lg:col-span-3">
-                    <span className="text-slate-500 font-semibold block">Fecha de Llegada / Salida:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.usa_fecha_llegada || '-'} al {selectedCaseModal.formData.usa_fecha_salida || '-'}</strong>
-                  </div>
-                  <div className="sm:col-span-2 md:col-span-3 lg:col-span-6">
-                    <span className="text-slate-500 font-semibold block">Viajes Anteriores a EE.UU.:</span>
-                    <p className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 mt-1">{selectedCaseModal.formData.usa_viajes_anteriores || 'Sin viajes previos registrados.'}</p>
-                  </div>
-                  <div className="sm:col-span-2 md:col-span-3 lg:col-span-6">
-                    <span className="text-slate-500 font-semibold block">Visas Americanas Anteriores:</span>
-                    <p className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 mt-1">{selectedCaseModal.formData.usa_visas_anteriores_detalle || 'Sin visas anteriores.'}</p>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">Idiomas que habla:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.idiomas_habla || '-'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 font-semibold block">¿Servicio militar?:</span>
-                    <strong className="text-slate-900">{selectedCaseModal.formData.servicio_militar || 'No'}</strong>
-                  </div>
-                  <div className="sm:col-span-2 md:col-span-3 lg:col-span-4">
-                    <span className="text-slate-500 font-semibold block">Viajes a otros países en los últimos 5 años:</span>
-                    <p className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 mt-1">{selectedCaseModal.formData.viajes_otros_paises_5anos || 'Ninguno reportado.'}</p>
-                  </div>
+                  {EditableField({ formKey: "usa_hospedaje_direccion", label: "Dirección de Hospedaje en EE.UU.", className: "sm:col-span-2 lg:col-span-3" })}
+                  {EditableField({ formKey: "usa_fecha_llegada", label: "Fecha de Llegada" })}
+                  {EditableField({ formKey: "usa_fecha_salida", label: "Fecha de Salida" })}
+                  {EditableField({ formKey: "usa_viajes_anteriores", label: "Viajes Anteriores a EE.UU.", multiline: true, className: "sm:col-span-2 md:col-span-3 lg:col-span-6" })}
+                  {EditableField({ formKey: "usa_visas_anteriores_detalle", label: "Visas Americanas Anteriores", multiline: true, className: "sm:col-span-2 md:col-span-3 lg:col-span-6" })}
+                  {EditableField({ formKey: "idiomas_habla", label: "Idiomas que habla" })}
+                  {EditableField({ formKey: "servicio_militar", label: "¿Servicio militar?" })}
+                  {EditableField({ formKey: "viajes_otros_paises_5anos", label: "Viajes a otros países en los últimos 5 años", multiline: true, className: "sm:col-span-2 md:col-span-3 lg:col-span-4" })}
                 </div>
               </div>
 
@@ -1617,7 +1566,7 @@ export default function StaffPortalPage() {
               <div id="sec-13" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
                 <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
                   <span className="flex items-center gap-2"><Phone className="w-4 h-4 text-black" />13. Contactos de Emergencia (NO Familiares)</span>
-                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[11].fields)} />
+                  {SectionStatusBadge({ filled: isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[11].fields) })}
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                   {/* Contacto 1 */}
@@ -1625,32 +1574,14 @@ export default function StaffPortalPage() {
                     <strong className="text-slate-900 font-bold block border-b border-slate-200 pb-1 uppercase tracking-wider text-[11px]">
                       Contacto de Emergencia N° 1
                     </strong>
-                    <div>
-                      <span className="text-slate-500 font-semibold">Nombre:</span>{' '}
-                      <strong className="text-slate-900">
-                        {selectedCaseModal.formData.c1_nombre || `${selectedCaseModal.formData.contacto1_nombres || ''} ${selectedCaseModal.formData.contacto1_apellidos || ''}`.trim() || '-'}
-                      </strong>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 font-semibold">Teléfono:</span>{' '}
-                      <strong className="text-slate-900">{selectedCaseModal.formData.c1_telefono || selectedCaseModal.formData.contacto1_celular || '-'}</strong>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 font-semibold">Email:</span>{' '}
-                      <strong className="text-slate-900">{selectedCaseModal.formData.c1_email || selectedCaseModal.formData.contacto1_email || '-'}</strong>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 font-semibold">Dirección:</span>{' '}
-                      <strong className="text-slate-900">
-                        {[
-                          selectedCaseModal.formData.c1_direccion,
-                          selectedCaseModal.formData.c1_ciudad,
-                          selectedCaseModal.formData.c1_estado,
-                          selectedCaseModal.formData.c1_pais,
-                          selectedCaseModal.formData.c1_cp ? `CP: ${selectedCaseModal.formData.c1_cp}` : ''
-                        ].filter(Boolean).join(', ') || '-'}
-                      </strong>
-                    </div>
+                    {EditableField({ formKey: "c1_nombre", label: "Nombre" })}
+                    {EditableField({ formKey: "c1_telefono", label: "Teléfono" })}
+                    {EditableField({ formKey: "c1_email", label: "Email" })}
+                    {EditableField({ formKey: "c1_direccion", label: "Dirección" })}
+                    {EditableField({ formKey: "c1_ciudad", label: "Ciudad" })}
+                    {EditableField({ formKey: "c1_estado", label: "Estado" })}
+                    {EditableField({ formKey: "c1_pais", label: "País" })}
+                    {EditableField({ formKey: "c1_cp", label: "Código Postal" })}
                   </div>
 
                   {/* Contacto 2 */}
@@ -1658,32 +1589,14 @@ export default function StaffPortalPage() {
                     <strong className="text-slate-900 font-bold block border-b border-slate-200 pb-1 uppercase tracking-wider text-[11px]">
                       Contacto de Emergencia N° 2
                     </strong>
-                    <div>
-                      <span className="text-slate-500 font-semibold">Nombre:</span>{' '}
-                      <strong className="text-slate-900">
-                        {selectedCaseModal.formData.c2_nombre || `${selectedCaseModal.formData.contacto2_nombres || ''} ${selectedCaseModal.formData.contacto2_apellidos || ''}`.trim() || '-'}
-                      </strong>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 font-semibold">Teléfono:</span>{' '}
-                      <strong className="text-slate-900">{selectedCaseModal.formData.c2_telefono || selectedCaseModal.formData.contacto2_celular || '-'}</strong>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 font-semibold">Email:</span>{' '}
-                      <strong className="text-slate-900">{selectedCaseModal.formData.c2_email || selectedCaseModal.formData.contacto2_email || '-'}</strong>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 font-semibold block">Dirección:</span>{' '}
-                      <strong className="text-slate-900">
-                        {[
-                          selectedCaseModal.formData.c2_direccion,
-                          selectedCaseModal.formData.c2_ciudad,
-                          selectedCaseModal.formData.c2_estado,
-                          selectedCaseModal.formData.c2_pais,
-                          selectedCaseModal.formData.c2_cp ? `CP: ${selectedCaseModal.formData.c2_cp}` : ''
-                        ].filter(Boolean).join(', ') || '-'}
-                      </strong>
-                    </div>
+                    {EditableField({ formKey: "c2_nombre", label: "Nombre" })}
+                    {EditableField({ formKey: "c2_telefono", label: "Teléfono" })}
+                    {EditableField({ formKey: "c2_email", label: "Email" })}
+                    {EditableField({ formKey: "c2_direccion", label: "Dirección" })}
+                    {EditableField({ formKey: "c2_ciudad", label: "Ciudad" })}
+                    {EditableField({ formKey: "c2_estado", label: "Estado" })}
+                    {EditableField({ formKey: "c2_pais", label: "País" })}
+                    {EditableField({ formKey: "c2_cp", label: "Código Postal" })}
                   </div>
                 </div>
               </div>

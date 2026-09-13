@@ -322,20 +322,37 @@ export async function DELETE(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
-    const { caseId, status, notes } = body;
+    const { caseId, status, notes, formData, email, name, visaType } = body;
 
     if (!caseId) {
       return NextResponse.json({ error: 'caseId es requerido' }, { status: 400 });
     }
 
     if (db) {
+      const docRef = db.collection('solicitudes_visas').doc(caseId);
+      const existing = await docRef.get();
+
       const updatePayload: any = {
         updatedAt: new Date().toISOString()
       };
       if (status) updatePayload.status = status;
       if (notes !== undefined) updatePayload.notes = notes;
+      if (formData) updatePayload.formData = formData;
 
-      await db.collection('solicitudes_visas').doc(caseId).set(updatePayload, { merge: true });
+      if (existing.exists) {
+        await docRef.set(updatePayload, { merge: true });
+      } else {
+        // This caseId may belong to a "synthetic" case — one that only exists in the Staff
+        // list because the client purchased a plan, with no real solicitudes_visas document
+        // yet. Editing it for the first time needs to seed the baseline fields, or it would
+        // be saved as a bare stub missing name/email/visaType.
+        updatePayload.email = email || formData?.email_contacto || '';
+        updatePayload.name = name || `${formData?.nombres || ''} ${formData?.apellidos || ''}`.trim() || 'Postulante';
+        updatePayload.visaType = visaType === 'B-2' ? 'B-2' : 'F-1';
+        updatePayload.status = updatePayload.status || 'nuevos';
+        updatePayload.createdAt = new Date().toISOString();
+        await docRef.set(updatePayload);
+      }
     }
 
     return NextResponse.json({ success: true, caseId, status });
