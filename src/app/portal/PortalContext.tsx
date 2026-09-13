@@ -530,9 +530,6 @@ export function PortalProvider({ children }: { children: ReactNode }) {
     if (typeof window !== 'undefined' && localStorage.getItem('udreamms_bypass') === '@Udreamms2026') {
       return true;
     }
-    if (user?.email && (user.email.toLowerCase().includes('udreamms') || user.email.toLowerCase().includes('udremmas'))) {
-      return true;
-    }
 
     if (!dbUser) return false;
 
@@ -549,9 +546,12 @@ export function PortalProvider({ children }: { children: ReactNode }) {
       dbUser.purchased_plan_turista_vip
     );
 
-    // Recursos adicionales se liberan EXCLUSIVAMENTE con planes de Udreamms
+    // Recursos adicionales se liberan con cualquier plan de Udreamms del mismo tipo de visa,
+    // o si Staff lo activó de forma independiente (purchased_recursos_*) sin necesidad de plan.
     if (type === 'recursos') {
-      return visa === 'estudiante' ? hasStudentPlan : hasTouristPlan;
+      return visa === 'estudiante'
+        ? (hasStudentPlan || !!dbUser.purchased_recursos_estudiante)
+        : (hasTouristPlan || !!dbUser.purchased_recursos_turista);
     }
 
     if (visa === 'estudiante') {

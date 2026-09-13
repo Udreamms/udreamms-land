@@ -293,14 +293,14 @@ export default function ProcesoPage() {
   useEffect(() => {
     if (!user?.email) return;
 
-    const hydrateFromCloud = async (visaType: 'F-1' | 'B-2') => {
+    const hydrateFromCloud = async (visaType: 'F-1' | 'B-2', applicantId: string = '1') => {
       try {
-        const res = await fetch(`/api/portal/submission?email=${encodeURIComponent(user.email!)}&visaType=${visaType}`);
+        const res = await fetch(`/api/portal/submission?email=${encodeURIComponent(user.email!)}&visaType=${visaType}&applicantId=${encodeURIComponent(applicantId)}`);
         if (!res.ok) return;
         const data = await res.json();
         if (data.case) {
           const prefix = visaType === 'F-1' ? 'f1' : 'b2';
-          const defaultId = '1';
+          const defaultId = applicantId;
 
           if (data.case.status) {
             setCloudStages(prev => ({
@@ -397,17 +397,48 @@ export default function ProcesoPage() {
       }
     };
 
+    // Discover applicant cards that exist in the cloud but not on this browser — most often
+    // ones Staff created directly for a client who needs multiple cards under one visa
+    // service. Merges into the local list (never removes a locally-known id) and hydrates
+    // each newly-discovered card's data.
+    const syncApplicantList = async (visaType: 'F-1' | 'B-2') => {
+      try {
+        const res = await fetch(`/api/portal/applicants?email=${encodeURIComponent(user.email!)}&visaType=${visaType}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const cloudIds: string[] = data.applicantIds || [];
+        if (cloudIds.length === 0) return;
+
+        const setApplicants = visaType === 'F-1' ? setStudentApplicants : setTouristApplicants;
+        let newIds: string[] = [];
+        setApplicants(prev => {
+          newIds = cloudIds.filter(id => !prev.includes(id));
+          if (newIds.length === 0) return prev;
+          return [...prev, ...newIds];
+        });
+        for (const id of newIds) {
+          await hydrateFromCloud(visaType, id);
+        }
+      } catch (err) {
+        console.warn('Could not sync applicant list from cloud:', err);
+      }
+    };
+
     // Push first, then hydrate — hydration now treats the cloud as authoritative for files,
     // so it must run after any pending local-only upload has actually reached the cloud,
     // otherwise hydration could immediately erase it locally again.
     void (async () => {
       await pushLocalToCloud();
+      await syncApplicantList('F-1');
+      await syncApplicantList('B-2');
       await hydrateFromCloud('F-1');
       await hydrateFromCloud('B-2');
     })();
 
     // Poll every 12 seconds to reflect staff status changes in real-time
     const interval = setInterval(() => {
+      void syncApplicantList('F-1');
+      void syncApplicantList('B-2');
       void hydrateFromCloud('F-1');
       void hydrateFromCloud('B-2');
     }, 12000);
@@ -455,6 +486,15 @@ export default function ProcesoPage() {
       localStorage.removeItem(`udreamms_passport_${prefix}`);
       localStorage.removeItem(`udreamms_bank_${prefix}_${idToRemove}`);
       localStorage.removeItem(`udreamms_bank_${prefix}`);
+    }
+
+    // Delete the real Firestore card too — without this, the next cloud sync (which pulls in
+    // any card that exists there, including ones Staff or another device created) would just
+    // discover this same card again and bring it right back.
+    if (user?.email) {
+      void fetch(`/api/portal/submission?email=${encodeURIComponent(user.email)}&visaType=${isStudent ? 'F-1' : 'B-2'}&applicantId=${encodeURIComponent(idToRemove)}`, {
+        method: 'DELETE',
+      }).catch(err => console.error('Error deleting applicant card from cloud:', err));
     }
 
     if (list.length <= 1) {

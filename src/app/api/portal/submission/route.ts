@@ -142,3 +142,36 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: error?.message || 'Error al obtener postulación' }, { status: 500 });
   }
 }
+
+// Lets a client permanently remove one of their own applicant cards. Without this, the
+// client's "remove card" button only cleared localStorage — the Firestore document stayed
+// behind, so the next cloud sync (which discovers cards Staff or another device created)
+// would bring the "removed" card right back.
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const email = searchParams.get('email');
+    const visaType = searchParams.get('visaType') || 'F-1';
+    const applicantId = searchParams.get('applicantId') || '1';
+
+    if (!email) {
+      return NextResponse.json({ error: 'Email requerido' }, { status: 400 });
+    }
+    if (!db) {
+      return NextResponse.json({ error: 'Firebase Admin no está configurado' }, { status: 500 });
+    }
+
+    const emailKey = email.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_');
+    const typeKey = visaType === 'B-2' ? 'b2' : 'f1';
+    const docId = applicantId === '1'
+      ? `case_${emailKey}_${typeKey}`
+      : `case_${emailKey}_${typeKey}_${applicantId}`;
+
+    await db.collection('solicitudes_visas').doc(docId).delete();
+
+    return NextResponse.json({ success: true, caseId: docId });
+  } catch (error: any) {
+    console.error('Error deleting submission:', error);
+    return NextResponse.json({ error: error?.message || 'Error al eliminar la tarjeta' }, { status: 500 });
+  }
+}

@@ -12,9 +12,8 @@ import {
   GraduationCap, 
   Plane, 
   PhoneCall, 
-  CheckCircle2, 
-  Save, 
-  ChevronDown, 
+  CheckCircle2,
+  ChevronDown,
   ChevronUp,
   Building2
 } from "lucide-react";
@@ -193,110 +192,30 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
       if (typeof window !== 'undefined') {
         localStorage.setItem(storageKey, JSON.stringify(updated));
       }
-
-      if (field === 'nombres' || field === 'apellidos') {
-        const fullName = `${updated.nombres || ''} ${updated.apellidos || ''}`.trim();
-        if (onNameChange) {
-          onNameChange(fullName);
-        }
-      }
-
       return updated;
     });
-  };
 
-  const [isSavingManual, setIsSavingManual] = useState(false);
-
-  const handleManualSave = async () => {
-    setIsSavingManual(true);
-    try {
-      const prefix = isStudent ? 'f1' : 'b2';
-      const photoKey = applicantId ? `udreamms_photo_${prefix}_${applicantId}` : `udreamms_photo_${prefix}`;
-      const passportKey = applicantId ? `udreamms_passport_${prefix}_${applicantId}` : `udreamms_passport_${prefix}`;
-      const bankKey = applicantId ? `udreamms_bank_${prefix}_${applicantId}` : `udreamms_bank_${prefix}`;
-
-      const photoUrl = typeof window !== 'undefined' ? localStorage.getItem(photoKey) : null;
-      let passportDoc: any = null;
-      let bankStatementDoc: any = null;
-
-      if (typeof window !== 'undefined') {
-        try {
-          const rawPassport = localStorage.getItem(passportKey);
-          if (rawPassport) passportDoc = JSON.parse(rawPassport);
-        } catch (e) {}
-        try {
-          const rawBank = localStorage.getItem(bankKey);
-          if (rawBank) bankStatementDoc = JSON.parse(rawBank);
-        } catch (e) {}
-      }
-
-      const payload = {
-        visaType: isStudent ? 'F-1' : 'B-2',
-        applicantId: applicantId || '1',
-        formData,
-        photoUrl: photoUrl && photoUrl.length < 350000 ? photoUrl : null,
-        passportDoc: passportDoc ? { name: passportDoc.name, type: passportDoc.type, size: passportDoc.size } : null,
-        bankStatementDoc: bankStatementDoc ? { name: bankStatementDoc.name, type: bankStatementDoc.type, size: bankStatementDoc.size } : null,
-        userEmail: user?.email || formData.email_contacto || '',
-        userName: user?.displayName || `${formData.nombres || ''} ${formData.apellidos || ''}`.trim(),
-        userId: user?.uid || '',
-      };
-
-      let res = await fetch('/api/portal/submission', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (res.ok) {
-        toast.success("¡Expediente guardado y sincronizado con el Staff de Udreamms con éxito!");
-      } else {
-        res = await fetch('/api/portal/submission', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...payload,
-            photoUrl: null,
-            passportDoc: null,
-            bankStatementDoc: null,
-          })
-        });
-
-        if (res.ok) {
-          toast.success("¡Expediente sincronizado con éxito! (sin adjuntos, vuelve a intentar subirlos)");
-        } else {
-          const errBody = await res.json().catch(() => ({}));
-          console.error('Manual save failed:', errBody);
-          toast.error("No se pudo guardar en el servidor. Tus datos quedaron solo en este dispositivo — intenta de nuevo o avisa a soporte.");
-        }
-      }
-    } catch (err) {
-      console.error('Error saving:', err);
-      toast.error("No se pudo conectar con el servidor. Tus datos quedaron solo en este dispositivo.");
-    } finally {
-      setIsSavingManual(false);
+    // Notifying the parent (which updates its own state) must happen outside the setFormData
+    // updater — calling it from inside the updater runs it during React's render/reconciliation
+    // of this component, which triggers "Cannot update a component while rendering a different
+    // component". Doing it here, at the top level of the event handler, is the correct place.
+    if ((field === 'nombres' || field === 'apellidos') && onNameChange) {
+      const nombres = field === 'nombres' ? value : (formData.nombres || '');
+      const apellidos = field === 'apellidos' ? value : (formData.apellidos || '');
+      onNameChange(`${nombres} ${apellidos}`.trim());
     }
   };
 
   return (
     <div className="space-y-6 pt-2">
       
-      {/* Progress + Auto-save Status & Manual Save Toolbar */}
+      {/* Progress + Auto-save Status — no manual save button: everything already saves on
+          its own the moment it changes, so a "Guardar" button here would just be redundant
+          and confusing about whether something needs to be clicked to actually persist. */}
       <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-2xl space-y-3">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>Tus datos se respaldan automáticamente mientras escribes.</span>
-          </div>
-          <Button
-            type="button"
-            onClick={handleManualSave}
-            disabled={isSavingManual}
-            className="h-9 px-4 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 shadow-sm shrink-0"
-          >
-            <Save className="w-3.5 h-3.5 text-white" />
-            {isSavingManual ? 'Guardando...' : 'Guardar Datos del Proceso'}
-          </Button>
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>Tus datos se respaldan automáticamente mientras escribes.</span>
         </div>
 
         <div className="space-y-1.5">
@@ -1383,25 +1302,13 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
         )}
       </div>
 
-      {/* BOTTOM SAVE & SEND BANNER */}
-      <div className="bg-white border-2 border-blue-200 rounded-3xl p-6 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="space-y-1 text-center sm:text-left">
-          <h4 className="text-sm font-bold text-slate-900">
-            ¿Terminaste de completar tus datos o deseas guardar tu avance?
-          </h4>
-          <p className="text-xs text-slate-500">
-            Al guardar, el equipo consular de Udreamms podrá revisar tu información inmediatamente para preparar tu DS-160.
-          </p>
-        </div>
-        <Button
-          type="button"
-          onClick={handleManualSave}
-          disabled={isSavingManual}
-          className="h-11 px-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-blue-500/20 shrink-0 transition-all duration-300"
-        >
-          <Save className="w-4 h-4 text-white" />
-          {isSavingManual ? 'Guardando...' : 'Guardar y Enviar al Staff'}
-        </Button>
+      {/* BOTTOM STATUS BANNER — no button: every field already reaches the Staff team the
+          moment it's typed, whether the client fills one field or all of them. */}
+      <div className="bg-white border-2 border-emerald-200 rounded-3xl p-6 shadow-md flex items-center justify-center gap-3 text-center">
+        <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+        <p className="text-xs text-slate-600">
+          <strong className="text-slate-900">Tu información ya está sincronizada.</strong> El equipo consular de Udreamms puede ver cada dato en tiempo real, no importa en qué punto del formulario estés.
+        </p>
       </div>
 
     </div>

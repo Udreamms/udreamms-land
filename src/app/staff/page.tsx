@@ -40,7 +40,8 @@ import {
   Sparkles,
   Trash2,
   AlertTriangle,
-  Save
+  Unlock,
+  Plus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -74,6 +75,10 @@ export interface StudentCase {
   passportDoc?: { name: string; type: string; dataUrl?: string; url?: string; size?: number };
   bankStatementDoc?: { name: string; type: string; dataUrl?: string; url?: string; size?: number };
   purchases?: string[];
+  entitlements?: Record<string, boolean>;
+  groupKey?: string;
+  applicantId?: string;
+  hasVisaService?: boolean;
   formData: Record<string, string>;
   notes?: string;
   unreadCount?: number;
@@ -95,9 +100,12 @@ export default function StaffPortalPage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [dbConnectionError, setDbConnectionError] = useState<string | null>(null);
   const [deletingCaseId, setDeletingCaseId] = useState<string | null>(null);
+  const [caseModalGroup, setCaseModalGroup] = useState<StudentCase[]>([]);
+  const [isCreatingApplicant, setIsCreatingApplicant] = useState<boolean>(false);
+  const [togglingFlags, setTogglingFlags] = useState<Set<string>>(new Set());
   const [isEditingDossier, setIsEditingDossier] = useState<boolean>(false);
   const [editedFormData, setEditedFormData] = useState<Record<string, string>>({});
-  const [isSavingDossier, setIsSavingDossier] = useState<boolean>(false);
+  const [dossierSaveStatus, setDossierSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
   // Check auth session on load
   useEffect(() => {
@@ -109,8 +117,10 @@ export default function StaffPortalPage() {
     }
   }, []);
 
-  // Fetch real cases from Firebase Firestore via API
-  const fetchCases = async () => {
+  // Fetch real cases from Firebase Firestore via API. Returns the fresh list so callers that
+  // need it right away (e.g. right after creating a new applicant card) don't have to wait
+  // for the next render to read it back out of state.
+  const fetchCases = async (): Promise<StudentCase[]> => {
     setIsLoadingCases(true);
     try {
       const res = await fetch('/api/staff/cases');
@@ -120,12 +130,104 @@ export default function StaffPortalPage() {
           setStudentCases(data.cases);
         }
         setDbConnectionError(data.error || null);
+        return data.cases && Array.isArray(data.cases) ? data.cases : [];
       }
+      return [];
     } catch (error) {
       console.error('Error fetching staff cases:', error);
       toast.error('No se pudieron actualizar los casos desde la nube.');
+      return [];
     } finally {
       setIsLoadingCases(false);
+    }
+  };
+
+  // Opens the dossier modal for a case, and gathers every other card that shares the same
+  // client+visaType (groupKey) so they can be reached as tabs inside the modal — e.g. a
+  // client who bought 3 F-1 visa services has 3 solicitudes_visas documents, one per family
+  // member, all under the same groupKey.
+  const openCaseModal = (student: StudentCase, allCases: StudentCase[]) => {
+    const group = allCases.filter(c => (c.groupKey || c.id) === (student.groupKey || student.id));
+    setCaseModalGroup(group.length > 0 ? group : [student]);
+    setSelectedCaseModal(student);
+  };
+
+  const closeCaseModal = () => {
+    setSelectedCaseModal(null);
+    setCaseModalGroup([]);
+    setIsEditingDossier(false);
+    setEditedFormData({});
+  };
+
+  // Staff-triggered "add another card" for a client who needs more than one applicant slot
+  // (e.g. bought several visa services for different family members under the same account).
+  const handleCreateApplicant = async (email: string, visaType: 'F-1' | 'B-2', name?: string) => {
+    setIsCreatingApplicant(true);
+    try {
+      const res = await fetch('/api/staff/cases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, visaType, name }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        toast.success('Nueva tarjeta creada.');
+        const freshCases = await fetchCases();
+        // Bring the new card into the currently-open modal as another tab right away,
+        // instead of making staff close and reopen to see it.
+        if (selectedCaseModal) {
+          const groupKey = selectedCaseModal.groupKey || selectedCaseModal.id;
+          const freshGroup = freshCases.filter(c => (c.groupKey || c.id) === groupKey);
+          if (freshGroup.length > 0) setCaseModalGroup(freshGroup);
+        }
+      } else {
+        toast.error(data?.error || 'No se pudo crear la tarjeta.');
+      }
+    } catch (err) {
+      console.error('Error creating applicant card:', err);
+      toast.error('No se pudo crear la tarjeta. Revisa tu conexión.');
+    } finally {
+      setIsCreatingApplicant(false);
+    }
+  };
+
+  // Lock/unlock any product for a client directly from the Staff panel, bypassing checkout.
+  const handleToggleEntitlement = async (email: string, flag: string, value: boolean) => {
+    if (!selectedCaseModal) return;
+    // Guard against a double-click (or an impatient second click while the request is still
+    // in flight) sending two overlapping toggles for the same product — that race is exactly
+    // what could make a toggle look like it "didn't do anything": on -> off -> on again,
+    // net change zero, even though each individual request succeeded.
+    if (togglingFlags.has(flag)) return;
+    setTogglingFlags(prev => new Set(prev).add(flag));
+
+    // Optimistic update so the toggle feels instant.
+    setSelectedCaseModal(prev => prev ? { ...prev, entitlements: { ...prev.entitlements, [flag]: value } } : prev);
+    try {
+      const res = await fetch('/api/staff/entitlements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, flag, value }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        // Revert on failure.
+        setSelectedCaseModal(prev => prev ? { ...prev, entitlements: { ...prev.entitlements, [flag]: !value } } : prev);
+        toast.error(data?.error || 'No se pudo actualizar el producto.');
+      } else {
+        toast.success(value ? 'Producto activado.' : 'Producto desactivado.');
+        void fetchCases();
+      }
+    } catch (err) {
+      console.error('Error toggling entitlement:', err);
+      setSelectedCaseModal(prev => prev ? { ...prev, entitlements: { ...prev.entitlements, [flag]: !value } } : prev);
+      toast.error('No se pudo actualizar el producto. Revisa tu conexión.');
+    } finally {
+      setTogglingFlags(prev => {
+        const next = new Set(prev);
+        next.delete(flag);
+        return next;
+      });
     }
   };
 
@@ -372,42 +474,52 @@ export default function StaffPortalPage() {
     setIsEditingDossier(true);
   };
 
-  const cancelEditingDossier = () => {
+  // Editing is done once staff is happy with what's on screen — there's nothing to "cancel"
+  // or "confirm" here, since every change already autosaved the instant it was made (see the
+  // debounced effect below). Leaving mid-edit is safe by design: whatever was last typed is
+  // already in Firestore.
+  const stopEditingDossier = () => {
     setIsEditingDossier(false);
     setEditedFormData({});
   };
 
-  const saveDossierEdits = async () => {
-    if (!selectedCaseModal) return;
-    setIsSavingDossier(true);
-    try {
-      const res = await fetch('/api/staff/cases', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          caseId: selectedCaseModal.id,
-          formData: editedFormData,
-          email: selectedCaseModal.email,
-          name: selectedCaseModal.name,
-          visaType: selectedCaseModal.visaType,
-        }),
-      });
-      if (res.ok) {
-        setStudentCases(prev => prev.map(c => c.id === selectedCaseModal.id ? { ...c, formData: editedFormData } : c));
-        setSelectedCaseModal(prev => prev ? { ...prev, formData: editedFormData } : null);
-        setIsEditingDossier(false);
-        toast.success('Expediente actualizado correctamente.');
-      } else {
-        const errBody = await res.json().catch(() => ({}));
-        toast.error(errBody?.error || 'No se pudo guardar el expediente.');
+  // Auto-save the dossier's text fields ~900ms after the last keystroke — same debounce
+  // pattern the client's own form uses. No "Guardar Cambios" button: every edit (including
+  // one staff abandons half-finished) reaches Firestore on its own, and a delete/clear is
+  // just as instant since it's the same code path with an empty value.
+  useEffect(() => {
+    if (!isEditingDossier || !selectedCaseModal) return;
+    setDossierSaveStatus('saving');
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch('/api/staff/cases', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            caseId: selectedCaseModal.id,
+            formData: editedFormData,
+            email: selectedCaseModal.email,
+            name: selectedCaseModal.name,
+            visaType: selectedCaseModal.visaType,
+          }),
+        });
+        if (res.ok) {
+          setStudentCases(prev => prev.map(c => c.id === selectedCaseModal.id ? { ...c, formData: editedFormData } : c));
+          setSelectedCaseModal(prev => (prev && prev.id === selectedCaseModal.id) ? { ...prev, formData: editedFormData } : prev);
+          setDossierSaveStatus('saved');
+        } else {
+          setDossierSaveStatus('error');
+          toast.error('No se pudo guardar el último cambio. Revisa tu conexión.');
+        }
+      } catch (err) {
+        console.error('Error auto-saving dossier edits:', err);
+        setDossierSaveStatus('error');
+        toast.error('No se pudo guardar el último cambio. Revisa tu conexión.');
       }
-    } catch (err) {
-      console.error('Error saving dossier edits:', err);
-      toast.error('No se pudo guardar el expediente. Revisa tu conexión.');
-    } finally {
-      setIsSavingDossier(false);
-    }
-  };
+    }, 900);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editedFormData, isEditingDossier]);
 
   const SectionStatusBadge = ({ filled }: { filled: boolean }) => (
     <span className={`shrink-0 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide flex items-center gap-1 ${
@@ -549,15 +661,32 @@ export default function StaffPortalPage() {
     );
   }
 
-  // Filtered cases for active tab and search
-  const filteredCases = studentCases.filter(c => {
-    const matchesTab = c.status === activeTab;
-    const matchesSearch = searchQuery === "" || 
-      (c.name && c.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
-      (c.email && c.email.toLowerCase().includes(searchQuery.toLowerCase())) || 
-      (c.id && c.id.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (c.schoolName && c.schoolName.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesTab && matchesSearch;
+  // A client who bought more than one visa service under the same visa type ends up with
+  // several solicitudes_visas documents sharing the same groupKey (email+visaType) — fold
+  // those into one list row, with the individual cards reachable as tabs inside the modal.
+  const casesByGroup = new Map<string, StudentCase[]>();
+  studentCases.forEach(c => {
+    const key = c.groupKey || c.id;
+    if (!casesByGroup.has(key)) casesByGroup.set(key, []);
+    casesByGroup.get(key)!.push(c);
+  });
+
+  const matchesSearchQuery = (c: StudentCase) =>
+    searchQuery === "" ||
+    (c.name && c.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (c.email && c.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (c.id && c.id.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (c.schoolName && c.schoolName.toLowerCase().includes(searchQuery.toLowerCase()));
+
+  // One row per group: pick whichever card in the group is actually in this stage (most
+  // recently updated if more than one is), so the group still shows up in every tab any of
+  // its cards belongs to.
+  const filteredCases: StudentCase[] = [];
+  casesByGroup.forEach(group => {
+    const inStage = group.filter(c => c.status === activeTab && matchesSearchQuery(c));
+    if (inStage.length === 0) return;
+    inStage.sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
+    filteredCases.push(inStage[0]);
   });
 
   // Tab definitions in chronological, logical visa processing order
@@ -773,11 +902,12 @@ export default function StaffPortalPage() {
                   const hasPhoto = Boolean(student.photoUrl);
                   const hasPassport = isUsableDoc(student.passportDoc);
                   const hasBankStatement = isUsableDoc(student.bankStatementDoc);
+                  const groupSize = casesByGroup.get(student.groupKey || student.id)?.length || 1;
 
                   return (
                     <div
                       key={student.id}
-                      onClick={() => setSelectedCaseModal(student)}
+                      onClick={() => openCaseModal(student, studentCases)}
                       className="w-full bg-white border border-slate-200 hover:border-blue-500 hover:shadow-md rounded-2xl p-4 md:p-5 transition-all duration-200 cursor-pointer flex flex-col xl:flex-row items-start xl:items-center justify-between gap-5 group relative overflow-hidden"
                     >
                       {/* Left side: Photo + Compact Detailed Info */}
@@ -808,13 +938,26 @@ export default function StaffPortalPage() {
                               {student.name || 'Postulante sin nombre registrado'}
                             </h4>
 
-                            <span className={`h-6 px-2.5 rounded-full text-[10px] font-semibold uppercase tracking-wide inline-flex items-center gap-1 ${
-                              student.visaType === 'F-1'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-indigo-600 text-white'
-                            }`}>
-                              {student.visaType === 'F-1' ? '🎓 F-1 Estudiante' : '✈️ B-2 Turista'}
-                            </span>
+                            {student.hasVisaService === false ? (
+                              <span className="h-6 px-2.5 rounded-full text-[10px] font-semibold uppercase tracking-wide inline-flex items-center gap-1 bg-slate-200 text-slate-600">
+                                🔒 Sin Servicio Comprado
+                              </span>
+                            ) : (
+                              <span className={`h-6 px-2.5 rounded-full text-[10px] font-semibold uppercase tracking-wide inline-flex items-center gap-1 ${
+                                student.visaType === 'F-1'
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-indigo-600 text-white'
+                              }`}>
+                                {student.visaType === 'F-1' ? '🎓 F-1 Estudiante' : '✈️ B-2 Turista'}
+                              </span>
+                            )}
+
+                            {groupSize > 1 && (
+                              <span className="h-6 px-2.5 rounded-full text-[10px] font-semibold bg-purple-100 text-purple-800 border border-purple-200 inline-flex items-center gap-1">
+                                <Users className="w-3 h-3" />
+                                {groupSize} Tarjetas
+                              </span>
+                            )}
 
                             <span className="h-6 px-2.5 rounded-full text-[10px] font-semibold text-slate-600 bg-slate-100 border border-slate-200 font-mono inline-flex items-center">
                               {student.id}
@@ -863,11 +1006,13 @@ export default function StaffPortalPage() {
                               <span className="text-slate-400 text-xs italic">Sin teléfono</span>
                             )}
 
-                            {/* School / State */}
-                            <div className="h-6 flex items-center gap-1.5 font-semibold text-slate-700 bg-slate-50 border border-slate-200 px-2.5 rounded-full text-xs">
-                              <School className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                              <span className="truncate">{student.schoolName || student.schoolState || 'Utah'}</span>
-                            </div>
+                            {/* School / State — not applicable until a visa service is bought */}
+                            {student.hasVisaService !== false && (
+                              <div className="h-6 flex items-center gap-1.5 font-semibold text-slate-700 bg-slate-50 border border-slate-200 px-2.5 rounded-full text-xs">
+                                <School className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                                <span className="truncate">{student.schoolName || student.schoolState || 'Utah'}</span>
+                              </div>
+                            )}
                           </div>
 
                           {/* Row 3: Document Attachment Status Badges & Form Progress — all the same pill size */}
@@ -899,36 +1044,39 @@ export default function StaffPortalPage() {
                               }
                             })()}
 
-                            {/* Photo 5x5 badge */}
-                            <span className={`h-6 px-2.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1 border ${
-                              hasPhoto
-                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                : 'bg-slate-100 text-slate-400 border-slate-200'
-                            }`}>
-                              <Camera className="w-3 h-3" />
-                              {hasPhoto ? 'Foto 5x5 ✓' : 'Sin Foto 5x5'}
-                            </span>
+                            {/* Document badges — not applicable until there's an actual
+                                expediente to attach files to */}
+                            {student.hasVisaService !== false && (
+                              <>
+                                <span className={`h-6 px-2.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1 border ${
+                                  hasPhoto
+                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                    : 'bg-slate-100 text-slate-400 border-slate-200'
+                                }`}>
+                                  <Camera className="w-3 h-3" />
+                                  {hasPhoto ? 'Foto 5x5 ✓' : 'Sin Foto 5x5'}
+                                </span>
 
-                            {/* Passport badge */}
-                            <span className={`h-6 px-2.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1 border ${
-                              hasPassport
-                                ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
-                                : 'bg-slate-100 text-slate-400 border-slate-200'
-                            }`}>
-                              <CreditCard className="w-3 h-3" />
-                              {hasPassport ? 'Pasaporte ✓' : 'Sin Pasaporte'}
-                            </span>
+                                <span className={`h-6 px-2.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1 border ${
+                                  hasPassport
+                                    ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                                    : 'bg-slate-100 text-slate-400 border-slate-200'
+                                }`}>
+                                  <CreditCard className="w-3 h-3" />
+                                  {hasPassport ? 'Pasaporte ✓' : 'Sin Pasaporte'}
+                                </span>
 
-                            {/* Bank statement badge (mainly for F-1) */}
-                            {student.visaType === 'F-1' && (
-                              <span className={`h-6 px-2.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1 border ${
-                                hasBankStatement
-                                  ? 'bg-blue-50 text-blue-700 border-blue-200'
-                                  : 'bg-slate-100 text-slate-400 border-slate-200'
-                              }`}>
-                                <Building className="w-3 h-3" />
-                                {hasBankStatement ? 'Edo. Cuenta ✓' : 'Sin Edo. Cuenta'}
-                              </span>
+                                {student.visaType === 'F-1' && (
+                                  <span className={`h-6 px-2.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1 border ${
+                                    hasBankStatement
+                                      ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                      : 'bg-slate-100 text-slate-400 border-slate-200'
+                                  }`}>
+                                    <Building className="w-3 h-3" />
+                                    {hasBankStatement ? 'Edo. Cuenta ✓' : 'Sin Edo. Cuenta'}
+                                  </span>
+                                )}
+                              </>
                             )}
                           </div>
 
@@ -997,28 +1145,6 @@ export default function StaffPortalPage() {
                                 </span>
                               </span>
                             )}
-                          </Button>
-
-                          <Button
-                            type="button"
-                            onClick={() => setSelectedCaseModal(student)}
-                            className="h-9 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs uppercase tracking-wide flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 transition-all flex-1 sm:flex-initial cursor-pointer"
-                          >
-                            <Eye className="w-3.5 h-3.5 text-white" />
-                            <span>Ver Expediente</span>
-                          </Button>
-
-                          <Button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteCase(student);
-                            }}
-                            disabled={deletingCaseId === student.id}
-                            className="h-9 w-9 p-0 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center shadow-xs shrink-0 cursor-pointer"
-                            title={`Eliminar expediente de ${student.name || 'este cliente'}`}
-                          >
-                            <Trash2 className="w-4 h-4 text-red-600" />
                           </Button>
                         </div>
                       </div>
@@ -1098,17 +1224,145 @@ export default function StaffPortalPage() {
                       Expediente: {selectedCaseModal.id}
                     </span>
                   </div>
+
+                  {/* Productos del Cliente — compact, single-row pills right in the header.
+                      Deliberately minimal: clients still have to buy plans through the normal
+                      checkout on /portal/planes; this is only for the exceptional stuff Staff
+                      needs to do by hand — create another card, or grant the 3 add-on products
+                      for whichever visa type is open in the current tab. */}
+                  {(() => {
+                    const isStudentTab = selectedCaseModal.visaType === 'F-1';
+                    const extras: { flag: string; label: string }[] = [
+                      { flag: isStudentTab ? 'purchased_curso_estudiante' : 'purchased_curso_turista', label: 'Master Class Express' },
+                      { flag: isStudentTab ? 'purchased_libro_estudiante' : 'purchased_libro_turista', label: 'Libro Digital' },
+                      { flag: isStudentTab ? 'purchased_recursos_estudiante' : 'purchased_recursos_turista', label: 'Recursos Adicionales' },
+                    ];
+                    return (
+                      <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                        <button
+                          type="button"
+                          onClick={() => handleCreateApplicant(selectedCaseModal.email, 'F-1', selectedCaseModal.name)}
+                          disabled={isCreatingApplicant || !selectedCaseModal.email}
+                          className="h-6 px-2.5 rounded-full text-[10px] font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 border border-blue-200 flex items-center gap-1 disabled:opacity-50"
+                        >
+                          <Plus className="w-3 h-3" />
+                          Tarjeta F-1
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleCreateApplicant(selectedCaseModal.email, 'B-2', selectedCaseModal.name)}
+                          disabled={isCreatingApplicant || !selectedCaseModal.email}
+                          className="h-6 px-2.5 rounded-full text-[10px] font-bold text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 flex items-center gap-1 disabled:opacity-50"
+                        >
+                          <Plus className="w-3 h-3" />
+                          Tarjeta B-2
+                        </button>
+                        <span className="w-px h-4 bg-slate-300 mx-0.5" />
+                        {extras.map(product => {
+                          const unlocked = Boolean(selectedCaseModal.entitlements?.[product.flag]);
+                          const isToggling = togglingFlags.has(product.flag);
+                          return (
+                            <button
+                              key={product.flag}
+                              type="button"
+                              onClick={() => handleToggleEntitlement(selectedCaseModal.email, product.flag, !unlocked)}
+                              disabled={!selectedCaseModal.email || isToggling}
+                              className={`h-6 px-2.5 rounded-full text-[10px] font-bold flex items-center gap-1 border transition-colors disabled:cursor-not-allowed ${
+                                isToggling
+                                  ? 'bg-slate-100 border-slate-200 text-slate-400 opacity-70'
+                                  : unlocked
+                                  ? 'bg-emerald-50 border-emerald-200 text-emerald-900 hover:bg-emerald-100'
+                                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-50'
+                              }`}
+                              title={selectedCaseModal.email ? (unlocked ? 'Clic para bloquear' : 'Clic para desbloquear') : 'Este cliente no tiene cuenta registrada aún'}
+                            >
+                              {isToggling ? (
+                                <span className="w-2.5 h-2.5 shrink-0 rounded-full border-2 border-slate-300 border-t-slate-600 animate-spin" />
+                              ) : unlocked ? (
+                                <Unlock className="w-2.5 h-2.5 text-emerald-600 shrink-0" />
+                              ) : (
+                                <Lock className="w-2.5 h-2.5 text-slate-400 shrink-0" />
+                              )}
+                              {product.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 
-              <button
-                onClick={() => setSelectedCaseModal(null)}
-                className="p-2 rounded-full hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors"
-                title="Cerrar modal"
-              >
-                <X className="w-6 h-6 text-black" />
-              </button>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  onClick={() => handleDeleteCase(selectedCaseModal)}
+                  disabled={deletingCaseId === selectedCaseModal.id}
+                  className="p-2 rounded-full hover:bg-red-100 text-red-500 hover:text-red-700 transition-colors"
+                  title={`Eliminar expediente de ${selectedCaseModal.name || 'este cliente'}`}
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={closeCaseModal}
+                  className="p-2 rounded-full hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors"
+                  title="Cerrar modal"
+                >
+                  <X className="w-6 h-6 text-black" />
+                </button>
+              </div>
             </div>
+
+            {!selectedCaseModal.hasVisaService ? (
+              // Registered, but hasn't bought an actual visa service (F-1/B-2 plan) yet.
+              // There's no applicant card to fill or edit — Master Class / Libro / Recursos
+              // can still be toggled from the header row above, but the 13-section dossier
+              // only exists once a real visa service unlocks it, same as on the client's side.
+              <div className="p-10 flex flex-col items-center justify-center text-center gap-3">
+                <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center">
+                  <Lock className="w-6 h-6 text-amber-600" />
+                </div>
+                <h4 className="text-base font-bold text-slate-900">Este cliente no ha comprado ningún servicio</h4>
+                <p className="text-sm text-slate-500 max-w-md">
+                  Se registró en el portal pero todavía no ha adquirido un servicio de Visa Estudiante (F-1) o Visa Turista (B-2).
+                  El expediente y los formularios se activan automáticamente en cuanto compre uno de esos servicios —
+                  Master Class, Libro Digital o Recursos Adicionales no cuentan para esto.
+                </p>
+              </div>
+            ) : (
+              <>
+            {/* Applicant Card Tabs — every card belonging to this client (a second F-1 card
+                for another family member, a separate B-2 tourist process, etc.) shows up here
+                so Staff can flip between them without leaving the modal. */}
+            {caseModalGroup.length > 1 && (
+              <div className="px-6 pt-3 bg-white border-b border-slate-200 shrink-0 flex items-center gap-1.5 flex-wrap">
+                <span className="text-[11px] font-bold text-slate-600 mr-1">Tarjetas de este cliente:</span>
+                {caseModalGroup.map((c, idx) => {
+                  // Count same-visaType cards before this one so repeats (e.g. 3 F-1 cards
+                  // for 3 family members) are still distinguishable as "F-1 (1)", "F-1 (2)"...
+                  const sameTypeIndex = caseModalGroup.slice(0, idx).filter(o => o.visaType === c.visaType).length;
+                  const sameTypeTotal = caseModalGroup.filter(o => o.visaType === c.visaType).length;
+                  const visaLabel = c.visaType === 'F-1' ? 'Estudiante F-1' : 'Turista B-2';
+                  const tabLabel = sameTypeTotal > 1 ? `${visaLabel} (${sameTypeIndex + 1})` : visaLabel;
+                  return (
+                    <button
+                      key={c.id}
+                      onClick={() => {
+                        setSelectedCaseModal(c);
+                        setIsEditingDossier(false);
+                        setEditedFormData({});
+                      }}
+                      className={`px-3 py-1.5 rounded-t-lg text-xs font-bold transition-colors flex items-center gap-1.5 ${
+                        selectedCaseModal?.id === c.id
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                      }`}
+                    >
+                      {c.visaType === 'F-1' ? '🎓' : '✈️'} {tabLabel}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Quick Status Toolbar */}
             <div className="px-6 py-3 bg-white border-b border-slate-200 shrink-0">
@@ -1143,33 +1397,28 @@ export default function StaffPortalPage() {
 
             {/* Edit Dossier Toolbar */}
             <div className="px-6 py-3 bg-amber-50/60 border-b border-amber-200/60 shrink-0 flex items-center justify-between gap-3">
-              <span className="text-[11px] font-semibold text-amber-800">
-                {isEditingDossier
-                  ? 'Editando el expediente — los cambios no se guardan hasta que le des a "Guardar Cambios".'
-                  : 'Puedes corregir o completar cualquier dato del expediente en nombre del cliente.'}
+              <span className="text-[11px] font-semibold text-amber-800 flex items-center gap-1.5">
+                {isEditingDossier ? (
+                  dossierSaveStatus === 'saving' ? (
+                    <><span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />Guardando...</>
+                  ) : dossierSaveStatus === 'error' ? (
+                    <><span className="w-1.5 h-1.5 rounded-full bg-red-500" />No se pudo guardar el último cambio — revisa tu conexión.</>
+                  ) : (
+                    <><CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />Todo guardado automáticamente.</>
+                  )
+                ) : (
+                  'Puedes corregir o completar cualquier dato del expediente en nombre del cliente.'
+                )}
               </span>
               <div className="flex items-center gap-2 shrink-0">
                 {isEditingDossier ? (
-                  <>
-                    <Button
-                      type="button"
-                      onClick={cancelEditingDossier}
-                      disabled={isSavingDossier}
-                      variant="outline"
-                      className="h-8 px-3 rounded-lg text-xs font-semibold border-slate-300 text-slate-700"
-                    >
-                      Cancelar
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={saveDossierEdits}
-                      disabled={isSavingDossier}
-                      className="h-8 px-3 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5"
-                    >
-                      <Save className="w-3.5 h-3.5 text-white" />
-                      {isSavingDossier ? 'Guardando...' : 'Guardar Cambios'}
-                    </Button>
-                  </>
+                  <Button
+                    type="button"
+                    onClick={stopEditingDossier}
+                    className="h-8 px-3 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-900 text-white flex items-center gap-1.5"
+                  >
+                    Terminar Edición
+                  </Button>
                 ) : (
                   <Button
                     type="button"
@@ -1185,25 +1434,6 @@ export default function StaffPortalPage() {
 
             {/* Modal Body: All 13 Sections */}
             <div className="p-6 md:p-8 overflow-y-auto space-y-6 text-slate-900">
-
-              {/* Compras del Cliente */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-4 md:p-5 space-y-2.5">
-                <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 text-emerald-600" />
-                  Compras del Cliente
-                </h4>
-                {selectedCaseModal.purchases && selectedCaseModal.purchases.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {selectedCaseModal.purchases.map((p) => (
-                      <span key={p} className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">
-                        {p}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-xs text-slate-500 italic">Sin compras registradas para este correo.</p>
-                )}
-              </div>
 
               {/* Quick-Nav: jump straight to any of the 12 sections instead of scrolling blindly */}
               <div className="sticky top-0 z-10 -mx-6 md:-mx-8 px-6 md:px-8 py-2.5 bg-white/95 backdrop-blur-sm border-b border-slate-100 flex items-center gap-1.5 overflow-x-auto">
@@ -1438,6 +1668,11 @@ export default function StaffPortalPage() {
                     <strong className="text-slate-900">Utah</strong>
                   </div>
                   {EditableField({ formKey: "nombre_escuela", label: "Nombre de la Escuela Seleccionada", className: "sm:col-span-2 lg:col-span-4" })}
+                  {getFieldValue('nombre_escuela') === 'Otra Escuela' &&
+                    EditableField({ formKey: "escuela_manual_nombre", label: "Nombre Manual de la Escuela (Otra Escuela)", className: "sm:col-span-2 lg:col-span-4" })}
+                  {EditableField({ formKey: "rechazo_estudiante_previo", label: "¿Te han rechazado la visa antes?" })}
+                  {getFieldValue('rechazo_estudiante_previo') === 'Sí' &&
+                    EditableField({ formKey: "detalle_rechazo_estudiante", label: "Detalle del rechazo anterior", multiline: true, className: "sm:col-span-2 md:col-span-3 lg:col-span-4" })}
                 </div>
               </div>
 
@@ -1454,7 +1689,9 @@ export default function StaffPortalPage() {
                       {EditableField({ formKey: "nombre_conyuge", label: "Nombre del Cónyuge" })}
                       {EditableField({ formKey: "fecha_matrimonio", label: "Fecha de Matrimonio" })}
                       {EditableField({ formKey: "fecha_nacimiento_conyuge", label: "Nacimiento Cónyuge" })}
+                      {EditableField({ formKey: "lugar_nacimiento_conyuge", label: "Lugar de Nacimiento Cónyuge" })}
                       {EditableField({ formKey: "ciudad_conyuge", label: "Ciudad Cónyuge" })}
+                      {EditableField({ formKey: "estado_conyuge", label: "Estado / Provincia Cónyuge" })}
                       {EditableField({ formKey: "pais_conyuge", label: "País Cónyuge" })}
                     </>
                   )}
@@ -1474,6 +1711,7 @@ export default function StaffPortalPage() {
                   {EditableField({ formKey: "fecha_emision_pasaporte", label: "Fecha de Emisión" })}
                   {EditableField({ formKey: "fecha_expiracion_pasaporte", label: "Fecha de Expiración" })}
                   {EditableField({ formKey: "perdio_pasaporte", label: "¿Ha extraviado pasaporte antes?" })}
+                  {EditableField({ formKey: "tiene_visa_turista", label: "¿Tiene visa de turista?" })}
                 </div>
               </div>
 
@@ -1569,11 +1807,20 @@ export default function StaffPortalPage() {
                       {EditableField({ formKey: "trabajo_empresa", label: "Empresa" })}
                       {EditableField({ formKey: "trabajo_direccion", label: "Dirección" })}
                       {EditableField({ formKey: "trabajo_ciudad", label: "Ciudad" })}
+                      {EditableField({ formKey: "trabajo_estado", label: "Estado / Provincia" })}
+                      {EditableField({ formKey: "trabajo_cp", label: "Código Postal" })}
                       {EditableField({ formKey: "trabajo_pais", label: "País" })}
                       {EditableField({ formKey: "trabajo_telefono", label: "Teléfono Empresa" })}
                       {EditableField({ formKey: "trabajo_fecha_inicio", label: "Fecha de Inicio" })}
                       {EditableField({ formKey: "trabajo_salario", label: "Salario Mensual" })}
                       {EditableField({ formKey: "trabajo_descripcion", label: "Descripción de Labores", multiline: true, className: "sm:col-span-2 md:col-span-3 lg:col-span-6" })}
+                      {EditableField({ formKey: "trabajo_otras_fuentes", label: "¿Tienes más fuentes de ingreso?", multiline: true, className: "sm:col-span-2 md:col-span-3 lg:col-span-6" })}
+                    </div>
+                  </div>
+
+                  <div className="border-t border-slate-100 pt-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                      {EditableField({ formKey: "trabajo_anterior_si", label: "¿Tuviste un empleo anterior al actual?" })}
                     </div>
                   </div>
 
@@ -1582,8 +1829,15 @@ export default function StaffPortalPage() {
                       <span className="text-xs font-bold text-amber-700 uppercase tracking-wider block">Empleo Anterior</span>
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 pt-2">
                         {EditableField({ formKey: "trabajo_ant_empresa", label: "Empresa Anterior" })}
+                        {EditableField({ formKey: "trabajo_ant_direccion", label: "Dirección" })}
+                        {EditableField({ formKey: "trabajo_ant_ciudad", label: "Ciudad" })}
+                        {EditableField({ formKey: "trabajo_ant_estado", label: "Estado" })}
+                        {EditableField({ formKey: "trabajo_ant_cp", label: "Código Postal" })}
                         {EditableField({ formKey: "trabajo_ant_cargo", label: "Cargo Desempeñado" })}
                         {EditableField({ formKey: "trabajo_ant_supervisor", label: "Supervisor" })}
+                        {EditableField({ formKey: "trabajo_ant_fecha_inicio", label: "Fecha de Inicio" })}
+                        {EditableField({ formKey: "trabajo_ant_fecha_fin", label: "Fecha de Término" })}
+                        {EditableField({ formKey: "trabajo_ant_descripcion", label: "Descripción de Labores Anteriores", multiline: true, className: "sm:col-span-2 md:col-span-3 lg:col-span-6" })}
                       </div>
                     </div>
                   )}
@@ -1600,6 +1854,7 @@ export default function StaffPortalPage() {
                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
                     <strong className="text-slate-900 text-xs uppercase block border-b border-slate-200 pb-1">Educación Secundaria</strong>
                     {EditableField({ formKey: "secundaria_nombre", label: "Institución" })}
+                    {EditableField({ formKey: "secundaria_direccion", label: "Dirección" })}
                     {EditableField({ formKey: "secundaria_programa", label: "Programa / Título" })}
                     {EditableField({ formKey: "secundaria_fecha_inicio", label: "Fecha Inicio" })}
                     {EditableField({ formKey: "secundaria_fecha_fin", label: "Fecha Fin" })}
@@ -1608,6 +1863,7 @@ export default function StaffPortalPage() {
                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
                     <strong className="text-slate-900 text-xs uppercase block border-b border-slate-200 pb-1">Universidad / Instituto</strong>
                     {EditableField({ formKey: "universidad_nombre", label: "Institución" })}
+                    {EditableField({ formKey: "universidad_direccion", label: "Dirección" })}
                     {EditableField({ formKey: "universidad_programa", label: "Carrera / Programa" })}
                     {EditableField({ formKey: "universidad_fecha_inicio", label: "Fecha Inicio" })}
                     {EditableField({ formKey: "universidad_fecha_fin", label: "Fecha Fin" })}
@@ -1629,6 +1885,12 @@ export default function StaffPortalPage() {
                   {EditableField({ formKey: "usa_visas_anteriores_detalle", label: "Visas Americanas Anteriores", multiline: true, className: "sm:col-span-2 md:col-span-3 lg:col-span-6" })}
                   {EditableField({ formKey: "idiomas_habla", label: "Idiomas que habla" })}
                   {EditableField({ formKey: "servicio_militar", label: "¿Servicio militar?" })}
+                  {EditableField({ formKey: "cambio_celular_5anos", label: "¿Cambió de celular en los últimos 5 años?" })}
+                  {EditableField({ formKey: "link_instagram", label: "Instagram" })}
+                  {EditableField({ formKey: "link_facebook", label: "Facebook", className: "sm:col-span-2" })}
+                  {EditableField({ formKey: "familia_en_usa", label: "¿Tiene familia en EE.UU.?" })}
+                  {getFieldValue('familia_en_usa') === 'Sí' &&
+                    EditableField({ formKey: "familia_usa_detalle", label: "Nombre Familiar / Relación / Estado migratorio", multiline: true, className: "sm:col-span-2 md:col-span-3 lg:col-span-6" })}
                   {EditableField({ formKey: "viajes_otros_paises_5anos", label: "Viajes a otros países en los últimos 5 años", multiline: true, className: "sm:col-span-2 md:col-span-3 lg:col-span-4" })}
                 </div>
               </div>
@@ -1673,6 +1935,8 @@ export default function StaffPortalPage() {
               </div>
 
             </div>
+              </>
+            )}
 
             {/* Modal Footer */}
             <div className="p-5 md:p-6 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
@@ -1681,7 +1945,7 @@ export default function StaffPortalPage() {
                   type="button"
                   onClick={() => {
                     const student = selectedCaseModal;
-                    setSelectedCaseModal(null);
+                    closeCaseModal();
                     setActiveChatStudent(student);
                   }}
                   className="h-10 px-4 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer"
@@ -1694,7 +1958,7 @@ export default function StaffPortalPage() {
                 </span>
               </div>
               <Button
-                onClick={() => setSelectedCaseModal(null)}
+                onClick={closeCaseModal}
                 className="h-10 px-6 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase tracking-wider shadow-md shadow-blue-500/20 cursor-pointer"
               >
                 Cerrar Formulario
