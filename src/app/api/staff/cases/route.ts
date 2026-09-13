@@ -144,12 +144,32 @@ export async function GET(req: NextRequest) {
     }
 
     // 2. Cross-reference users collection: guarantee any registered client or purchaser appears in Staff
+    const purchasesByEmail: Record<string, string[]> = {};
+    const PURCHASE_LABELS: Record<string, string> = {
+      purchased_plan_esencial: 'Plan Esencial (F-1)',
+      purchased_plan_pro: 'Plan Pro (F-1)',
+      purchased_plan_elite: 'Plan Elite (F-1)',
+      purchased_plan_allinclusive: 'Plan All-Inclusive (F-1)',
+      purchased_plan_turista_basico: 'Plan Turista Básico (B-2)',
+      purchased_plan_turista_premium: 'Plan Turista Premium (B-2)',
+      purchased_plan_turista_vip: 'Plan Turista VIP (B-2)',
+      purchased_curso_estudiante: 'Curso Digital Estudiante',
+      purchased_libro_estudiante: 'Libro Digital Estudiante',
+      purchased_curso_turista: 'Curso Digital Turista',
+      purchased_libro_turista: 'Libro Digital Turista',
+      purchased_aplicacion_escuela: 'Aplicación a la Escuela',
+      purchased_sevis: 'Tasa SEVIS (I-901)',
+      purchased_entrevista_embajada: 'Simulacro de Entrevista',
+    };
+
     try {
       const usersSnap = await db.collection('users').get();
       usersSnap.forEach(uDoc => {
         const uData = uDoc.data();
         const uEmail = (uData.email || '').toLowerCase().trim();
         if (!uEmail) return;
+
+        purchasesByEmail[uEmail] = Object.keys(PURCHASE_LABELS).filter(key => Boolean(uData[key])).map(key => PURCHASE_LABELS[key]);
 
         const hasStudent = Boolean(
           uData.purchased_plan_esencial ||
@@ -186,7 +206,10 @@ export async function GET(req: NextRequest) {
             status: 'nuevos',
             submittedAt: userSubmittedAt,
             updatedAt: userUpdatedAt,
-            photoUrl: uData.photoURL || '',
+            // No official photo yet — this entry only exists because the client purchased a plan.
+            // We must never show a Google-account profile picture here as if it were the
+            // consular 5x5 photo the client is supposed to upload themselves.
+            photoUrl: '',
             passportDoc: null,
             bankStatementDoc: null,
             formData: {
@@ -197,6 +220,7 @@ export async function GET(req: NextRequest) {
             notes: 'Plan Estudiante F-1 adquirido. Expediente pendiente de llenado consular.',
             unreadCount: chatInfo.unreadByStaff || 0,
             lastChatMessage: chatInfo.lastMessage || '',
+            purchases: purchasesByEmail[uEmail] || [],
           });
         }
 
@@ -214,7 +238,7 @@ export async function GET(req: NextRequest) {
             status: 'nuevos',
             submittedAt: userSubmittedAt,
             updatedAt: userUpdatedAt,
-            photoUrl: uData.photoURL || '',
+            photoUrl: '',
             passportDoc: null,
             bankStatementDoc: null,
             formData: {
@@ -225,6 +249,7 @@ export async function GET(req: NextRequest) {
             notes: 'Plan Turista B-2 adquirido. Expediente pendiente de llenado consular.',
             unreadCount: chatInfo.unreadByStaff || 0,
             lastChatMessage: chatInfo.lastMessage || '',
+            purchases: purchasesByEmail[uEmail] || [],
           });
         }
       });
@@ -232,6 +257,14 @@ export async function GET(req: NextRequest) {
       console.warn('Could not cross-reference users collection:', usersErr);
       fetchErrors.push(`users: ${usersErr?.message || usersErr}`);
     }
+
+    // Attach purchase info to every case, including ones sourced from solicitudes_visas
+    // (which were built before the users-collection pass above ran).
+    realCases.forEach(c => {
+      if (c.purchases) return;
+      const key = (c.email || '').toLowerCase().trim();
+      c.purchases = purchasesByEmail[key] || [];
+    });
 
     if (realCases.length === 0) {
       return NextResponse.json({

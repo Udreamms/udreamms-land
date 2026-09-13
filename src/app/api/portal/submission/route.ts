@@ -57,10 +57,14 @@ export async function POST(req: NextRequest) {
       schoolName: formData.nombre_escuela || (visaType === 'B-2' ? 'N/A (Turismo B-2)' : 'Sin escuela seleccionada'),
       submittedAt: new Date().toISOString().split('T')[0],
       updatedAt: new Date().toISOString(),
-      photoUrl: cleanPhoto,
       formData: formData,
     };
 
+    // Only touch these fields when real data comes in. Every save re-sends the whole form,
+    // including calls triggered by uploading just one document — if we always wrote photoUrl
+    // (even as ''), that call would silently wipe out a photo (or passport/bank doc) that was
+    // already synced from a previous, separate upload.
+    if (cleanPhoto) caseData.photoUrl = cleanPhoto;
     if (cleanPassport) caseData.passportDoc = cleanPassport;
     if (cleanBank) caseData.bankStatementDoc = cleanBank;
 

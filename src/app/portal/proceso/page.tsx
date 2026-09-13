@@ -38,6 +38,7 @@ export interface AttachedDoc {
   name: string;
   type: string;
   dataUrl: string;
+  url?: string;
   size?: number;
   uploadedAt?: string;
 }
@@ -498,6 +499,44 @@ export default function ProcesoPage() {
     });
   };
 
+  // Uploads a base64 data URL to Firebase Storage and returns a permanent, small download URL.
+  // This is what actually lets photos and PDFs of real-world size reach the Staff panel intact,
+  // instead of being embedded (and truncated past ~450KB) inside the Firestore document itself.
+  const uploadToStorage = async (
+    dataUrl: string,
+    fileName: string,
+    contentType: string,
+    docType: 'photo' | 'passport' | 'bank'
+  ): Promise<string | null> => {
+    if (!activeApplicant) return null;
+    try {
+      const res = await fetch('/api/portal/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dataUrl,
+          fileName,
+          contentType,
+          docType,
+          visaType: isSelectedStudent ? 'F-1' : 'B-2',
+          applicantId: activeApplicant.applicantId,
+          email: user?.email || '',
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.url) {
+        console.error('Error uploading file to storage:', data);
+        toast.error('No se pudo subir el archivo a la nube. Tus datos de texto sí se guardaron, intenta subir el archivo de nuevo.');
+        return null;
+      }
+      return data.url as string;
+    } catch (err) {
+      console.error('Error uploading file to storage:', err);
+      toast.error('No se pudo subir el archivo a la nube. Revisa tu conexión e intenta de nuevo.');
+      return null;
+    }
+  };
+
   // Cloud sync helper
   const syncToCloud = async (
     photo: string | null,
@@ -517,9 +556,11 @@ export default function ProcesoPage() {
         visaType: isSelectedStudent ? 'F-1' : 'B-2',
         applicantId,
         formData: parsedForm,
-        photoUrl: photo,
-        passportDoc: passport,
-        bankStatementDoc: bankStatement,
+        // Only ever send the short, permanent Storage URL to Firestore — never the raw base64,
+        // which is what used to get silently truncated once a scanned PDF passed ~450KB.
+        photoUrl: photo || null,
+        passportDoc: passport ? { name: passport.name, type: passport.type, url: passport.url || '', size: passport.size } : null,
+        bankStatementDoc: bankStatement ? { name: bankStatement.name, type: bankStatement.type, url: bankStatement.url || '', size: bankStatement.size } : null,
         userEmail: user?.email || parsedForm.email_contacto || '',
         userName: user?.displayName || `${parsedForm.nombres || ''} ${parsedForm.apellidos || ''}`.trim(),
         userId: user?.uid || '',
@@ -532,20 +573,13 @@ export default function ProcesoPage() {
       });
 
       if (!res.ok) {
-        // Fallback: send clean formData to ensure no textual fields are ever dropped
-        await fetch('/api/portal/submission', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...payload,
-            photoUrl: photo && photo.length < 300000 ? photo : null,
-            passportDoc: passport ? { name: passport.name, type: passport.type, size: passport.size } : null,
-            bankStatementDoc: bankStatement ? { name: bankStatement.name, type: bankStatement.type, size: bankStatement.size } : null,
-          }),
-        });
+        const errBody = await res.json().catch(() => ({}));
+        console.error('Error syncing documents with cloud:', errBody);
+        toast.error('No se pudo sincronizar tu documento con el servidor. Intenta de nuevo.');
       }
     } catch (err) {
       console.error('Error syncing documents with cloud:', err);
+      toast.error('No se pudo sincronizar tu documento con el servidor. Revisa tu conexión.');
     }
   };
 
@@ -563,7 +597,9 @@ export default function ProcesoPage() {
     }
 
     refreshApplicantsData();
-    await syncToCloud(photo, currentPassport, currentBankStatement);
+
+    const photoStorageUrl = photo ? await uploadToStorage(photo, 'foto-5x5.jpg', 'image/jpeg', 'photo') : null;
+    await syncToCloud(photoStorageUrl, currentPassport, currentBankStatement);
   };
 
   // Set Passport Document
@@ -662,15 +698,20 @@ export default function ProcesoPage() {
         });
       }
 
+      const storageUrl = await uploadToStorage(dataUrlToStore, file.name, file.type || 'application/pdf', 'passport');
+
       const doc: AttachedDoc = {
         name: file.name,
         type: file.type || (isPdf ? 'application/pdf' : 'image/jpeg'),
         dataUrl: dataUrlToStore,
+        url: storageUrl || undefined,
         size: file.size,
         uploadedAt: new Date().toISOString()
       };
       await setCurrentPassportDoc(doc);
-      toast.success(`¡Pasaporte guardado con éxito! (${isPdf ? 'Documento PDF' : 'Imagen'})`);
+      if (storageUrl) {
+        toast.success(`¡Pasaporte guardado y sincronizado con éxito! (${isPdf ? 'Documento PDF' : 'Imagen'})`);
+      }
     } catch (err) {
       console.error('Error uploading passport:', err);
       toast.error("Error al procesar el archivo del pasaporte.");
@@ -707,15 +748,20 @@ export default function ProcesoPage() {
         });
       }
 
+      const storageUrl = await uploadToStorage(dataUrlToStore, file.name, file.type || 'application/pdf', 'bank');
+
       const doc: AttachedDoc = {
         name: file.name,
         type: file.type || (isPdf ? 'application/pdf' : 'image/jpeg'),
         dataUrl: dataUrlToStore,
+        url: storageUrl || undefined,
         size: file.size,
         uploadedAt: new Date().toISOString()
       };
       await setCurrentBankStatementDoc(doc);
-      toast.success(`¡Estado de cuenta bancario guardado con éxito! (${isPdf ? 'Documento PDF' : 'Imagen'})`);
+      if (storageUrl) {
+        toast.success(`¡Estado de cuenta bancario guardado y sincronizado con éxito! (${isPdf ? 'Documento PDF' : 'Imagen'})`);
+      }
     } catch (err) {
       console.error('Error uploading bank statement:', err);
       toast.error("Error al procesar el estado de cuenta.");

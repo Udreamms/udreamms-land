@@ -70,8 +70,9 @@ export interface StudentCase {
   submittedAt: string;
   updatedAt?: string;
   photoUrl?: string;
-  passportDoc?: { name: string; type: string; dataUrl: string; size?: number };
-  bankStatementDoc?: { name: string; type: string; dataUrl: string; size?: number };
+  passportDoc?: { name: string; type: string; dataUrl?: string; url?: string; size?: number };
+  bankStatementDoc?: { name: string; type: string; dataUrl?: string; url?: string; size?: number };
+  purchases?: string[];
   formData: Record<string, string>;
   notes?: string;
   unreadCount?: number;
@@ -210,6 +211,16 @@ export default function StaffPortalPage() {
     } catch (err) {
       console.error('Error updating status in cloud:', err);
     }
+  };
+
+  // A doc entry only counts as "attached" if it actually has a usable link. Guards against
+  // legacy records where a large PDF got truncated to a broken placeholder string before
+  // the Storage-based upload pipeline existed.
+  const isUsableDoc = (doc?: { url?: string; dataUrl?: string }): boolean => {
+    if (!doc) return false;
+    if (doc.url) return true;
+    if (doc.dataUrl && !doc.dataUrl.includes('[truncated_due_to_size]')) return true;
+    return false;
   };
 
   const getStatusLabel = (status: StaffTabType) => {
@@ -565,8 +576,8 @@ export default function StaffPortalPage() {
               <div className="flex flex-col gap-3 w-full">
                 {filteredCases.map((student) => {
                   const hasPhoto = Boolean(student.photoUrl);
-                  const hasPassport = Boolean(student.passportDoc);
-                  const hasBankStatement = Boolean(student.bankStatementDoc);
+                  const hasPassport = isUsableDoc(student.passportDoc);
+                  const hasBankStatement = isUsableDoc(student.bankStatementDoc);
 
                   return (
                     <div
@@ -942,7 +953,26 @@ export default function StaffPortalPage() {
 
             {/* Modal Body: All 13 Sections */}
             <div className="p-6 md:p-8 overflow-y-auto space-y-6 text-slate-900">
-              
+
+              {/* Compras del Cliente */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 md:p-5 space-y-2.5">
+                <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-emerald-600" />
+                  Compras del Cliente
+                </h4>
+                {selectedCaseModal.purchases && selectedCaseModal.purchases.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {selectedCaseModal.purchases.map((p) => (
+                      <span key={p} className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">
+                        {p}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-500 italic">Sin compras registradas para este correo.</p>
+                )}
+              </div>
+
               {/* Expediente Overview Banner */}
               <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border border-blue-200/80 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
                 <div className="space-y-1">
@@ -1026,7 +1056,7 @@ export default function StaffPortalPage() {
                             <CreditCard className="w-3 h-3 text-indigo-600" />
                             Pasaporte
                           </span>
-                          {selectedCaseModal.passportDoc ? (
+                          {isUsableDoc(selectedCaseModal.passportDoc) ? (
                             <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-bold">
                               Adjunto
                             </span>
@@ -1036,23 +1066,23 @@ export default function StaffPortalPage() {
                             </span>
                           )}
                         </div>
-                        {selectedCaseModal.passportDoc ? (
+                        {isUsableDoc(selectedCaseModal.passportDoc) ? (
                           <div className="p-2 rounded-xl bg-indigo-50/50 border border-indigo-100 text-center">
-                            <p className="text-[11px] font-bold text-indigo-950 truncate" title={selectedCaseModal.passportDoc.name}>
-                              {selectedCaseModal.passportDoc.name}
+                            <p className="text-[11px] font-bold text-indigo-950 truncate" title={selectedCaseModal.passportDoc!.name}>
+                              {selectedCaseModal.passportDoc!.name}
                             </p>
                             <span className="text-[9px] font-bold text-indigo-700 uppercase">
-                              {selectedCaseModal.passportDoc.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
+                              {selectedCaseModal.passportDoc!.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
                             </span>
                           </div>
                         ) : (
                           <div className="py-4 text-center text-slate-400 text-[11px]">No cargado</div>
                         )}
                       </div>
-                      {selectedCaseModal.passportDoc ? (
+                      {isUsableDoc(selectedCaseModal.passportDoc) ? (
                         <a
-                          href={selectedCaseModal.passportDoc.dataUrl}
-                          download={selectedCaseModal.passportDoc.name}
+                          href={selectedCaseModal.passportDoc!.url || selectedCaseModal.passportDoc!.dataUrl}
+                          download={selectedCaseModal.passportDoc!.name}
                           target="_blank"
                           rel="noreferrer"
                           className="w-full h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors shadow-xs"
@@ -1073,7 +1103,7 @@ export default function StaffPortalPage() {
                             <Building className="w-3 h-3 text-emerald-600" />
                             Estado de Cuenta
                           </span>
-                          {selectedCaseModal.bankStatementDoc ? (
+                          {isUsableDoc(selectedCaseModal.bankStatementDoc) ? (
                             <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-bold">
                               Adjunto
                             </span>
@@ -1083,23 +1113,23 @@ export default function StaffPortalPage() {
                             </span>
                           )}
                         </div>
-                        {selectedCaseModal.bankStatementDoc ? (
+                        {isUsableDoc(selectedCaseModal.bankStatementDoc) ? (
                           <div className="p-2 rounded-xl bg-emerald-50/50 border border-emerald-100 text-center">
-                            <p className="text-[11px] font-bold text-emerald-950 truncate" title={selectedCaseModal.bankStatementDoc.name}>
-                              {selectedCaseModal.bankStatementDoc.name}
+                            <p className="text-[11px] font-bold text-emerald-950 truncate" title={selectedCaseModal.bankStatementDoc!.name}>
+                              {selectedCaseModal.bankStatementDoc!.name}
                             </p>
                             <span className="text-[9px] font-bold text-emerald-700 uppercase">
-                              {selectedCaseModal.bankStatementDoc.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
+                              {selectedCaseModal.bankStatementDoc!.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
                             </span>
                           </div>
                         ) : (
                           <div className="py-4 text-center text-slate-400 text-[11px]">No cargado</div>
                         )}
                       </div>
-                      {selectedCaseModal.bankStatementDoc ? (
+                      {isUsableDoc(selectedCaseModal.bankStatementDoc) ? (
                         <a
-                          href={selectedCaseModal.bankStatementDoc.dataUrl}
-                          download={selectedCaseModal.bankStatementDoc.name}
+                          href={selectedCaseModal.bankStatementDoc!.url || selectedCaseModal.bankStatementDoc!.dataUrl}
+                          download={selectedCaseModal.bankStatementDoc!.name}
                           target="_blank"
                           rel="noreferrer"
                           className="w-full h-8 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors shadow-xs"
