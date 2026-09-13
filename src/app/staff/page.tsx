@@ -223,6 +223,41 @@ export default function StaffPortalPage() {
     return false;
   };
 
+  // Quick-nav + completion badges for the 12-section dossier modal. Each entry's `fields`
+  // is a representative sample used only to flag a section "Con datos" vs "Pendiente" —
+  // it doesn't need to be exhaustive, just enough to tell staff where to look first.
+  const DOSSIER_SECTIONS: { anchor: string; label: string; fields: string[] }[] = [
+    { anchor: 'sec-1', label: '1. Personal', fields: ['apellidos', 'nombres', 'fecha_nacimiento'] },
+    { anchor: 'sec-2', label: '2. Escuela', fields: ['nombre_escuela', 'duracion_estudio', 'horario_estudio'] },
+    { anchor: 'sec-3', label: '3. Estado Civil', fields: ['estado_civil'] },
+    { anchor: 'sec-4', label: '4. Pasaporte', fields: ['num_pasaporte', 'fecha_expiracion_pasaporte'] },
+    { anchor: 'sec-5', label: '5. Domicilio', fields: ['direccion_domicilio', 'celular_contacto', 'email_contacto'] },
+    { anchor: 'sec-6', label: '6. Sponsor', fields: ['tiene_patrocinador'] },
+    { anchor: 'sec-7', label: '7. Hijos', fields: ['hijos_count'] },
+    { anchor: 'sec-8', label: '8. Padres', fields: ['nombre_mama', 'nombre_papa'] },
+    { anchor: 'sec-9', label: '9. Trabajo', fields: ['trabajo_empresa'] },
+    { anchor: 'sec-10', label: '10-11. Educación', fields: ['secundaria_nombre', 'universidad_nombre'] },
+    { anchor: 'sec-12', label: '12. Entrada a EE.UU.', fields: ['usa_hospedaje_direccion'] },
+    { anchor: 'sec-13', label: '13. Emergencia', fields: ['c1_nombre', 'contacto1_nombres'] },
+  ];
+
+  const isSectionFilled = (formData: Record<string, string>, fields: string[]): boolean =>
+    fields.some(f => Boolean(formData?.[f]));
+
+  const scrollToDossierSection = (anchor: string) => {
+    if (typeof document === 'undefined') return;
+    document.getElementById(anchor)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const SectionStatusBadge = ({ filled }: { filled: boolean }) => (
+    <span className={`shrink-0 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide flex items-center gap-1 ${
+      filled ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500'
+    }`}>
+      {filled && <CheckCircle2 className="w-2.5 h-2.5" />}
+      {filled ? 'Con Datos' : 'Pendiente'}
+    </span>
+  );
+
   const getStatusLabel = (status: StaffTabType) => {
     switch (status) {
       case 'nuevos': return 'Procesos Nuevos';
@@ -868,6 +903,10 @@ export default function StaffPortalPage() {
                     <span className="px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-800 border border-blue-200">
                       {selectedCaseModal.visaType === 'F-1' ? 'Visa de Estudiante (F-1)' : 'Visa de Turista (B-2)'}
                     </span>
+                    <span className="px-3 py-0.5 rounded-full text-xs font-extrabold uppercase bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      {getStatusLabel(selectedCaseModal.status)}
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-4 text-xs text-slate-600 flex-wrap">
@@ -914,16 +953,9 @@ export default function StaffPortalPage() {
             </div>
 
             {/* Quick Status Toolbar */}
-            <div className="px-6 py-3 bg-white border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-700">Estado Actual:</span>
-                <span className="px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-blue-50 text-blue-800 border border-blue-200">
-                  {getStatusLabel(selectedCaseModal.status)}
-                </span>
-              </div>
-
+            <div className="px-6 py-3 bg-white border-b border-slate-200 shrink-0">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs font-bold text-slate-700 mr-1">Mover a:</span>
+                <span className="text-xs font-bold text-slate-700 mr-1">Cambiar estado a:</span>
                 {([
                   'nuevos',
                   'aplicacion_escuela',
@@ -971,6 +1003,28 @@ export default function StaffPortalPage() {
                 ) : (
                   <p className="text-xs text-slate-500 italic">Sin compras registradas para este correo.</p>
                 )}
+              </div>
+
+              {/* Quick-Nav: jump straight to any of the 12 sections instead of scrolling blindly */}
+              <div className="sticky top-0 z-10 -mx-6 md:-mx-8 px-6 md:px-8 py-2.5 bg-white/95 backdrop-blur-sm border-b border-slate-100 flex items-center gap-1.5 overflow-x-auto">
+                {DOSSIER_SECTIONS.map(sec => {
+                  const filled = isSectionFilled(selectedCaseModal.formData || {}, sec.fields);
+                  return (
+                    <button
+                      key={sec.anchor}
+                      type="button"
+                      onClick={() => scrollToDossierSection(sec.anchor)}
+                      className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 transition-colors border ${
+                        filled
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
+                          : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      {filled && <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />}
+                      {sec.label}
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Expediente Overview Banner */}
@@ -1146,10 +1200,10 @@ export default function StaffPortalPage() {
               )}
 
               {/* 1. INFORMACIÓN PERSONAL */}
-              <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm">
-                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
-                  <User className="w-4 h-4 text-black" />
-                  1. Información Personal
+              <div id="sec-1" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
+                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2"><User className="w-4 h-4 text-black" />1. Información Personal</span>
+                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[0].fields)} />
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 text-xs">
                   <div>
@@ -1202,10 +1256,10 @@ export default function StaffPortalPage() {
               </div>
 
               {/* 2. INFORMACIÓN ADICIONAL (ESTUDIANTES F-1) */}
-              <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm">
-                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
-                  <School className="w-4 h-4 text-black" />
-                  2. Información Adicional (Sólo para Estudiantes)
+              <div id="sec-2" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
+                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2"><School className="w-4 h-4 text-black" />2. Información Adicional (Sólo para Estudiantes)</span>
+                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[1].fields)} />
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-xs">
                   <div className="sm:col-span-2 md:col-span-3 lg:col-span-4">
@@ -1240,10 +1294,10 @@ export default function StaffPortalPage() {
               </div>
 
               {/* 3. ESTADO CIVIL */}
-              <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm">
-                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
-                  <Heart className="w-4 h-4 text-black" />
-                  3. Estado Civil
+              <div id="sec-3" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
+                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2"><Heart className="w-4 h-4 text-black" />3. Estado Civil</span>
+                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[2].fields)} />
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-xs">
                   <div>
@@ -1274,10 +1328,10 @@ export default function StaffPortalPage() {
               </div>
 
               {/* 4. PASAPORTE */}
-              <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm">
-                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 text-black" />
-                  4. Pasaporte
+              <div id="sec-4" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
+                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2"><CreditCard className="w-4 h-4 text-black" />4. Pasaporte</span>
+                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[3].fields)} />
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-xs">
                   <div>
@@ -1308,10 +1362,10 @@ export default function StaffPortalPage() {
               </div>
 
               {/* 5. DIRECCIÓN DE DOMICILIO ACTUAL */}
-              <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm">
-                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
-                  <Home className="w-4 h-4 text-black" />
-                  5. Dirección de Domicilio Actual
+              <div id="sec-5" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
+                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2"><Home className="w-4 h-4 text-black" />5. Dirección de Domicilio Actual</span>
+                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[4].fields)} />
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 text-xs">
                   <div className="sm:col-span-2">
@@ -1346,10 +1400,10 @@ export default function StaffPortalPage() {
               </div>
 
               {/* 6. PATROCINADOR / SPONSOR */}
-              <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm">
-                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-black" />
-                  6. Patrocinador / Sponsor
+              <div id="sec-6" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
+                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2"><Users className="w-4 h-4 text-black" />6. Patrocinador / Sponsor</span>
+                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[5].fields)} />
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-xs">
                   <div>
@@ -1384,10 +1438,10 @@ export default function StaffPortalPage() {
               </div>
 
               {/* 7. HIJOS */}
-              <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm">
-                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-black" />
-                  7. Hijos ({selectedCaseModal.formData.hijos_count || '0'} Hijos Registrados)
+              <div id="sec-7" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
+                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2"><Users className="w-4 h-4 text-black" />7. Hijos ({selectedCaseModal.formData.hijos_count || '0'} Hijos Registrados)</span>
+                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[6].fields)} />
                 </h4>
                 <div className="space-y-3">
                   {Array.from({ length: parseInt(selectedCaseModal.formData.hijos_count || '0', 10) || 0 }).map((_, i) => {
@@ -1416,10 +1470,10 @@ export default function StaffPortalPage() {
               </div>
 
               {/* 8. PADRES */}
-              <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm">
-                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-black" />
-                  8. Nombre de los Padres
+              <div id="sec-8" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
+                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2"><Users className="w-4 h-4 text-black" />8. Nombre de los Padres</span>
+                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[7].fields)} />
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                   <div>
@@ -1436,10 +1490,10 @@ export default function StaffPortalPage() {
               </div>
 
               {/* 9. INFORMACIÓN DE TRABAJO */}
-              <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm">
-                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
-                  <Briefcase className="w-4 h-4 text-black" />
-                  9. Información de Trabajo
+              <div id="sec-9" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
+                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-black" />9. Información de Trabajo</span>
+                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[8].fields)} />
                 </h4>
                 <div className="space-y-4 text-xs">
                   <div>
@@ -1499,10 +1553,10 @@ export default function StaffPortalPage() {
               </div>
 
               {/* 10 & 11. EDUCACIÓN */}
-              <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm">
-                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
-                  <GraduationCap className="w-4 h-4 text-black" />
-                  10 & 11. Historial Educativo
+              <div id="sec-10" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
+                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2"><GraduationCap className="w-4 h-4 text-black" />10 & 11. Historial Educativo</span>
+                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[9].fields)} />
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
@@ -1522,10 +1576,10 @@ export default function StaffPortalPage() {
               </div>
 
               {/* 12. ENTRADA A ESTADOS UNIDOS Y ANTECEDENTES */}
-              <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm">
-                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
-                  <Plane className="w-4 h-4 text-black" />
-                  12. Información requerida antes de entrar a EE.UU.
+              <div id="sec-12" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
+                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2"><Plane className="w-4 h-4 text-black" />12. Información requerida antes de entrar a EE.UU.</span>
+                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[10].fields)} />
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-xs">
                   <div className="sm:col-span-2 lg:col-span-3">
@@ -1560,10 +1614,10 @@ export default function StaffPortalPage() {
               </div>
 
               {/* 13. CONTACTOS DE EMERGENCIA (NO FAMILIARES) */}
-              <div className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm">
-                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-black" />
-                  13. Contactos de Emergencia (NO Familiares)
+              <div id="sec-13" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
+                <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2"><Phone className="w-4 h-4 text-black" />13. Contactos de Emergencia (NO Familiares)</span>
+                  <SectionStatusBadge filled={isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[11].fields)} />
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                   {/* Contacto 1 */}

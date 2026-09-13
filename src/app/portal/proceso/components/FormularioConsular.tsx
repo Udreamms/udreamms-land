@@ -131,6 +131,42 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
     return () => clearTimeout(timer);
   }, [formData, isStudent, applicantId, user]);
 
+  // Same representative fields used in the Staff dossier's quick-nav, so a section that
+  // shows "Con Datos" here shows the same on the Staff side — the two views agree on what
+  // "done" means for each of the 13 sections.
+  const SECTION_META: { key: string; label: string; fields: string[] }[] = [
+    { key: 'sec1', label: '1. Personal', fields: ['nombres', 'apellidos', 'fecha_nacimiento'] },
+    { key: 'sec2', label: '2. Escuela', fields: ['nombre_escuela', 'duracion_estudio', 'horario_estudio', 'motivo_estudio_ingles'] },
+    { key: 'sec3', label: '3. Estado Civil', fields: ['estado_civil'] },
+    { key: 'sec4', label: '4. Pasaporte', fields: ['num_pasaporte'] },
+    { key: 'sec5', label: '5. Domicilio', fields: ['direccion_domicilio', 'celular_contacto', 'email_contacto'] },
+    { key: 'sec6', label: '6. Sponsor', fields: ['tiene_patrocinador'] },
+    { key: 'sec7', label: '7. Hijos', fields: ['hijos_count'] },
+    { key: 'sec8', label: '8. Padres', fields: ['nombre_mama', 'nombre_papa'] },
+    { key: 'sec9', label: '9. Trabajo', fields: ['trabajo_empresa'] },
+    { key: 'sec10', label: '10. Secundaria', fields: ['secundaria_nombre'] },
+    { key: 'sec11', label: '11. Universidad', fields: ['universidad_nombre'] },
+    { key: 'sec12', label: '12. Entrada EE.UU.', fields: ['usa_hospedaje_direccion'] },
+    { key: 'sec13', label: '13. Emergencia', fields: ['c1_nombre', 'contacto1_nombres'] },
+  ];
+
+  const isSectionFilled = (fields: string[]) => fields.some(f => Boolean(formData[f]));
+  const sectionsCompletedCount = SECTION_META.filter(s => isSectionFilled(s.fields)).length;
+
+  const SectionBadge = ({ sectionKey }: { sectionKey: string }) => {
+    const meta = SECTION_META.find(s => s.key === sectionKey);
+    if (!meta) return null;
+    const filled = isSectionFilled(meta.fields);
+    return (
+      <span className={`shrink-0 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide flex items-center gap-1 ${
+        filled ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-500'
+      }`}>
+        {filled && <CheckCircle2 className="w-2.5 h-2.5" />}
+        {filled ? 'Completa' : 'Pendiente'}
+      </span>
+    );
+  };
+
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     sec1: true,
     sec2: true,
@@ -245,21 +281,36 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
   return (
     <div className="space-y-6 pt-2">
       
-      {/* Auto-save Status & Manual Save Toolbar */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-50 border border-slate-200 p-3.5 rounded-2xl">
-        <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span>Tus datos se respaldan automáticamente mientras escribes.</span>
+      {/* Progress + Auto-save Status & Manual Save Toolbar */}
+      <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-2xl space-y-3">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>Tus datos se respaldan automáticamente mientras escribes.</span>
+          </div>
+          <Button
+            type="button"
+            onClick={handleManualSave}
+            disabled={isSavingManual}
+            className="h-9 px-4 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 shadow-sm shrink-0"
+          >
+            <Save className="w-3.5 h-3.5 text-white" />
+            {isSavingManual ? 'Guardando...' : 'Guardar Datos del Proceso'}
+          </Button>
         </div>
-        <Button
-          type="button"
-          onClick={handleManualSave}
-          disabled={isSavingManual}
-          className="h-9 px-4 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 shadow-sm shrink-0"
-        >
-          <Save className="w-3.5 h-3.5 text-white" />
-          {isSavingManual ? 'Guardando...' : 'Guardar Datos del Proceso'}
-        </Button>
+
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between text-[11px] font-bold text-slate-600">
+            <span>Progreso del formulario</span>
+            <span>{sectionsCompletedCount} de {SECTION_META.length} secciones</span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-slate-200 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-emerald-500 transition-all duration-300"
+              style={{ width: `${(sectionsCompletedCount / SECTION_META.length) * 100}%` }}
+            />
+          </div>
+        </div>
       </div>
 
       {/* SECCIÓN 1: INFORMACIÓN PERSONAL */}
@@ -273,7 +324,10 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
             <User className="w-5 h-5 text-black" />
             <h4 className="text-sm md:text-base font-bold text-slate-900">1. Información Personal</h4>
           </div>
-          {openSections.sec1 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          <div className="flex items-center gap-2 shrink-0">
+            <SectionBadge sectionKey="sec1" />
+            {openSections.sec1 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          </div>
         </button>
 
         {openSections.sec1 && (
@@ -377,7 +431,10 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
               2. Información adicional (Sólo para estudiantes)
             </h4>
           </div>
-          {openSections.sec2 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          <div className="flex items-center gap-2 shrink-0">
+            <SectionBadge sectionKey="sec2" />
+            {openSections.sec2 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          </div>
         </button>
 
         {openSections.sec2 && (
@@ -527,7 +584,10 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
             <Heart className="w-5 h-5 text-black" />
             <h4 className="text-sm md:text-base font-bold text-slate-900">3. Estado Civil</h4>
           </div>
-          {openSections.sec3 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          <div className="flex items-center gap-2 shrink-0">
+            <SectionBadge sectionKey="sec3" />
+            {openSections.sec3 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          </div>
         </button>
 
         {openSections.sec3 && (
@@ -597,7 +657,10 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
             <CreditCard className="w-5 h-5 text-black" />
             <h4 className="text-sm md:text-base font-bold text-slate-900">4. Pasaporte</h4>
           </div>
-          {openSections.sec4 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          <div className="flex items-center gap-2 shrink-0">
+            <SectionBadge sectionKey="sec4" />
+            {openSections.sec4 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          </div>
         </button>
 
         {openSections.sec4 && (
@@ -669,7 +732,10 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
             <Home className="w-5 h-5 text-black" />
             <h4 className="text-sm md:text-base font-bold text-slate-900">5. Dirección de domicilio actual</h4>
           </div>
-          {openSections.sec5 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          <div className="flex items-center gap-2 shrink-0">
+            <SectionBadge sectionKey="sec5" />
+            {openSections.sec5 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          </div>
         </button>
 
         {openSections.sec5 && (
@@ -723,7 +789,10 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
             <Users className="w-5 h-5 text-black" />
             <h4 className="text-sm md:text-base font-bold text-slate-900">6. Patrocinador / Sponsor (Sí o No)</h4>
           </div>
-          {openSections.sec6 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          <div className="flex items-center gap-2 shrink-0">
+            <SectionBadge sectionKey="sec6" />
+            {openSections.sec6 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          </div>
         </button>
 
         {openSections.sec6 && (
@@ -795,7 +864,10 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
             <Users className="w-5 h-5 text-black" />
             <h4 className="text-sm md:text-base font-bold text-slate-900">7. Hijos</h4>
           </div>
-          {openSections.sec7 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          <div className="flex items-center gap-2 shrink-0">
+            <SectionBadge sectionKey="sec7" />
+            {openSections.sec7 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          </div>
         </button>
 
         {openSections.sec7 && (
@@ -883,7 +955,10 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
             <Users className="w-5 h-5 text-black" />
             <h4 className="text-sm md:text-base font-bold text-slate-900">8. Nombre de tus Padres</h4>
           </div>
-          {openSections.sec8 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          <div className="flex items-center gap-2 shrink-0">
+            <SectionBadge sectionKey="sec8" />
+            {openSections.sec8 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          </div>
         </button>
 
         {openSections.sec8 && (
@@ -922,7 +997,10 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
             <Briefcase className="w-5 h-5 text-black" />
             <h4 className="text-sm md:text-base font-bold text-slate-900">9. Información de Trabajo</h4>
           </div>
-          {openSections.sec9 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          <div className="flex items-center gap-2 shrink-0">
+            <SectionBadge sectionKey="sec9" />
+            {openSections.sec9 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          </div>
         </button>
 
         {openSections.sec9 && (
@@ -1067,7 +1145,10 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
             <GraduationCap className="w-5 h-5 text-black" />
             <h4 className="text-sm md:text-base font-bold text-slate-900">10. Institución en la que estudiaste (Secundaria)</h4>
           </div>
-          {openSections.sec10 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          <div className="flex items-center gap-2 shrink-0">
+            <SectionBadge sectionKey="sec10" />
+            {openSections.sec10 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          </div>
         </button>
 
         {openSections.sec10 && (
@@ -1111,7 +1192,10 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
             <GraduationCap className="w-5 h-5 text-black" />
             <h4 className="text-sm md:text-base font-bold text-slate-900">11. Institución en la que estudiaste (Universidad / Instituto)</h4>
           </div>
-          {openSections.sec11 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          <div className="flex items-center gap-2 shrink-0">
+            <SectionBadge sectionKey="sec11" />
+            {openSections.sec11 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          </div>
         </button>
 
         {openSections.sec11 && (
@@ -1155,7 +1239,10 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
             <Plane className="w-5 h-5 text-black" />
             <h4 className="text-sm md:text-base font-bold text-slate-900">12. Información requerida antes de entrar a los Estados Unidos</h4>
           </div>
-          {openSections.sec12 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          <div className="flex items-center gap-2 shrink-0">
+            <SectionBadge sectionKey="sec12" />
+            {openSections.sec12 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          </div>
         </button>
 
         {openSections.sec12 && (
@@ -1253,7 +1340,10 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
             <PhoneCall className="w-5 h-5 text-black" />
             <h4 className="text-sm md:text-base font-bold text-slate-900">13. DOS contactos de emergencia (NO FAMILIARES)</h4>
           </div>
-          {openSections.sec13 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          <div className="flex items-center gap-2 shrink-0">
+            <SectionBadge sectionKey="sec13" />
+            {openSections.sec13 ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
+          </div>
         </button>
 
         {openSections.sec13 && (
