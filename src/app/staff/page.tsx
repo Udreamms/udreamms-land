@@ -1522,7 +1522,10 @@ export default function StaffPortalPage() {
                   {SectionStatusBadge({ filled: isSectionFilled(selectedCaseModal.formData, DOSSIER_SECTIONS[6].fields) })}
                 </h4>
                 <div className="space-y-3">
-                  {Array.from({ length: parseInt(selectedCaseModal.formData.hijos_count || '0', 10) || 0 }).map((_, i) => {
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                    {EditableField({ formKey: "hijos_count", label: "¿Cuántos hijos vendrán contigo?" })}
+                  </div>
+                  {Array.from({ length: parseInt(getFieldValue('hijos_count') || '0', 10) || 0 }).map((_, i) => {
                     const hNum = i + 1;
                     return (
                       <div key={hNum} className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
@@ -1533,7 +1536,7 @@ export default function StaffPortalPage() {
                       </div>
                     );
                   })}
-                  {(!selectedCaseModal.formData.hijos_count || selectedCaseModal.formData.hijos_count === '0') && (
+                  {(!getFieldValue('hijos_count') || getFieldValue('hijos_count') === '0') && (
                     <p className="text-xs text-slate-500">El postulante indicó que no viajará con hijos.</p>
                   )}
                 </div>
