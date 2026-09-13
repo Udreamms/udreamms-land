@@ -60,13 +60,15 @@ export async function POST(req: NextRequest) {
       formData: formData,
     };
 
-    // Only touch these fields when real data comes in. Every save re-sends the whole form,
-    // including calls triggered by uploading just one document — if we always wrote photoUrl
-    // (even as ''), that call would silently wipe out a photo (or passport/bank doc) that was
-    // already synced from a previous, separate upload.
-    if (cleanPhoto) caseData.photoUrl = cleanPhoto;
-    if (cleanPassport) caseData.passportDoc = cleanPassport;
-    if (cleanBank) caseData.bankStatementDoc = cleanBank;
+    // Only touch these fields when the client actually meant to change them. A save
+    // triggered by uploading just one document (or removing it) always explicitly includes
+    // that field's key in the request body — even as null, to mean "clear it". A save that
+    // isn't about that field at all (e.g. only text changed) omits the key entirely, so
+    // `'photoUrl' in body` is false and we never touch — and never accidentally wipe —
+    // whatever was already synced for it.
+    if ('photoUrl' in body) caseData.photoUrl = cleanPhoto;
+    if ('passportDoc' in body) caseData.passportDoc = cleanPassport;
+    if ('bankStatementDoc' in body) caseData.bankStatementDoc = cleanBank;
 
     if (db) {
       const docRef = db.collection('solicitudes_visas').doc(docId);

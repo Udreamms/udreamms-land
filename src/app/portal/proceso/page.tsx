@@ -537,11 +537,18 @@ export default function ProcesoPage() {
     }
   };
 
-  // Cloud sync helper
+  // Cloud sync helper.
+  // `photo`/`passport`/`bankStatement` use three states, not two: `undefined` means "this
+  // call isn't about this field, leave whatever is already saved alone"; `null` means
+  // "clear it, the user removed it"; a real value means "set it". Passing the current
+  // cached value here for a field that isn't actually changing (e.g. re-sending the old
+  // photo URL whenever the passport changes) is what used to make removing a file a no-op
+  // server-side — every field always looked "present", so a delete and an unrelated save
+  // were indistinguishable.
   const syncToCloud = async (
-    photo: string | null,
-    passport: AttachedDoc | null,
-    bankStatement: AttachedDoc | null
+    photo: string | null | undefined,
+    passport: AttachedDoc | null | undefined,
+    bankStatement: AttachedDoc | null | undefined
   ) => {
     if (!activeApplicant) return;
     const prefix = isSelectedStudent ? 'f1' : 'b2';
@@ -552,19 +559,24 @@ export default function ProcesoPage() {
       const savedForm = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null;
       const parsedForm = savedForm ? JSON.parse(savedForm) : {};
 
-      const payload = {
+      const payload: Record<string, any> = {
         visaType: isSelectedStudent ? 'F-1' : 'B-2',
         applicantId,
         formData: parsedForm,
-        // Only ever send the short, permanent Storage URL to Firestore — never the raw base64,
-        // which is what used to get silently truncated once a scanned PDF passed ~450KB.
-        photoUrl: photo || null,
-        passportDoc: passport ? { name: passport.name, type: passport.type, url: passport.url || '', size: passport.size } : null,
-        bankStatementDoc: bankStatement ? { name: bankStatement.name, type: bankStatement.type, url: bankStatement.url || '', size: bankStatement.size } : null,
         userEmail: user?.email || parsedForm.email_contacto || '',
         userName: user?.displayName || `${parsedForm.nombres || ''} ${parsedForm.apellidos || ''}`.trim(),
         userId: user?.uid || '',
       };
+
+      // Only ever send the short, permanent Storage URL to Firestore — never the raw base64,
+      // which is what used to get silently truncated once a scanned PDF passed ~450KB.
+      if (photo !== undefined) payload.photoUrl = photo || null;
+      if (passport !== undefined) {
+        payload.passportDoc = passport ? { name: passport.name, type: passport.type, url: passport.url || '', size: passport.size } : null;
+      }
+      if (bankStatement !== undefined) {
+        payload.bankStatementDoc = bankStatement ? { name: bankStatement.name, type: bankStatement.type, url: bankStatement.url || '', size: bankStatement.size } : null;
+      }
 
       const res = await fetch('/api/portal/submission', {
         method: 'POST',
@@ -599,7 +611,7 @@ export default function ProcesoPage() {
     refreshApplicantsData();
 
     const photoStorageUrl = photo ? await uploadToStorage(photo, 'foto-5x5.jpg', 'image/jpeg', 'photo') : null;
-    await syncToCloud(photoStorageUrl, currentPassport, currentBankStatement);
+    await syncToCloud(photoStorageUrl, undefined, undefined);
   };
 
   // Set Passport Document
@@ -622,7 +634,7 @@ export default function ProcesoPage() {
     }
 
     refreshApplicantsData();
-    await syncToCloud(currentPhoto, doc, currentBankStatement);
+    await syncToCloud(undefined, doc, undefined);
   };
 
   // Set Bank Statement Document
@@ -645,7 +657,7 @@ export default function ProcesoPage() {
     }
 
     refreshApplicantsData();
-    await syncToCloud(currentPhoto, currentPassport, doc);
+    await syncToCloud(undefined, undefined, doc);
   };
 
   // Handlers for Photo file input with automatic compression
