@@ -88,9 +88,6 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
           visaType: isStudent ? 'F-1' : 'B-2',
           applicantId: applicantId || '1',
           formData,
-          photoUrl: photoUrl && photoUrl.length < 350000 ? photoUrl : null,
-          passportDoc: passportDoc ? { name: passportDoc.name, type: passportDoc.type, size: passportDoc.size } : null,
-          bankStatementDoc: bankStatementDoc ? { name: bankStatementDoc.name, type: bankStatementDoc.type, size: bankStatementDoc.size } : null,
           userEmail: user?.email || formData.email_contacto || '',
           userName: user?.displayName || `${formData.nombres || ''} ${formData.apellidos || ''}`.trim(),
           userId: user?.uid || '',
@@ -101,20 +98,6 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-
-        if (!res.ok) {
-          // Fallback: retry with pure formData (drop attachments in case they were the issue)
-          res = await fetch('/api/portal/submission', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              ...payload,
-              photoUrl: null,
-              passportDoc: null,
-              bankStatementDoc: null,
-            })
-          });
-        }
 
         if (!res.ok) {
           const errBody = await res.json().catch(() => ({}));

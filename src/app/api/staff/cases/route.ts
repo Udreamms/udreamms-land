@@ -133,6 +133,12 @@ export async function GET(req: NextRequest) {
           photoUrl: cleanPhotoUrl,
           passportDoc: data.passportDoc || null,
           bankStatementDoc: data.bankStatementDoc || null,
+          sevisDoc: data.sevisDoc || null,
+          i20Doc: data.i20Doc || null,
+          ds160Doc: data.ds160Doc || null,
+          acceptanceLetterDoc: data.acceptanceLetterDoc || null,
+          affidavitDoc: data.affidavitDoc || null,
+          embassyAppointmentDoc: data.embassyAppointmentDoc || null,
           formData: formData,
           notes: data.notes || '',
           unreadCount: chatInfo.unreadByStaff || 0,
@@ -221,6 +227,12 @@ export async function GET(req: NextRequest) {
             photoUrl: '',
             passportDoc: null,
             bankStatementDoc: null,
+            sevisDoc: null,
+            i20Doc: null,
+            ds160Doc: null,
+            acceptanceLetterDoc: null,
+            affidavitDoc: null,
+            embassyAppointmentDoc: null,
             formData: {
               email_contacto: uEmail,
               nombres: userDisplayName.split(' ')[0] || '',
@@ -251,6 +263,12 @@ export async function GET(req: NextRequest) {
             photoUrl: '',
             passportDoc: null,
             bankStatementDoc: null,
+            sevisDoc: null,
+            i20Doc: null,
+            ds160Doc: null,
+            acceptanceLetterDoc: null,
+            affidavitDoc: null,
+            embassyAppointmentDoc: null,
             formData: {
               email_contacto: uEmail,
               nombres: userDisplayName.split(' ')[0] || '',
@@ -292,6 +310,12 @@ export async function GET(req: NextRequest) {
             photoUrl: '',
             passportDoc: null,
             bankStatementDoc: null,
+            sevisDoc: null,
+            i20Doc: null,
+            ds160Doc: null,
+            acceptanceLetterDoc: null,
+            affidavitDoc: null,
+            embassyAppointmentDoc: null,
             formData: {},
             notes: 'Cliente registrado. Aún no ha comprado ningún servicio de visa (F-1 o B-2).',
             unreadCount: chatInfo.unreadByStaff || 0,
@@ -430,7 +454,24 @@ export async function DELETE(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
-    const { caseId, status, notes, formData, email, name, visaType } = body;
+    const {
+      caseId,
+      status,
+      notes,
+      formData,
+      email,
+      name,
+      visaType,
+      photoUrl,
+      passportDoc,
+      bankStatementDoc,
+      sevisDoc,
+      i20Doc,
+      ds160Doc,
+      acceptanceLetterDoc,
+      affidavitDoc,
+      embassyAppointmentDoc,
+    } = body;
 
     if (!caseId) {
       return NextResponse.json({ error: 'caseId es requerido' }, { status: 400 });
@@ -441,11 +482,20 @@ export async function PATCH(req: NextRequest) {
       const existing = await docRef.get();
 
       const updatePayload: any = {
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
       if (status) updatePayload.status = status;
       if (notes !== undefined) updatePayload.notes = notes;
       if (formData) updatePayload.formData = formData;
+      if ('photoUrl' in body) updatePayload.photoUrl = photoUrl;
+      if ('passportDoc' in body) updatePayload.passportDoc = passportDoc;
+      if ('bankStatementDoc' in body) updatePayload.bankStatementDoc = bankStatementDoc;
+      if ('sevisDoc' in body) updatePayload.sevisDoc = sevisDoc;
+      if ('i20Doc' in body) updatePayload.i20Doc = i20Doc;
+      if ('ds160Doc' in body) updatePayload.ds160Doc = ds160Doc;
+      if ('acceptanceLetterDoc' in body) updatePayload.acceptanceLetterDoc = acceptanceLetterDoc;
+      if ('affidavitDoc' in body) updatePayload.affidavitDoc = affidavitDoc;
+      if ('embassyAppointmentDoc' in body) updatePayload.embassyAppointmentDoc = embassyAppointmentDoc;
 
       if (existing.exists) {
         await docRef.set(updatePayload, { merge: true });

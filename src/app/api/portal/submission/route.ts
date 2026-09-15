@@ -23,7 +23,23 @@ function sanitizePhotoUrl(url: any): string {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { visaType, formData, photoUrl, passportDoc, bankStatementDoc, userEmail, userName, userId, applicantId } = body;
+    const {
+      visaType,
+      formData,
+      photoUrl,
+      passportDoc,
+      bankStatementDoc,
+      sevisDoc,
+      i20Doc,
+      ds160Doc,
+      acceptanceLetterDoc,
+      affidavitDoc,
+      embassyAppointmentDoc,
+      userEmail,
+      userName,
+      userId,
+      applicantId,
+    } = body;
 
     if (!visaType || !formData) {
       return NextResponse.json({ error: 'Faltan datos obligatorios (visaType, formData)' }, { status: 400 });
@@ -44,6 +60,12 @@ export async function POST(req: NextRequest) {
 
     const cleanPassport = sanitizeDocForFirestore(passportDoc);
     const cleanBank = sanitizeDocForFirestore(bankStatementDoc);
+    const cleanSevis = sanitizeDocForFirestore(sevisDoc);
+    const cleanI20 = sanitizeDocForFirestore(i20Doc);
+    const cleanDs160 = sanitizeDocForFirestore(ds160Doc);
+    const cleanAcceptance = sanitizeDocForFirestore(acceptanceLetterDoc);
+    const cleanAffidavit = sanitizeDocForFirestore(affidavitDoc);
+    const cleanEmbassyAppointment = sanitizeDocForFirestore(embassyAppointmentDoc);
     const cleanPhoto = sanitizePhotoUrl(photoUrl);
 
     const caseData: any = {
@@ -69,6 +91,12 @@ export async function POST(req: NextRequest) {
     if ('photoUrl' in body) caseData.photoUrl = cleanPhoto;
     if ('passportDoc' in body) caseData.passportDoc = cleanPassport;
     if ('bankStatementDoc' in body) caseData.bankStatementDoc = cleanBank;
+    if ('sevisDoc' in body) caseData.sevisDoc = cleanSevis;
+    if ('i20Doc' in body) caseData.i20Doc = cleanI20;
+    if ('ds160Doc' in body) caseData.ds160Doc = cleanDs160;
+    if ('acceptanceLetterDoc' in body) caseData.acceptanceLetterDoc = cleanAcceptance;
+    if ('affidavitDoc' in body) caseData.affidavitDoc = cleanAffidavit;
+    if ('embassyAppointmentDoc' in body) caseData.embassyAppointmentDoc = cleanEmbassyAppointment;
 
     if (db) {
       const docRef = db.collection('solicitudes_visas').doc(docId);

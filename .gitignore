@@ -34,6 +34,8 @@ tsconfig.tsbuildinfo
 # IDE
 .vscode/
 .idea/
+.claude/
+.gemini/
 *.swp
 *.swo
 *~
