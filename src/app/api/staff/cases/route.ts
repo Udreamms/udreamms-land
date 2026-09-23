@@ -50,6 +50,22 @@ function parseDateTimeSafe(val: any): string {
   return new Date().toISOString();
 }
 
+function parseTimestampMs(val: any): number {
+  if (!val) return 0;
+  if (typeof val === 'number') return val;
+  if (typeof val === 'string') {
+    const t = new Date(val).getTime();
+    return isNaN(t) ? 0 : t;
+  }
+  if (typeof val === 'object') {
+    if (typeof val.toDate === 'function') return val.toDate().getTime();
+    if (val._seconds) return val._seconds * 1000 + (val._nanoseconds ? Math.round(val._nanoseconds / 1000000) : 0);
+    if (val.seconds) return val.seconds * 1000 + (val.nanoseconds ? Math.round(val.nanoseconds / 1000000) : 0);
+  }
+  if (val instanceof Date) return val.getTime();
+  return 0;
+}
+
 export async function GET(req: NextRequest) {
   try {
     if (!db) {
@@ -153,6 +169,7 @@ export async function GET(req: NextRequest) {
     // 2. Cross-reference users collection: guarantee any registered client or purchaser appears in Staff
     const purchasesByEmail: Record<string, string[]> = {};
     const entitlementsByEmail: Record<string, Record<string, boolean>> = {};
+    const userCreatedAtRaw: Record<string, number> = {};
     const PURCHASE_LABELS: Record<string, string> = {
       purchased_plan_esencial: 'Plan Esencial (F-1)',
       purchased_plan_pro: 'Plan Pro (F-1)',
@@ -179,11 +196,22 @@ export async function GET(req: NextRequest) {
         const uEmail = (uData.email || '').toLowerCase().trim();
         if (!uEmail) return;
 
-        purchasesByEmail[uEmail] = Object.keys(PURCHASE_LABELS).filter(key => Boolean(uData[key])).map(key => PURCHASE_LABELS[key]);
-        entitlementsByEmail[uEmail] = Object.keys(PURCHASE_LABELS).reduce((acc, key) => {
-          acc[key] = Boolean(uData[key]);
+        const userTimestamp = parseTimestampMs(uData.createdAt || uData.lastLogin || uData.last_payment_at);
+        if (userTimestamp > 0) {
+          userCreatedAtRaw[uEmail] = userTimestamp;
+        }
+
+        const currentEnt = entitlementsByEmail[uEmail] || {};
+        const newEnt = Object.keys(PURCHASE_LABELS).reduce((acc, key) => {
+          if (uData[key] !== undefined) {
+            acc[key] = Boolean(uData[key]);
+          } else {
+            acc[key] = Boolean(currentEnt[key]);
+          }
           return acc;
         }, {} as Record<string, boolean>);
+        entitlementsByEmail[uEmail] = newEnt;
+        purchasesByEmail[uEmail] = Object.keys(PURCHASE_LABELS).filter(key => Boolean(newEnt[key])).map(key => PURCHASE_LABELS[key]);
 
         const hasStudent = Boolean(
           uData.purchased_plan_esencial ||
@@ -201,7 +229,9 @@ export async function GET(req: NextRequest) {
         const userDisplayName = uData.displayName || uData.name || (uEmail.split('@')[0] || 'Cliente Registrado');
         const userPhone = uData.phone || uData.phoneNumber || '';
         const userSubmittedAt = parseDateSafe(uData.createdAt || uData.last_payment_at || uData.lastLogin);
-        const userUpdatedAt = parseDateTimeSafe(uData.updatedAt || uData.last_payment_at || uData.lastLogin || uData.createdAt);
+        const userUpdatedAt = parseDateTimeSafe(uData.updatedAt || uData.last_payment_at || uData.createdAt);
+        const userCountry = uData.country || uData.pais || uData.nacionalidad || '';
+        const userBirthDate = uData.birthDate || uData.fecha_nacimiento || uData.birth_date || '';
 
         const syntheticF1Id = `case_${uEmail.replace(/[^a-zA-Z0-9]/g, '_')}_f1`;
         const syntheticB2Id = `case_${uEmail.replace(/[^a-zA-Z0-9]/g, '_')}_b2`;
@@ -221,9 +251,6 @@ export async function GET(req: NextRequest) {
             status: 'nuevos',
             submittedAt: userSubmittedAt,
             updatedAt: userUpdatedAt,
-            // No official photo yet — this entry only exists because the client purchased a plan.
-            // We must never show a Google-account profile picture here as if it were the
-            // consular 5x5 photo the client is supposed to upload themselves.
             photoUrl: '',
             passportDoc: null,
             bankStatementDoc: null,
@@ -235,6 +262,9 @@ export async function GET(req: NextRequest) {
             embassyAppointmentDoc: null,
             formData: {
               email_contacto: uEmail,
+              celular_contacto: userPhone,
+              pais_domicilio: userCountry,
+              fecha_nacimiento: userBirthDate,
               nombres: userDisplayName.split(' ')[0] || '',
               apellidos: userDisplayName.split(' ').slice(1).join(' ') || '',
             },
@@ -271,6 +301,9 @@ export async function GET(req: NextRequest) {
             embassyAppointmentDoc: null,
             formData: {
               email_contacto: uEmail,
+              celular_contacto: userPhone,
+              pais_domicilio: userCountry,
+              fecha_nacimiento: userBirthDate,
               nombres: userDisplayName.split(' ')[0] || '',
               apellidos: userDisplayName.split(' ').slice(1).join(' ') || '',
             },
@@ -281,12 +314,6 @@ export async function GET(req: NextRequest) {
           });
         }
 
-        // Every registered account shows up in Staff right away, even before buying
-        // anything — but with no visa service purchased (F-1 or B-2 plan specifically;
-        // Master Class / Libro / Recursos don't count), there's no applicant card yet, so
-        // there's nothing to fill a 13-section dossier with. This placeholder lets Staff see
-        // and act on (lock/unlock products for) a brand-new lead without a real expediente
-        // existing until they actually buy a visa service.
         const placeholderId = `case_${uEmail.replace(/[^a-zA-Z0-9]/g, '_')}_registered`;
         if (
           !hasStudent && !hasTourist &&
@@ -316,7 +343,14 @@ export async function GET(req: NextRequest) {
             acceptanceLetterDoc: null,
             affidavitDoc: null,
             embassyAppointmentDoc: null,
-            formData: {},
+            formData: {
+              email_contacto: uEmail,
+              celular_contacto: userPhone,
+              pais_domicilio: userCountry,
+              fecha_nacimiento: userBirthDate,
+              nombres: userDisplayName.split(' ')[0] || '',
+              apellidos: userDisplayName.split(' ').slice(1).join(' ') || '',
+            },
             notes: 'Cliente registrado. Aún no ha comprado ningún servicio de visa (F-1 o B-2).',
             unreadCount: chatInfo.unreadByStaff || 0,
             lastChatMessage: chatInfo.lastMessage || '',
@@ -343,6 +377,35 @@ export async function GET(req: NextRequest) {
       // family member, or their separate B-2 tourist process — shares this groupKey, so the
       // Staff UI can fold them all into one expediente with tabs instead of separate list rows.
       c.groupKey = key;
+    });
+
+    // Calculate sequential Expediente Number per unique client (ordered chronologically by user registration timestamp)
+    const clientEarliestDateMap = new Map<string, number>();
+    realCases.forEach(c => {
+      const key = c.groupKey || (c.email || '').toLowerCase().trim();
+      const explicitUserTs = userCreatedAtRaw[key];
+      const caseTs = parseTimestampMs(c.submittedAt || c.updatedAt);
+      const effectiveTs = explicitUserTs || caseTs || Date.now();
+      const existing = clientEarliestDateMap.get(key);
+      if (!existing || effectiveTs < existing) {
+        clientEarliestDateMap.set(key, effectiveTs);
+      }
+    });
+
+    const sortedClientKeys = Array.from(clientEarliestDateMap.keys()).sort((a, b) => {
+      const timeA = clientEarliestDateMap.get(a) || 0;
+      const timeB = clientEarliestDateMap.get(b) || 0;
+      return timeA - timeB;
+    });
+
+    const clientNumberMap = new Map<string, number>();
+    sortedClientKeys.forEach((key, idx) => {
+      clientNumberMap.set(key, idx + 1);
+    });
+
+    realCases.forEach(c => {
+      const key = c.groupKey || (c.email || '').toLowerCase().trim();
+      c.expedienteNumber = clientNumberMap.get(key) || 1;
     });
 
     if (realCases.length === 0) {
@@ -510,6 +573,27 @@ export async function PATCH(req: NextRequest) {
         updatePayload.status = updatePayload.status || 'nuevos';
         updatePayload.createdAt = new Date().toISOString();
         await docRef.set(updatePayload);
+      }
+
+      // If status is updated, move ALL cases belonging to this client's email so the entire expediente moves together
+      if (status && (email || existing.data()?.email)) {
+        const clientEmailLower = String(email || existing.data()?.email || '').toLowerCase().trim();
+        if (clientEmailLower) {
+          try {
+            const allClientDocs = await db.collection('solicitudes_visas').get();
+            const batch = db.batch();
+            allClientDocs.forEach(d => {
+              const dData = d.data();
+              const dEmail = (dData.email || dData.formData?.email_contacto || '').toLowerCase().trim();
+              if (dEmail === clientEmailLower && d.id !== caseId) {
+                batch.update(d.ref, { status, updatedAt: new Date().toISOString() });
+              }
+            });
+            await batch.commit();
+          } catch (batchErr) {
+            console.warn('Could not batch update client cases status:', batchErr);
+          }
+        }
       }
     }
 

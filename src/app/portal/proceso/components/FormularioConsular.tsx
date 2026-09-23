@@ -116,35 +116,127 @@ export default function FormularioConsular({ isStudent, applicantId, onNameChang
   // Same representative fields used in the Staff dossier's quick-nav, so a section that
   // shows "Con Datos" here shows the same on the Staff side — the two views agree on what
   // "done" means for each of the 13 sections.
-  const SECTION_META: { key: string; label: string; fields: string[] }[] = [
-    { key: 'sec1', label: '1. Personal', fields: ['nombres', 'apellidos', 'fecha_nacimiento'] },
-    { key: 'sec2', label: '2. Escuela', fields: ['nombre_escuela', 'duracion_estudio', 'horario_estudio', 'motivo_estudio_ingles'] },
-    { key: 'sec3', label: '3. Estado Civil', fields: ['estado_civil'] },
-    { key: 'sec4', label: '4. Pasaporte', fields: ['num_pasaporte'] },
-    { key: 'sec5', label: '5. Domicilio', fields: ['direccion_domicilio', 'celular_contacto', 'email_contacto'] },
-    { key: 'sec6', label: '6. Sponsor', fields: ['tiene_patrocinador'] },
-    { key: 'sec7', label: '7. Hijos', fields: ['hijos_count'] },
-    { key: 'sec8', label: '8. Padres', fields: ['nombre_mama', 'nombre_papa'] },
-    { key: 'sec9', label: '9. Trabajo', fields: ['trabajo_empresa'] },
-    { key: 'sec10', label: '10. Secundaria', fields: ['secundaria_nombre'] },
-    { key: 'sec11', label: '11. Universidad', fields: ['universidad_nombre'] },
-    { key: 'sec12', label: '12. Entrada EE.UU.', fields: ['usa_hospedaje_direccion'] },
-    { key: 'sec13', label: '13. Emergencia', fields: ['c1_nombre', 'contacto1_nombres'] },
+  const SECTION_META: { key: string; label: string }[] = [
+    { key: 'sec1', label: '1. Personal' },
+    { key: 'sec2', label: '2. Escuela' },
+    { key: 'sec3', label: '3. Estado Civil' },
+    { key: 'sec4', label: '4. Pasaporte' },
+    { key: 'sec5', label: '5. Domicilio' },
+    { key: 'sec6', label: '6. Sponsor' },
+    { key: 'sec7', label: '7. Hijos' },
+    { key: 'sec8', label: '8. Padres' },
+    { key: 'sec9', label: '9. Trabajo' },
+    { key: 'sec10', label: '10. Secundaria' },
+    { key: 'sec11', label: '11. Universidad' },
+    { key: 'sec12', label: '12. Entrada EE.UU.' },
+    { key: 'sec13', label: '13. Emergencia' },
   ];
 
-  const isSectionFilled = (fields: string[]) => fields.some(f => Boolean(formData[f]));
-  const sectionsCompletedCount = SECTION_META.filter(s => isSectionFilled(s.fields)).length;
+  const isSectionComplete = (sectionKey: string): boolean => {
+    if (!formData) return false;
+
+    switch (sectionKey) {
+      case 'sec1': // 1. Personal
+        if (!formData.apellidos?.trim() || !formData.nombres?.trim() || !formData.fecha_nacimiento?.trim()) return false;
+        if (!formData.ciudad_nacimiento?.trim() && !formData.lugar_nacimiento?.trim()) return false;
+        if (!formData.pais_nacimiento?.trim()) return false;
+        if (formData.otra_nacionalidad === 'Sí' && !formData.cuales_nacionalidades?.trim()) return false;
+        if (formData.residente_otro_pais === 'Sí' && !formData.que_pais_residencia?.trim()) return false;
+        return true;
+
+      case 'sec2': // 2. Escuela (F-1)
+        if (!isStudent) return true;
+        if (!formData.motivo_estudio_ingles?.trim()) return false;
+        if (!formData.duracion_estudio?.trim()) return false;
+        if (!formData.horario_estudio?.trim()) return false;
+        if (!formData.semestre_inicio?.trim()) return false;
+        if (!formData.rechazo_estudiante_previo?.trim()) return false;
+        if (formData.rechazo_estudiante_previo === 'Sí' && !formData.detalle_rechazo_estudiante?.trim()) return false;
+        if (!formData.nombre_escuela?.trim()) return false;
+        if (formData.nombre_escuela === 'Otra Escuela' && !formData.escuela_manual_nombre?.trim()) return false;
+        return true;
+
+      case 'sec3': // 3. Estado Civil
+        if (!formData.estado_civil?.trim()) return false;
+        if (formData.estado_civil === 'Casado') {
+          if (!formData.nombre_conyuge?.trim() || !formData.fecha_matrimonio?.trim() || !formData.fecha_nacimiento_conyuge?.trim()) return false;
+          if (!formData.ciudad_conyuge?.trim() || !formData.pais_conyuge?.trim()) return false;
+        }
+        return true;
+
+      case 'sec4': // 4. Pasaporte
+        if (!formData.num_pasaporte?.trim() || !formData.ciudad_pasaporte?.trim() || !formData.fecha_emision_pasaporte?.trim() || !formData.fecha_expiracion_pasaporte?.trim()) return false;
+        if (!formData.perdio_pasaporte?.trim() || !formData.tiene_visa_turista?.trim()) return false;
+        return true;
+
+      case 'sec5': // 5. Domicilio
+        if (!formData.direccion_domicilio?.trim() || !formData.ciudad_domicilio?.trim() || !formData.pais_domicilio?.trim()) return false;
+        if (!formData.celular_contacto?.trim() || !formData.email_contacto?.trim()) return false;
+        return true;
+
+      case 'sec6': // 6. Sponsor
+        if (!formData.tiene_patrocinador?.trim()) return false;
+        if (formData.tiene_patrocinador === 'Sí') {
+          if (!formData.sponsor_apellidos?.trim() || !formData.sponsor_nombres?.trim() || !formData.sponsor_celular?.trim() || !formData.sponsor_email?.trim() || !formData.sponsor_parentesco?.trim()) return false;
+        }
+        return true;
+
+      case 'sec7': // 7. Hijos
+        if (!formData.hijos_count?.trim()) return false;
+        const count = parseInt(formData.hijos_count, 10) || 0;
+        if (count > 0) {
+          for (let i = 1; i <= count; i++) {
+            if (!formData[`hijo${i}_apellidos`]?.trim() || !formData[`hijo${i}_nombres`]?.trim() || !formData[`hijo${i}_fecha_nac`]?.trim()) return false;
+          }
+        }
+        return true;
+
+      case 'sec8': // 8. Padres
+        if (!formData.nombre_mama?.trim() || !formData.fecha_nac_mama?.trim() || !formData.nombre_papa?.trim() || !formData.fecha_nac_papa?.trim()) return false;
+        return true;
+
+      case 'sec9': // 9. Trabajo
+        if (!formData.trabajo_empresa?.trim() || !formData.trabajo_direccion?.trim() || !formData.trabajo_ciudad?.trim()) return false;
+        if (!formData.trabajo_salario?.trim() || !formData.trabajo_descripcion?.trim()) return false;
+        if (formData.trabajo_anterior_si === 'Sí') {
+          if (!formData.trabajo_ant_empresa?.trim() || !formData.trabajo_ant_cargo?.trim()) return false;
+        }
+        return true;
+
+      case 'sec10': // 10. Secundaria
+        if (!formData.secundaria_nombre?.trim() || !formData.secundaria_direccion?.trim() || !formData.secundaria_programa?.trim() || !formData.secundaria_fecha_inicio?.trim() || !formData.secundaria_fecha_fin?.trim()) return false;
+        return true;
+
+      case 'sec11': // 11. Universidad / Instituto
+        if (!formData.universidad_nombre?.trim() || !formData.universidad_direccion?.trim() || !formData.universidad_programa?.trim() || !formData.universidad_fecha_inicio?.trim() || !formData.universidad_fecha_fin?.trim()) return false;
+        return true;
+
+      case 'sec12': // 12. Entrada EE.UU.
+        if (!formData.usa_hospedaje_direccion?.trim() || !formData.idiomas_habla?.trim() || !formData.servicio_militar?.trim()) return false;
+        if (formData.familia_en_usa === 'Sí' && !formData.familia_usa_detalle?.trim()) return false;
+        return true;
+
+      case 'sec13': // 13. Emergencia
+        if (!formData.c1_nombre?.trim() || !formData.c1_telefono?.trim() || !formData.c1_email?.trim()) return false;
+        if (!formData.c2_nombre?.trim() || !formData.c2_telefono?.trim() || !formData.c2_email?.trim()) return false;
+        return true;
+
+      default:
+        return false;
+    }
+  };
+
+  const activeSectionMeta = SECTION_META.filter(s => s.key !== 'sec2' || isStudent);
+  const sectionsCompletedCount = activeSectionMeta.filter(s => isSectionComplete(s.key)).length;
 
   const SectionBadge = ({ sectionKey }: { sectionKey: string }) => {
-    const meta = SECTION_META.find(s => s.key === sectionKey);
-    if (!meta) return null;
-    const filled = isSectionFilled(meta.fields);
+    const isComplete = isSectionComplete(sectionKey);
     return (
       <span className={`shrink-0 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide flex items-center gap-1 ${
-        filled ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-500'
+        isComplete ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-500'
       }`}>
-        {filled && <CheckCircle2 className="w-2.5 h-2.5" />}
-        {filled ? 'Completa' : 'Pendiente'}
+        {isComplete && <CheckCircle2 className="w-2.5 h-2.5" />}
+        {isComplete ? 'Completa' : 'Pendiente'}
       </span>
     );
   };

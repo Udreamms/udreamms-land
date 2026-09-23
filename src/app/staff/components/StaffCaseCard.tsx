@@ -94,7 +94,7 @@ export const StaffCaseCard: React.FC<StaffCaseCardProps> = ({
             )}
 
             <span className="h-6 px-2.5 rounded-full text-[10px] font-semibold text-slate-600 bg-slate-100 border border-slate-200 font-mono inline-flex items-center">
-              {student.id}
+              Expediente #{student.expedienteNumber ?? 1}
             </span>
           </div>
 

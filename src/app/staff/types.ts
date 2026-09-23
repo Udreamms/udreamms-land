@@ -11,6 +11,7 @@ import {
   CheckCircle2,
   XCircle,
   BookOpen,
+  Gift,
 } from 'lucide-react';
 
 export type StaffTabType =
@@ -24,6 +25,7 @@ export type StaffTabType =
   | 'entrevista'
   | 'aprobados'
   | 'negados'
+  | 'referidos'
   | 'recursos';
 
 export interface StudentCase {
@@ -55,6 +57,7 @@ export interface StudentCase {
   notes?: string;
   unreadCount?: number;
   lastChatMessage?: string;
+  expedienteNumber?: number;
 }
 
 export interface TabDefinition {
@@ -86,6 +89,8 @@ export const getStatusLabel = (status: StaffTabType): string => {
       return 'Aprobados / Completados';
     case 'negados':
       return 'Negados';
+    case 'referidos':
+      return 'Programa de Referidos';
     case 'recursos':
       return 'Recursos & Guías para el Staff';
     default:
@@ -104,6 +109,7 @@ export const STAFF_TABS_LIST: TabDefinition[] = [
   { id: 'entrevista', label: '8. Cita en Embajada', icon: Calendar, color: 'text-purple-600' },
   { id: 'aprobados', label: '9. Aprobados', icon: CheckCircle2, color: 'text-emerald-600' },
   { id: 'negados', label: '10. Negados', icon: XCircle, color: 'text-red-600' },
+  { id: 'referidos', label: 'Programa de Referidos', icon: Gift, color: 'text-emerald-600' },
   { id: 'recursos', label: 'Recursos & Guías Staff', icon: BookOpen, color: 'text-amber-600' },
 ];
 
@@ -115,22 +121,24 @@ export const isUsableDoc = (doc?: { url?: string; dataUrl?: string }): boolean =
 };
 
 export const DOSSIER_SECTIONS: { anchor: string; label: string; fields: string[] }[] = [
-  { anchor: 'sec-1', label: '1. Personal', fields: ['apellidos', 'nombres', 'fecha_nacimiento'] },
-  { anchor: 'sec-2', label: '2. Escuela', fields: ['nombre_escuela', 'duracion_estudio', 'horario_estudio'] },
+  { anchor: 'sec-1', label: '1. Personal', fields: ['apellidos', 'nombres', 'fecha_nacimiento', 'pais_nacimiento'] },
+  { anchor: 'sec-2', label: '2. Escuela', fields: ['motivo_estudio_ingles', 'duracion_estudio', 'horario_estudio', 'semestre_inicio', 'nombre_escuela'] },
   { anchor: 'sec-3', label: '3. Estado Civil', fields: ['estado_civil'] },
-  { anchor: 'sec-4', label: '4. Pasaporte', fields: ['num_pasaporte', 'fecha_expiracion_pasaporte'] },
-  { anchor: 'sec-5', label: '5. Domicilio', fields: ['direccion_domicilio', 'celular_contacto', 'email_contacto'] },
+  { anchor: 'sec-4', label: '4. Pasaporte', fields: ['num_pasaporte', 'ciudad_pasaporte', 'fecha_emision_pasaporte', 'fecha_expiracion_pasaporte'] },
+  { anchor: 'sec-5', label: '5. Domicilio', fields: ['direccion_domicilio', 'ciudad_domicilio', 'pais_domicilio', 'celular_contacto', 'email_contacto'] },
   { anchor: 'sec-6', label: '6. Sponsor', fields: ['tiene_patrocinador'] },
   { anchor: 'sec-7', label: '7. Hijos', fields: ['hijos_count'] },
-  { anchor: 'sec-8', label: '8. Padres', fields: ['nombre_mama', 'nombre_papa'] },
-  { anchor: 'sec-9', label: '9. Trabajo', fields: ['trabajo_empresa'] },
-  { anchor: 'sec-10', label: '10-11. Educación', fields: ['secundaria_nombre', 'universidad_nombre'] },
-  { anchor: 'sec-12', label: '12. Entrada a EE.UU.', fields: ['usa_hospedaje_direccion'] },
-  { anchor: 'sec-13', label: '13. Emergencia', fields: ['c1_nombre', 'contacto1_nombres'] },
+  { anchor: 'sec-8', label: '8. Padres', fields: ['nombre_mama', 'fecha_nac_mama', 'nombre_papa', 'fecha_nac_papa'] },
+  { anchor: 'sec-9', label: '9. Trabajo', fields: ['trabajo_empresa', 'trabajo_direccion', 'trabajo_ciudad', 'trabajo_salario', 'trabajo_descripcion'] },
+  { anchor: 'sec-10', label: '10-11. Educación', fields: ['secundaria_nombre', 'secundaria_direccion', 'secundaria_programa'] },
+  { anchor: 'sec-12', label: '12. Entrada a EE.UU.', fields: ['usa_hospedaje_direccion', 'idiomas_habla', 'servicio_militar'] },
+  { anchor: 'sec-13', label: '13. Emergencia', fields: ['c1_nombre', 'c1_telefono', 'c1_email', 'c2_nombre', 'c2_telefono', 'c2_email'] },
 ];
 
-export const isSectionFilled = (formData: Record<string, string>, fields: string[]): boolean =>
-  fields.some(f => Boolean(formData?.[f]));
+export const isSectionFilled = (formData: Record<string, string>, fields: string[]): boolean => {
+  if (!formData || typeof formData !== 'object') return false;
+  return fields.every(f => Boolean(formData[f]?.trim()));
+};
 
 export const SI_NO_OPTIONS = [{ value: 'No', label: 'No' }, { value: 'Sí', label: 'Sí' }];
 

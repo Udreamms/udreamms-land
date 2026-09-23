@@ -17,6 +17,7 @@ import { StaffCaseCard } from './components/StaffCaseCard';
 import { StaffDossierModal } from './components/StaffDossierModal';
 import { StaffChatDrawer } from './components/StaffChatDrawer';
 import { StaffResources } from './components/StaffResources';
+import { StaffReferrals } from './components/StaffReferrals';
 
 export default function StaffPortalPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -74,7 +75,14 @@ export default function StaffPortalPage() {
   };
 
   const openCaseModal = (student: StudentCase, allCases: StudentCase[]) => {
-    const group = allCases.filter((c) => (c.groupKey || c.id) === (student.groupKey || student.id));
+    const studentEmail = (student.email || student.formData?.email_contacto || '').trim().toLowerCase();
+    const group = allCases.filter((c) => {
+      const cEmail = (c.email || c.formData?.email_contacto || '').trim().toLowerCase();
+      if (studentEmail && cEmail && studentEmail === cEmail) {
+        return true;
+      }
+      return Boolean(c.groupKey && student.groupKey && c.groupKey === student.groupKey);
+    });
     setCaseModalGroup(group.length > 0 ? group : [student]);
     setSelectedCaseModal(student);
   };
@@ -98,10 +106,17 @@ export default function StaffPortalPage() {
       if (res.ok) {
         toast.success('Nueva tarjeta creada.');
         const freshCases = await fetchCases();
-        if (selectedCaseModal) {
-          const groupKey = selectedCaseModal.groupKey || selectedCaseModal.id;
-          const freshGroup = freshCases.filter((c) => (c.groupKey || c.id) === groupKey);
-          if (freshGroup.length > 0) setCaseModalGroup(freshGroup);
+        const clientEmail = (email || '').trim().toLowerCase();
+        const freshGroup = freshCases.filter((c) => {
+          const cEmail = (c.email || c.formData?.email_contacto || '').trim().toLowerCase();
+          return Boolean(clientEmail && cEmail && clientEmail === cEmail);
+        });
+        if (freshGroup.length > 0) {
+          setCaseModalGroup(freshGroup);
+          if (data?.createdCase?.id) {
+            const created = freshGroup.find((c) => c.id === data.createdCase.id);
+            if (created) setSelectedCaseModal(created);
+          }
         }
       } else {
         toast.error(data?.error || 'No se pudo crear la tarjeta.');
@@ -119,24 +134,72 @@ export default function StaffPortalPage() {
     if (togglingFlags.has(flag)) return;
     setTogglingFlags((prev) => new Set(prev).add(flag));
 
-    setSelectedCaseModal((prev) => (prev ? { ...prev, entitlements: { ...prev.entitlements, [flag]: value } } : prev));
+    const emailNorm = email.toLowerCase().trim();
+
+    // Optimistic UI updates
+    setSelectedCaseModal((prev) => (prev ? { ...prev, entitlements: { ...(prev.entitlements || {}), [flag]: value } } : prev));
+    setStudentCases((prev) =>
+      prev.map((c) =>
+        c.email.toLowerCase().trim() === emailNorm
+          ? { ...c, entitlements: { ...(c.entitlements || {}), [flag]: value } }
+          : c
+      )
+    );
+    setCaseModalGroup((prev) =>
+      prev.map((c) =>
+        c.email.toLowerCase().trim() === emailNorm
+          ? { ...c, entitlements: { ...(c.entitlements || {}), [flag]: value } }
+          : c
+      )
+    );
+
     try {
       const res = await fetch('/api/staff/entitlements', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, flag, value }),
+        body: JSON.stringify({ email: emailNorm, flag, value }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setSelectedCaseModal((prev) => (prev ? { ...prev, entitlements: { ...prev.entitlements, [flag]: !value } } : prev));
+        // Rollback
+        setSelectedCaseModal((prev) => (prev ? { ...prev, entitlements: { ...(prev.entitlements || {}), [flag]: !value } } : prev));
+        setStudentCases((prev) =>
+          prev.map((c) =>
+            c.email.toLowerCase().trim() === emailNorm
+              ? { ...c, entitlements: { ...(c.entitlements || {}), [flag]: !value } }
+              : c
+          )
+        );
+        setCaseModalGroup((prev) =>
+          prev.map((c) =>
+            c.email.toLowerCase().trim() === emailNorm
+              ? { ...c, entitlements: { ...(c.entitlements || {}), [flag]: !value } }
+              : c
+          )
+        );
         toast.error(data?.error || 'No se pudo actualizar el producto.');
       } else {
-        toast.success(value ? 'Producto activado.' : 'Producto desactivado.');
+        toast.success(value ? 'Producto desbloqueado para el cliente.' : 'Producto bloqueado para el cliente.');
         void fetchCases();
       }
     } catch (err) {
       console.error('Error toggling entitlement:', err);
-      setSelectedCaseModal((prev) => (prev ? { ...prev, entitlements: { ...prev.entitlements, [flag]: !value } } : prev));
+      // Rollback
+      setSelectedCaseModal((prev) => (prev ? { ...prev, entitlements: { ...(prev.entitlements || {}), [flag]: !value } } : prev));
+      setStudentCases((prev) =>
+        prev.map((c) =>
+          c.email.toLowerCase().trim() === emailNorm
+            ? { ...c, entitlements: { ...(c.entitlements || {}), [flag]: !value } }
+            : c
+        )
+      );
+      setCaseModalGroup((prev) =>
+        prev.map((c) =>
+          c.email.toLowerCase().trim() === emailNorm
+            ? { ...c, entitlements: { ...(c.entitlements || {}), [flag]: !value } }
+            : c
+        )
+      );
       toast.error('No se pudo actualizar el producto. Revisa tu conexión.');
     } finally {
       setTogglingFlags((prev) => {
@@ -163,7 +226,11 @@ export default function StaffPortalPage() {
       });
       if (res.ok) {
         setStudentCases((prev) => prev.filter((c) => c.id !== caseItem.id));
-        if (selectedCaseModal?.id === caseItem.id) setSelectedCaseModal(null);
+        setCaseModalGroup((prev) => prev.filter((c) => c.id !== caseItem.id));
+        if (selectedCaseModal?.id === caseItem.id) {
+          const remaining = caseModalGroup.filter((c) => c.id !== caseItem.id);
+          setSelectedCaseModal(remaining.length > 0 ? remaining[0] : null);
+        }
         toast.success(`Expediente de "${caseItem.name}" eliminado.`);
       } else {
         const errBody = await res.json().catch(() => ({}));
@@ -210,16 +277,31 @@ export default function StaffPortalPage() {
   };
 
   const handleMoveStatus = async (caseId: string, newStatus: StaffTabType) => {
+    const targetCase = studentCases.find((c) => c.id === caseId) || selectedCaseModal;
+    const clientEmail = (targetCase?.email || targetCase?.formData?.email_contacto || '').trim().toLowerCase();
+    const groupKey = targetCase?.groupKey;
+
+    // Move all cards belonging to this client's expediente
     setStudentCases((prev) =>
       prev.map((item) => {
-        if (item.id === caseId) {
+        const itemEmail = (item.email || item.formData?.email_contacto || '').trim().toLowerCase();
+        const belongsToClient =
+          (clientEmail && itemEmail === clientEmail) ||
+          (groupKey && item.groupKey === groupKey) ||
+          item.id === caseId;
+
+        if (belongsToClient) {
           return { ...item, status: newStatus };
         }
         return item;
       })
     );
 
-    if (selectedCaseModal && selectedCaseModal.id === caseId) {
+    setCaseModalGroup((prev) =>
+      prev.map((item) => ({ ...item, status: newStatus }))
+    );
+
+    if (selectedCaseModal) {
       setSelectedCaseModal((prev) => (prev ? { ...prev, status: newStatus } : null));
     }
 
@@ -227,7 +309,11 @@ export default function StaffPortalPage() {
       await fetch('/api/staff/cases', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ caseId, status: newStatus }),
+        body: JSON.stringify({
+          caseId,
+          email: clientEmail,
+          status: newStatus,
+        }),
       });
       toast.success(`Expediente movido a "${getStatusLabel(newStatus)}" en la nube.`);
     } catch (err) {
@@ -285,7 +371,10 @@ export default function StaffPortalPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editedFormData, isEditingDossier]);
 
-  // Fetch chat messages
+  // Minimized chat heads list
+  const [minimizedClients, setMinimizedClients] = useState<StudentCase[]>([]);
+
+  // Fetch chat messages automatically with fast polling
   const fetchStaffChat = async () => {
     if (!activeChatStudent?.email) return;
     try {
@@ -302,7 +391,7 @@ export default function StaffPortalPage() {
   useEffect(() => {
     if (activeChatStudent) {
       fetchStaffChat();
-      const interval = setInterval(fetchStaffChat, 3500);
+      const interval = setInterval(fetchStaffChat, 2500);
       return () => clearInterval(interval);
     }
   }, [activeChatStudent]);
@@ -318,7 +407,7 @@ export default function StaffPortalPage() {
     const tempMsg = {
       id: `temp_${Date.now()}`,
       sender: 'staff',
-      senderName: 'Staff Consular Udreamms',
+      senderName: 'Sarah Davis',
       text,
       timestamp: new Date().toISOString(),
       read: true,
@@ -333,11 +422,24 @@ export default function StaffPortalPage() {
           clientEmail: activeChatStudent.email,
           clientName: activeChatStudent.name,
           sender: 'staff',
-          senderName: 'Staff Consular Udreamms',
+          senderName: 'Sarah Davis',
           text,
         }),
       });
       await fetchStaffChat();
+      // Reset unread count locally for this client
+      setStudentCases((prev) =>
+        prev.map((c) =>
+          (c.email || '').toLowerCase() === activeChatStudent.email.toLowerCase()
+            ? { ...c, unreadCount: 0 }
+            : c
+        )
+      );
+      // Remove from minimized if responded
+      setMinimizedClients((prev) =>
+        prev.filter((c) => (c.email || '').toLowerCase() !== activeChatStudent.email.toLowerCase())
+      );
+      void fetchCases();
     } catch (err) {
       toast.error('Error al enviar mensaje.');
     } finally {
@@ -406,6 +508,8 @@ export default function StaffPortalPage() {
         <div className="w-full max-w-[1550px] space-y-5">
           {activeTab === 'recursos' ? (
             <StaffResources />
+          ) : activeTab === 'referidos' ? (
+            <StaffReferrals />
           ) : (
             <>
               {/* Header Row: Title & Actions */}
@@ -524,16 +628,125 @@ export default function StaffPortalPage() {
         stopEditingDossier={stopEditingDossier}
       />
 
+      {/* FLOATING UNANSWERED CLIENT CHAT BUBBLES */}
+      <div className="fixed bottom-5 right-5 z-40 flex flex-row-reverse items-center gap-3.5 pointer-events-none">
+        {(() => {
+          const map = new Map<string, StudentCase>();
+          studentCases.forEach((c) => {
+            const email = (c.email || c.formData?.email_contacto || '').toLowerCase().trim();
+            if (email && (c.unreadCount || 0) > 0) {
+              if (!map.has(email) || (map.get(email)!.unreadCount || 0) < (c.unreadCount || 0)) {
+                map.set(email, c);
+              }
+            }
+          });
+          minimizedClients.forEach((c) => {
+            const email = (c.email || c.formData?.email_contacto || '').toLowerCase().trim();
+            if (email && !map.has(email)) {
+              map.set(email, c);
+            }
+          });
+
+          return Array.from(map.values())
+            .filter((client) => (client.email || '').toLowerCase() !== (activeChatStudent?.email || '').toLowerCase())
+            .map((client) => {
+              const clientName = client.name || client.formData?.nombres || 'Cliente';
+              const initial = (clientName || 'C')[0]?.toUpperCase();
+              const unread = client.unreadCount || 0;
+
+              return (
+                <div key={client.email} className="relative group pointer-events-auto">
+                  {/* Tooltip on hover */}
+                  <div className="absolute bottom-full right-0 mb-2.5 hidden group-hover:flex flex-col items-end whitespace-nowrap bg-slate-900 text-white text-xs rounded-2xl py-2 px-3.5 shadow-2xl border border-slate-700/80 animate-in fade-in zoom-in-95 duration-200 pointer-events-none z-50">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold text-white">{clientName}</span>
+                      <span className="text-[10px] px-1.5 py-0.2 bg-blue-500/30 text-blue-300 rounded font-bold uppercase">
+                        {client.visaType}
+                      </span>
+                    </div>
+                    {client.lastChatMessage && (
+                      <span className="text-[11px] text-slate-300 max-w-[220px] truncate mt-0.5">
+                        "{client.lastChatMessage}"
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Floating Avatar Bubble Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStudentCases((prev) =>
+                        prev.map((item) =>
+                          (item.email || '').toLowerCase() === (client.email || '').toLowerCase()
+                            ? { ...item, unreadCount: 0 }
+                            : item
+                        )
+                      );
+                      setActiveChatStudent(client);
+                      setMinimizedClients((prev) =>
+                        prev.filter((c) => (c.email || '').toLowerCase() !== (client.email || '').toLowerCase())
+                      );
+                    }}
+                    className="relative p-1 rounded-full bg-gradient-to-tr from-blue-600 via-indigo-500 to-cyan-400 shadow-xl shadow-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/50 hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer"
+                    title={`Abrir chat con ${clientName}`}
+                  >
+                    {unread > 0 && (
+                      <span className="absolute inset-0 rounded-full bg-blue-500/30 animate-ping opacity-60 pointer-events-none" />
+                    )}
+
+                    <div className="relative w-14 h-14 rounded-full overflow-hidden border-2 border-white bg-blue-600 flex items-center justify-center text-white font-bold text-base shadow-inner">
+                      {client.photoUrl ? (
+                        <img
+                          src={client.photoUrl}
+                          alt={clientName}
+                          className="w-full h-full object-cover object-top"
+                        />
+                      ) : (
+                        initial
+                      )}
+                    </div>
+
+                    {/* Online Indicator Badge */}
+                    <span className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full ring-1 ring-emerald-500/20 shadow-xs" />
+
+                    {/* Unread Counter Badge */}
+                    {unread > 0 && (
+                      <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 bg-red-500 border-2 border-white text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md animate-bounce">
+                        {unread}
+                      </span>
+                    )}
+                  </button>
+                </div>
+              );
+            });
+        })()}
+      </div>
+
       {/* STAFF LIVE CHAT DRAWER */}
       <StaffChatDrawer
         activeChatStudent={activeChatStudent}
-        onClose={() => setActiveChatStudent(null)}
+        onClose={() => {
+          if (activeChatStudent) {
+            setMinimizedClients((prev) =>
+              prev.filter((c) => (c.email || '').toLowerCase() !== (activeChatStudent.email || '').toLowerCase())
+            );
+          }
+          setActiveChatStudent(null);
+        }}
+        onMinimize={() => {
+          if (activeChatStudent) {
+            setMinimizedClients((prev) => {
+              const exists = prev.some((c) => (c.email || '').toLowerCase() === (activeChatStudent.email || '').toLowerCase());
+              return exists ? prev : [...prev, activeChatStudent];
+            });
+          }
+          setActiveChatStudent(null);
+        }}
         chatMessages={chatMessages}
         chatInput={chatInput}
         setChatInput={setChatInput}
         isSendingChat={isSendingChat}
         onSendChat={handleSendStaffChat}
-        onRefreshChat={fetchStaffChat}
       />
     </div>
   );

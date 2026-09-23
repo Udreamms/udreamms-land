@@ -25,8 +25,28 @@ export const PURCHASE_FIELD_BY_ITEM: Record<string, string> = {
   'entrevista-embajada': 'purchased_entrevista_embajada',
   'curso-estudiante': 'purchased_curso_estudiante',
   'libro-estudiante': 'purchased_libro_estudiante',
+  'recursos-estudiante': 'purchased_recursos_estudiante',
   'curso-turista': 'purchased_curso_turista',
   'libro-turista': 'purchased_libro_turista',
+  'recursos-turista': 'purchased_recursos_turista',
+  
+  // Direct flag mappings for staff overrides
+  'purchased_curso_estudiante': 'purchased_curso_estudiante',
+  'purchased_libro_estudiante': 'purchased_libro_estudiante',
+  'purchased_recursos_estudiante': 'purchased_recursos_estudiante',
+  'purchased_curso_turista': 'purchased_curso_turista',
+  'purchased_libro_turista': 'purchased_libro_turista',
+  'purchased_recursos_turista': 'purchased_recursos_turista',
+  'purchased_plan_esencial': 'purchased_plan_esencial',
+  'purchased_plan_pro': 'purchased_plan_pro',
+  'purchased_plan_elite': 'purchased_plan_elite',
+  'purchased_plan_allinclusive': 'purchased_plan_allinclusive',
+  'purchased_plan_turista_basico': 'purchased_plan_turista_basico',
+  'purchased_plan_turista_premium': 'purchased_plan_turista_premium',
+  'purchased_plan_turista_vip': 'purchased_plan_turista_vip',
+  'purchased_aplicacion_escuela': 'purchased_aplicacion_escuela',
+  'purchased_sevis': 'purchased_sevis',
+  'purchased_entrevista_embajada': 'purchased_entrevista_embajada',
   
   // Student Plans
   'plan-esencial': 'purchased_plan_esencial',
@@ -247,6 +267,27 @@ export async function applyPendingPurchasesForEmail(email: string, uid?: string)
       batch.set(userDoc.ref, updates, { merge: true });
     }
     await batch.commit();
+  }
+
+  // Also check if users/{normalized} has any purchased_* flags to copy to users/{uid}
+  if (uid && normalized && uid !== normalized) {
+    try {
+      const emailDoc = await requireAdminDb().doc(`users/${normalized}`).get();
+      if (emailDoc.exists) {
+        const data = emailDoc.data() || {};
+        const emailUpdates: Record<string, any> = {};
+        for (const [k, v] of Object.entries(data)) {
+          if (k.startsWith('purchased_')) {
+            emailUpdates[k] = v;
+          }
+        }
+        if (Object.keys(emailUpdates).length > 0) {
+          await requireAdminDb().doc(`users/${uid}`).set(emailUpdates, { merge: true });
+        }
+      }
+    } catch (e) {
+      console.warn('Could not sync email doc into uid doc:', e);
+    }
   }
 
   await pendingRef.delete();

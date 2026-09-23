@@ -79,6 +79,38 @@ export default function ProcesoPage() {
     doc: AttachedDoc;
   } | null>(null);
 
+  const handleDirectDownload = async (url: string, filename: string) => {
+    try {
+      if (url.startsWith('data:')) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        return;
+      }
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  };
+
   // Multi-applicants list for Student Visa (F-1)
   const [studentApplicants, setStudentApplicants] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
@@ -1446,968 +1478,815 @@ export default function ProcesoPage() {
 
             {/* SECCIÓN 2: CARGA DE DOCUMENTOS OFICIALES */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm md:text-base font-bold text-slate-900 flex items-center gap-2">
-                  <FileCheck className="w-5 h-5 text-blue-600" />
-                  <span>Documentos y Archivos Oficiales del Postulante</span>
-                </h4>
-                <span className="text-[11px] font-semibold text-slate-500">
-                  Formatos admitidos: PDF, JPG, PNG (hasta 15MB)
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-blue-600" />
+                    <span>Documentos y Archivos Adjuntos del Expediente</span>
+                  </h4>
+                  <p className="text-[11px] text-slate-500">
+                    Adjunta, visualiza, descarga o actualiza los documentos oficiales de tu expediente consular.
+                  </p>
+                </div>
+                <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider bg-white px-3 py-1 rounded-full border border-slate-200 self-start sm:self-auto shadow-2xs">
+                  {isSelectedStudent ? "9 Documentos Oficiales" : "5 Documentos Oficiales"}
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-5 gap-4">
                 
-                {/* CARD 1: FOTOGRAFÍA OFICIAL 5x5 */}
-                <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 flex flex-col justify-between space-y-4 hover:border-slate-300 transition-all shadow-2xs">
-                  <div className="space-y-3">
+                {/* 1. Foto Oficial 5x5 */}
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 flex flex-col justify-between space-y-3 shadow-2xs relative">
+                  <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-800">
-                        <Camera className="w-3 h-3 text-blue-600" />
-                        1. Foto 5x5 cm
+                      <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
+                        <Camera className="w-3.5 h-3.5 text-blue-600" />
+                        1. Foto Oficial 5x5
                       </span>
                       {currentPhoto ? (
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                          ✓ Cargada
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-bold">
+                          Adjunta
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
-                          Pendiente
+                        <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[9px] font-bold">
+                          Sin Foto
                         </span>
                       )}
                     </div>
 
-                    <div className="relative w-full h-36 rounded-2xl bg-white border-2 border-dashed border-slate-300 overflow-hidden flex items-center justify-center shadow-inner group">
-                      {currentPhoto ? (
-                        <>
-                          <img 
-                            src={currentPhoto} 
-                            alt="Fotografía de Visa" 
-                            className="w-full h-full object-cover" 
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setPreviewDocModal({
-                              title: "Fotografía Oficial 5x5 cm",
-                              doc: { name: "Fotografia_Oficial_5x5.jpg", type: "image/jpeg", dataUrl: currentPhoto }
-                            })}
-                            className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white text-xs font-bold cursor-pointer"
-                          >
-                            <Eye className="w-4 h-4 text-white" />
-                            Ver Foto
-                          </button>
-                        </>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center text-slate-400 p-3 text-center space-y-1">
-                          <User className="w-10 h-10 text-slate-300" />
-                          <span className="text-[11px] font-bold text-slate-600">Sin Fotografía</span>
-                          <span className="text-[9px] text-slate-400">Fondo blanco 5x5 cm</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="space-y-1">
-                      <h5 className="text-xs font-bold text-slate-900">
-                        Fotografía Tipo Pasaporte
-                      </h5>
-                      <p className="text-[11px] text-slate-500 leading-snug">
-                        Fondo blanco liso, frente descubierta, sin lentes, para el DS-160.
-                      </p>
-                    </div>
+                    {currentPhoto ? (
+                      <a
+                        href={currentPhoto}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="w-20 h-20 mx-auto rounded-xl overflow-hidden border border-slate-200 shadow-inner group relative block cursor-pointer"
+                        title="Clic para ver foto"
+                      >
+                        <img src={currentPhoto} alt="Foto Oficial 5x5" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                        <span className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                          <Eye className="w-4 h-4" />
+                        </span>
+                      </a>
+                    ) : (
+                      <div className="py-4 text-center text-slate-400 text-[11px] flex flex-col items-center gap-1">
+                        <Camera className="w-6 h-6 text-slate-300" />
+                        <span>Sin fotografía</span>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-200/80">
-                    <label className="flex-1">
-                      <input 
-                        type="file" 
-                        accept="image/jpeg,image/png,image/webp" 
-                        onChange={handlePhotoUpload} 
-                        className="hidden" 
-                      />
-                      <span className="w-full h-9 px-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm cursor-pointer transition-all">
-                        <Upload className="w-3.5 h-3.5 text-white" />
-                        {currentPhoto ? "Cambiar" : "Cargar Foto"}
-                      </span>
-                    </label>
-
+                  <div className="space-y-1.5 pt-1">
                     {currentPhoto && (
-                      <Button
-                        onClick={() => {
-                          setCurrentPhoto(null);
-                          toast.info("Fotografía removida.");
-                        }}
-                        variant="outline"
-                        className="h-9 w-9 p-0 rounded-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex items-center justify-center shrink-0 transition-all cursor-pointer"
-                        title="Eliminar fotografía"
-                      >
-                        <Trash2 className="w-3.5 h-3.5 text-red-600" />
-                      </Button>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setPreviewDocModal({
+                            title: "Fotografía Oficial 5x5 cm",
+                            doc: { name: "Foto_Oficial_5x5.jpg", type: "image/jpeg", dataUrl: currentPhoto }
+                          })}
+                          className="flex-1 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                          title="Ver foto oficial"
+                        >
+                          <Eye className="w-3 h-3 text-slate-600" />
+                          Ver
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDirectDownload(currentPhoto, `${(currentApplicantData?.name || 'foto_5x5').replace(/\s+/g, '_')}_5x5.jpg`)}
+                          className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                          title="Descargar foto oficial"
+                        >
+                          <Download className="w-3 h-3 text-white" />
+                          Descargar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCurrentPhoto(null);
+                            toast.info("Fotografía removida.");
+                          }}
+                          className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                          title="Eliminar foto"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     )}
+
+                    <label className="w-full h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+                      <Upload className="w-3 h-3 text-blue-600" />
+                      <span>{currentPhoto ? 'Reemplazar Foto' : 'Adjuntar Foto'}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handlePhotoUpload}
+                      />
+                    </label>
                   </div>
                 </div>
 
-                {/* CARD 2: FOTOGRAFÍA / ESCANEO DE PASAPORTE */}
-                <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 flex flex-col justify-between space-y-4 hover:border-slate-300 transition-all shadow-2xs">
-                  <div className="space-y-3">
+                {/* 2. Pasaporte */}
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 flex flex-col justify-between space-y-3 shadow-2xs relative">
+                  <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-800">
-                        <CreditCard className="w-3 h-3 text-indigo-600" />
+                      <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
+                        <CreditCard className="w-3.5 h-3.5 text-blue-600" />
                         2. Pasaporte
                       </span>
                       {currentPassport ? (
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                          ✓ Adjunto
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-bold">
+                          Adjunto
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
-                          Pendiente
+                        <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[9px] font-bold">
+                          Sin Archivo
                         </span>
                       )}
                     </div>
 
-                    <div className="relative w-full h-36 rounded-2xl bg-white border-2 border-dashed border-slate-300 overflow-hidden flex items-center justify-center shadow-inner group">
-                      {currentPassport ? (
-                        currentPassport.type === 'application/pdf' ? (
-                          <div className="flex flex-col items-center justify-center p-3 text-center space-y-1.5">
-                            <div className="w-10 h-10 rounded-xl bg-red-100 border border-red-200 flex items-center justify-center text-red-700 font-extrabold text-xs shadow-2xs">
-                              PDF
-                            </div>
-                            <p className="text-[11px] font-bold text-slate-800 truncate max-w-[200px]" title={currentPassport.name}>
-                              {currentPassport.name}
-                            </p>
-                            <span className="text-[10px] font-semibold text-slate-500">
-                              {formatFileSize(currentPassport.size)}
-                            </span>
-                          </div>
-                        ) : (
-                          <>
-                            <img 
-                              src={currentPassport.dataUrl} 
-                              alt="Pasaporte" 
-                              className="w-full h-full object-cover" 
-                            />
-                            <div className="absolute bottom-0 inset-x-0 bg-slate-900/70 p-1.5 text-center text-white text-[10px] font-semibold truncate">
-                              {currentPassport.name}
-                            </div>
-                          </>
-                        )
-                      ) : (
-                        <div className="flex flex-col items-center justify-center text-slate-400 p-3 text-center space-y-1">
-                          <CreditCard className="w-10 h-10 text-slate-300" />
-                          <span className="text-[11px] font-bold text-slate-600">Sin Pasaporte</span>
-                          <span className="text-[9px] text-slate-400">PDF escaneado o foto</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="space-y-1">
-                      <h5 className="text-xs font-bold text-slate-900">
-                        Página de Datos del Pasaporte
-                      </h5>
-                      <p className="text-[11px] text-slate-500 leading-snug">
-                        Preferiblemente en <strong>PDF escaneado</strong> o foto nítida (mín. 6 meses de vigencia).
-                      </p>
-                    </div>
+                    {currentPassport ? (
+                      <div className="p-2 rounded-xl bg-blue-50/50 border border-blue-100 text-center">
+                        <p className="text-[11px] font-bold text-blue-950 truncate" title={currentPassport.name}>
+                          {currentPassport.name}
+                        </p>
+                        <span className="text-[9px] font-bold text-blue-700 uppercase">
+                          {currentPassport.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="py-4 text-center text-slate-400 text-[11px] flex flex-col items-center gap-1">
+                        <CreditCard className="w-6 h-6 text-slate-300" />
+                        <span>Sin pasaporte</span>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-200/80">
-                    <label className="flex-1">
-                      <input 
-                        type="file" 
-                        accept="application/pdf,image/jpeg,image/png,image/webp" 
-                        onChange={handlePassportUpload} 
-                        className="hidden" 
-                      />
-                      <span className="w-full h-9 px-3 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm cursor-pointer transition-all">
-                        <Upload className="w-3.5 h-3.5 text-white" />
-                        Añadir Pasaporte
-                      </span>
-                    </label>
-
+                  <div className="space-y-1.5 pt-1">
                     {currentPassport && (
-                      <>
-                        <Button
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
                           onClick={() => setPreviewDocModal({
                             title: "Pasaporte Oficial del Postulante",
                             doc: currentPassport
                           })}
-                          variant="outline"
-                          className="h-9 w-9 p-0 rounded-full border-slate-300 text-slate-700 hover:bg-slate-100 flex items-center justify-center shrink-0 transition-all cursor-pointer"
+                          className="flex-1 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
                           title="Ver pasaporte"
                         >
-                          <Eye className="w-3.5 h-3.5 text-slate-700" />
-                        </Button>
-                        <Button
+                          <Eye className="w-3 h-3 text-slate-600" />
+                          Ver
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDirectDownload(currentPassport.url || currentPassport.dataUrl, currentPassport.name || 'pasaporte.pdf')}
+                          className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                          title="Descargar pasaporte"
+                        >
+                          <Download className="w-3 h-3 text-white" />
+                          Descargar
+                        </button>
+                        <button
+                          type="button"
                           onClick={() => {
                             setCurrentPassportDoc(null);
                             toast.info("Pasaporte removido.");
                           }}
-                          variant="outline"
-                          className="h-9 w-9 p-0 rounded-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex items-center justify-center shrink-0 transition-all cursor-pointer"
-                          title="Eliminar archivo"
+                          className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                          title="Eliminar pasaporte"
                         >
-                          <Trash2 className="w-3.5 h-3.5 text-red-600" />
-                        </Button>
-                      </>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     )}
+
+                    <label className="w-full h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+                      <Upload className="w-3 h-3 text-blue-600" />
+                      <span>{currentPassport ? 'Reemplazar Pasaporte' : 'Adjuntar Pasaporte'}</span>
+                      <input
+                        type="file"
+                        accept="image/*,application/pdf"
+                        className="hidden"
+                        onChange={handlePassportUpload}
+                      />
+                    </label>
                   </div>
                 </div>
 
-                {/* CARD 3: ESTADO DE CUENTA BANCARIO */}
-                <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 flex flex-col justify-between space-y-4 hover:border-slate-300 transition-all shadow-2xs">
-                  <div className="space-y-3">
+                {/* 3. Estado de Cuenta */}
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 flex flex-col justify-between space-y-3 shadow-2xs relative">
+                  <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-800">
-                        <Building2 className="w-3 h-3 text-emerald-600" />
+                      <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
+                        <Building2 className="w-3.5 h-3.5 text-blue-600" />
                         3. Estado de Cuenta
                       </span>
                       {currentBankStatement ? (
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                          ✓ Adjunto
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-bold">
+                          Adjunto
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
-                          Pendiente
+                        <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[9px] font-bold">
+                          Sin Archivo
                         </span>
                       )}
                     </div>
 
-                    <div className="relative w-full h-36 rounded-2xl bg-white border-2 border-dashed border-slate-300 overflow-hidden flex items-center justify-center shadow-inner group">
-                      {currentBankStatement ? (
-                        currentBankStatement.type === 'application/pdf' ? (
-                          <div className="flex flex-col items-center justify-center p-3 text-center space-y-1.5">
-                            <div className="w-10 h-10 rounded-xl bg-red-100 border border-red-200 flex items-center justify-center text-red-700 font-extrabold text-xs shadow-2xs">
-                              PDF
-                            </div>
-                            <p className="text-[11px] font-bold text-slate-800 truncate max-w-[200px]" title={currentBankStatement.name}>
-                              {currentBankStatement.name}
-                            </p>
-                            <span className="text-[10px] font-semibold text-slate-500">
-                              {formatFileSize(currentBankStatement.size)}
-                            </span>
-                          </div>
-                        ) : (
-                          <>
-                            <img 
-                              src={currentBankStatement.dataUrl} 
-                              alt="Estado de Cuenta" 
-                              className="w-full h-full object-cover" 
-                            />
-                            <div className="absolute bottom-0 inset-x-0 bg-slate-900/70 p-1.5 text-center text-white text-[10px] font-semibold truncate">
-                              {currentBankStatement.name}
-                            </div>
-                          </>
-                        )
-                      ) : (
-                        <div className="flex flex-col items-center justify-center text-slate-400 p-3 text-center space-y-1">
-                          <Building2 className="w-10 h-10 text-slate-300" />
-                          <span className="text-[11px] font-bold text-slate-600">Sin Estado de Cuenta</span>
-                          <span className="text-[9px] text-slate-400">PDF escaneado oficial</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="space-y-1">
-                      <h5 className="text-xs font-bold text-slate-900">
-                        Solvencia Económica Bancaria
-                      </h5>
-                      <p className="text-[11px] text-slate-500 leading-snug">
-                        Preferiblemente en <strong>PDF escaneado</strong> (últimos 3 meses del titular o sponsor).
-                      </p>
-                    </div>
+                    {currentBankStatement ? (
+                      <div className="p-2 rounded-xl bg-blue-50/50 border border-blue-100 text-center">
+                        <p className="text-[11px] font-bold text-blue-950 truncate" title={currentBankStatement.name}>
+                          {currentBankStatement.name}
+                        </p>
+                        <span className="text-[9px] font-bold text-blue-700 uppercase">
+                          {currentBankStatement.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="py-4 text-center text-slate-400 text-[11px] flex flex-col items-center gap-1">
+                        <Building2 className="w-6 h-6 text-slate-300" />
+                        <span>Sin estado de cuenta</span>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-200/80">
-                    <label className="flex-1">
-                      <input 
-                        type="file" 
-                        accept="application/pdf,image/jpeg,image/png,image/webp" 
-                        onChange={handleBankStatementUpload} 
-                        className="hidden" 
-                      />
-                      <span className="w-full h-9 px-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm cursor-pointer transition-all">
-                        <Upload className="w-3.5 h-3.5 text-white" />
-                        Añadir Estado
-                      </span>
-                    </label>
-
+                  <div className="space-y-1.5 pt-1">
                     {currentBankStatement && (
-                      <>
-                        <Button
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
                           onClick={() => setPreviewDocModal({
                             title: "Estado de Cuenta Bancario",
                             doc: currentBankStatement
                           })}
-                          variant="outline"
-                          className="h-9 w-9 p-0 rounded-full border-slate-300 text-slate-700 hover:bg-slate-100 flex items-center justify-center shrink-0 transition-all cursor-pointer"
+                          className="flex-1 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
                           title="Ver estado de cuenta"
                         >
-                          <Eye className="w-3.5 h-3.5 text-slate-700" />
-                        </Button>
-                        <Button
+                          <Eye className="w-3 h-3 text-slate-600" />
+                          Ver
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDirectDownload(currentBankStatement.url || currentBankStatement.dataUrl, currentBankStatement.name || 'estado_cuenta.pdf')}
+                          className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                          title="Descargar estado de cuenta"
+                        >
+                          <Download className="w-3 h-3 text-white" />
+                          Descargar
+                        </button>
+                        <button
+                          type="button"
                           onClick={() => {
                             setCurrentBankStatementDoc(null);
                             toast.info("Estado de cuenta removido.");
                           }}
-                          variant="outline"
-                          className="h-9 w-9 p-0 rounded-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex items-center justify-center shrink-0 transition-all cursor-pointer"
-                          title="Eliminar archivo"
+                          className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                          title="Eliminar estado de cuenta"
                         >
-                          <Trash2 className="w-3.5 h-3.5 text-red-600" />
-                        </Button>
-                      </>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     )}
+
+                    <label className="w-full h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+                      <Upload className="w-3 h-3 text-blue-600" />
+                      <span>{currentBankStatement ? 'Reemplazar Estado' : 'Adjuntar Estado'}</span>
+                      <input
+                        type="file"
+                        accept="image/*,application/pdf"
+                        className="hidden"
+                        onChange={handleBankStatementUpload}
+                      />
+                    </label>
                   </div>
                 </div>
 
-                {/* CARD 4: COMPROBANTE SEVIS (I-901) */}
-                <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 flex flex-col justify-between space-y-4 hover:border-slate-300 transition-all shadow-2xs">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-800">
-                        <Ticket className="w-3 h-3 text-purple-600" />
-                        4. SEVIS (I-901)
-                      </span>
-                      {currentSevis ? (
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                          ✓ Adjunto
+                {/* 4. SEVIS (I-901) - Estudiantes */}
+                {isSelectedStudent && (
+                  <div className="p-4 rounded-2xl bg-white border border-slate-200 flex flex-col justify-between space-y-3 shadow-2xs relative">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
+                          <Ticket className="w-3.5 h-3.5 text-blue-600" />
+                          4. SEVIS (I-901)
                         </span>
-                      ) : (
-                        <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
-                          Pendiente
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="relative w-full h-36 rounded-2xl bg-white border-2 border-dashed border-slate-300 overflow-hidden flex items-center justify-center shadow-inner group">
-                      {currentSevis ? (
-                        currentSevis.type === 'application/pdf' ? (
-                          <div className="flex flex-col items-center justify-center p-3 text-center space-y-1.5">
-                            <div className="w-10 h-10 rounded-xl bg-red-100 border border-red-200 flex items-center justify-center text-red-700 font-extrabold text-xs shadow-2xs">
-                              PDF
-                            </div>
-                            <p className="text-[11px] font-bold text-slate-800 truncate max-w-[200px]" title={currentSevis.name}>
-                              {currentSevis.name}
-                            </p>
-                            <span className="text-[10px] font-semibold text-slate-500">
-                              {formatFileSize(currentSevis.size)}
-                            </span>
-                          </div>
+                        {currentSevis ? (
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-bold">
+                            Adjunto
+                          </span>
                         ) : (
-                          <>
-                            <img 
-                              src={currentSevis.dataUrl} 
-                              alt="Comprobante SEVIS" 
-                              className="w-full h-full object-cover" 
-                            />
-                            <div className="absolute bottom-0 inset-x-0 bg-slate-900/70 p-1.5 text-center text-white text-[10px] font-semibold truncate">
-                              {currentSevis.name}
-                            </div>
-                          </>
-                        )
+                          <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[9px] font-bold">
+                            Sin Archivo
+                          </span>
+                        )}
+                      </div>
+
+                      {currentSevis ? (
+                        <div className="p-2 rounded-xl bg-blue-50/50 border border-blue-100 text-center">
+                          <p className="text-[11px] font-bold text-blue-950 truncate" title={currentSevis.name}>
+                            {currentSevis.name}
+                          </p>
+                          <span className="text-[9px] font-bold text-blue-700 uppercase">
+                            {currentSevis.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
+                          </span>
+                        </div>
                       ) : (
-                        <div className="flex flex-col items-center justify-center text-slate-400 p-3 text-center space-y-1">
-                          <Ticket className="w-10 h-10 text-slate-300" />
-                          <span className="text-[11px] font-bold text-slate-600">Sin Comprobante SEVIS</span>
-                          <span className="text-[9px] text-slate-400">PDF de confirmación I-901</span>
+                        <div className="py-4 text-center text-slate-400 text-[11px] flex flex-col items-center gap-1">
+                          <Ticket className="w-6 h-6 text-slate-300" />
+                          <span>Sin SEVIS I-901</span>
                         </div>
                       )}
                     </div>
 
-                    <div className="space-y-1">
-                      <h5 className="text-xs font-bold text-slate-900">
-                        Comprobante Tasa SEVIS I-901
-                      </h5>
-                      <p className="text-[11px] text-slate-500 leading-snug">
-                        Recibo oficial en <strong>PDF o imagen</strong> emitido por FMJfee / DHS para tu trámite.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-200/80">
-                    <label className="flex-1">
-                      <input 
-                        type="file" 
-                        accept="application/pdf,image/jpeg,image/png,image/webp" 
-                        onChange={handleSevisUpload} 
-                        className="hidden" 
-                      />
-                      <span className="w-full h-9 px-3 rounded-full bg-purple-600 hover:bg-purple-700 text-white text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm cursor-pointer transition-all">
-                        <Upload className="w-3.5 h-3.5 text-white" />
-                        Añadir SEVIS
-                      </span>
-                    </label>
-
-                    {currentSevis && (
-                      <>
-                        <Button
-                          onClick={() => setPreviewDocModal({
-                            title: "Comprobante SEVIS (I-901)",
-                            doc: currentSevis
-                          })}
-                          variant="outline"
-                          className="h-9 w-9 p-0 rounded-full border-slate-300 text-slate-700 hover:bg-slate-100 flex items-center justify-center shrink-0 transition-all cursor-pointer"
-                          title="Ver comprobante SEVIS"
-                        >
-                          <Eye className="w-3.5 h-3.5 text-slate-700" />
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            setCurrentSevisDoc(null);
-                            toast.info("Comprobante SEVIS removido.");
-                          }}
-                          variant="outline"
-                          className="h-9 w-9 p-0 rounded-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex items-center justify-center shrink-0 transition-all cursor-pointer"
-                          title="Eliminar archivo"
-                        >
-                          <Trash2 className="w-3.5 h-3.5 text-red-600" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* CARD 5: FORMULARIO I-20 (OFICIAL DE LA ESCUELA) */}
-                <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 flex flex-col justify-between space-y-4 hover:border-slate-300 transition-all shadow-2xs">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-800">
-                        <GraduationCap className="w-3 h-3 text-amber-600" />
-                        5. Formulario I-20
-                      </span>
-                      {currentI20 ? (
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                          ✓ Adjunto
-                        </span>
-                      ) : (
-                        <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
-                          Pendiente
-                        </span>
+                    <div className="space-y-1.5 pt-1">
+                      {currentSevis && (
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setPreviewDocModal({
+                              title: "Comprobante SEVIS (I-901)",
+                              doc: currentSevis
+                            })}
+                            className="flex-1 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                            title="Ver SEVIS"
+                          >
+                            <Eye className="w-3 h-3 text-slate-600" />
+                            Ver
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDirectDownload(currentSevis.url || currentSevis.dataUrl, currentSevis.name || 'sevis_i901.pdf')}
+                            className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                            title="Descargar SEVIS"
+                          >
+                            <Download className="w-3 h-3 text-white" />
+                            Descargar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCurrentSevisDoc(null);
+                              toast.info("Comprobante SEVIS removido.");
+                            }}
+                            className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                            title="Eliminar SEVIS"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       )}
-                    </div>
 
-                    <div className="relative w-full h-36 rounded-2xl bg-white border-2 border-dashed border-slate-300 overflow-hidden flex items-center justify-center shadow-inner group">
-                      {currentI20 ? (
-                        currentI20.type === 'application/pdf' ? (
-                          <div className="flex flex-col items-center justify-center p-3 text-center space-y-1.5">
-                            <div className="w-10 h-10 rounded-xl bg-red-100 border border-red-200 flex items-center justify-center text-red-700 font-extrabold text-xs shadow-2xs">
-                              PDF
-                            </div>
-                            <p className="text-[11px] font-bold text-slate-800 truncate max-w-[200px]" title={currentI20.name}>
-                              {currentI20.name}
-                            </p>
-                            <span className="text-[10px] font-semibold text-slate-500">
-                              {formatFileSize(currentI20.size)}
-                            </span>
-                          </div>
+                      <label className="w-full h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+                        <Upload className="w-3 h-3 text-blue-600" />
+                        <span>{currentSevis ? 'Reemplazar SEVIS' : 'Adjuntar SEVIS'}</span>
+                        <input
+                          type="file"
+                          accept="image/*,application/pdf"
+                          className="hidden"
+                          onChange={handleSevisUpload}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                {/* 5. Formulario I-20 - Estudiantes */}
+                {isSelectedStudent && (
+                  <div className="p-4 rounded-2xl bg-white border border-slate-200 flex flex-col justify-between space-y-3 shadow-2xs relative">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
+                          <GraduationCap className="w-3.5 h-3.5 text-blue-600" />
+                          5. Formulario I-20
+                        </span>
+                        {currentI20 ? (
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-bold">
+                            Adjunto
+                          </span>
                         ) : (
-                          <>
-                            <img 
-                              src={currentI20.dataUrl} 
-                              alt="Formulario I-20" 
-                              className="w-full h-full object-cover" 
-                            />
-                            <div className="absolute bottom-0 inset-x-0 bg-slate-900/70 p-1.5 text-center text-white text-[10px] font-semibold truncate">
-                              {currentI20.name}
-                            </div>
-                          </>
-                        )
+                          <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[9px] font-bold">
+                            Sin Archivo
+                          </span>
+                        )}
+                      </div>
+
+                      {currentI20 ? (
+                        <div className="p-2 rounded-xl bg-blue-50/50 border border-blue-100 text-center">
+                          <p className="text-[11px] font-bold text-blue-950 truncate" title={currentI20.name}>
+                            {currentI20.name}
+                          </p>
+                          <span className="text-[9px] font-bold text-blue-700 uppercase">
+                            {currentI20.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
+                          </span>
+                        </div>
                       ) : (
-                        <div className="flex flex-col items-center justify-center text-slate-400 p-3 text-center space-y-1">
-                          <GraduationCap className="w-10 h-10 text-slate-300" />
-                          <span className="text-[11px] font-bold text-slate-600">Sin Formulario I-20</span>
-                          <span className="text-[9px] text-slate-400">Certificado oficial de elegibilidad</span>
+                        <div className="py-4 text-center text-slate-400 text-[11px] flex flex-col items-center gap-1">
+                          <GraduationCap className="w-6 h-6 text-slate-300" />
+                          <span>Sin Formulario I-20</span>
                         </div>
                       )}
                     </div>
 
-                    <div className="space-y-1">
-                      <h5 className="text-xs font-bold text-slate-900">
-                        Formulario I-20 Oficial
-                      </h5>
-                      <p className="text-[11px] text-slate-500 leading-snug">
-                        Documento oficial emitido por la institución educativa acreditada en EE.UU.
-                      </p>
+                    <div className="space-y-1.5 pt-1">
+                      {currentI20 && (
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setPreviewDocModal({
+                              title: "Formulario I-20 Oficial",
+                              doc: currentI20
+                            })}
+                            className="flex-1 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                            title="Ver I-20"
+                          >
+                            <Eye className="w-3 h-3 text-slate-600" />
+                            Ver
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDirectDownload(currentI20.url || currentI20.dataUrl, currentI20.name || 'formulario_i20.pdf')}
+                            className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                            title="Descargar I-20"
+                          >
+                            <Download className="w-3 h-3 text-white" />
+                            Descargar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCurrentI20Doc(null);
+                              toast.info("Formulario I-20 removido.");
+                            }}
+                            className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                            title="Eliminar I-20"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
+
+                      <label className="w-full h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+                        <Upload className="w-3 h-3 text-blue-600" />
+                        <span>{currentI20 ? 'Reemplazar I-20' : 'Adjuntar I-20'}</span>
+                        <input
+                          type="file"
+                          accept="image/*,application/pdf"
+                          className="hidden"
+                          onChange={handleI20Upload}
+                        />
+                      </label>
                     </div>
                   </div>
+                )}
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-200/80">
-                    <label className="flex-1">
-                      <input 
-                        type="file" 
-                        accept="application/pdf,image/jpeg,image/png,image/webp" 
-                        onChange={handleI20Upload} 
-                        className="hidden" 
-                      />
-                      <span className="w-full h-9 px-3 rounded-full bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm cursor-pointer transition-all">
-                        <Upload className="w-3.5 h-3.5 text-white" />
-                        Añadir I-20
-                      </span>
-                    </label>
-
-                    {currentI20 && (
-                      <>
-                        <Button
-                          onClick={() => setPreviewDocModal({
-                            title: "Formulario I-20 Oficial",
-                            doc: currentI20
-                          })}
-                          variant="outline"
-                          className="h-9 w-9 p-0 rounded-full border-slate-300 text-slate-700 hover:bg-slate-100 flex items-center justify-center shrink-0 transition-all cursor-pointer"
-                          title="Ver Formulario I-20"
-                        >
-                          <Eye className="w-3.5 h-3.5 text-slate-700" />
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            setCurrentI20Doc(null);
-                            toast.info("Formulario I-20 removido.");
-                          }}
-                          variant="outline"
-                          className="h-9 w-9 p-0 rounded-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex items-center justify-center shrink-0 transition-all cursor-pointer"
-                          title="Eliminar archivo"
-                        >
-                          <Trash2 className="w-3.5 h-3.5 text-red-600" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* CARD 6: CONFIRMACIÓN DS-160 */}
-                <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 flex flex-col justify-between space-y-4 hover:border-slate-300 transition-all shadow-2xs">
-                  <div className="space-y-3">
+                {/* 6. Confirmación DS-160 */}
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 flex flex-col justify-between space-y-3 shadow-2xs relative">
+                  <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-800">
-                        <FileCheck className="w-3 h-3 text-sky-600" />
-                        6. Confirmación DS-160
+                      <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
+                        <FileCheck className="w-3.5 h-3.5 text-blue-600" />
+                        {isSelectedStudent ? "6. DS-160 (Confirmación)" : "4. DS-160 (Confirmación)"}
                       </span>
                       {currentDs160 ? (
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                          ✓ Adjunta
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-bold">
+                          Adjunto
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
-                          Pendiente
+                        <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[9px] font-bold">
+                          Sin Archivo
                         </span>
                       )}
                     </div>
 
-                    <div className="relative w-full h-36 rounded-2xl bg-white border-2 border-dashed border-slate-300 overflow-hidden flex items-center justify-center shadow-inner group">
-                      {currentDs160 ? (
-                        currentDs160.type === 'application/pdf' ? (
-                          <div className="flex flex-col items-center justify-center p-3 text-center space-y-1.5">
-                            <div className="w-10 h-10 rounded-xl bg-red-100 border border-red-200 flex items-center justify-center text-red-700 font-extrabold text-xs shadow-2xs">
-                              PDF
-                            </div>
-                            <p className="text-[11px] font-bold text-slate-800 truncate max-w-[200px]" title={currentDs160.name}>
-                              {currentDs160.name}
-                            </p>
-                            <span className="text-[10px] font-semibold text-slate-500">
-                              {formatFileSize(currentDs160.size)}
-                            </span>
-                          </div>
-                        ) : (
-                          <>
-                            <img 
-                              src={currentDs160.dataUrl} 
-                              alt="Confirmación DS-160" 
-                              className="w-full h-full object-cover" 
-                            />
-                            <div className="absolute bottom-0 inset-x-0 bg-slate-900/70 p-1.5 text-center text-white text-[10px] font-semibold truncate">
-                              {currentDs160.name}
-                            </div>
-                          </>
-                        )
-                      ) : (
-                        <div className="flex flex-col items-center justify-center text-slate-400 p-3 text-center space-y-1">
-                          <FileCheck className="w-10 h-10 text-slate-300" />
-                          <span className="text-[11px] font-bold text-slate-600">Sin Confirmación DS-160</span>
-                          <span className="text-[9px] text-slate-400">Hoja con código de barras CEAC</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="space-y-1">
-                      <h5 className="text-xs font-bold text-slate-900">
-                        Hoja de Confirmación DS-160
-                      </h5>
-                      <p className="text-[11px] text-slate-500 leading-snug">
-                        Hoja de confirmación oficial con código de barras del Departamento de Estado.
-                      </p>
-                    </div>
+                    {currentDs160 ? (
+                      <div className="p-2 rounded-xl bg-blue-50/50 border border-blue-100 text-center">
+                        <p className="text-[11px] font-bold text-blue-950 truncate" title={currentDs160.name}>
+                          {currentDs160.name}
+                        </p>
+                        <span className="text-[9px] font-bold text-blue-700 uppercase">
+                          {currentDs160.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="py-4 text-center text-slate-400 text-[11px] flex flex-col items-center gap-1">
+                        <FileCheck className="w-6 h-6 text-slate-300" />
+                        <span>Sin DS-160</span>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-200/80">
-                    <label className="flex-1">
-                      <input 
-                        type="file" 
-                        accept="application/pdf,image/jpeg,image/png,image/webp" 
-                        onChange={handleDs160Upload} 
-                        className="hidden" 
-                      />
-                      <span className="w-full h-9 px-3 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm cursor-pointer transition-all">
-                        <Upload className="w-3.5 h-3.5 text-white" />
-                        Añadir DS-160
-                      </span>
-                    </label>
-
+                  <div className="space-y-1.5 pt-1">
                     {currentDs160 && (
-                      <>
-                        <Button
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
                           onClick={() => setPreviewDocModal({
                             title: "Hoja de Confirmación DS-160",
                             doc: currentDs160
                           })}
-                          variant="outline"
-                          className="h-9 w-9 p-0 rounded-full border-slate-300 text-slate-700 hover:bg-slate-100 flex items-center justify-center shrink-0 transition-all cursor-pointer"
-                          title="Ver confirmación DS-160"
+                          className="flex-1 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                          title="Ver DS-160"
                         >
-                          <Eye className="w-3.5 h-3.5 text-slate-700" />
-                        </Button>
-                        <Button
+                          <Eye className="w-3 h-3 text-slate-600" />
+                          Ver
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDirectDownload(currentDs160.url || currentDs160.dataUrl, currentDs160.name || 'ds160_confirmacion.pdf')}
+                          className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                          title="Descargar DS-160"
+                        >
+                          <Download className="w-3 h-3 text-white" />
+                          Descargar
+                        </button>
+                        <button
+                          type="button"
                           onClick={() => {
                             setCurrentDs160Doc(null);
                             toast.info("Confirmación DS-160 removida.");
                           }}
-                          variant="outline"
-                          className="h-9 w-9 p-0 rounded-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex items-center justify-center shrink-0 transition-all cursor-pointer"
-                          title="Eliminar archivo"
+                          className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                          title="Eliminar DS-160"
                         >
-                          <Trash2 className="w-3.5 h-3.5 text-red-600" />
-                        </Button>
-                      </>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     )}
+
+                    <label className="w-full h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+                      <Upload className="w-3 h-3 text-blue-600" />
+                      <span>{currentDs160 ? 'Reemplazar DS-160' : 'Adjuntar DS-160'}</span>
+                      <input
+                        type="file"
+                        accept="image/*,application/pdf"
+                        className="hidden"
+                        onChange={handleDs160Upload}
+                      />
+                    </label>
                   </div>
                 </div>
 
-                {/* CARD 7: CARTA DE ACEPTACIÓN */}
-                <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 flex flex-col justify-between space-y-4 hover:border-slate-300 transition-all shadow-2xs">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-800">
-                        <School className="w-3 h-3 text-teal-600" />
-                        7. Carta de Aceptación
-                      </span>
-                      {currentAcceptance ? (
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                          ✓ Adjunta
+                {/* 7. Carta de Aceptación - Estudiantes */}
+                {isSelectedStudent && (
+                  <div className="p-4 rounded-2xl bg-white border border-slate-200 flex flex-col justify-between space-y-3 shadow-2xs relative">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
+                          <School className="w-3.5 h-3.5 text-blue-600" />
+                          7. Carta de Aceptación
                         </span>
-                      ) : (
-                        <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
-                          Pendiente
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="relative w-full h-36 rounded-2xl bg-white border-2 border-dashed border-slate-300 overflow-hidden flex items-center justify-center shadow-inner group">
-                      {currentAcceptance ? (
-                        currentAcceptance.type === 'application/pdf' ? (
-                          <div className="flex flex-col items-center justify-center p-3 text-center space-y-1.5">
-                            <div className="w-10 h-10 rounded-xl bg-red-100 border border-red-200 flex items-center justify-center text-red-700 font-extrabold text-xs shadow-2xs">
-                              PDF
-                            </div>
-                            <p className="text-[11px] font-bold text-slate-800 truncate max-w-[200px]" title={currentAcceptance.name}>
-                              {currentAcceptance.name}
-                            </p>
-                            <span className="text-[10px] font-semibold text-slate-500">
-                              {formatFileSize(currentAcceptance.size)}
-                            </span>
-                          </div>
+                        {currentAcceptance ? (
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-bold">
+                            Adjunta
+                          </span>
                         ) : (
-                          <>
-                            <img 
-                              src={currentAcceptance.dataUrl} 
-                              alt="Carta de Aceptación" 
-                              className="w-full h-full object-cover" 
-                            />
-                            <div className="absolute bottom-0 inset-x-0 bg-slate-900/70 p-1.5 text-center text-white text-[10px] font-semibold truncate">
-                              {currentAcceptance.name}
-                            </div>
-                          </>
-                        )
+                          <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[9px] font-bold">
+                            Sin Archivo
+                          </span>
+                        )}
+                      </div>
+
+                      {currentAcceptance ? (
+                        <div className="p-2 rounded-xl bg-blue-50/50 border border-blue-100 text-center">
+                          <p className="text-[11px] font-bold text-blue-950 truncate" title={currentAcceptance.name}>
+                            {currentAcceptance.name}
+                          </p>
+                          <span className="text-[9px] font-bold text-blue-700 uppercase">
+                            {currentAcceptance.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
+                          </span>
+                        </div>
                       ) : (
-                        <div className="flex flex-col items-center justify-center text-slate-400 p-3 text-center space-y-1">
-                          <School className="w-10 h-10 text-slate-300" />
-                          <span className="text-[11px] font-bold text-slate-600">Sin Carta de Aceptación</span>
-                          <span className="text-[9px] text-slate-400">Documento de admisión escolar</span>
+                        <div className="py-4 text-center text-slate-400 text-[11px] flex flex-col items-center gap-1">
+                          <School className="w-6 h-6 text-slate-300" />
+                          <span>Sin Carta Aceptación</span>
                         </div>
                       )}
                     </div>
 
-                    <div className="space-y-1">
-                      <h5 className="text-xs font-bold text-slate-900">
-                        Carta Oficial de Admisión
-                      </h5>
-                      <p className="text-[11px] text-slate-500 leading-snug">
-                        Carta membretada emitida por el departamento de admisiones de la escuela.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-200/80">
-                    <label className="flex-1">
-                      <input 
-                        type="file" 
-                        accept="application/pdf,image/jpeg,image/png,image/webp" 
-                        onChange={handleAcceptanceLetterUpload} 
-                        className="hidden" 
-                      />
-                      <span className="w-full h-9 px-3 rounded-full bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm cursor-pointer transition-all">
-                        <Upload className="w-3.5 h-3.5 text-white" />
-                        Añadir Carta
-                      </span>
-                    </label>
-
-                    {currentAcceptance && (
-                      <>
-                        <Button
-                          onClick={() => setPreviewDocModal({
-                            title: "Carta de Aceptación de la Escuela",
-                            doc: currentAcceptance
-                          })}
-                          variant="outline"
-                          className="h-9 w-9 p-0 rounded-full border-slate-300 text-slate-700 hover:bg-slate-100 flex items-center justify-center shrink-0 transition-all cursor-pointer"
-                          title="Ver carta de aceptación"
-                        >
-                          <Eye className="w-3.5 h-3.5 text-slate-700" />
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            setCurrentAcceptanceLetterDoc(null);
-                            toast.info("Carta de aceptación removida.");
-                          }}
-                          variant="outline"
-                          className="h-9 w-9 p-0 rounded-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex items-center justify-center shrink-0 transition-all cursor-pointer"
-                          title="Eliminar archivo"
-                        >
-                          <Trash2 className="w-3.5 h-3.5 text-red-600" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* CARD 8: AFFIDAVIT OF SUPPORT */}
-                <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 flex flex-col justify-between space-y-4 hover:border-slate-300 transition-all shadow-2xs">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-800">
-                        <ShieldCheck className="w-3 h-3 text-rose-600" />
-                        8. Affidavit of Support
-                      </span>
-                      {currentAffidavit ? (
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                          ✓ Adjunto
-                        </span>
-                      ) : (
-                        <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
-                          Pendiente
-                        </span>
+                    <div className="space-y-1.5 pt-1">
+                      {currentAcceptance && (
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setPreviewDocModal({
+                              title: "Carta de Aceptación de la Escuela",
+                              doc: currentAcceptance
+                            })}
+                            className="flex-1 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                            title="Ver carta de aceptación"
+                          >
+                            <Eye className="w-3 h-3 text-slate-600" />
+                            Ver
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDirectDownload(currentAcceptance.url || currentAcceptance.dataUrl, currentAcceptance.name || 'carta_aceptacion.pdf')}
+                            className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                            title="Descargar carta de aceptación"
+                          >
+                            <Download className="w-3 h-3 text-white" />
+                            Descargar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCurrentAcceptanceLetterDoc(null);
+                              toast.info("Carta de aceptación removida.");
+                            }}
+                            className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                            title="Eliminar carta"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       )}
-                    </div>
 
-                    <div className="relative w-full h-36 rounded-2xl bg-white border-2 border-dashed border-slate-300 overflow-hidden flex items-center justify-center shadow-inner group">
-                      {currentAffidavit ? (
-                        currentAffidavit.type === 'application/pdf' ? (
-                          <div className="flex flex-col items-center justify-center p-3 text-center space-y-1.5">
-                            <div className="w-10 h-10 rounded-xl bg-red-100 border border-red-200 flex items-center justify-center text-red-700 font-extrabold text-xs shadow-2xs">
-                              PDF
-                            </div>
-                            <p className="text-[11px] font-bold text-slate-800 truncate max-w-[200px]" title={currentAffidavit.name}>
-                              {currentAffidavit.name}
-                            </p>
-                            <span className="text-[10px] font-semibold text-slate-500">
-                              {formatFileSize(currentAffidavit.size)}
-                            </span>
-                          </div>
+                      <label className="w-full h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+                        <Upload className="w-3 h-3 text-blue-600" />
+                        <span>{currentAcceptance ? 'Reemplazar Carta' : 'Adjuntar Carta'}</span>
+                        <input
+                          type="file"
+                          accept="image/*,application/pdf"
+                          className="hidden"
+                          onChange={handleAcceptanceLetterUpload}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                {/* 8. Affidavit of Support - Estudiantes */}
+                {isSelectedStudent && (
+                  <div className="p-4 rounded-2xl bg-white border border-slate-200 flex flex-col justify-between space-y-3 shadow-2xs relative">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
+                          <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                          8. Affidavit of Support
+                        </span>
+                        {currentAffidavit ? (
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-bold">
+                            Adjunto
+                          </span>
                         ) : (
-                          <>
-                            <img 
-                              src={currentAffidavit.dataUrl} 
-                              alt="Affidavit of Support" 
-                              className="w-full h-full object-cover" 
-                            />
-                            <div className="absolute bottom-0 inset-x-0 bg-slate-900/70 p-1.5 text-center text-white text-[10px] font-semibold truncate">
-                              {currentAffidavit.name}
-                            </div>
-                          </>
-                        )
+                          <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[9px] font-bold">
+                            Sin Archivo
+                          </span>
+                        )}
+                      </div>
+
+                      {currentAffidavit ? (
+                        <div className="p-2 rounded-xl bg-blue-50/50 border border-blue-100 text-center">
+                          <p className="text-[11px] font-bold text-blue-950 truncate" title={currentAffidavit.name}>
+                            {currentAffidavit.name}
+                          </p>
+                          <span className="text-[9px] font-bold text-blue-700 uppercase">
+                            {currentAffidavit.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
+                          </span>
+                        </div>
                       ) : (
-                        <div className="flex flex-col items-center justify-center text-slate-400 p-3 text-center space-y-1">
-                          <ShieldCheck className="w-10 h-10 text-slate-300" />
-                          <span className="text-[11px] font-bold text-slate-600">Sin Affidavit</span>
-                          <span className="text-[9px] text-slate-400">Declaración jurada de solvencia</span>
+                        <div className="py-4 text-center text-slate-400 text-[11px] flex flex-col items-center gap-1">
+                          <ShieldCheck className="w-6 h-6 text-slate-300" />
+                          <span>Sin Affidavit</span>
                         </div>
                       )}
                     </div>
 
-                    <div className="space-y-1">
-                      <h5 className="text-xs font-bold text-slate-900">
-                        Declaración de Patrocinio
-                      </h5>
-                      <p className="text-[11px] text-slate-500 leading-snug">
-                        Carta de patrocinio económico firmada y notariada por el sponsor o garante.
-                      </p>
+                    <div className="space-y-1.5 pt-1">
+                      {currentAffidavit && (
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setPreviewDocModal({
+                              title: "Affidavit of Support (Patrocinio)",
+                              doc: currentAffidavit
+                            })}
+                            className="flex-1 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                            title="Ver affidavit"
+                          >
+                            <Eye className="w-3 h-3 text-slate-600" />
+                            Ver
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDirectDownload(currentAffidavit.url || currentAffidavit.dataUrl, currentAffidavit.name || 'affidavit_support.pdf')}
+                            className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                            title="Descargar affidavit"
+                          >
+                            <Download className="w-3 h-3 text-white" />
+                            Descargar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCurrentAffidavitDoc(null);
+                              toast.info("Affidavit of Support removido.");
+                            }}
+                            className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                            title="Eliminar affidavit"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
+
+                      <label className="w-full h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+                        <Upload className="w-3 h-3 text-blue-600" />
+                        <span>{currentAffidavit ? 'Reemplazar Affidavit' : 'Adjuntar Affidavit'}</span>
+                        <input
+                          type="file"
+                          accept="image/*,application/pdf"
+                          className="hidden"
+                          onChange={handleAffidavitUpload}
+                        />
+                      </label>
                     </div>
                   </div>
+                )}
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-200/80">
-                    <label className="flex-1">
-                      <input 
-                        type="file" 
-                        accept="application/pdf,image/jpeg,image/png,image/webp" 
-                        onChange={handleAffidavitUpload} 
-                        className="hidden" 
-                      />
-                      <span className="w-full h-9 px-3 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm cursor-pointer transition-all">
-                        <Upload className="w-3.5 h-3.5 text-white" />
-                        Añadir Affidavit
-                      </span>
-                    </label>
-
-                    {currentAffidavit && (
-                      <>
-                        <Button
-                          onClick={() => setPreviewDocModal({
-                            title: "Affidavit of Support (Patrocinio)",
-                            doc: currentAffidavit
-                          })}
-                          variant="outline"
-                          className="h-9 w-9 p-0 rounded-full border-slate-300 text-slate-700 hover:bg-slate-100 flex items-center justify-center shrink-0 transition-all cursor-pointer"
-                          title="Ver affidavit"
-                        >
-                          <Eye className="w-3.5 h-3.5 text-slate-700" />
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            setCurrentAffidavitDoc(null);
-                            toast.info("Affidavit of Support removido.");
-                          }}
-                          variant="outline"
-                          className="h-9 w-9 p-0 rounded-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex items-center justify-center shrink-0 transition-all cursor-pointer"
-                          title="Eliminar archivo"
-                        >
-                          <Trash2 className="w-3.5 h-3.5 text-red-600" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* CARD 9: COMPROBANTE CITA EMBAJADA */}
-                <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 flex flex-col justify-between space-y-4 hover:border-slate-300 transition-all shadow-2xs">
-                  <div className="space-y-3">
+                {/* 9. Comprobante Cita Embajada */}
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 flex flex-col justify-between space-y-3 shadow-2xs relative">
+                  <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-800">
-                        <Calendar className="w-3 h-3 text-fuchsia-600" />
-                        9. Cita Embajada (AIS)
+                      <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5 text-blue-600" />
+                        {isSelectedStudent ? "9. Cita Embajada (AIS)" : "5. Cita Embajada (AIS)"}
                       </span>
                       {currentEmbassy ? (
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                          ✓ Adjunto
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-bold">
+                          Adjunto
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
-                          Pendiente
+                        <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[9px] font-bold">
+                          Sin Archivo
                         </span>
                       )}
                     </div>
 
-                    <div className="relative w-full h-36 rounded-2xl bg-white border-2 border-dashed border-slate-300 overflow-hidden flex items-center justify-center shadow-inner group">
-                      {currentEmbassy ? (
-                        currentEmbassy.type === 'application/pdf' ? (
-                          <div className="flex flex-col items-center justify-center p-3 text-center space-y-1.5">
-                            <div className="w-10 h-10 rounded-xl bg-red-100 border border-red-200 flex items-center justify-center text-red-700 font-extrabold text-xs shadow-2xs">
-                              PDF
-                            </div>
-                            <p className="text-[11px] font-bold text-slate-800 truncate max-w-[200px]" title={currentEmbassy.name}>
-                              {currentEmbassy.name}
-                            </p>
-                            <span className="text-[10px] font-semibold text-slate-500">
-                              {formatFileSize(currentEmbassy.size)}
-                            </span>
-                          </div>
-                        ) : (
-                          <>
-                            <img 
-                              src={currentEmbassy.dataUrl} 
-                              alt="Comprobante de Cita" 
-                              className="w-full h-full object-cover" 
-                            />
-                            <div className="absolute bottom-0 inset-x-0 bg-slate-900/70 p-1.5 text-center text-white text-[10px] font-semibold truncate">
-                              {currentEmbassy.name}
-                            </div>
-                          </>
-                        )
-                      ) : (
-                        <div className="flex flex-col items-center justify-center text-slate-400 p-3 text-center space-y-1">
-                          <Calendar className="w-10 h-10 text-slate-300" />
-                          <span className="text-[11px] font-bold text-slate-600">Sin Cita Embajada</span>
-                          <span className="text-[9px] text-slate-400">Confirmación del portal AIS / CAS</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="space-y-1">
-                      <h5 className="text-xs font-bold text-slate-900">
-                        Confirmación Cita Consular
-                      </h5>
-                      <p className="text-[11px] text-slate-500 leading-snug">
-                        Hoja de confirmación de cita oficial para el CAS y entrevista consular en la Embajada.
-                      </p>
-                    </div>
+                    {currentEmbassy ? (
+                      <div className="p-2 rounded-xl bg-blue-50/50 border border-blue-100 text-center">
+                        <p className="text-[11px] font-bold text-blue-950 truncate" title={currentEmbassy.name}>
+                          {currentEmbassy.name}
+                        </p>
+                        <span className="text-[9px] font-bold text-blue-700 uppercase">
+                          {currentEmbassy.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="py-4 text-center text-slate-400 text-[11px] flex flex-col items-center gap-1">
+                        <Calendar className="w-6 h-6 text-slate-300" />
+                        <span>Sin Cita Embajada</span>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-200/80">
-                    <label className="flex-1">
-                      <input 
-                        type="file" 
-                        accept="application/pdf,image/jpeg,image/png,image/webp" 
-                        onChange={handleEmbassyAppointmentUpload} 
-                        className="hidden" 
-                      />
-                      <span className="w-full h-9 px-3 rounded-full bg-fuchsia-600 hover:bg-fuchsia-700 text-white text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm cursor-pointer transition-all">
-                        <Upload className="w-3.5 h-3.5 text-white" />
-                        Añadir Cita
-                      </span>
-                    </label>
-
+                  <div className="space-y-1.5 pt-1">
                     {currentEmbassy && (
-                      <>
-                        <Button
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
                           onClick={() => setPreviewDocModal({
                             title: "Comprobante Cita Consular Embajada (AIS)",
                             doc: currentEmbassy
                           })}
-                          variant="outline"
-                          className="h-9 w-9 p-0 rounded-full border-slate-300 text-slate-700 hover:bg-slate-100 flex items-center justify-center shrink-0 transition-all cursor-pointer"
+                          className="flex-1 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
                           title="Ver comprobante de cita"
                         >
-                          <Eye className="w-3.5 h-3.5 text-slate-700" />
-                        </Button>
-                        <Button
+                          <Eye className="w-3 h-3 text-slate-600" />
+                          Ver
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDirectDownload(currentEmbassy.url || currentEmbassy.dataUrl, currentEmbassy.name || 'cita_embajada.pdf')}
+                          className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                          title="Descargar comprobante de cita"
+                        >
+                          <Download className="w-3 h-3 text-white" />
+                          Descargar
+                        </button>
+                        <button
+                          type="button"
                           onClick={() => {
                             setCurrentEmbassyAppointmentDoc(null);
                             toast.info("Comprobante de cita consular removido.");
                           }}
-                          variant="outline"
-                          className="h-9 w-9 p-0 rounded-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex items-center justify-center shrink-0 transition-all cursor-pointer"
-                          title="Eliminar archivo"
+                          className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                          title="Eliminar comprobante de cita"
                         >
-                          <Trash2 className="w-3.5 h-3.5 text-red-600" />
-                        </Button>
-                      </>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     )}
+
+                    <label className="w-full h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+                      <Upload className="w-3 h-3 text-blue-600" />
+                      <span>{currentEmbassy ? 'Reemplazar Cita' : 'Adjuntar Cita'}</span>
+                      <input
+                        type="file"
+                        accept="image/*,application/pdf"
+                        className="hidden"
+                        onChange={handleEmbassyAppointmentUpload}
+                      />
+                    </label>
                   </div>
                 </div>
 
@@ -2449,15 +2328,15 @@ export default function ProcesoPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <a
-                  href={previewDocModal.doc.dataUrl}
-                  download={previewDocModal.doc.name}
-                  className="h-9 px-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center gap-1.5 transition-all"
+                <button
+                  type="button"
+                  onClick={() => handleDirectDownload(previewDocModal.doc.url || previewDocModal.doc.dataUrl, previewDocModal.doc.name)}
+                  className="h-9 px-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
                   title="Descargar archivo"
                 >
-                  <Download className="w-3.5 h-3.5 text-slate-700" />
+                  <Download className="w-3.5 h-3.5 text-white" />
                   <span className="hidden sm:inline">Descargar</span>
-                </a>
+                </button>
                 <button
                   type="button"
                   onClick={() => setPreviewDocModal(null)}
@@ -2472,14 +2351,14 @@ export default function ProcesoPage() {
             <div className="p-6 flex-1 overflow-auto bg-slate-100/50 flex items-center justify-center min-h-[400px]">
               {previewDocModal.doc.type === 'application/pdf' || previewDocModal.doc.name.toLowerCase().endsWith('.pdf') ? (
                 <iframe
-                  src={previewDocModal.doc.dataUrl}
+                  src={previewDocModal.doc.url || previewDocModal.doc.dataUrl}
                   title={previewDocModal.doc.name}
                   className="w-full h-[65vh] rounded-2xl border border-slate-200 bg-white shadow-sm"
                 />
               ) : (
                 <div className="max-h-[65vh] flex items-center justify-center">
                   <img
-                    src={previewDocModal.doc.dataUrl}
+                    src={previewDocModal.doc.url || previewDocModal.doc.dataUrl}
                     alt={previewDocModal.doc.name}
                     className="max-h-[65vh] max-w-full object-contain rounded-2xl shadow-md border border-slate-200"
                   />

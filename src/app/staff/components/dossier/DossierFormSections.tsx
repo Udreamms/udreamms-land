@@ -115,52 +115,8 @@ export const DossierFormSections: React.FC<DossierFormSectionsProps> = ({
     );
   };
 
-  const totalRegisteredCount = Object.values(selectedCaseModal.formData || {}).filter(Boolean).length;
-
   return (
     <>
-      {/* Quick-Nav Sticky Bar */}
-      <div className="sticky top-0 z-10 -mx-6 md:-mx-8 px-6 md:px-8 py-2.5 bg-white/95 backdrop-blur-sm border-b border-slate-100 flex items-center gap-1.5 overflow-x-auto">
-        {DOSSIER_SECTIONS.map((sec) => {
-          const filled = isSectionFilled(selectedCaseModal.formData || {}, sec.fields);
-          return (
-            <button
-              key={sec.anchor}
-              type="button"
-              onClick={() => scrollToDossierSection(sec.anchor)}
-              className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 transition-colors border cursor-pointer ${
-                filled
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
-                  : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'
-              }`}
-            >
-              {filled && <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />}
-              {sec.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Progress Overview Banner */}
-      <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border border-blue-200/80 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-blue-900">Progreso del Expediente:</span>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-600 text-white shadow-2xs">
-              {totalRegisteredCount} datos registrados
-            </span>
-          </div>
-          <p className="text-xs text-slate-600">
-            {selectedCaseModal.notes || 'Datos sincronizados en tiempo real con la nube de Firebase.'}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
-          <Calendar className="w-3.5 h-3.5 text-blue-600" />
-          <span>Registrado: {selectedCaseModal.submittedAt || 'Reciente'}</span>
-        </div>
-      </div>
-
       {/* 1. INFORMACIÓN PERSONAL */}
       <div id="sec-1" className="border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm scroll-mt-16">
         <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between gap-2">

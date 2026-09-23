@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { StudentCase, StaffTabType } from '../types';
 import { DossierHeader } from './dossier/DossierHeader';
 import { DossierToolbar } from './dossier/DossierToolbar';
+import { DossierSectionNav } from './dossier/DossierSectionNav';
 import { DossierDocGrid } from './dossier/DossierDocGrid';
 import { DossierFormSections } from './dossier/DossierFormSections';
 
@@ -65,13 +66,16 @@ export const StaffDossierModal: React.FC<StaffDossierModalProps> = ({
           caseModalGroup={caseModalGroup}
           setSelectedCaseModal={setSelectedCaseModal}
           onClose={onClose}
+          onMoveStatus={onMoveStatus}
           onCreateApplicant={onCreateApplicant}
           onToggleEntitlement={onToggleEntitlement}
           onDeleteCase={onDeleteCase}
           onCopy={onCopy}
           isCreatingApplicant={isCreatingApplicant}
           togglingFlags={togglingFlags}
-          deletingCaseId={deletingCaseId}
+          isEditingDossier={isEditingDossier}
+          editedFormData={editedFormData}
+          startEditingDossier={startEditingDossier}
           stopEditingDossier={stopEditingDossier}
         />
 
@@ -88,19 +92,23 @@ export const StaffDossierModal: React.FC<StaffDossierModalProps> = ({
           </div>
         ) : (
           <>
-            {/* Modular Toolbars (Status + Edit mode) */}
-            <DossierToolbar
-              currentStatus={selectedCaseModal.status}
-              caseId={selectedCaseModal.id}
-              onMoveStatus={onMoveStatus}
-              isEditingDossier={isEditingDossier}
-              dossierSaveStatus={dossierSaveStatus}
-              startEditingDossier={startEditingDossier}
-              stopEditingDossier={stopEditingDossier}
-            />
+            {/* Auto-save & Edit Notice Bar (Only visible while editing) */}
+            {isEditingDossier && (
+              <DossierToolbar
+                isEditingDossier={isEditingDossier}
+                dossierSaveStatus={dossierSaveStatus}
+                startEditingDossier={startEditingDossier}
+                stopEditingDossier={stopEditingDossier}
+              />
+            )}
 
-            {/* Modal Body: Documents Grid & Form Sections */}
+            {/* Modal Body: Navigation Capsules, Documents Grid & Form Sections */}
             <div className="p-6 md:p-8 overflow-y-auto space-y-6 text-slate-900">
+              {/* 13 Section Navigation Capsules (Full Width) */}
+              <DossierSectionNav
+                formData={isEditingDossier ? editedFormData : selectedCaseModal.formData}
+              />
+
               {/* 9 Documents Grid */}
               <DossierDocGrid
                 selectedCaseModal={selectedCaseModal}

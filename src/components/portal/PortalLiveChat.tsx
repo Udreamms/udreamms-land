@@ -28,6 +28,7 @@ export interface ChatMessage {
 interface PortalLiveChatProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpen?: () => void;
   userEmail: string;
   userName?: string;
 }
@@ -35,6 +36,7 @@ interface PortalLiveChatProps {
 export default function PortalLiveChat({
   isOpen,
   onClose,
+  onOpen,
   userEmail,
   userName = 'Cliente'
 }: PortalLiveChatProps) {
@@ -42,6 +44,8 @@ export default function PortalLiveChat({
   const [inputText, setInputText] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPhotoZoomOpen, setIsPhotoZoomOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -57,6 +61,9 @@ export default function PortalLiveChat({
         if (data.messages && Array.isArray(data.messages)) {
           setMessages(data.messages);
         }
+        if (typeof data.unreadByClient === 'number') {
+          setUnreadCount(isOpen ? 0 : data.unreadByClient);
+        }
       }
     } catch (err) {
       console.error('Error fetching chat messages:', err);
@@ -65,12 +72,11 @@ export default function PortalLiveChat({
     }
   };
 
-  // Fetch when opened
+  // Poll for messages: faster when open (3.5s), normal when closed (8s)
   useEffect(() => {
-    if (isOpen && userEmail) {
-      setIsLoading(true);
+    if (userEmail) {
       fetchMessages();
-      const interval = setInterval(fetchMessages, 3500);
+      const interval = setInterval(fetchMessages, isOpen ? 3500 : 8000);
       return () => clearInterval(interval);
     }
   }, [isOpen, userEmail]);
@@ -126,38 +132,100 @@ export default function PortalLiveChat({
     }
   };
 
-  if (!isOpen) return null;
+  // When chat is closed: show the stylish floating Sarah Davis bubble button
+  if (!isOpen) {
+    return (
+      <div className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-40 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-3 duration-300">
+        {/* Floating Greeting Pill on Desktop */}
+        <button
+          type="button"
+          onClick={onOpen}
+          className="hidden sm:flex items-center gap-2.5 px-4 py-2.5 bg-white/95 backdrop-blur-md border border-slate-200/90 text-slate-800 rounded-full shadow-lg hover:shadow-xl hover:border-blue-300 transition-all cursor-pointer group hover:-translate-y-0.5 active:translate-y-0"
+        >
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-xs font-bold text-slate-700 group-hover:text-blue-600 transition-colors">
+            ¿Dudas sobre tu visa? Chatea con Sarah
+          </span>
+          <div className="w-5 h-5 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+            <MessageCircle className="w-3 h-3" />
+          </div>
+        </button>
+
+        {/* Floating Avatar Bubble Button */}
+        <button
+          type="button"
+          onClick={onOpen}
+          className="relative group p-1 rounded-full bg-gradient-to-tr from-blue-600 via-indigo-500 to-cyan-400 shadow-xl shadow-blue-500/25 hover:shadow-2xl hover:shadow-blue-500/40 hover:scale-108 active:scale-95 transition-all duration-300 cursor-pointer"
+          title="Abrir chat con Sarah Davis"
+        >
+          {/* Subtle Ambient Ping Ring */}
+          <span className="absolute inset-0 rounded-full bg-blue-500/30 animate-ping opacity-60 pointer-events-none" />
+
+          <div className="relative w-14 h-14 sm:w-15 sm:h-15 rounded-full overflow-hidden border-2 border-white bg-slate-900 shadow-inner">
+            <img
+              src="/images/staff-advisor.png"
+              alt="Sarah Davis"
+              className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+
+          {/* Online Indicator Badge */}
+          <span className="absolute bottom-1 right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full ring-2 ring-emerald-500/20 shadow-xs" />
+
+          {/* Unread Message Counter Badge */}
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 bg-red-500 border-2 border-white text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md animate-bounce">
+              {unreadCount}
+            </span>
+          )}
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-end sm:items-center justify-end sm:p-6 animate-in fade-in duration-200">
-      <div className="bg-white border border-slate-200 shadow-2xl rounded-t-3xl sm:rounded-3xl w-full sm:max-w-md h-[85vh] sm:h-[620px] flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 sm:slide-in-from-right-5 duration-300">
+    <div className="fixed bottom-0 right-0 z-50 p-3 sm:p-5 pointer-events-none flex justify-end items-end animate-in fade-in duration-200">
+      <div className="pointer-events-auto bg-white border border-slate-200/90 shadow-2xl rounded-3xl w-[94vw] sm:w-[460px] h-[82vh] sm:h-[620px] max-h-[720px] flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300 relative">
         
         {/* Chat Header */}
         <div className="p-4 bg-slate-900 text-white flex items-center justify-between shadow-md shrink-0">
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-bold shadow-sm">
-                <Headphones className="w-5 h-5 text-white" />
+            <button
+              type="button"
+              onClick={() => setIsPhotoZoomOpen(true)}
+              className="relative group cursor-pointer focus:outline-none"
+              title="Ver foto de perfil de Sarah Davis"
+            >
+              <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-blue-400/40 group-hover:border-blue-400 group-hover:scale-105 active:scale-95 transition-all shadow-sm shrink-0 bg-slate-800">
+                <img
+                  src="/images/staff-advisor.png"
+                  alt="Sarah Davis"
+                  className="w-full h-full object-cover object-top"
+                />
               </div>
-              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-slate-900 rounded-full" />
-            </div>
+              <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-slate-900 rounded-full" />
+            </button>
 
             <div>
               <div className="flex items-center gap-1.5">
-                <h4 className="text-sm font-bold text-white leading-tight">
-                  Staff Udreamms
+                <h4 
+                  onClick={() => setIsPhotoZoomOpen(true)}
+                  className="text-sm font-bold text-white leading-tight cursor-pointer hover:text-blue-300 transition-colors"
+                  title="Ver perfil"
+                >
+                  Sarah Davis
                 </h4>
                 <ShieldCheck className="w-4 h-4 text-blue-400" />
               </div>
               <p className="text-[11px] text-slate-300 font-medium">
-                Atención consular personalizada
+                Asesora consular Udreamms
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-slate-800 text-slate-300 hover:text-white transition-colors"
+            className="p-1.5 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
             title="Cerrar chat"
           >
             <X className="w-5 h-5" />
@@ -165,15 +233,15 @@ export default function PortalLiveChat({
         </div>
 
         {/* Message Area */}
-        <div className="flex-1 p-4 overflow-y-auto space-y-3.5 bg-slate-50">
+        <div className="flex-1 p-4 overflow-y-auto space-y-3.5 bg-slate-50 no-scrollbar [&::-webkit-scrollbar]:hidden [scrollbar-width:none] [-ms-overflow-style:none]">
           {/* Welcome Message */}
           <div className="p-3.5 rounded-2xl bg-blue-50/80 border border-blue-100 text-xs text-blue-950 space-y-1 shadow-2xs">
             <div className="flex items-center gap-1.5 font-bold text-blue-800">
               <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-              <span>Canal Directo con tu Asesor</span>
+              <span>Canal Directo con Sarah Davis</span>
             </div>
             <p className="text-slate-600 text-[11px] leading-relaxed">
-              Escribe tus preguntas sobre tu formulario consular, documentos o citas. Nuestro equipo te responderá directamente aquí.
+              Escribe tus preguntas sobre tu formulario consular, documentos o citas. Sarah te responderá directamente aquí.
             </p>
           </div>
 
@@ -191,26 +259,37 @@ export default function PortalLiveChat({
             return (
               <div
                 key={msg.id}
-                className={`flex flex-col ${isClient ? 'items-end' : 'items-start'}`}
+                className={`flex items-end gap-2.5 ${isClient ? 'justify-end' : 'justify-start'}`}
               >
-                <div
-                  className={`max-w-[82%] p-3 rounded-2xl text-xs leading-relaxed shadow-xs ${
-                    isClient
-                      ? 'bg-blue-600 text-white rounded-br-xs'
-                      : 'bg-white text-slate-900 border border-slate-200 rounded-bl-xs'
-                  }`}
-                >
-                  {!isClient && (
-                    <span className="text-[10px] font-bold text-blue-600 block mb-1">
-                      Staff Udreamms
-                    </span>
-                  )}
-                  <p className="whitespace-pre-wrap font-medium">{msg.text}</p>
+                {!isClient && (
+                  <button
+                    type="button"
+                    onClick={() => setIsPhotoZoomOpen(true)}
+                    className="w-8 h-8 rounded-full overflow-hidden border border-slate-200 shrink-0 mb-4 shadow-2xs bg-slate-100 hover:scale-105 active:scale-95 transition-transform cursor-pointer"
+                    title="Ampliar foto"
+                  >
+                    <img
+                      src="/images/staff-advisor.png"
+                      alt="Sarah Davis"
+                      className="w-full h-full object-cover object-top"
+                    />
+                  </button>
+                )}
+                <div className={`flex flex-col ${isClient ? 'items-end' : 'items-start'} max-w-[80%]`}>
+                  <div
+                    className={`p-3.5 rounded-2xl text-xs leading-relaxed shadow-xs ${
+                      isClient
+                        ? 'bg-blue-600 text-white rounded-br-xs'
+                        : 'bg-white text-slate-900 border border-slate-200/80 rounded-bl-xs'
+                    }`}
+                  >
+                    <p className="whitespace-pre-wrap font-medium">{msg.text}</p>
+                  </div>
+                  <span className="text-[9px] text-slate-400 mt-1 px-1 flex items-center gap-1">
+                    {timeStr}
+                    {isClient && <CheckCircle2 className="w-2.5 h-2.5 text-blue-500" />}
+                  </span>
                 </div>
-                <span className="text-[9px] text-slate-400 mt-1 px-1 flex items-center gap-1">
-                  {timeStr}
-                  {isClient && <CheckCircle2 className="w-2.5 h-2.5 text-blue-500" />}
-                </span>
               </div>
             );
           })}
@@ -219,22 +298,67 @@ export default function PortalLiveChat({
 
         {/* Input Bar */}
         <form onSubmit={handleSendMessage} className="p-3 bg-white border-t border-slate-200 flex items-center gap-2 shrink-0">
-          <Input
+          <input
+            type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Escribe un mensaje para el staff..."
-            className="h-10 text-xs bg-slate-50 border-slate-200 rounded-full px-4 focus:bg-white focus:border-blue-600"
+            placeholder="Escribe un mensaje para Sarah Davis..."
+            className="flex-1 h-10 text-xs bg-slate-50 border border-slate-200 rounded-full px-4 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
             disabled={isSending}
           />
           <Button
             type="submit"
             disabled={isSending || !inputText.trim()}
-            className="h-10 w-10 p-0 rounded-full bg-blue-600 hover:bg-blue-700 text-white shrink-0 flex items-center justify-center shadow-sm"
+            className="h-10 w-10 p-0 rounded-full bg-blue-600 hover:bg-blue-700 text-white shrink-0 flex items-center justify-center shadow-sm cursor-pointer"
             title="Enviar mensaje"
           >
             <Send className="w-4 h-4" />
           </Button>
         </form>
+
+        {/* Photo Zoom / Profile Lightbox (Social Media Style) */}
+        {isPhotoZoomOpen && (
+          <div
+            className="absolute inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex flex-col items-center justify-center p-6 animate-in fade-in duration-200"
+            onClick={() => setIsPhotoZoomOpen(false)}
+          >
+            <button
+              onClick={() => setIsPhotoZoomOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+              title="Cerrar vista previa"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div
+              className="bg-slate-900 border border-slate-700/80 rounded-3xl p-6 shadow-2xl max-w-[320px] w-full flex flex-col items-center text-center space-y-4 animate-in zoom-in-95 duration-200"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative w-44 h-44 rounded-full overflow-hidden border-4 border-blue-500/40 shadow-xl ring-4 ring-blue-500/20 bg-slate-800">
+                <img
+                  src="/images/staff-advisor.png"
+                  alt="Sarah Davis"
+                  className="w-full h-full object-cover object-top"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-center gap-1.5">
+                  <h3 className="text-base font-bold text-white tracking-tight">Sarah Davis</h3>
+                  <ShieldCheck className="w-4 h-4 text-blue-400" />
+                </div>
+                <p className="text-xs text-slate-300 font-medium">Asesora Consular Udreamms</p>
+                
+                <div className="pt-1">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[11px] font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    En línea • Atención activa
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

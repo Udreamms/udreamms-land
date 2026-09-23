@@ -546,12 +546,20 @@ export function PortalProvider({ children }: { children: ReactNode }) {
       dbUser.purchased_plan_turista_vip
     );
 
-    // Recursos adicionales se liberan con cualquier plan de Udreamms del mismo tipo de visa,
-    // o si Staff lo activó de forma independiente (purchased_recursos_*) sin necesidad de plan.
+    // Recursos adicionales:
+    // Si Staff lo bloqueó explícitamente (false), queda bloqueado.
+    // Si Staff lo desbloqueó explícitamente (true), queda desbloqueado.
+    // Si no está configurado (undefined), se desbloquea con cualquier plan activo.
     if (type === 'recursos') {
-      return visa === 'estudiante'
-        ? (hasStudentPlan || !!dbUser.purchased_recursos_estudiante)
-        : (hasTouristPlan || !!dbUser.purchased_recursos_turista);
+      if (visa === 'estudiante') {
+        if (dbUser.purchased_recursos_estudiante === false) return false;
+        if (dbUser.purchased_recursos_estudiante === true) return true;
+        return hasStudentPlan;
+      } else {
+        if (dbUser.purchased_recursos_turista === false) return false;
+        if (dbUser.purchased_recursos_turista === true) return true;
+        return hasTouristPlan;
+      }
     }
 
     if (visa === 'estudiante') {

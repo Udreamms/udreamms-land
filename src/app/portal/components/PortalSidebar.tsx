@@ -16,6 +16,8 @@ import {
   Settings,
   LogOut,
   MessageSquare,
+  Calendar,
+  Gift,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { usePortal, cartItemsConfig } from '../PortalContext';
@@ -26,18 +28,13 @@ interface PortalSidebarProps {
   activeSection: string;
   isSidebarCollapsed: boolean;
   onToggleSidebar?: () => void;
-  isLiveChatOpen?: boolean;
-  onToggleLiveChat?: () => void;
 }
 
 export default function PortalSidebar({
   activeSection,
   isSidebarCollapsed,
   onToggleSidebar,
-  isLiveChatOpen = false,
-  onToggleLiveChat,
 }: PortalSidebarProps) {
-  const [unreadChatCount, setUnreadChatCount] = useState<number>(0);
   const {
     user,
     cart,
@@ -56,27 +53,6 @@ export default function PortalSidebar({
     handleCheckout,
     checkoutMethod,
   } = usePortal();
-
-  // Poll for unread messages from staff
-  useEffect(() => {
-    if (!user?.email) return;
-
-    const checkUnread = async () => {
-      try {
-        const res = await fetch(`/api/portal/chat?email=${encodeURIComponent(user.email!)}&viewer=client`);
-        if (res.ok) {
-          const data = await res.json();
-          setUnreadChatCount(data.unreadByClient || 0);
-        }
-      } catch (e) {
-        // silent catch
-      }
-    };
-
-    checkUnread();
-    const interval = setInterval(checkUnread, 8000);
-    return () => clearInterval(interval);
-  }, [user?.email, isLiveChatOpen]);
 
   const userInitials = user?.displayName
     ? user.displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
@@ -194,44 +170,35 @@ export default function PortalSidebar({
         </Link>
 
         <Link
-          href="/portal/soporte"
-          title={isSidebarCollapsed ? 'Hablar con un experto' : undefined}
-          className={linkClass(activeSection === 'soporte')}
+          href="/portal/referidos"
+          title={isSidebarCollapsed ? 'Referidos' : undefined}
+          className={linkClass(activeSection === 'referidos')}
         >
-          <Headphones className={`w-4 h-4 shrink-0 ${activeSection === 'soporte' ? 'text-white' : 'text-black'}`} />
-          {!isSidebarCollapsed && <span>Hablar con un experto</span>}
+          <Gift className={`w-4 h-4 shrink-0 ${activeSection === 'referidos' ? 'text-white' : 'text-black'}`} />
+          {!isSidebarCollapsed && <span>Referidos</span>}
         </Link>
 
-        {/* Live Chat with Staff Button */}
-        <button
-          type="button"
-          onClick={onToggleLiveChat}
-          title={isSidebarCollapsed ? 'Chat en vivo con Staff' : undefined}
-          className={`px-4 py-2.5 md:py-3 text-[10px] md:text-xs tracking-widest md:tracking-wider uppercase rounded-full md:rounded-xl shrink-0 transition-all duration-300 flex items-center gap-3 w-full cursor-pointer text-left ${
-            isSidebarCollapsed ? 'justify-center' : 'justify-start'
-          } ${
-            isLiveChatOpen
-              ? 'text-white bg-blue-600 font-bold shadow-md'
-              : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50/60 border border-transparent font-medium'
-          }`}
+        <a
+          href="https://wa.me/13854162224?text=Hola%2C%20necesito%20soporte%20con%20mi%20portal%20Udreamms"
+          target="_blank"
+          rel="noopener noreferrer"
+          title={isSidebarCollapsed ? 'Soporte por WhatsApp' : undefined}
+          className={linkClass(false)}
         >
-          <div className="relative shrink-0 flex items-center justify-center">
-            <MessageSquare className={`w-4 h-4 shrink-0 ${isLiveChatOpen ? 'text-white' : 'text-blue-600'}`} />
-            {unreadChatCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 w-3 h-3 bg-red-500 rounded-full ring-2 ring-white animate-pulse" />
-            )}
-          </div>
-          {!isSidebarCollapsed && (
-            <div className="flex items-center justify-between flex-1 min-w-0">
-              <span className="truncate">Chat en vivo</span>
-              {unreadChatCount > 0 && (
-                <span className="bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0 shadow-xs">
-                  {unreadChatCount}
-                </span>
-              )}
-            </div>
-          )}
-        </button>
+          <MessageSquare className="w-4 h-4 shrink-0 text-black group-hover:text-blue-600 transition-colors" />
+          {!isSidebarCollapsed && <span>Soporte por WhatsApp</span>}
+        </a>
+
+        <a
+          href="https://calendar.app.google/uAhHFp3YC2T1PbGU6"
+          target="_blank"
+          rel="noopener noreferrer"
+          title={isSidebarCollapsed ? 'Agendar Videollamada' : undefined}
+          className={linkClass(false)}
+        >
+          <Calendar className="w-4 h-4 shrink-0 text-black group-hover:text-blue-600 transition-colors" />
+          {!isSidebarCollapsed && <span>Agendar Videollamada</span>}
+        </a>
 
         <a
           href="https://www.udreamms.com"

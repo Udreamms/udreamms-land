@@ -15,6 +15,8 @@ import {
   Upload,
   Loader2,
   Trash2,
+  Eye,
+  Download,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { StudentCase, isUsableDoc } from '../../types';
@@ -43,6 +45,38 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
 }) => {
   const [uploadingDoc, setUploadingDoc] = useState<StaffDossierDocType | null>(null);
   const [deletingDoc, setDeletingDoc] = useState<StaffDossierDocType | null>(null);
+
+  const handleDirectDownload = async (url: string, filename: string) => {
+    try {
+      if (url.startsWith('data:')) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        return;
+      }
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  };
 
   const compressImageFile = (file: File, maxDim = 800, quality = 0.85): Promise<string> => {
     return new Promise((resolve) => {
@@ -318,9 +352,19 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
             </div>
 
             {selectedCaseModal.photoUrl ? (
-              <div className="w-20 h-20 mx-auto rounded-xl overflow-hidden border border-slate-200 shadow-inner group relative">
-                <img src={selectedCaseModal.photoUrl} alt="Foto" className="w-full h-full object-cover" />
-              </div>
+              <a
+                href={selectedCaseModal.photoUrl}
+                target="_blank"
+                rel="noreferrer"
+                download="foto_oficial_5x5.jpg"
+                className="w-20 h-20 mx-auto rounded-xl overflow-hidden border border-slate-200 shadow-inner group relative block cursor-pointer"
+                title="Clic para abrir y descargar la foto"
+              >
+                <img src={selectedCaseModal.photoUrl} alt="Foto Oficial 5x5" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                <span className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                  <ExternalLink className="w-4 h-4" />
+                </span>
+              </a>
             ) : (
               <div className="py-4 text-center text-slate-400 text-[11px] flex flex-col items-center gap-1">
                 <Camera className="w-6 h-6 text-slate-300" />
@@ -337,15 +381,25 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
                   target="_blank"
                   rel="noreferrer"
                   className="flex-1 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                  title="Ver foto oficial"
                 >
-                  <ExternalLink className="w-3 h-3 text-slate-600" />
-                  Ver Foto
+                  <Eye className="w-3 h-3 text-slate-600" />
+                  Ver
                 </a>
+                <button
+                  type="button"
+                  onClick={() => handleDirectDownload(selectedCaseModal.photoUrl!, `${(selectedCaseModal.name || 'foto_5x5').replace(/\s+/g, '_')}_5x5.jpg`)}
+                  className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                  title="Descargar foto oficial"
+                >
+                  <Download className="w-3 h-3 text-white" />
+                  Descargar
+                </button>
                 <button
                   type="button"
                   onClick={() => handleStaffDocDelete('photo')}
                   disabled={deletingDoc === 'photo'}
-                  className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50"
+                  className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50 shrink-0"
                   title="Eliminar foto"
                 >
                   {deletingDoc === 'photo' ? (
@@ -385,7 +439,7 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
-                <CreditCard className="w-3.5 h-3.5 text-indigo-600" />
+                <CreditCard className="w-3.5 h-3.5 text-blue-600" />
                 2. Pasaporte
               </span>
               {isUsableDoc(selectedCaseModal.passportDoc) ? (
@@ -400,11 +454,11 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
             </div>
 
             {isUsableDoc(selectedCaseModal.passportDoc) ? (
-              <div className="p-2 rounded-xl bg-indigo-50/50 border border-indigo-100 text-center">
-                <p className="text-[11px] font-bold text-indigo-950 truncate" title={selectedCaseModal.passportDoc!.name}>
+              <div className="p-2 rounded-xl bg-blue-50/50 border border-blue-100 text-center">
+                <p className="text-[11px] font-bold text-blue-950 truncate" title={selectedCaseModal.passportDoc!.name}>
                   {selectedCaseModal.passportDoc!.name}
                 </p>
-                <span className="text-[9px] font-bold text-indigo-700 uppercase">
+                <span className="text-[9px] font-bold text-blue-700 uppercase">
                   {selectedCaseModal.passportDoc!.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
                 </span>
               </div>
@@ -421,19 +475,28 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
               <div className="flex items-center gap-1.5">
                 <a
                   href={selectedCaseModal.passportDoc!.url || selectedCaseModal.passportDoc!.dataUrl}
-                  download={selectedCaseModal.passportDoc!.name}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex-1 h-7 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                  className="flex-1 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                  title="Ver pasaporte"
                 >
-                  <ExternalLink className="w-3 h-3 text-white" />
-                  Ver / Descargar
+                  <Eye className="w-3 h-3 text-slate-600" />
+                  Ver
                 </a>
+                <button
+                  type="button"
+                  onClick={() => handleDirectDownload(selectedCaseModal.passportDoc!.url || selectedCaseModal.passportDoc!.dataUrl!, selectedCaseModal.passportDoc!.name || 'pasaporte.pdf')}
+                  className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                  title="Descargar pasaporte"
+                >
+                  <Download className="w-3 h-3 text-white" />
+                  Descargar
+                </button>
                 <button
                   type="button"
                   onClick={() => handleStaffDocDelete('passport')}
                   disabled={deletingDoc === 'passport'}
-                  className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50"
+                  className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50 shrink-0"
                   title="Eliminar pasaporte"
                 >
                   {deletingDoc === 'passport' ? (
@@ -445,15 +508,15 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
               </div>
             )}
 
-            <label className="w-full h-7 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+            <label className="w-full h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
               {uploadingDoc === 'passport' ? (
                 <>
-                  <Loader2 className="w-3 h-3 animate-spin text-indigo-600" />
+                  <Loader2 className="w-3 h-3 animate-spin text-blue-600" />
                   <span>Subiendo...</span>
                 </>
               ) : (
                 <>
-                  <Upload className="w-3 h-3 text-indigo-600" />
+                  <Upload className="w-3 h-3 text-blue-600" />
                   <span>{isUsableDoc(selectedCaseModal.passportDoc) ? 'Reemplazar Pasaporte' : 'Adjuntar Pasaporte'}</span>
                 </>
               )}
@@ -473,7 +536,7 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
-                <Building className="w-3.5 h-3.5 text-emerald-600" />
+                <Building className="w-3.5 h-3.5 text-blue-600" />
                 3. Estado de Cuenta
               </span>
               {isUsableDoc(selectedCaseModal.bankStatementDoc) ? (
@@ -488,11 +551,11 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
             </div>
 
             {isUsableDoc(selectedCaseModal.bankStatementDoc) ? (
-              <div className="p-2 rounded-xl bg-emerald-50/50 border border-emerald-100 text-center">
-                <p className="text-[11px] font-bold text-emerald-950 truncate" title={selectedCaseModal.bankStatementDoc!.name}>
+              <div className="p-2 rounded-xl bg-blue-50/50 border border-blue-100 text-center">
+                <p className="text-[11px] font-bold text-blue-950 truncate" title={selectedCaseModal.bankStatementDoc!.name}>
                   {selectedCaseModal.bankStatementDoc!.name}
                 </p>
-                <span className="text-[9px] font-bold text-emerald-700 uppercase">
+                <span className="text-[9px] font-bold text-blue-700 uppercase">
                   {selectedCaseModal.bankStatementDoc!.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
                 </span>
               </div>
@@ -509,19 +572,28 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
               <div className="flex items-center gap-1.5">
                 <a
                   href={selectedCaseModal.bankStatementDoc!.url || selectedCaseModal.bankStatementDoc!.dataUrl}
-                  download={selectedCaseModal.bankStatementDoc!.name}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex-1 h-7 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                  className="flex-1 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                  title="Ver estado de cuenta"
                 >
-                  <ExternalLink className="w-3 h-3 text-white" />
-                  Ver / Descargar
+                  <Eye className="w-3 h-3 text-slate-600" />
+                  Ver
                 </a>
+                <button
+                  type="button"
+                  onClick={() => handleDirectDownload(selectedCaseModal.bankStatementDoc!.url || selectedCaseModal.bankStatementDoc!.dataUrl!, selectedCaseModal.bankStatementDoc!.name || 'estado_cuenta.pdf')}
+                  className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                  title="Descargar estado de cuenta"
+                >
+                  <Download className="w-3 h-3 text-white" />
+                  Descargar
+                </button>
                 <button
                   type="button"
                   onClick={() => handleStaffDocDelete('bank')}
                   disabled={deletingDoc === 'bank'}
-                  className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50"
+                  className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50 shrink-0"
                   title="Eliminar estado de cuenta"
                 >
                   {deletingDoc === 'bank' ? (
@@ -533,15 +605,15 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
               </div>
             )}
 
-            <label className="w-full h-7 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+            <label className="w-full h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
               {uploadingDoc === 'bank' ? (
                 <>
-                  <Loader2 className="w-3 h-3 animate-spin text-emerald-600" />
+                  <Loader2 className="w-3 h-3 animate-spin text-blue-600" />
                   <span>Subiendo...</span>
                 </>
               ) : (
                 <>
-                  <Upload className="w-3 h-3 text-emerald-600" />
+                  <Upload className="w-3 h-3 text-blue-600" />
                   <span>{isUsableDoc(selectedCaseModal.bankStatementDoc) ? 'Reemplazar Estado' : 'Adjuntar Estado'}</span>
                 </>
               )}
@@ -561,7 +633,7 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
-                <FileText className="w-3.5 h-3.5 text-purple-600" />
+                <FileText className="w-3.5 h-3.5 text-blue-600" />
                 4. SEVIS (I-901)
               </span>
               {isUsableDoc(selectedCaseModal.sevisDoc) ? (
@@ -576,11 +648,11 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
             </div>
 
             {isUsableDoc(selectedCaseModal.sevisDoc) ? (
-              <div className="p-2 rounded-xl bg-purple-50/50 border border-purple-100 text-center">
-                <p className="text-[11px] font-bold text-purple-950 truncate" title={selectedCaseModal.sevisDoc!.name}>
+              <div className="p-2 rounded-xl bg-blue-50/50 border border-blue-100 text-center">
+                <p className="text-[11px] font-bold text-blue-950 truncate" title={selectedCaseModal.sevisDoc!.name}>
                   {selectedCaseModal.sevisDoc!.name}
                 </p>
-                <span className="text-[9px] font-bold text-purple-700 uppercase">
+                <span className="text-[9px] font-bold text-blue-700 uppercase">
                   {selectedCaseModal.sevisDoc!.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
                 </span>
               </div>
@@ -597,19 +669,28 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
               <div className="flex items-center gap-1.5">
                 <a
                   href={selectedCaseModal.sevisDoc!.url || selectedCaseModal.sevisDoc!.dataUrl}
-                  download={selectedCaseModal.sevisDoc!.name}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex-1 h-7 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                  className="flex-1 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                  title="Ver SEVIS"
                 >
-                  <ExternalLink className="w-3 h-3 text-white" />
-                  Ver / Descargar
+                  <Eye className="w-3 h-3 text-slate-600" />
+                  Ver
                 </a>
+                <button
+                  type="button"
+                  onClick={() => handleDirectDownload(selectedCaseModal.sevisDoc!.url || selectedCaseModal.sevisDoc!.dataUrl!, selectedCaseModal.sevisDoc!.name || 'sevis_i901.pdf')}
+                  className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                  title="Descargar SEVIS"
+                >
+                  <Download className="w-3 h-3 text-white" />
+                  Descargar
+                </button>
                 <button
                   type="button"
                   onClick={() => handleStaffDocDelete('sevis')}
                   disabled={deletingDoc === 'sevis'}
-                  className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50"
+                  className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50 shrink-0"
                   title="Eliminar SEVIS"
                 >
                   {deletingDoc === 'sevis' ? (
@@ -621,15 +702,15 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
               </div>
             )}
 
-            <label className="w-full h-7 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+            <label className="w-full h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
               {uploadingDoc === 'sevis' ? (
                 <>
-                  <Loader2 className="w-3 h-3 animate-spin text-purple-600" />
+                  <Loader2 className="w-3 h-3 animate-spin text-blue-600" />
                   <span>Subiendo...</span>
                 </>
               ) : (
                 <>
-                  <Upload className="w-3 h-3 text-purple-600" />
+                  <Upload className="w-3 h-3 text-blue-600" />
                   <span>{isUsableDoc(selectedCaseModal.sevisDoc) ? 'Reemplazar SEVIS' : 'Adjuntar SEVIS'}</span>
                 </>
               )}
@@ -649,7 +730,7 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
-                <GraduationCap className="w-3.5 h-3.5 text-amber-600" />
+                <GraduationCap className="w-3.5 h-3.5 text-blue-600" />
                 5. Formulario I-20
               </span>
               {isUsableDoc(selectedCaseModal.i20Doc) ? (
@@ -664,11 +745,11 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
             </div>
 
             {isUsableDoc(selectedCaseModal.i20Doc) ? (
-              <div className="p-2 rounded-xl bg-amber-50/50 border border-amber-100 text-center">
-                <p className="text-[11px] font-bold text-amber-950 truncate" title={selectedCaseModal.i20Doc!.name}>
+              <div className="p-2 rounded-xl bg-blue-50/50 border border-blue-100 text-center">
+                <p className="text-[11px] font-bold text-blue-950 truncate" title={selectedCaseModal.i20Doc!.name}>
                   {selectedCaseModal.i20Doc!.name}
                 </p>
-                <span className="text-[9px] font-bold text-amber-700 uppercase">
+                <span className="text-[9px] font-bold text-blue-700 uppercase">
                   {selectedCaseModal.i20Doc!.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
                 </span>
               </div>
@@ -685,19 +766,28 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
               <div className="flex items-center gap-1.5">
                 <a
                   href={selectedCaseModal.i20Doc!.url || selectedCaseModal.i20Doc!.dataUrl}
-                  download={selectedCaseModal.i20Doc!.name}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex-1 h-7 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                  className="flex-1 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                  title="Ver I-20"
                 >
-                  <ExternalLink className="w-3 h-3 text-white" />
-                  Ver / Descargar
+                  <Eye className="w-3 h-3 text-slate-600" />
+                  Ver
                 </a>
+                <button
+                  type="button"
+                  onClick={() => handleDirectDownload(selectedCaseModal.i20Doc!.url || selectedCaseModal.i20Doc!.dataUrl!, selectedCaseModal.i20Doc!.name || 'formulario_i20.pdf')}
+                  className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                  title="Descargar I-20"
+                >
+                  <Download className="w-3 h-3 text-white" />
+                  Descargar
+                </button>
                 <button
                   type="button"
                   onClick={() => handleStaffDocDelete('i20')}
                   disabled={deletingDoc === 'i20'}
-                  className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50"
+                  className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50 shrink-0"
                   title="Eliminar I-20"
                 >
                   {deletingDoc === 'i20' ? (
@@ -709,15 +799,15 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
               </div>
             )}
 
-            <label className="w-full h-7 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+            <label className="w-full h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
               {uploadingDoc === 'i20' ? (
                 <>
-                  <Loader2 className="w-3 h-3 animate-spin text-amber-600" />
+                  <Loader2 className="w-3 h-3 animate-spin text-blue-600" />
                   <span>Subiendo...</span>
                 </>
               ) : (
                 <>
-                  <Upload className="w-3 h-3 text-amber-600" />
+                  <Upload className="w-3 h-3 text-blue-600" />
                   <span>{isUsableDoc(selectedCaseModal.i20Doc) ? 'Reemplazar I-20' : 'Adjuntar I-20'}</span>
                 </>
               )}
@@ -737,7 +827,7 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
-                <FileCheck className="w-3.5 h-3.5 text-cyan-600" />
+                <FileCheck className="w-3.5 h-3.5 text-blue-600" />
                 6. DS-160 (Confirmación)
               </span>
               {isUsableDoc(selectedCaseModal.ds160Doc) ? (
@@ -752,11 +842,11 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
             </div>
 
             {isUsableDoc(selectedCaseModal.ds160Doc) ? (
-              <div className="p-2 rounded-xl bg-cyan-50/50 border border-cyan-100 text-center">
-                <p className="text-[11px] font-bold text-cyan-950 truncate" title={selectedCaseModal.ds160Doc!.name}>
+              <div className="p-2 rounded-xl bg-blue-50/50 border border-blue-100 text-center">
+                <p className="text-[11px] font-bold text-blue-950 truncate" title={selectedCaseModal.ds160Doc!.name}>
                   {selectedCaseModal.ds160Doc!.name}
                 </p>
-                <span className="text-[9px] font-bold text-cyan-700 uppercase">
+                <span className="text-[9px] font-bold text-blue-700 uppercase">
                   {selectedCaseModal.ds160Doc!.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
                 </span>
               </div>
@@ -773,19 +863,28 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
               <div className="flex items-center gap-1.5">
                 <a
                   href={selectedCaseModal.ds160Doc!.url || selectedCaseModal.ds160Doc!.dataUrl}
-                  download={selectedCaseModal.ds160Doc!.name}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex-1 h-7 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                  className="flex-1 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                  title="Ver DS-160"
                 >
-                  <ExternalLink className="w-3 h-3 text-white" />
-                  Ver / Descargar
+                  <Eye className="w-3 h-3 text-slate-600" />
+                  Ver
                 </a>
+                <button
+                  type="button"
+                  onClick={() => handleDirectDownload(selectedCaseModal.ds160Doc!.url || selectedCaseModal.ds160Doc!.dataUrl!, selectedCaseModal.ds160Doc!.name || 'ds160_confirmacion.pdf')}
+                  className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                  title="Descargar DS-160"
+                >
+                  <Download className="w-3 h-3 text-white" />
+                  Descargar
+                </button>
                 <button
                   type="button"
                   onClick={() => handleStaffDocDelete('ds160')}
                   disabled={deletingDoc === 'ds160'}
-                  className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50"
+                  className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50 shrink-0"
                   title="Eliminar DS-160"
                 >
                   {deletingDoc === 'ds160' ? (
@@ -797,15 +896,15 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
               </div>
             )}
 
-            <label className="w-full h-7 rounded-lg bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+            <label className="w-full h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
               {uploadingDoc === 'ds160' ? (
                 <>
-                  <Loader2 className="w-3 h-3 animate-spin text-cyan-600" />
+                  <Loader2 className="w-3 h-3 animate-spin text-blue-600" />
                   <span>Subiendo...</span>
                 </>
               ) : (
                 <>
-                  <Upload className="w-3 h-3 text-cyan-600" />
+                  <Upload className="w-3 h-3 text-blue-600" />
                   <span>{isUsableDoc(selectedCaseModal.ds160Doc) ? 'Reemplazar DS-160' : 'Adjuntar DS-160'}</span>
                 </>
               )}
@@ -825,7 +924,7 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
-                <School className="w-3.5 h-3.5 text-teal-600" />
+                <School className="w-3.5 h-3.5 text-blue-600" />
                 7. Carta de Aceptación
               </span>
               {isUsableDoc(selectedCaseModal.acceptanceLetterDoc) ? (
@@ -840,11 +939,11 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
             </div>
 
             {isUsableDoc(selectedCaseModal.acceptanceLetterDoc) ? (
-              <div className="p-2 rounded-xl bg-teal-50/50 border border-teal-100 text-center">
-                <p className="text-[11px] font-bold text-teal-950 truncate" title={selectedCaseModal.acceptanceLetterDoc!.name}>
+              <div className="p-2 rounded-xl bg-blue-50/50 border border-blue-100 text-center">
+                <p className="text-[11px] font-bold text-blue-950 truncate" title={selectedCaseModal.acceptanceLetterDoc!.name}>
                   {selectedCaseModal.acceptanceLetterDoc!.name}
                 </p>
-                <span className="text-[9px] font-bold text-teal-700 uppercase">
+                <span className="text-[9px] font-bold text-blue-700 uppercase">
                   {selectedCaseModal.acceptanceLetterDoc!.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
                 </span>
               </div>
@@ -861,19 +960,28 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
               <div className="flex items-center gap-1.5">
                 <a
                   href={selectedCaseModal.acceptanceLetterDoc!.url || selectedCaseModal.acceptanceLetterDoc!.dataUrl}
-                  download={selectedCaseModal.acceptanceLetterDoc!.name}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex-1 h-7 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                  className="flex-1 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                  title="Ver carta de aceptación"
                 >
-                  <ExternalLink className="w-3 h-3 text-white" />
-                  Ver / Descargar
+                  <Eye className="w-3 h-3 text-slate-600" />
+                  Ver
                 </a>
+                <button
+                  type="button"
+                  onClick={() => handleDirectDownload(selectedCaseModal.acceptanceLetterDoc!.url || selectedCaseModal.acceptanceLetterDoc!.dataUrl!, selectedCaseModal.acceptanceLetterDoc!.name || 'carta_aceptacion.pdf')}
+                  className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                  title="Descargar carta de aceptación"
+                >
+                  <Download className="w-3 h-3 text-white" />
+                  Descargar
+                </button>
                 <button
                   type="button"
                   onClick={() => handleStaffDocDelete('acceptance')}
                   disabled={deletingDoc === 'acceptance'}
-                  className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50"
+                  className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50 shrink-0"
                   title="Eliminar carta"
                 >
                   {deletingDoc === 'acceptance' ? (
@@ -885,15 +993,15 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
               </div>
             )}
 
-            <label className="w-full h-7 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-700 border border-teal-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+            <label className="w-full h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
               {uploadingDoc === 'acceptance' ? (
                 <>
-                  <Loader2 className="w-3 h-3 animate-spin text-teal-600" />
+                  <Loader2 className="w-3 h-3 animate-spin text-blue-600" />
                   <span>Subiendo...</span>
                 </>
               ) : (
                 <>
-                  <Upload className="w-3 h-3 text-teal-600" />
+                  <Upload className="w-3 h-3 text-blue-600" />
                   <span>{isUsableDoc(selectedCaseModal.acceptanceLetterDoc) ? 'Reemplazar Carta' : 'Adjuntar Carta'}</span>
                 </>
               )}
@@ -913,7 +1021,7 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-rose-600" />
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
                 8. Affidavit of Support
               </span>
               {isUsableDoc(selectedCaseModal.affidavitDoc) ? (
@@ -928,11 +1036,11 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
             </div>
 
             {isUsableDoc(selectedCaseModal.affidavitDoc) ? (
-              <div className="p-2 rounded-xl bg-rose-50/50 border border-rose-100 text-center">
-                <p className="text-[11px] font-bold text-rose-950 truncate" title={selectedCaseModal.affidavitDoc!.name}>
+              <div className="p-2 rounded-xl bg-blue-50/50 border border-blue-100 text-center">
+                <p className="text-[11px] font-bold text-blue-950 truncate" title={selectedCaseModal.affidavitDoc!.name}>
                   {selectedCaseModal.affidavitDoc!.name}
                 </p>
-                <span className="text-[9px] font-bold text-rose-700 uppercase">
+                <span className="text-[9px] font-bold text-blue-700 uppercase">
                   {selectedCaseModal.affidavitDoc!.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
                 </span>
               </div>
@@ -949,19 +1057,28 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
               <div className="flex items-center gap-1.5">
                 <a
                   href={selectedCaseModal.affidavitDoc!.url || selectedCaseModal.affidavitDoc!.dataUrl}
-                  download={selectedCaseModal.affidavitDoc!.name}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex-1 h-7 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                  className="flex-1 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                  title="Ver affidavit"
                 >
-                  <ExternalLink className="w-3 h-3 text-white" />
-                  Ver / Descargar
+                  <Eye className="w-3 h-3 text-slate-600" />
+                  Ver
                 </a>
+                <button
+                  type="button"
+                  onClick={() => handleDirectDownload(selectedCaseModal.affidavitDoc!.url || selectedCaseModal.affidavitDoc!.dataUrl!, selectedCaseModal.affidavitDoc!.name || 'affidavit_support.pdf')}
+                  className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                  title="Descargar affidavit"
+                >
+                  <Download className="w-3 h-3 text-white" />
+                  Descargar
+                </button>
                 <button
                   type="button"
                   onClick={() => handleStaffDocDelete('affidavit')}
                   disabled={deletingDoc === 'affidavit'}
-                  className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50"
+                  className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50 shrink-0"
                   title="Eliminar affidavit"
                 >
                   {deletingDoc === 'affidavit' ? (
@@ -973,15 +1090,15 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
               </div>
             )}
 
-            <label className="w-full h-7 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+            <label className="w-full h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
               {uploadingDoc === 'affidavit' ? (
                 <>
-                  <Loader2 className="w-3 h-3 animate-spin text-rose-600" />
+                  <Loader2 className="w-3 h-3 animate-spin text-blue-600" />
                   <span>Subiendo...</span>
                 </>
               ) : (
                 <>
-                  <Upload className="w-3 h-3 text-rose-600" />
+                  <Upload className="w-3 h-3 text-blue-600" />
                   <span>{isUsableDoc(selectedCaseModal.affidavitDoc) ? 'Reemplazar Affidavit' : 'Adjuntar Affidavit'}</span>
                 </>
               )}
@@ -1001,7 +1118,7 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-fuchsia-600" />
+                <Calendar className="w-3.5 h-3.5 text-blue-600" />
                 9. Cita Embajada (AIS)
               </span>
               {isUsableDoc(selectedCaseModal.embassyAppointmentDoc) ? (
@@ -1016,11 +1133,11 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
             </div>
 
             {isUsableDoc(selectedCaseModal.embassyAppointmentDoc) ? (
-              <div className="p-2 rounded-xl bg-fuchsia-50/50 border border-fuchsia-100 text-center">
-                <p className="text-[11px] font-bold text-fuchsia-950 truncate" title={selectedCaseModal.embassyAppointmentDoc!.name}>
+              <div className="p-2 rounded-xl bg-blue-50/50 border border-blue-100 text-center">
+                <p className="text-[11px] font-bold text-blue-950 truncate" title={selectedCaseModal.embassyAppointmentDoc!.name}>
                   {selectedCaseModal.embassyAppointmentDoc!.name}
                 </p>
-                <span className="text-[9px] font-bold text-fuchsia-700 uppercase">
+                <span className="text-[9px] font-bold text-blue-700 uppercase">
                   {selectedCaseModal.embassyAppointmentDoc!.type === 'application/pdf' ? 'Documento PDF' : 'Imagen'}
                 </span>
               </div>
@@ -1037,19 +1154,28 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
               <div className="flex items-center gap-1.5">
                 <a
                   href={selectedCaseModal.embassyAppointmentDoc!.url || selectedCaseModal.embassyAppointmentDoc!.dataUrl}
-                  download={selectedCaseModal.embassyAppointmentDoc!.name}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex-1 h-7 rounded-lg bg-fuchsia-600 hover:bg-fuchsia-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                  className="flex-1 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                  title="Ver comprobante de cita"
                 >
-                  <ExternalLink className="w-3 h-3 text-white" />
-                  Ver / Descargar
+                  <Eye className="w-3 h-3 text-slate-600" />
+                  Ver
                 </a>
+                <button
+                  type="button"
+                  onClick={() => handleDirectDownload(selectedCaseModal.embassyAppointmentDoc!.url || selectedCaseModal.embassyAppointmentDoc!.dataUrl!, selectedCaseModal.embassyAppointmentDoc!.name || 'cita_embajada.pdf')}
+                  className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                  title="Descargar comprobante de cita"
+                >
+                  <Download className="w-3 h-3 text-white" />
+                  Descargar
+                </button>
                 <button
                   type="button"
                   onClick={() => handleStaffDocDelete('embassyAppointment')}
                   disabled={deletingDoc === 'embassyAppointment'}
-                  className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50"
+                  className="h-7 w-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50 shrink-0"
                   title="Eliminar comprobante de cita"
                 >
                   {deletingDoc === 'embassyAppointment' ? (
@@ -1061,15 +1187,15 @@ export const DossierDocGrid: React.FC<DossierDocGridProps> = ({
               </div>
             )}
 
-            <label className="w-full h-7 rounded-lg bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
+            <label className="w-full h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">
               {uploadingDoc === 'embassyAppointment' ? (
                 <>
-                  <Loader2 className="w-3 h-3 animate-spin text-fuchsia-600" />
+                  <Loader2 className="w-3 h-3 animate-spin text-blue-600" />
                   <span>Subiendo...</span>
                 </>
               ) : (
                 <>
-                  <Upload className="w-3 h-3 text-fuchsia-600" />
+                  <Upload className="w-3 h-3 text-blue-600" />
                   <span>{isUsableDoc(selectedCaseModal.embassyAppointmentDoc) ? 'Reemplazar Cita' : 'Adjuntar Cita'}</span>
                 </>
               )}

@@ -249,8 +249,6 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
           activeSection={activeSection}
           isSidebarCollapsed={isSidebarCollapsed}
           onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          isLiveChatOpen={isLiveChatOpen}
-          onToggleLiveChat={() => setIsLiveChatOpen(prev => !prev)}
         />
 
         {/* MAIN CONTENT AREA */}
@@ -264,7 +262,7 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
-              className="w-full min-h-[400px] max-w-7xl mx-auto"
+              className="w-full min-h-[400px] max-w-[1680px] mx-auto"
             >
               {children}
             </motion.div>
@@ -694,6 +692,7 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
       {/* CLIENT LIVE CHAT DRAWER */}
       <PortalLiveChat
         isOpen={isLiveChatOpen}
+        onOpen={() => setIsLiveChatOpen(true)}
         onClose={() => setIsLiveChatOpen(false)}
         userEmail={user?.email || ''}
         userName={user?.displayName || user?.email || 'Cliente'}

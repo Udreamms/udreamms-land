@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
     const newMessage: ChatMessage = {
       id: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       sender: sender === 'staff' ? 'staff' : 'client',
-      senderName: senderName || (sender === 'staff' ? 'Staff Udreamms' : clientName || 'Cliente'),
+      senderName: senderName || (sender === 'staff' ? 'Sarah Davis' : clientName || 'Cliente'),
       text: text.trim(),
       timestamp: new Date().toISOString(),
       read: false,

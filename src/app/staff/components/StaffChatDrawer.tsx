@@ -1,37 +1,47 @@
-'use client';
-
-import React from 'react';
-import { RefreshCw, X, MessageSquare, Send } from 'lucide-react';
+import React, { useEffect, useRef } from 'react';
+import { Minus, X, MessageSquare, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { StudentCase, getStatusLabel } from '../types';
 
 interface StaffChatDrawerProps {
   activeChatStudent: StudentCase | null;
   onClose: () => void;
+  onMinimize?: () => void;
   chatMessages: any[];
   chatInput: string;
   setChatInput: (val: string) => void;
   isSendingChat: boolean;
   onSendChat: (e?: React.FormEvent) => void;
-  onRefreshChat: () => void;
+  onRefreshChat?: () => void;
 }
 
 export const StaffChatDrawer: React.FC<StaffChatDrawerProps> = ({
   activeChatStudent,
   onClose,
+  onMinimize,
   chatMessages,
   chatInput,
   setChatInput,
   isSendingChat,
   onSendChat,
-  onRefreshChat,
 }) => {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    if (activeChatStudent) {
+      scrollToBottom();
+    }
+  }, [chatMessages, activeChatStudent]);
+
   if (!activeChatStudent) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-end sm:items-center justify-end sm:p-6 animate-in fade-in duration-200">
-      <div className="bg-white border border-slate-200 shadow-2xl rounded-t-3xl sm:rounded-3xl w-full sm:max-w-md h-[85vh] sm:h-[620px] flex flex-col overflow-hidden animate-in slide-in-from-bottom sm:slide-in-from-right duration-300">
+    <div className="fixed bottom-0 right-0 z-50 p-3 sm:p-5 pointer-events-none flex justify-end items-end animate-in fade-in duration-200">
+      <div className="pointer-events-auto bg-white border border-slate-200/90 shadow-2xl rounded-3xl w-[94vw] sm:w-[460px] h-[82vh] sm:h-[620px] max-h-[720px] flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
         {/* Chat Header */}
         <div className="p-4 bg-slate-900 text-white flex items-center justify-between gap-3 shrink-0 shadow-md">
           <div className="flex items-center gap-3 min-w-0">
@@ -65,11 +75,11 @@ export const StaffChatDrawer: React.FC<StaffChatDrawerProps> = ({
           <div className="flex items-center gap-1 shrink-0">
             <button
               type="button"
-              onClick={onRefreshChat}
+              onClick={onMinimize || onClose}
               className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-              title="Refrescar mensajes"
+              title="Minimizar chat"
             >
-              <RefreshCw className="w-4 h-4" />
+              <Minus className="w-4 h-4" />
             </button>
             <button
               type="button"
@@ -91,7 +101,7 @@ export const StaffChatDrawer: React.FC<StaffChatDrawerProps> = ({
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50/50">
+        <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50/50 no-scrollbar [&::-webkit-scrollbar]:hidden [scrollbar-width:none] [-ms-overflow-style:none]">
           {chatMessages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-2">
               <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
@@ -112,20 +122,6 @@ export const StaffChatDrawer: React.FC<StaffChatDrawerProps> = ({
                   key={msg.id || index}
                   className={`flex flex-col ${isStaff ? 'items-end' : 'items-start'}`}
                 >
-                  <div className="flex items-center gap-1.5 mb-1 px-1">
-                    <span className="text-[10px] font-bold text-slate-500">
-                      {isStaff ? 'Tú (Staff Udreamms)' : msg.senderName || activeChatStudent.name || 'Cliente'}
-                    </span>
-                    {msg.timestamp && (
-                      <span className="text-[9px] text-slate-400">
-                        {new Date(msg.timestamp).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </span>
-                    )}
-                  </div>
-
                   <div
                     className={`max-w-[85%] p-3 rounded-2xl text-xs leading-relaxed shadow-2xs whitespace-pre-wrap break-words ${
                       isStaff
@@ -135,10 +131,19 @@ export const StaffChatDrawer: React.FC<StaffChatDrawerProps> = ({
                   >
                     {msg.text}
                   </div>
+                  {msg.timestamp && (
+                    <span className="text-[9px] text-slate-400 mt-1 px-1">
+                      {new Date(msg.timestamp).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  )}
                 </div>
               );
             })
           )}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Chat Input Bar */}
@@ -146,11 +151,12 @@ export const StaffChatDrawer: React.FC<StaffChatDrawerProps> = ({
           onSubmit={onSendChat}
           className="p-3 bg-white border-t border-slate-200 flex items-center gap-2 shrink-0"
         >
-          <Input
+          <input
+            type="text"
             placeholder="Escribe un mensaje al cliente..."
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
-            className="h-10 text-xs bg-slate-50 border-slate-200 rounded-full focus:border-blue-600 focus:bg-white"
+            className="flex-1 h-10 text-xs bg-slate-50 border border-slate-200 rounded-full px-4 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
             disabled={isSendingChat}
           />
           <Button

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/backend/firebase/admin';
+import { PENDING_PURCHASES_COLLECTION, pendingPurchaseDocId } from '@/backend/payments/unlock-purchase';
 
 // Every product staff can lock/unlock for a client, matching the purchased_* flags
 // written by the normal checkout flow (see PortalContext.tsx / unlock-purchase.ts).
@@ -38,18 +39,79 @@ export async function POST(req: NextRequest) {
     }
 
     const emailLower = String(email).toLowerCase().trim();
-    const snap = await db.collection('users').where('email', '==', emailLower).limit(1).get();
+    const boolValue = Boolean(value);
+    const now = new Date().toISOString();
 
-    if (snap.empty) {
-      return NextResponse.json({
-        error: 'Este cliente todavía no tiene una cuenta registrada en el portal (nunca inició sesión), así que no hay un perfil donde activar el producto todavía.',
-      }, { status: 404 });
+    // 1. Find all matching user documents in `users` collection by email
+    const snap = await db.collection('users').where('email', '==', emailLower).get();
+    const directDocRef = db.collection('users').doc(emailLower);
+    const directDoc = await directDocRef.get();
+
+    const batch = db.batch();
+    const touchedRefs = new Set<string>();
+
+    // Update all query-matched user docs
+    snap.docs.forEach((docSnap) => {
+      batch.set(docSnap.ref, { [flag]: boolValue, updatedAt: now }, { merge: true });
+      touchedRefs.add(docSnap.ref.path);
+    });
+
+    // If direct doc exists or no docs matched at all, ensure users/emailLower is also updated/created
+    if (directDoc.exists || touchedRefs.size === 0) {
+      batch.set(
+        directDocRef,
+        {
+          email: emailLower,
+          [flag]: boolValue,
+          updatedAt: now,
+          ...(directDoc.exists ? {} : { createdAt: now }),
+        },
+        { merge: true }
+      );
+      touchedRefs.add(directDocRef.path);
     }
 
-    const userDoc = snap.docs[0];
-    await userDoc.ref.set({ [flag]: Boolean(value), updatedAt: new Date().toISOString() }, { merge: true });
+    // 2. Also keep pendingPurchases in sync so if client signs up later with a new UID, it carries over
+    const pendingDocId = pendingPurchaseDocId(emailLower);
+    const pendingRef = db.collection(PENDING_PURCHASES_COLLECTION).doc(pendingDocId);
+    const pendingSnap = await pendingRef.get();
 
-    return NextResponse.json({ success: true, email: emailLower, flag, value: Boolean(value) });
+    if (boolValue) {
+      // Add to pending
+      const existingItems = (pendingSnap.data()?.items as Record<string, boolean>) || {};
+      batch.set(
+        pendingRef,
+        {
+          email: emailLower,
+          items: { ...existingItems, [flag]: true },
+          lastSource: 'staff_override',
+          updatedAt: now,
+          createdAt: pendingSnap.exists ? pendingSnap.data()?.createdAt || now : now,
+        },
+        { merge: true }
+      );
+    } else if (pendingSnap.exists) {
+      // Remove from pending
+      const existingItems = (pendingSnap.data()?.items as Record<string, boolean>) || {};
+      if (existingItems[flag]) {
+        const remaining = { ...existingItems };
+        delete remaining[flag];
+        if (Object.keys(remaining).length === 0) {
+          batch.delete(pendingRef);
+        } else {
+          batch.set(pendingRef, { items: remaining, updatedAt: now }, { merge: true });
+        }
+      }
+    }
+
+    await batch.commit();
+
+    return NextResponse.json({
+      success: true,
+      email: emailLower,
+      flag,
+      value: boolValue,
+    });
   } catch (error: any) {
     console.error('Error toggling entitlement:', error);
     return NextResponse.json({ error: error?.message || 'Error al actualizar el producto' }, { status: 500 });
