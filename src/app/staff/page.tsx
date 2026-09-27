@@ -104,7 +104,7 @@ export default function StaffPortalPage() {
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        toast.success('Nueva tarjeta creada.');
+        toast.success(`¡Nueva tarjeta ${visaType === 'F-1' ? 'Estudiante F-1' : 'Turista B-2'} creada y activa en el portal!`);
         const freshCases = await fetchCases();
         const clientEmail = (email || '').trim().toLowerCase();
         const freshGroup = freshCases.filter((c) => {
@@ -113,9 +113,13 @@ export default function StaffPortalPage() {
         });
         if (freshGroup.length > 0) {
           setCaseModalGroup(freshGroup);
-          if (data?.createdCase?.id) {
-            const created = freshGroup.find((c) => c.id === data.createdCase.id);
+          const targetId = data?.caseId || data?.createdCase?.id;
+          if (targetId) {
+            const created = freshGroup.find((c) => c.id === targetId);
             if (created) setSelectedCaseModal(created);
+            else setSelectedCaseModal(freshGroup[freshGroup.length - 1]);
+          } else {
+            setSelectedCaseModal(freshGroup[freshGroup.length - 1]);
           }
         }
       } else {
@@ -211,10 +215,12 @@ export default function StaffPortalPage() {
   };
 
   const handleDeleteCase = async (caseItem: StudentCase) => {
+    const visaLabel = caseItem.visaType === 'F-1' ? 'Visa Estudiante (F-1)' : 'Visa Turista (B-2)';
+    const cardTitle = caseItem.formData?.nombres || caseItem.name || 'Postulante';
     const confirmed =
       typeof window !== 'undefined'
         ? window.confirm(
-            `¿Eliminar el expediente de "${caseItem.name}" (${caseItem.email})? Esta acción no se puede deshacer.`
+            `¿Estás seguro de eliminar la tarjeta "${cardTitle}" (${visaLabel}) de este expediente?\n\nEsta tarjeta se eliminará también del portal personal del cliente (/portal/proceso).`
           )
         : false;
     if (!confirmed) return;
@@ -225,20 +231,26 @@ export default function StaffPortalPage() {
         method: 'DELETE',
       });
       if (res.ok) {
-        setStudentCases((prev) => prev.filter((c) => c.id !== caseItem.id));
-        setCaseModalGroup((prev) => prev.filter((c) => c.id !== caseItem.id));
-        if (selectedCaseModal?.id === caseItem.id) {
-          const remaining = caseModalGroup.filter((c) => c.id !== caseItem.id);
-          setSelectedCaseModal(remaining.length > 0 ? remaining[0] : null);
+        toast.success(`Tarjeta de ${visaLabel} eliminada correctamente.`);
+        const freshCases = await fetchCases();
+        const clientEmail = (caseItem.email || caseItem.formData?.email_contacto || '').trim().toLowerCase();
+        const freshGroup = freshCases.filter((c) => {
+          const cEmail = (c.email || c.formData?.email_contacto || '').trim().toLowerCase();
+          return Boolean(clientEmail && cEmail && clientEmail === cEmail);
+        });
+        setCaseModalGroup(freshGroup);
+        if (freshGroup.length > 0) {
+          setSelectedCaseModal(freshGroup[0]);
+        } else {
+          closeCaseModal();
         }
-        toast.success(`Expediente de "${caseItem.name}" eliminado.`);
       } else {
         const errBody = await res.json().catch(() => ({}));
-        toast.error(errBody?.error || 'No se pudo eliminar el expediente.');
+        toast.error(errBody?.error || 'No se pudo eliminar la tarjeta.');
       }
     } catch (err) {
       console.error('Error deleting case:', err);
-      toast.error('No se pudo eliminar el expediente.');
+      toast.error('No se pudo eliminar la tarjeta.');
     } finally {
       setDeletingCaseId(null);
     }
@@ -291,18 +303,18 @@ export default function StaffPortalPage() {
           item.id === caseId;
 
         if (belongsToClient) {
-          return { ...item, status: newStatus };
+          return { ...item, status: newStatus, updatedAt: new Date().toISOString() };
         }
         return item;
       })
     );
 
     setCaseModalGroup((prev) =>
-      prev.map((item) => ({ ...item, status: newStatus }))
+      prev.map((item) => ({ ...item, status: newStatus, updatedAt: new Date().toISOString() }))
     );
 
     if (selectedCaseModal) {
-      setSelectedCaseModal((prev) => (prev ? { ...prev, status: newStatus } : null));
+      setSelectedCaseModal((prev) => (prev ? { ...prev, status: newStatus, updatedAt: new Date().toISOString() } : null));
     }
 
     try {
@@ -350,11 +362,20 @@ export default function StaffPortalPage() {
           }),
         });
         if (res.ok) {
+          const updatedName = [editedFormData.nombres, editedFormData.apellidos].filter(Boolean).join(' ');
           setStudentCases((prev) =>
-            prev.map((c) => (c.id === selectedCaseModal.id ? { ...c, formData: editedFormData } : c))
+            prev.map((c) => (c.id === selectedCaseModal.id ? {
+              ...c,
+              formData: editedFormData,
+              name: updatedName || c.name,
+            } : c))
           );
           setSelectedCaseModal((prev) =>
-            prev && prev.id === selectedCaseModal.id ? { ...prev, formData: editedFormData } : prev
+            prev && prev.id === selectedCaseModal.id ? {
+              ...prev,
+              formData: editedFormData,
+              name: updatedName || prev.name,
+            } : prev
           );
           setDossierSaveStatus('saved');
         } else {
@@ -487,6 +508,26 @@ export default function StaffPortalPage() {
     filteredCases.push(inStage[0]);
   });
 
+  // Sort expedientes according to user workflow:
+  // 1. In 'nuevos' (Usuarios Registrados): strictly by arrival order (most recent arrival at the top, oldest at the bottom)
+  // 2. In other tabs: by when staff moved them (most recently moved at the top)
+  filteredCases.sort((a, b) => {
+    if (activeTab === 'nuevos') {
+      const numA = a.expedienteNumber || 0;
+      const numB = b.expedienteNumber || 0;
+      if (numA !== numB) {
+        return numB - numA; // El expediente más reciente arriba (ej. #9), el más antiguo abajo (ej. #1)
+      }
+      const timeA = new Date(a.submittedAt || a.updatedAt || 0).getTime();
+      const timeB = new Date(b.submittedAt || b.updatedAt || 0).getTime();
+      return timeB - timeA;
+    } else {
+      const timeA = new Date(a.updatedAt || a.submittedAt || 0).getTime();
+      const timeB = new Date(b.updatedAt || b.submittedAt || 0).getTime();
+      return timeB - timeA;
+    }
+  });
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col relative selection:bg-blue-500/20">
       {/* FLOATING WHITE GLASSMORPHISM SIDEBAR */}
@@ -578,12 +619,25 @@ export default function StaffPortalPage() {
                 ) : (
                   <div className="flex flex-col gap-3 w-full">
                     {filteredCases.map((student) => {
-                      const groupSize = casesByGroup.get(student.groupKey || student.id)?.length || 1;
+                      const groupCards = casesByGroup.get(student.groupKey || student.id) || [student];
+                      const activeGroupCards = groupCards.filter(c => c.hasVisaService !== false);
+                      const targetCards = activeGroupCards.length > 0 ? activeGroupCards : groupCards;
+                      const groupNames = targetCards.map(c => {
+                        const fData = c.formData || {};
+                        const cNombres = fData.nombres?.trim() || fData.first_name?.trim();
+                        const cApellidos = fData.apellidos?.trim() || fData.last_name?.trim();
+                        const fullName = [cNombres, cApellidos].filter(Boolean).join(' ');
+                        return fullName || c.name || 'Postulante';
+                      }).join(' | ');
+                      const groupPhoto = targetCards.find(c => Boolean(c.photoUrl))?.photoUrl || student.photoUrl || '';
+                      const groupSize = groupCards.length;
                       return (
                         <StaffCaseCard
                           key={student.id}
                           student={student}
                           groupSize={groupSize}
+                          groupNames={groupNames}
+                          groupPhoto={groupPhoto}
                           onSelectCase={(s) => openCaseModal(s, studentCases)}
                           onMoveStatus={handleMoveStatus}
                           onStartChat={(s) => {

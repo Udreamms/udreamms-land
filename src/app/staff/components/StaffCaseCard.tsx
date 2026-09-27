@@ -22,6 +22,8 @@ import { StudentCase, StaffTabType, isUsableDoc } from '../types';
 interface StaffCaseCardProps {
   student: StudentCase;
   groupSize: number;
+  groupNames?: string;
+  groupPhoto?: string;
   onSelectCase: (student: StudentCase) => void;
   onMoveStatus: (caseId: string, newStatus: StaffTabType) => void;
   onStartChat: (student: StudentCase) => void;
@@ -31,15 +33,19 @@ interface StaffCaseCardProps {
 export const StaffCaseCard: React.FC<StaffCaseCardProps> = ({
   student,
   groupSize,
+  groupNames,
+  groupPhoto,
   onSelectCase,
   onMoveStatus,
   onStartChat,
   onCopy,
 }) => {
-  const hasPhoto = Boolean(student.photoUrl);
+  const effectivePhoto = groupPhoto || student.photoUrl || '';
+  const hasPhoto = Boolean(effectivePhoto);
   const hasPassport = isUsableDoc(student.passportDoc);
   const hasBankStatement = isUsableDoc(student.bankStatementDoc);
   const hasSevis = isUsableDoc(student.sevisDoc);
+  const displayTitle = groupNames || student.name || 'Postulante sin nombre registrado';
 
   return (
     <div
@@ -50,10 +56,10 @@ export const StaffCaseCard: React.FC<StaffCaseCardProps> = ({
       <div className="flex items-start md:items-center gap-4 min-w-0 flex-1">
         {/* 5x5 Photo Thumbnail */}
         <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-slate-100 border border-slate-200 group-hover:border-blue-500 overflow-hidden shrink-0 flex items-center justify-center shadow-xs transition-colors">
-          {student.photoUrl ? (
+          {effectivePhoto ? (
             <img
-              src={student.photoUrl}
-              alt={student.name}
+              src={effectivePhoto}
+              alt={displayTitle}
               className="w-full h-full object-cover"
             />
           ) : (
@@ -68,8 +74,11 @@ export const StaffCaseCard: React.FC<StaffCaseCardProps> = ({
         <div className="space-y-1.5 min-w-0 flex-1">
           {/* Row 1: Full Name + Visa Badge + Case ID */}
           <div className="flex items-center gap-2 flex-wrap">
-            <h4 className="text-base md:text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
-              {student.name || 'Postulante sin nombre registrado'}
+            <h4
+              className="text-base md:text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate"
+              title={displayTitle}
+            >
+              {displayTitle}
             </h4>
 
             {student.hasVisaService === false ? (

@@ -117,14 +117,29 @@ export async function POST(req: NextRequest) {
       }
 
       // Also update user document if userId or email matches
+      const clientEmailClean = (userEmail || email || formData.email_contacto || '').toLowerCase().trim();
+      const userUpdates: any = {
+        name: fullName,
+        displayName: fullName,
+        phone: formData.celular_contacto || '',
+        updatedAt: new Date().toISOString(),
+      };
+      if ('photoUrl' in body && cleanPhoto) {
+        userUpdates.photoUrl = cleanPhoto;
+      }
+
       if (userId) {
         try {
-          await db.collection('users').doc(userId).set({
-            name: fullName,
-            displayName: fullName,
-            phone: formData.celular_contacto || '',
-            updatedAt: new Date().toISOString(),
-          }, { merge: true });
+          await db.collection('users').doc(userId).set(userUpdates, { merge: true });
+        } catch (uErr) {
+          // non-blocking
+        }
+      } else if (clientEmailClean) {
+        try {
+          const uSnap = await db.collection('users').where('email', '==', clientEmailClean).get();
+          uSnap.forEach(uDoc => {
+            uDoc.ref.set(userUpdates, { merge: true }).catch(() => {});
+          });
         } catch (uErr) {
           // non-blocking
         }

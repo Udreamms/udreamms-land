@@ -22,6 +22,31 @@ export const StaffSidebar: React.FC<StaffSidebarProps> = ({
   studentCases,
   onLogout,
 }) => {
+  // Count unique expedientes (clients), NOT individual cards
+  const { countsByTab, unreadByTab } = React.useMemo(() => {
+    const map = new Map<string, StudentCase[]>();
+    studentCases.forEach((c) => {
+      const key = c.groupKey || c.email?.toLowerCase().trim() || c.id;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(c);
+    });
+
+    const counts: Record<string, number> = {};
+    const unreads: Record<string, number> = {};
+
+    map.forEach((group) => {
+      const status = group[0]?.status || 'nuevos';
+      counts[status] = (counts[status] || 0) + 1;
+
+      const maxUnread = Math.max(...group.map((c) => c.unreadCount || 0));
+      if (maxUnread > 0) {
+        unreads[status] = (unreads[status] || 0) + maxUnread;
+      }
+    });
+
+    return { countsByTab: counts, unreadByTab: unreads };
+  }, [studentCases]);
+
   return (
     <aside
       className={`shrink-0 fixed top-[18px] left-[18px] z-40 flex flex-col justify-between h-[calc(100vh-36px)] bg-white border border-slate-200 rounded-3xl p-3 md:p-4 shadow-[0_10px_35px_rgba(0,0,0,0.06)] text-black overflow-y-auto no-scrollbar transition-all duration-300 ${
@@ -78,10 +103,8 @@ export const StaffSidebar: React.FC<StaffSidebarProps> = ({
           {STAFF_TABS_LIST.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
-            const count = studentCases.filter((c) => c.status === tab.id).length;
-            const unreadInTab = studentCases
-              .filter((c) => c.status === tab.id && (c.unreadCount || 0) > 0)
-              .reduce((acc, curr) => acc + (curr.unreadCount || 0), 0);
+            const count = countsByTab[tab.id] || 0;
+            const unreadInTab = unreadByTab[tab.id] || 0;
 
             return (
               <button

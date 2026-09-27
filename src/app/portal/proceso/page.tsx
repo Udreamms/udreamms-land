@@ -119,7 +119,7 @@ export default function ProcesoPage() {
         if (saved) return JSON.parse(saved);
       } catch (e) {}
     }
-    return ['1'];
+    return [];
   });
 
   // Multi-applicants list for Tourist Visa (B-2)
@@ -130,7 +130,7 @@ export default function ProcesoPage() {
         if (saved) return JSON.parse(saved);
       } catch (e) {}
     }
-    return ['1'];
+    return [];
   });
 
   // Detailed info per applicant cache
@@ -544,17 +544,25 @@ export default function ProcesoPage() {
         if (!res.ok) return;
         const data = await res.json();
         const cloudIds: string[] = data.applicantIds || [];
-        if (cloudIds.length === 0) return;
+        const isStudent = visaType === 'F-1';
+        const setApplicants = isStudent ? setStudentApplicants : setTouristApplicants;
+        const hasPlan = isStudent ? unlockedStudent : unlockedTourist;
 
-        const setApplicants = visaType === 'F-1' ? setStudentApplicants : setTouristApplicants;
-        let newIds: string[] = [];
-        setApplicants(prev => {
-          newIds = cloudIds.filter(id => !prev.includes(id));
-          if (newIds.length === 0) return prev;
-          return [...prev, ...newIds];
-        });
-        for (const id of newIds) {
-          await hydrateFromCloud(visaType, id);
+        if (cloudIds.length > 0) {
+          setApplicants((prev) => {
+            const isSame = prev.length === cloudIds.length && prev.every((id) => cloudIds.includes(id));
+            return isSame ? prev : cloudIds;
+          });
+          for (const id of cloudIds) {
+            await hydrateFromCloud(visaType, id);
+          }
+        } else if (hasPlan) {
+          // If the user paid for a plan but no cloud cards have been seeded yet, initialize with card '1'
+          setApplicants((prev) => (prev.length > 0 ? prev : ['1']));
+          await hydrateFromCloud(visaType, '1');
+        } else {
+          // No cards in cloud and no unlocked plan: clear list completely
+          setApplicants([]);
         }
       } catch (err) {
         console.warn('Could not sync applicant list from cloud:', err);
@@ -1134,24 +1142,27 @@ export default function ProcesoPage() {
     totalInType: number;
   }> = [];
 
+  const effectiveStudentApplicants = (unlockedStudent && studentApplicants.length === 0) ? ['1'] : studentApplicants;
+  const effectiveTouristApplicants = (unlockedTourist && touristApplicants.length === 0) ? ['1'] : touristApplicants;
+
   if (unlockedStudent && (visaFilter === 'all' || visaFilter === 'estudiante')) {
-    studentApplicants.forEach((id, idx) => {
+    effectiveStudentApplicants.forEach((id, idx) => {
       allCards.push({
         visaType: 'estudiante',
         applicantId: id,
         index: idx,
-        totalInType: studentApplicants.length,
+        totalInType: effectiveStudentApplicants.length,
       });
     });
   }
 
   if (unlockedTourist && (visaFilter === 'all' || visaFilter === 'turista')) {
-    touristApplicants.forEach((id, idx) => {
+    effectiveTouristApplicants.forEach((id, idx) => {
       allCards.push({
         visaType: 'turista',
         applicantId: id,
         index: idx,
-        totalInType: touristApplicants.length,
+        totalInType: effectiveTouristApplicants.length,
       });
     });
   }

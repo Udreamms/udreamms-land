@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Lock, MessageCircle } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StudentCase, StaffTabType } from '../types';
 import { DossierHeader } from './dossier/DossierHeader';
@@ -9,6 +9,7 @@ import { DossierToolbar } from './dossier/DossierToolbar';
 import { DossierSectionNav } from './dossier/DossierSectionNav';
 import { DossierDocGrid } from './dossier/DossierDocGrid';
 import { DossierFormSections } from './dossier/DossierFormSections';
+import { DossierChatFooter } from './dossier/DossierChatFooter';
 
 interface StaffDossierModalProps {
   selectedCaseModal: StudentCase | null;
@@ -59,7 +60,7 @@ export const StaffDossierModal: React.FC<StaffDossierModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 md:p-6 overflow-y-auto">
-      <div className="bg-white border border-slate-200 shadow-2xl rounded-3xl w-full max-w-[1560px] max-h-[95vh] flex flex-col overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-white border border-slate-200 shadow-2xl rounded-3xl w-full max-w-[1560px] h-[95vh] max-h-[95vh] flex flex-col overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200">
         {/* Modular Header */}
         <DossierHeader
           selectedCaseModal={selectedCaseModal}
@@ -103,10 +104,13 @@ export const StaffDossierModal: React.FC<StaffDossierModalProps> = ({
             )}
 
             {/* Modal Body: Navigation Capsules, Documents Grid & Form Sections */}
-            <div className="p-6 md:p-8 overflow-y-auto space-y-6 text-slate-900">
+            <div className="p-6 md:p-8 overflow-y-auto space-y-6 text-slate-900 flex-1 min-h-0 sleek-scrollbar">
               {/* 13 Section Navigation Capsules (Full Width) */}
               <DossierSectionNav
                 formData={isEditingDossier ? editedFormData : selectedCaseModal.formData}
+                isEditingDossier={isEditingDossier}
+                startEditingDossier={startEditingDossier}
+                stopEditingDossier={stopEditingDossier}
               />
 
               {/* 9 Documents Grid */}
@@ -127,32 +131,14 @@ export const StaffDossierModal: React.FC<StaffDossierModalProps> = ({
           </>
         )}
 
-        {/* Modal Footer */}
-        <div className="p-5 md:p-6 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-3">
-            <Button
-              type="button"
-              onClick={() => {
-                const student = selectedCaseModal;
-                onClose();
-                onStartChat(student);
-              }}
-              className="h-10 px-4 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer"
-            >
-              <MessageCircle className="w-4 h-4 text-blue-600" />
-              <span>Chatear en Vivo con {selectedCaseModal.name || 'el Postulante'}</span>
-            </Button>
-            <span className="text-xs text-slate-500 hidden sm:inline">
-              Última actualización sincronizada con Firebase.
-            </span>
-          </div>
-          <Button
-            onClick={onClose}
-            className="h-10 px-6 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase tracking-wider shadow-md shadow-blue-500/20 cursor-pointer"
-          >
-            Cerrar Formulario
-          </Button>
-        </div>
+        {/* Modal Footer: Live Embedded Chat with Client */}
+        {selectedCaseModal.email && (
+          <DossierChatFooter
+            clientEmail={selectedCaseModal.email}
+            clientName={selectedCaseModal.name}
+            onCaseUpdated={onCaseUpdated}
+          />
+        )}
       </div>
     </div>
   );

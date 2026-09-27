@@ -18,18 +18,31 @@ export async function GET(req: NextRequest) {
     }
 
     const emailLower = email.toLowerCase().trim();
-    const snap = await db.collection('solicitudes_visas').where('email', '==', emailLower).get();
+    
+    // Check hidden cases list to ignore deleted cards
+    const hiddenIds = new Set<string>();
+    try {
+      const hiddenSnap = await db.collection('staff_hidden_cases').get();
+      hiddenSnap.forEach((hDoc) => hiddenIds.add(hDoc.id));
+    } catch (hErr) {}
+
+    const snap = await db.collection('solicitudes_visas').get();
 
     const applicantIds: string[] = [];
-    snap.forEach(doc => {
+    snap.forEach((doc) => {
+      if (hiddenIds.has(doc.id)) return;
       const data = doc.data();
+      const docEmail = (data.email || data.formData?.email_contacto || '').toLowerCase().trim();
       const docVisaType = data.visaType === 'B-2' ? 'B-2' : 'F-1';
-      if (docVisaType === visaType) {
-        applicantIds.push(data.applicantId || '1');
+      if (docEmail === emailLower && docVisaType === visaType) {
+        const aId = data.applicantId || '1';
+        if (!applicantIds.includes(aId)) {
+          applicantIds.push(aId);
+        }
       }
     });
 
-    return NextResponse.json({ applicantIds });
+    return NextResponse.json({ applicantIds, count: applicantIds.length });
   } catch (error: any) {
     console.error('Error listing applicants:', error);
     return NextResponse.json({ error: error?.message || 'Error al obtener aplicantes', applicantIds: [] }, { status: 500 });

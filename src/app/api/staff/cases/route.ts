@@ -481,7 +481,31 @@ export async function POST(req: NextRequest) {
 
     await db.collection('solicitudes_visas').doc(docId).set(caseData);
 
-    return NextResponse.json({ success: true, caseId: docId, applicantId });
+    // If this doc was previously in staff_hidden_cases, un-hide it
+    await db.collection('staff_hidden_cases').doc(docId).delete().catch(() => {});
+
+    // Ensure the client's account has the respective visa process unlocked in the Portal
+    try {
+      const usersSnap = await db.collection('users').get();
+      const batch = db.batch();
+      let matchedAny = false;
+      usersSnap.forEach((uDoc) => {
+        const uData = uDoc.data();
+        const uEmail = (uData.email || '').toLowerCase().trim();
+        if (uEmail === emailLower) {
+          matchedAny = true;
+          const planField = visaType === 'B-2' ? 'purchased_plan_turista_basico' : 'purchased_plan_esencial';
+          batch.set(uDoc.ref, { [planField]: true, updatedAt: new Date().toISOString() }, { merge: true });
+        }
+      });
+      if (matchedAny) {
+        await batch.commit();
+      }
+    } catch (uErr) {
+      console.warn('Could not auto-unlock visa plan for user in users collection:', uErr);
+    }
+
+    return NextResponse.json({ success: true, caseId: docId, applicantId, createdCase: caseData });
   } catch (error: any) {
     console.error('Error creating new applicant card:', error);
     return NextResponse.json({ error: error?.message || 'Error al crear la tarjeta' }, { status: 500 });
@@ -498,13 +522,86 @@ export async function DELETE(req: NextRequest) {
     }
 
     if (db) {
-      // Remove the actual expediente document if one exists...
+      // 1. Fetch case details before deletion to determine email and visaType
+      let targetEmail = '';
+      let targetVisaType = '';
+      try {
+        const existingDoc = await db.collection('solicitudes_visas').doc(caseId).get();
+        if (existingDoc.exists) {
+          const d = existingDoc.data() || {};
+          targetEmail = (d.email || d.formData?.email_contacto || '').toLowerCase().trim();
+          targetVisaType = d.visaType || '';
+        }
+      } catch (err) {
+        console.warn('Could not read doc before delete:', err);
+      }
+
+      // If synthetic case id, parse email and visaType from id: case_${emailKey}_${typeKey}
+      if (!targetEmail && caseId.startsWith('case_')) {
+        const parts = caseId.split('_');
+        if (parts.includes('f1')) targetVisaType = 'F-1';
+        else if (parts.includes('b2')) targetVisaType = 'B-2';
+      }
+
+      // 2. Remove the actual expediente document if one exists...
       await db.collection('solicitudes_visas').doc(caseId).delete().catch(() => {});
-      // ...and blocklist the id so it never resurfaces from the users cross-reference,
-      // without touching the client's payment/plan status in the `users` collection.
+
+      // 3. Blocklist the id so it never resurfaces from the users cross-reference
       await db.collection('staff_hidden_cases').doc(caseId).set({
         hiddenAt: new Date().toISOString(),
       });
+
+      // 4. Check if client has ANY remaining active cards in solicitudes_visas for this visaType
+      if (targetEmail && targetVisaType) {
+        try {
+          const allDocsSnap = await db.collection('solicitudes_visas').get();
+          let hasRemainingForType = false;
+          allDocsSnap.forEach((doc) => {
+            if (doc.id === caseId) return;
+            const docData = doc.data();
+            const dEmail = (docData.email || docData.formData?.email_contacto || '').toLowerCase().trim();
+            const dVisa = docData.visaType === 'B-2' ? 'B-2' : 'F-1';
+            if (dEmail === targetEmail && dVisa === targetVisaType) {
+              hasRemainingForType = true;
+            }
+          });
+
+          // If no remaining cards of this visa type exist, reset the plan in users collection
+          if (!hasRemainingForType) {
+            const usersSnap = await db.collection('users').get();
+            const batch = db.batch();
+            let matchedUser = false;
+            usersSnap.forEach((uDoc) => {
+              const uData = uDoc.data();
+              const uEmail = (uData.email || '').toLowerCase().trim();
+              if (uEmail === targetEmail) {
+                matchedUser = true;
+                if (targetVisaType === 'F-1') {
+                  batch.set(uDoc.ref, {
+                    purchased_plan_esencial: false,
+                    purchased_plan_pro: false,
+                    purchased_plan_elite: false,
+                    purchased_plan_allinclusive: false,
+                    updatedAt: new Date().toISOString(),
+                  }, { merge: true });
+                } else if (targetVisaType === 'B-2') {
+                  batch.set(uDoc.ref, {
+                    purchased_plan_turista_basico: false,
+                    purchased_plan_turista_premium: false,
+                    purchased_plan_turista_vip: false,
+                    updatedAt: new Date().toISOString(),
+                  }, { merge: true });
+                }
+              }
+            });
+            if (matchedUser) {
+              await batch.commit();
+            }
+          }
+        } catch (uResetErr) {
+          console.warn('Could not check remaining cards or reset plan on delete:', uResetErr);
+        }
+      }
     }
 
     return NextResponse.json({ success: true, caseId });
@@ -549,8 +646,24 @@ export async function PATCH(req: NextRequest) {
       };
       if (status) updatePayload.status = status;
       if (notes !== undefined) updatePayload.notes = notes;
-      if (formData) updatePayload.formData = formData;
-      if ('photoUrl' in body) updatePayload.photoUrl = photoUrl;
+      if (formData) {
+        updatePayload.formData = formData;
+        const fullName = `${formData.nombres || ''} ${formData.apellidos || ''}`.trim();
+        if (fullName) {
+          updatePayload.name = fullName;
+          const targetEmail = (email || formData?.email_contacto || (existing.exists ? existing.data()?.email : '') || '').toLowerCase().trim();
+          if (targetEmail) {
+            db.collection('users').where('email', '==', targetEmail).get().then(uSnap => {
+              uSnap.forEach(uDoc => {
+                uDoc.ref.set({ displayName: fullName, name: fullName }, { merge: true }).catch(() => {});
+              });
+            }).catch(() => {});
+          }
+        }
+      }
+      if ('photoUrl' in body) {
+        updatePayload.photoUrl = photoUrl || '';
+      }
       if ('passportDoc' in body) updatePayload.passportDoc = passportDoc;
       if ('bankStatementDoc' in body) updatePayload.bankStatementDoc = bankStatementDoc;
       if ('sevisDoc' in body) updatePayload.sevisDoc = sevisDoc;

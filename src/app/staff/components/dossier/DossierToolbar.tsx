@@ -58,7 +58,7 @@ export const DossierToolbar: React.FC<DossierToolbarProps> = ({
             className="h-8 px-3 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 cursor-pointer"
           >
             <FileText className="w-3.5 h-3.5 text-white" />
-            Editar Expediente
+            Editar Tarjeta
           </Button>
         )}
       </div>
