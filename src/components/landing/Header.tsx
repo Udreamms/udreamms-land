@@ -177,14 +177,20 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* MOBILE TOGGLE */}
+          {/* MOBILE & TABLET ACTIONS */}
           {!isVisaLandingPage && (
-            <div className="lg:hidden flex items-center gap-2">
+            <div className="lg:hidden flex items-center gap-2 z-50">
+              <Link href="/login" className="shrink-0">
+                <Button className="bg-white text-black hover:bg-white/90 rounded-full h-8 px-3.5 font-semibold text-xs transition-all duration-300 active:scale-95 shadow-md">
+                  Comenzar
+                </Button>
+              </Link>
               <button
-                className="text-white p-2"
+                className="text-white p-2 hover:bg-white/10 rounded-full transition-colors"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label="Abrir menú de navegación"
               >
-                {isMobileMenuOpen ? <X /> : <Menu />}
+                {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
           )}
@@ -299,13 +305,22 @@ export default function Header() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-[60] bg-black md:hidden overflow-y-auto"
+            className="fixed inset-0 z-[60] bg-black lg:hidden overflow-y-auto pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(2.5rem,env(safe-area-inset-bottom))]"
           >
-            <div className="p-6">
+            <div className="p-6 max-w-lg mx-auto">
               <div className="flex justify-between items-center mb-8">
-                <span className="text-xl font-medium text-white">Menú</span>
-                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-white bg-white/10 rounded-full">
-                  <X />
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 relative">
+                    <img src="/icons/new-icon-udreamms.png" alt="Udreamms" className="object-contain w-full h-full" />
+                  </div>
+                  <span className="text-xl font-medium text-white tracking-tight">Udreamms</span>
+                </div>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 text-white bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+                  aria-label="Cerrar menú"
+                >
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
@@ -325,30 +340,30 @@ export default function Header() {
                       <span className="text-2xl font-medium text-white mb-4 block tracking-tight">{item.label}</span>
                     )}
                     {item.megaMenu && (
-                      <div className="grid grid-cols-1 gap-4 pl-2">
+                      <div className="grid grid-cols-1 gap-3 pl-2">
                         {item.megaMenu.items.map((subItem, idx) => (
                           <Link
                             key={idx}
                             href={subItem.href}
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="flex items-center gap-4 py-3"
+                            className="flex items-center gap-3.5 py-2.5 px-3 rounded-2xl hover:bg-white/5 active:bg-white/10 transition-colors"
                           >
-                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${subItem.colorClass}`}>
-                              <subItem.icon className="w-6 h-6" />
+                            <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${subItem.colorClass}`}>
+                              <subItem.icon className="w-5 h-5" />
                             </div>
                             <div className="flex flex-col">
-                              <span className="text-gray-200 font-medium text-lg">{subItem.title}</span>
-                              <span className="text-gray-600 text-xs">{subItem.desc}</span>
+                              <span className="text-gray-200 font-medium text-base">{subItem.title}</span>
+                              <span className="text-gray-400 text-xs">{subItem.desc}</span>
                             </div>
                           </Link>
                         ))}
 
                         {item.megaMenu.socials && (
-                          <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/5">
+                          <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/5">
                             {item.megaMenu.socials.map((social, idx) => (
-                              <a key={idx} href={social.href} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2 p-4 bg-white/5 rounded-2xl active:scale-95 transition-transform">
-                                <img src={social.imgSrc} alt={social.label} className="w-12 h-12 rounded-xl" />
-                                <span className="text-[10px] text-gray-500 font-medium uppercase tracking-widest">{social.label}</span>
+                              <a key={idx} href={social.href} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 p-3 bg-white/5 rounded-2xl active:scale-95 transition-transform">
+                                <img src={social.imgSrc} alt={social.label} className="w-10 h-10 rounded-xl object-cover" />
+                                <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">{social.label}</span>
                               </a>
                             ))}
                           </div>
@@ -358,16 +373,22 @@ export default function Header() {
                   </div>
                 ))}
 
-                <div className="pt-6 space-y-4">
-                  <div>
-                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="w-full block">
-                      <Button className="w-full bg-white text-black hover:bg-white/90 h-12 text-sm font-semibold rounded-xl">
-                        Comenzar
-                      </Button>
-                    </Link>
-                  </div>
-
-
+                <div className="pt-4 space-y-3">
+                  <Link href="/login?register=true" onClick={() => setIsMobileMenuOpen(false)} className="w-full block">
+                    <Button className="w-full bg-white text-black hover:bg-white/90 h-12 text-sm font-semibold rounded-2xl shadow-lg active:scale-[0.98] transition-transform">
+                      Comenzar / Registrarse
+                    </Button>
+                  </Link>
+                  <Link href="/login?mode=login" onClick={() => setIsMobileMenuOpen(false)} className="w-full block">
+                    <Button variant="outline" className="w-full border-white/20 bg-transparent text-white hover:bg-white/10 h-12 text-sm font-medium rounded-2xl active:scale-[0.98] transition-transform">
+                      Ya tengo cuenta (Iniciar Sesión)
+                    </Button>
+                  </Link>
+                  <Link href="/staff" onClick={() => setIsMobileMenuOpen(false)} className="w-full block text-center pt-2">
+                    <span className="text-xs text-gray-400 hover:text-white uppercase tracking-widest inline-flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5" /> Acceso Staff
+                    </span>
+                  </Link>
                 </div>
               </div>
             </div>

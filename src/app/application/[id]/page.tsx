@@ -258,7 +258,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
 
     if (loading) {
         return (
-            <div className="h-screen w-screen flex items-center justify-center bg-[#0a0f18]">
+            <div className="min-h-[100dvh] w-full flex items-center justify-center bg-[#0a0f18] safe-top safe-bottom">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                     <p className="text-neutral-400 font-medium animate-pulse">Cargando tu aventura...</p>
@@ -269,7 +269,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
 
     if (!contact && !loading) {
         return (
-            <div className="h-screen w-screen flex items-center justify-center bg-[#0a0f18] p-4 text-center">
+            <div className="min-h-[100dvh] w-full flex items-center justify-center bg-[#0a0f18] p-4 text-center safe-top safe-bottom">
                 <div className="max-w-md space-y-6">
                     <div className="relative mx-auto">
                         <AlertCircle size={80} className="mx-auto text-red-500/50 animate-pulse" />
@@ -303,14 +303,14 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
     );
 
     return (
-        <div className="min-h-screen w-screen bg-[#0a0f18] text-white selection:bg-blue-500/30 font-sans relative overflow-x-hidden">
+        <div className="min-h-screen w-full max-w-full bg-[#0a0f18] text-white selection:bg-blue-500/30 font-sans relative overflow-x-hidden safe-top safe-bottom">
             {/* Background elements */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px]"></div>
                 <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-red-600/10 rounded-full blur-[120px]"></div>
             </div>
 
-            <div className="relative z-10 container mx-auto px-4 py-12 md:py-24 flex items-center justify-center min-h-screen">
+            <div className="relative z-10 container mx-auto px-4 py-8 md:py-24 flex items-center justify-center min-h-screen">
                 <AnimatePresence mode="wait">
                     {!submitted ? (
                         <motion.div

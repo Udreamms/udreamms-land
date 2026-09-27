@@ -58,6 +58,7 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLiveChatOpen, setIsLiveChatOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const {
     user,
     dbUser,
@@ -237,18 +238,65 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
   const cardGrossTotal = calculateStripeGrossTotal(cardSubtotal);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-500/20 flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-500/20 flex flex-col relative overflow-x-hidden">
       
       {/* Background ambient glows */}
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-slate-200/40 rounded-full blur-[120px] pointer-events-none z-0" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-100/30 rounded-full blur-[120px] pointer-events-none z-0" />
 
+      {/* MOBILE TOPBAR (< md) */}
+      <header className="md:hidden sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between safe-top">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsMobileSidebarOpen(true)}
+            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 transition-colors"
+            aria-label="Abrir menú"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-6 h-6 relative shrink-0">
+              <img src="/icons/new-icon-udreamms.png" alt="Udreamms" className="object-contain w-full h-full" />
+            </div>
+            <span className="font-bold text-sm text-slate-900 tracking-tight">Portal</span>
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {cart.length > 0 && (
+            <button
+              onClick={() => setIsCartOpen(!isCartOpen)}
+              className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-200 relative"
+              aria-label="Ver carrito"
+            >
+              <ShoppingCart className="w-4 h-4" />
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-600 text-white rounded-full text-[9px] font-bold flex items-center justify-center">
+                {cart.length}
+              </span>
+            </button>
+          )}
+          <button
+            onClick={() => setIsProfileModalOpen(true)}
+            className="w-8 h-8 rounded-full overflow-hidden border border-slate-300 bg-slate-900 text-white text-[10px] font-bold flex items-center justify-center cursor-pointer shadow-sm"
+            title="Mi Perfil"
+          >
+            {user.photoURL ? (
+              <img src={user.photoURL} alt="Usuario" className="w-full h-full object-cover" />
+            ) : (
+              userInitials
+            )}
+          </button>
+        </div>
+      </header>
+
       {/* DASHBOARD CONTENT BODY */}
-      <main className="flex-1 relative z-10 pt-6 md:pt-8 pb-16 px-4 md:px-8 w-full min-h-screen">
+      <main className="flex-1 relative z-10 pt-4 md:pt-8 pb-16 px-4 md:px-8 w-full min-h-screen">
         <PortalSidebar
           activeSection={activeSection}
           isSidebarCollapsed={isSidebarCollapsed}
           onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          isMobileOpen={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
         />
 
         {/* MAIN CONTENT AREA */}

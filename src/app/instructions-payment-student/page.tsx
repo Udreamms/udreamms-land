@@ -423,7 +423,7 @@ function InstructionsContent() {
 
                   {/* Right Column: Payment Box Summary */}
                   <div className="lg:sticky lg:top-28">
-                    <div className="bg-transparent border border-white/10 rounded-3xl p-8 md:p-12 py-16 md:py-20 shadow-2xl backdrop-blur-md space-y-12 min-h-[580px] flex flex-col justify-between">
+                    <div className="bg-transparent border border-white/10 rounded-3xl p-5 sm:p-8 md:p-12 py-8 sm:py-12 md:py-16 shadow-2xl backdrop-blur-md space-y-6 sm:space-y-8 md:space-y-12 flex flex-col justify-between">
                       <div className="flex items-center justify-between pb-4">
                         <div>
                           <p className="text-[10px] uppercase tracking-widest text-slate-400 font-medium mb-1">Resumen de Pedido</p>
