@@ -12,10 +12,10 @@ export default function LibroPage() {
   const unlocked = isUnlocked('libro', isStudent ? 'estudiante' : 'turista');
 
   return (
-    <div className="space-y-6 text-slate-900">
-      <div>
-        <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">Mi Libro Digital</h2>
-        <p className="text-sm text-slate-500">Tu guía definitiva hacia Estados Unidos en formato ebook.</p>
+    <div className="w-full min-w-0 space-y-6 text-slate-900 pb-12">
+      <div className="space-y-1">
+        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">Mi Libro Digital</h2>
+        <p className="text-sm text-slate-500 font-normal">Tu guía definitiva hacia Estados Unidos en formato ebook.</p>
       </div>
 
       <div className="relative min-h-[450px]">
@@ -44,14 +44,14 @@ export default function LibroPage() {
           </div>
 
           {/* Book details */}
-          <div className="space-y-6 text-center md:text-left flex-1">
+          <div className="space-y-6 text-center md:text-left flex-1 min-w-0">
             <div className="space-y-2">
-              <h3 className="text-xl md:text-2xl font-bold text-slate-900">
+              <h3 className="text-xl md:text-2xl font-semibold text-slate-900">
                 {isStudent 
                   ? "Obtén tu Visa de Estudiante en 30 Días" 
                   : "Turista en USA: Guía para una Aprobación Consular Exitosa"}
               </h3>
-              <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+              <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line font-normal">
                 {isStudent
                   ? "Descubre cómo obtener tu visa de estudiante para Estados Unidos con el libro digital Udreamms.\n\nEsta guía completa y actualizada te enseña a gestionar de forma autónoma y exitosa todo el proceso para obtener tu visa F1. Aprenderás paso a paso cómo preparar correctamente tu documentación oficial, llenar los formularios oficiales y presentarte a la entrevista en la embajada con total confianza.\n\nCon consejos prácticos basados en nuestra experiencia como agentes oficiales de escuelas en EE.UU. y enlaces oficiales actualizados, evitarás errores comunes que suelen retrasar o invalidar las solicitudes, ahorrando tiempo y dinero. Este libro está diseñado especialmente para personas de Latinoamérica que desean información clara, confiable y práctica para tomar el control de su trámite y cumplir su sueño de estudiar en Estados Unidos."
                   : "Este libro digital contiene los secretos prácticos de Udreamms para responder con precisión sobre tus planes turísticos, justificar fondos y garantizar tu retorno."}

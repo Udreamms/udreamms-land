@@ -52,10 +52,13 @@ export default function PortalLiveChat({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const fetchMessages = async () => {
+  const fetchMessages = async (signal?: AbortSignal) => {
     if (!userEmail) return;
     try {
-      const res = await fetch(`/api/portal/chat?email=${encodeURIComponent(userEmail)}&viewer=client`);
+      const res = await fetch(`/api/portal/chat?email=${encodeURIComponent(userEmail)}&viewer=client`, {
+        signal,
+        cache: 'no-store',
+      });
       if (res.ok) {
         const data = await res.json();
         if (data.messages && Array.isArray(data.messages)) {
@@ -65,8 +68,11 @@ export default function PortalLiveChat({
           setUnreadCount(isOpen ? 0 : data.unreadByClient);
         }
       }
-    } catch (err) {
-      console.error('Error fetching chat messages:', err);
+    } catch (err: any) {
+      // Ignore normal abort errors when component unmounts or polling cleans up
+      if (err?.name === 'AbortError') return;
+      // Silently catch background polling fetch errors so they don't break the UI/Next overlay
+      console.warn('PortalLiveChat sync notice (will retry):', err?.message || err);
     } finally {
       setIsLoading(false);
     }
@@ -74,11 +80,19 @@ export default function PortalLiveChat({
 
   // Poll for messages: faster when open (3.5s), normal when closed (8s)
   useEffect(() => {
-    if (userEmail) {
-      fetchMessages();
-      const interval = setInterval(fetchMessages, isOpen ? 3500 : 8000);
-      return () => clearInterval(interval);
-    }
+    if (!userEmail) return;
+
+    const controller = new AbortController();
+    fetchMessages(controller.signal);
+
+    const interval = setInterval(() => {
+      fetchMessages(controller.signal);
+    }, isOpen ? 3500 : 8000);
+
+    return () => {
+      controller.abort();
+      clearInterval(interval);
+    };
   }, [isOpen, userEmail]);
 
   useEffect(() => {

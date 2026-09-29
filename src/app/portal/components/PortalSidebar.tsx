@@ -19,6 +19,9 @@ import {
   MessageSquare,
   Calendar,
   Gift,
+  Sparkles,
+  School,
+  Radio,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { usePortal, cartItemsConfig } from '../PortalContext';
@@ -59,11 +62,29 @@ export default function PortalSidebar({
     checkoutMethod,
   } = usePortal();
 
+  const [imageError, setImageError] = useState(false);
+
+  // Reset image error state whenever user photo changes
+  useEffect(() => {
+    setImageError(false);
+  }, [user?.photoURL]);
+
   const userInitials = user?.displayName
-    ? user.displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
+    ? user.displayName.split(' ').filter(Boolean).map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
     : user?.email
     ? user.email.slice(0, 2).toUpperCase()
     : 'UD';
+
+  // Sanitize Google / third-party avatar URLs (e.g., ensure higher resolution or default query params)
+  const avatarUrl = React.useMemo(() => {
+    if (!user?.photoURL) return null;
+    let url = user.photoURL;
+    // If it's a google user content image, ensure a standard size without restrictive params
+    if (url.includes('googleusercontent.com') && !url.includes('=s')) {
+      url = `${url}=s120-c`;
+    }
+    return url;
+  }, [user?.photoURL]);
 
   const checkoutTotal = getCartTotal(checkoutMethod);
 
@@ -159,6 +180,15 @@ export default function PortalSidebar({
           )}
 
         <Link
+          href="/portal/bienvenido"
+          title={isSidebarCollapsed ? 'Bienvenido' : undefined}
+          className={linkClass(activeSection === 'bienvenido')}
+        >
+          <Sparkles className={`w-4 h-4 shrink-0 ${activeSection === 'bienvenido' ? 'text-white' : 'text-blue-600'}`} />
+          {!isSidebarCollapsed && <span>Bienvenido</span>}
+        </Link>
+
+        <Link
           href="/portal/proceso"
           title={isSidebarCollapsed ? 'Mi proceso' : undefined}
           className={linkClass(activeSection === 'proceso')}
@@ -168,34 +198,44 @@ export default function PortalSidebar({
         </Link>
 
         <Link
-          href="/portal/planes"
-          title={isSidebarCollapsed ? 'Planes' : undefined}
+          href="/portal/curso"
+          title={isSidebarCollapsed ? 'Hazlo por ti mismo' : undefined}
+          className={linkClass(activeSection === 'curso')}
+        >
+          <Video className={`w-4 h-4 shrink-0 ${activeSection === 'curso' ? 'text-white' : 'text-black'}`} />
+          {!isSidebarCollapsed && <span>Hazlo por ti mismo</span>}
+        </Link>
+
+        <Link
+          href="/portal/tienda"
+          title={isSidebarCollapsed ? 'Tienda' : undefined}
           className={linkClass(
-            activeSection === 'planes' ||
+            activeSection === 'tienda' ||
+              activeSection === 'planes' ||
               activeSection === 'visa-estudiante' ||
               activeSection === 'visa-turista'
           )}
         >
-          <ShoppingBag className={`w-4 h-4 shrink-0 ${activeSection === 'planes' || activeSection === 'visa-estudiante' || activeSection === 'visa-turista' ? 'text-white' : 'text-black'}`} />
-          {!isSidebarCollapsed && <span>Planes</span>}
+          <ShoppingBag className={`w-4 h-4 shrink-0 ${activeSection === 'tienda' || activeSection === 'planes' || activeSection === 'visa-estudiante' || activeSection === 'visa-turista' ? 'text-white' : 'text-black'}`} />
+          {!isSidebarCollapsed && <span>Tienda</span>}
         </Link>
 
         <Link
-          href="/portal/curso"
-          title={isSidebarCollapsed ? 'Master class express' : undefined}
-          className={linkClass(activeSection === 'curso')}
+          href="/portal/instituciones"
+          title={isSidebarCollapsed ? 'Instituciones aliadas' : undefined}
+          className={linkClass(activeSection === 'instituciones')}
         >
-          <Video className={`w-4 h-4 shrink-0 ${activeSection === 'curso' ? 'text-white' : 'text-black'}`} />
-          {!isSidebarCollapsed && <span>Master class express</span>}
+          <School className={`w-4 h-4 shrink-0 ${activeSection === 'instituciones' ? 'text-white' : 'text-black'}`} />
+          {!isSidebarCollapsed && <span>Instituciones aliadas</span>}
         </Link>
 
         <Link
-          href="/portal/libro"
-          title={isSidebarCollapsed ? 'Libro digital' : undefined}
-          className={linkClass(activeSection === 'libro')}
+          href="/portal/streaming"
+          title={isSidebarCollapsed ? 'Adaptación streaming' : undefined}
+          className={linkClass(activeSection === 'streaming')}
         >
-          <BookOpen className={`w-4 h-4 shrink-0 ${activeSection === 'libro' ? 'text-white' : 'text-black'}`} />
-          {!isSidebarCollapsed && <span>Libro digital</span>}
+          <Radio className={`w-4 h-4 shrink-0 ${activeSection === 'streaming' ? 'text-white' : 'text-black'}`} />
+          {!isSidebarCollapsed && <span>Adaptación streaming</span>}
         </Link>
 
         <Link
@@ -413,16 +453,17 @@ export default function PortalSidebar({
               }`}
               title={user.displayName || user.email || 'Mi Cuenta'}
             >
-              <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-300 shrink-0 relative flex items-center justify-center bg-slate-900 shadow-sm text-white font-bold">
-                {user.photoURL ? (
+              <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-300 shrink-0 relative flex items-center justify-center bg-gradient-to-tr from-slate-900 to-slate-700 shadow-sm text-white font-bold select-none">
+                {avatarUrl && !imageError ? (
                   <img
-                    src={user.photoURL}
+                    src={avatarUrl}
                     alt={user.displayName || 'Usuario'}
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
+                    onError={() => setImageError(true)}
                   />
                 ) : (
-                  <span className="text-[10px] font-bold text-white uppercase tracking-wider">
+                  <span className="text-[11px] font-bold text-white uppercase tracking-wider">
                     {userInitials}
                   </span>
                 )}

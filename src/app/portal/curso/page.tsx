@@ -19,12 +19,12 @@ export default function CursoPage() {
   const unlocked = isUnlocked('curso', isStudent ? 'estudiante' : 'turista');
 
   return (
-    <div className="space-y-6 text-slate-900">
-      <div>
-        <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">
-          Master class express
+    <div className="w-full min-w-0 space-y-6 text-slate-900 pb-12">
+      <div className="space-y-1">
+        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">
+          Hazlo por ti mismo
         </h2>
-        <p className="text-sm text-slate-500">Capacítate con nuestros videocursos prácticos dictados por mentores autorizados.</p>
+        <p className="text-sm text-slate-500 font-normal">Capacítate con nuestros videocursos prácticos dictados por mentores autorizados.</p>
       </div>
 
       <div className="relative min-h-[450px]">
@@ -63,12 +63,12 @@ export default function CursoPage() {
               )
             )}
             <div className="p-6 space-y-2">
-              <h3 className="text-lg font-bold text-slate-900">
+              <h3 className="text-lg font-semibold text-slate-900">
                 {isStudent 
                   ? studentModules[activeStudentStep].title 
                   : touristModules[activeTouristStep].title}
               </h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <p className="text-xs text-slate-600 leading-relaxed font-normal">
                 {isStudent
                   ? studentModules[activeStudentStep].description
                   : touristModules[activeTouristStep].description}
@@ -78,7 +78,7 @@ export default function CursoPage() {
 
           {/* Modules List */}
           <div className="bg-white border border-slate-200 shadow-xl rounded-3xl p-6 space-y-4">
-            <h3 className="text-md font-bold text-slate-900 tracking-wide border-b border-slate-100 pb-3">Módulos del Curso</h3>
+            <h3 className="text-sm font-semibold text-slate-900 tracking-wide border-b border-slate-100 pb-3">Módulos del Curso</h3>
             
             <div className="space-y-2 overflow-y-auto max-h-[350px] pr-2">
               {isStudent ? (
@@ -94,11 +94,11 @@ export default function CursoPage() {
                           : "hover:bg-slate-50 border border-slate-100 text-slate-700"
                       }`}
                     >
-                      <span className={`text-xs font-medium ${isActive ? "font-bold text-blue-700" : "text-slate-700 group-hover:text-slate-900"}`}>
+                      <span className={`text-xs ${isActive ? "font-semibold text-blue-700" : "font-normal text-slate-700 group-hover:text-slate-900"}`}>
                         {mod.title}
                       </span>
                       {isActive && (
-                        <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded-full uppercase">
+                        <span className="text-[10px] font-semibold text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded-full uppercase">
                           Viendo
                         </span>
                       )}
@@ -118,11 +118,11 @@ export default function CursoPage() {
                           : "hover:bg-slate-50 border border-slate-100 text-slate-700"
                       }`}
                     >
-                      <span className={`text-xs font-medium ${isActive ? "font-bold text-blue-700" : "text-slate-700 group-hover:text-slate-900"}`}>
+                      <span className={`text-xs ${isActive ? "font-semibold text-blue-700" : "font-normal text-slate-700 group-hover:text-slate-900"}`}>
                         {mod.title}
                       </span>
                       {isActive && (
-                        <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded-full uppercase">
+                        <span className="text-[10px] font-semibold text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded-full uppercase">
                           Viendo
                         </span>
                       )}

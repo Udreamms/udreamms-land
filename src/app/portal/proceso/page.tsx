@@ -1168,15 +1168,15 @@ export default function ProcesoPage() {
   }
 
   return (
-    <div className="space-y-6 text-slate-900">
+    <div className="w-full min-w-0 space-y-6 text-slate-900 pb-12">
       
       {/* Header section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">
             Mi Proceso Consular
           </h2>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 font-normal">
             {activeApplicant
               ? `Expediente y Documentación de ${currentApplicantData?.name || `Postulante #${(isSelectedStudent ? studentApplicants : touristApplicants).indexOf(activeApplicant.applicantId) + 1}`}`
               : "Gestiona los trámites, formularios DS-160, pasaportes y estados de cuenta de cada solicitud o familiar."}

@@ -118,6 +118,12 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
   const checkoutEmail = user?.email || billingData?.email || '';
   const stripeReturnHandled = useRef(false);
   const [stripeRedirecting, setStripeRedirecting] = useState(false);
+  const [mobileAvatarError, setMobileAvatarError] = useState(false);
+
+  // Reset error when user photo changes
+  useEffect(() => {
+    setMobileAvatarError(false);
+  }, [user?.photoURL]);
 
   const handleStartStripeCheckout = useCallback(async () => {
     if (cart.length === 0) {
@@ -228,8 +234,14 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
   if (!user) return null;
 
   const userInitials = user.displayName
-    ? user.displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
+    ? user.displayName.split(' ').filter(Boolean).map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
     : user.email ? user.email.slice(0, 2).toUpperCase() : "UD";
+
+  const mobileAvatarUrl = user.photoURL
+    ? (user.photoURL.includes('googleusercontent.com') && !user.photoURL.includes('=s')
+        ? `${user.photoURL}=s120-c`
+        : user.photoURL)
+    : null;
 
   const cryptoCheckoutPlan = cart.length === 1 ? cart[0] : 'cart';
   const checkoutTotal = getCartTotal(checkoutMethod);
@@ -277,13 +289,19 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
           )}
           <button
             onClick={() => setIsProfileModalOpen(true)}
-            className="w-8 h-8 rounded-full overflow-hidden border border-slate-300 bg-slate-900 text-white text-[10px] font-bold flex items-center justify-center cursor-pointer shadow-sm"
+            className="w-8 h-8 rounded-full overflow-hidden border border-slate-300 bg-gradient-to-tr from-slate-900 to-slate-700 text-white text-[10px] font-bold flex items-center justify-center cursor-pointer shadow-sm select-none"
             title="Mi Perfil"
           >
-            {user.photoURL ? (
-              <img src={user.photoURL} alt="Usuario" className="w-full h-full object-cover" />
+            {mobileAvatarUrl && !mobileAvatarError ? (
+              <img
+                src={mobileAvatarUrl}
+                alt={user.displayName || "Usuario"}
+                className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+                onError={() => setMobileAvatarError(true)}
+              />
             ) : (
-              userInitials
+              <span>{userInitials}</span>
             )}
           </button>
         </div>

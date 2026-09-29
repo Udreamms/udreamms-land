@@ -214,9 +214,9 @@ export default function ReferidosPage() {
   };
 
   return (
-    <div className="space-y-8 text-slate-900 pb-16">
+    <div className="w-full min-w-0 space-y-8 text-slate-900 pb-16">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6 w-full">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium uppercase tracking-wider mb-2">
             <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
