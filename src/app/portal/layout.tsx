@@ -250,7 +250,7 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
   const cardGrossTotal = calculateStripeGrossTotal(cardSubtotal);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-500/20 flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen w-full bg-[#f8fafc] text-slate-900 font-sans selection:bg-blue-500/20 flex flex-col relative">
       
       {/* Background ambient glows */}
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-slate-200/40 rounded-full blur-[120px] pointer-events-none z-0" />
@@ -771,7 +771,7 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <PortalProvider>
-      <Suspense fallback={<div className="min-h-screen bg-[#050505]" />}>
+      <Suspense fallback={<div className="min-h-screen w-full bg-[#f8fafc]" />}>
         <PortalLayoutContent>{children}</PortalLayoutContent>
       </Suspense>
     </PortalProvider>

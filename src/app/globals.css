@@ -107,8 +107,20 @@
     @apply border-border;
   }
 
+  html {
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #f8fafc;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    background-color: #f8fafc;
+    color: hsl(var(--foreground));
+    overflow-x: hidden;
+    overflow-y: visible;
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
   }
 }
 
