@@ -49,8 +49,11 @@ import {
   calculateStripeProcessingFee,
 } from "@/lib/payments/product-catalog";
 import PortalSidebar from "./components/PortalSidebar";
+
 import PortalLiveChat from "@/components/portal/PortalLiveChat";
 import { toast } from "sonner";
+
+const LOCKED_SECTIONS = ['instituciones', 'streaming'];
 
 const IS_DEV = process.env.NODE_ENV === 'development';
 
@@ -330,7 +333,22 @@ function PortalLayoutContent({ children }: { children: React.ReactNode }) {
               transition={{ duration: 0.25, ease: "easeOut" }}
               className="w-full min-h-[400px] max-w-[1680px] mx-auto"
             >
-              {children}
+              {LOCKED_SECTIONS.includes(activeSection) ? (
+                <div className="w-full min-h-[60vh] flex items-center justify-center">
+                  <div className="max-w-md w-full bg-white border border-slate-200 rounded-3xl p-8 text-center space-y-4 shadow-sm">
+                    <Lock className="w-10 h-10 text-slate-400 mx-auto" />
+                    <h2 className="text-xl font-semibold text-slate-900">No disponible por ahora</h2>
+                    <p className="text-sm text-slate-500">
+                      Esta sección estará disponible muy pronto. Mientras tanto, puedes seguir con tu proceso.
+                    </p>
+                    <Link href="/portal/proceso" className="inline-block text-sm font-semibold text-blue-600 hover:text-blue-700">
+                      Ir a Mi proceso →
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                children
+              )}
             </motion.div>
           </AnimatePresence>
         </div>

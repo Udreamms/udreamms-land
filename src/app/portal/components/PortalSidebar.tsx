@@ -23,6 +23,7 @@ import {
   School,
   Radio,
   ChevronDown,
+  Lock,
   type LucideIcon,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
@@ -35,6 +36,7 @@ interface NavItem {
   icon: LucideIcon;
   sections?: string[];
   external?: boolean;
+  locked?: boolean;
 }
 
 interface NavGroup {
@@ -50,7 +52,7 @@ const navGroups: NavGroup[] = [
     items: [
       { label: 'Bienvenido', href: '/portal/bienvenido', icon: Sparkles, sections: ['bienvenido'] },
       { label: 'Mi proceso', href: '/portal/proceso', icon: GraduationCap, sections: ['proceso'] },
-      { label: 'Instituciones aliadas', href: '/portal/instituciones', icon: School, sections: ['instituciones'] },
+      { label: 'Instituciones aliadas', href: '/portal/instituciones', icon: School, sections: ['instituciones'], locked: true },
     ],
   },
   {
@@ -58,7 +60,7 @@ const navGroups: NavGroup[] = [
     title: 'Aprende',
     items: [
       { label: 'Hazlo por ti mismo', href: '/portal/curso', icon: Video, sections: ['curso'] },
-      { label: 'Adaptación streaming', href: '/portal/streaming', icon: Radio, sections: ['streaming'] },
+      { label: 'Adaptación streaming', href: '/portal/streaming', icon: Radio, sections: ['streaming'], locked: true },
       { label: 'Recursos adicionales', href: '/portal/recursos', icon: Download, sections: ['recursos'] },
     ],
   },
@@ -296,6 +298,27 @@ export default function PortalSidebar({
                           {!isSidebarCollapsed && <span>{item.label}</span>}
                         </>
                       );
+                      if (item.locked) {
+                        return (
+                          <div
+                            key={item.href}
+                            role="link"
+                            aria-disabled="true"
+                            title={isSidebarCollapsed ? `${item.label} · No disponible por ahora` : 'No disponible por ahora'}
+                            className={`px-4 py-2.5 md:py-3 text-[10px] md:text-xs tracking-widest md:tracking-wider uppercase rounded-full md:rounded-xl shrink-0 flex items-center gap-3 cursor-not-allowed select-none text-slate-400 ${
+                              isSidebarCollapsed ? 'justify-center' : 'justify-start text-left'
+                            }`}
+                          >
+                            <Icon className="w-4 h-4 shrink-0 text-slate-300" />
+                            {!isSidebarCollapsed && (
+                              <>
+                                <span className="flex-1">{item.label}</span>
+                                <Lock className="w-3.5 h-3.5 shrink-0 text-slate-300" />
+                              </>
+                            )}
+                          </div>
+                        );
+                      }
                       return item.external ? (
                         <a
                           key={item.href}
