@@ -22,10 +22,76 @@ import {
   Sparkles,
   School,
   Radio,
+  ChevronDown,
+  type LucideIcon,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { usePortal, cartItemsConfig } from '../PortalContext';
 import { Button } from '@/components/ui/button';
+
+interface NavItem {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  sections?: string[];
+  external?: boolean;
+}
+
+interface NavGroup {
+  id: string;
+  title: string;
+  items: NavItem[];
+}
+
+const navGroups: NavGroup[] = [
+  {
+    id: 'camino',
+    title: 'Mi camino',
+    items: [
+      { label: 'Bienvenido', href: '/portal/bienvenido', icon: Sparkles, sections: ['bienvenido'] },
+      { label: 'Mi proceso', href: '/portal/proceso', icon: GraduationCap, sections: ['proceso'] },
+      { label: 'Instituciones aliadas', href: '/portal/instituciones', icon: School, sections: ['instituciones'] },
+    ],
+  },
+  {
+    id: 'aprende',
+    title: 'Aprende',
+    items: [
+      { label: 'Hazlo por ti mismo', href: '/portal/curso', icon: Video, sections: ['curso'] },
+      { label: 'Adaptación streaming', href: '/portal/streaming', icon: Radio, sections: ['streaming'] },
+      { label: 'Recursos adicionales', href: '/portal/recursos', icon: Download, sections: ['recursos'] },
+    ],
+  },
+  {
+    id: 'servicios',
+    title: 'Servicios',
+    items: [
+      {
+        label: 'Tienda',
+        href: '/portal/tienda',
+        icon: ShoppingBag,
+        sections: ['tienda', 'planes', 'visa-estudiante', 'visa-turista'],
+      },
+      { label: 'Referidos', href: '/portal/referidos', icon: Gift, sections: ['referidos'] },
+    ],
+  },
+  {
+    id: 'acompanamiento',
+    title: 'Acompañamiento',
+    items: [
+      {
+        label: 'Soporte por WhatsApp',
+        href: 'https://wa.me/13854162224?text=Hola%2C%20necesito%20soporte%20con%20mi%20portal%20Udreamms',
+        icon: MessageSquare,
+        external: true,
+      },
+      { label: 'Agendar Videollamada', href: 'https://calendar.app.google/uAhHFp3YC2T1PbGU6', icon: Calendar, external: true },
+      { label: 'Sitio web', href: 'https://www.udreamms.com', icon: Home, external: true },
+    ],
+  },
+];
+
+const CLOSED_GROUPS_KEY = 'portal-sidebar-closed-groups';
 
 interface PortalSidebarProps {
   activeTopSection?: string;
@@ -63,6 +129,24 @@ export default function PortalSidebar({
   } = usePortal();
 
   const [imageError, setImageError] = useState(false);
+  const [closedGroups, setClosedGroups] = useState<string[]>([]);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(CLOSED_GROUPS_KEY);
+      if (saved) setClosedGroups(JSON.parse(saved));
+    } catch {}
+  }, []);
+
+  const toggleGroup = (id: string) => {
+    setClosedGroups((prev) => {
+      const next = prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id];
+      try {
+        localStorage.setItem(CLOSED_GROUPS_KEY, JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
 
   // Reset image error state whenever user photo changes
   useEffect(() => {
@@ -179,115 +263,68 @@ export default function PortalSidebar({
             </div>
           )}
 
-        <Link
-          href="/portal/bienvenido"
-          title={isSidebarCollapsed ? 'Bienvenido' : undefined}
-          className={linkClass(activeSection === 'bienvenido')}
-        >
-          <Sparkles className={`w-4 h-4 shrink-0 ${activeSection === 'bienvenido' ? 'text-white' : 'text-blue-600'}`} />
-          {!isSidebarCollapsed && <span>Bienvenido</span>}
-        </Link>
-
-        <Link
-          href="/portal/proceso"
-          title={isSidebarCollapsed ? 'Mi proceso' : undefined}
-          className={linkClass(activeSection === 'proceso')}
-        >
-          <GraduationCap className={`w-4 h-4 shrink-0 ${activeSection === 'proceso' ? 'text-white' : 'text-black'}`} />
-          {!isSidebarCollapsed && <span>Mi proceso</span>}
-        </Link>
-
-        <Link
-          href="/portal/curso"
-          title={isSidebarCollapsed ? 'Hazlo por ti mismo' : undefined}
-          className={linkClass(activeSection === 'curso')}
-        >
-          <Video className={`w-4 h-4 shrink-0 ${activeSection === 'curso' ? 'text-white' : 'text-black'}`} />
-          {!isSidebarCollapsed && <span>Hazlo por ti mismo</span>}
-        </Link>
-
-        <Link
-          href="/portal/tienda"
-          title={isSidebarCollapsed ? 'Tienda' : undefined}
-          className={linkClass(
-            activeSection === 'tienda' ||
-              activeSection === 'planes' ||
-              activeSection === 'visa-estudiante' ||
-              activeSection === 'visa-turista'
-          )}
-        >
-          <ShoppingBag className={`w-4 h-4 shrink-0 ${activeSection === 'tienda' || activeSection === 'planes' || activeSection === 'visa-estudiante' || activeSection === 'visa-turista' ? 'text-white' : 'text-black'}`} />
-          {!isSidebarCollapsed && <span>Tienda</span>}
-        </Link>
-
-        <Link
-          href="/portal/instituciones"
-          title={isSidebarCollapsed ? 'Instituciones aliadas' : undefined}
-          className={linkClass(activeSection === 'instituciones')}
-        >
-          <School className={`w-4 h-4 shrink-0 ${activeSection === 'instituciones' ? 'text-white' : 'text-black'}`} />
-          {!isSidebarCollapsed && <span>Instituciones aliadas</span>}
-        </Link>
-
-        <Link
-          href="/portal/streaming"
-          title={isSidebarCollapsed ? 'Adaptación streaming' : undefined}
-          className={linkClass(activeSection === 'streaming')}
-        >
-          <Radio className={`w-4 h-4 shrink-0 ${activeSection === 'streaming' ? 'text-white' : 'text-black'}`} />
-          {!isSidebarCollapsed && <span>Adaptación streaming</span>}
-        </Link>
-
-        <Link
-          href="/portal/recursos"
-          title={isSidebarCollapsed ? 'Recursos adicionales' : undefined}
-          className={linkClass(activeSection === 'recursos')}
-        >
-          <Download className={`w-4 h-4 shrink-0 ${activeSection === 'recursos' ? 'text-white' : 'text-black'}`} />
-          {!isSidebarCollapsed && <span>Recursos adicionales</span>}
-        </Link>
-
-        <Link
-          href="/portal/referidos"
-          title={isSidebarCollapsed ? 'Referidos' : undefined}
-          className={linkClass(activeSection === 'referidos')}
-        >
-          <Gift className={`w-4 h-4 shrink-0 ${activeSection === 'referidos' ? 'text-white' : 'text-black'}`} />
-          {!isSidebarCollapsed && <span>Referidos</span>}
-        </Link>
-
-        <a
-          href="https://wa.me/13854162224?text=Hola%2C%20necesito%20soporte%20con%20mi%20portal%20Udreamms"
-          target="_blank"
-          rel="noopener noreferrer"
-          title={isSidebarCollapsed ? 'Soporte por WhatsApp' : undefined}
-          className={linkClass(false)}
-        >
-          <MessageSquare className="w-4 h-4 shrink-0 text-black group-hover:text-blue-600 transition-colors" />
-          {!isSidebarCollapsed && <span>Soporte por WhatsApp</span>}
-        </a>
-
-        <a
-          href="https://calendar.app.google/uAhHFp3YC2T1PbGU6"
-          target="_blank"
-          rel="noopener noreferrer"
-          title={isSidebarCollapsed ? 'Agendar Videollamada' : undefined}
-          className={linkClass(false)}
-        >
-          <Calendar className="w-4 h-4 shrink-0 text-black group-hover:text-blue-600 transition-colors" />
-          {!isSidebarCollapsed && <span>Agendar Videollamada</span>}
-        </a>
-
-        <a
-          href="https://www.udreamms.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          title={isSidebarCollapsed ? 'Sitio web' : undefined}
-          className={linkClass(false)}
-        >
-          <Home className="w-4 h-4 shrink-0 text-black" />
-          {!isSidebarCollapsed && <span>Sitio web</span>}
-        </a>
+        {navGroups.map((group) => {
+          const isOpen = isSidebarCollapsed || !closedGroups.includes(group.id);
+          return (
+            <div key={group.id} className={`flex flex-col gap-1 ${isSidebarCollapsed ? 'pt-2 mt-1 border-t border-slate-100 first:border-t-0 first:pt-0 first:mt-0' : 'mt-2'}`}>
+              {!isSidebarCollapsed && (
+                <button
+                  type="button"
+                  onClick={() => toggleGroup(group.id)}
+                  aria-expanded={isOpen}
+                  className="flex items-center justify-between px-4 py-1.5 text-[10px] font-bold tracking-widest uppercase text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                >
+                  <span>{group.title}</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? '' : '-rotate-90'}`} />
+                </button>
+              )}
+              <AnimatePresence initial={false}>
+                {isOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden flex flex-col gap-1"
+                  >
+                    {group.items.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = !!item.sections?.includes(activeSection);
+                      const content = (
+                        <>
+                          <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-black'}`} />
+                          {!isSidebarCollapsed && <span>{item.label}</span>}
+                        </>
+                      );
+                      return item.external ? (
+                        <a
+                          key={item.href}
+                          href={item.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={isSidebarCollapsed ? item.label : undefined}
+                          className={linkClass(false)}
+                        >
+                          {content}
+                        </a>
+                      ) : (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          title={isSidebarCollapsed ? item.label : undefined}
+                          aria-current={isActive ? 'page' : undefined}
+                          className={linkClass(isActive)}
+                        >
+                          {content}
+                        </Link>
+                      );
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          );
+        })}
       </div>
 
       {/* Bottom Footer Section: Cart & User Account */}
