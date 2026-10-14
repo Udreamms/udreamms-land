@@ -9,29 +9,41 @@ import { Button } from '@/components/ui/button';
 
 interface PhaseCard {
   phase: number;
+  videoUrl: string;
   title: string;
   subtitle: string;
   videoDuration?: string;
 }
 
+const MAIN_VIDEO_URL =
+  'https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/phases%2FPLATAFORMA%20V1.mp4?alt=media&token=1598f611-af84-4c06-98eb-71a19704411f';
+
 const phases: PhaseCard[] = [
   {
     phase: 1,
+    videoUrl:
+      'https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/phases%2FFASE%201%20V1.mp4?alt=media&token=75cb0a1f-ac36-4af4-b007-98dfd0f9532d',
     title: 'Preparándote para tu gran aventura',
     subtitle: 'Aún no cumples los requisitos: inglés y referidos.',
   },
   {
     phase: 2,
+    videoUrl:
+      'https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/phases%2FFASE%202%20V1.mp4?alt=media&token=7049de41-3688-4ab5-9882-a875f7952993',
     title: 'Iniciando tu proceso migratorio',
     subtitle: 'Ya tienes tus documentos: aplicación y visa.',
   },
   {
     phase: 3,
+    videoUrl:
+      'https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/phases%2FFASE%203%20V1.mp4?alt=media&token=2e24b3c7-0dad-4b87-85d5-cede3963c131',
     title: 'Organizando tu viaje a EE.UU.',
     subtitle: 'Ya tienes tu visa: llegada, vivienda y más.',
   },
   {
     phase: 4,
+    videoUrl:
+      'https://firebasestorage.googleapis.com/v0/b/udreamms-platform-1.firebasestorage.app/o/phases%2FFASE%204%20V1.mp4?alt=media&token=54505fcb-8343-47c1-b032-b8494539583a',
     title: 'Tus primeros días en EE.UU.',
     subtitle: 'Ya estás aquí: adaptación y crecimiento.',
   },
@@ -39,8 +51,22 @@ const phases: PhaseCard[] = [
 
 export default function BienvenidoPage() {
   const { user } = usePortal();
-  const [selectedPhase, setSelectedPhase] = useState<number>(1);
+  const [selectedPhase, setSelectedPhase] = useState<number | null>(null);
   const [isPlayingMain, setIsPlayingMain] = useState(false);
+
+  const activePhase = phases.find((p) => p.phase === selectedPhase) || null;
+  const activeVideoUrl = activePhase ? activePhase.videoUrl : MAIN_VIDEO_URL;
+
+  const selectPhase = (phase: number) => {
+    setSelectedPhase(phase);
+    setIsPlayingMain(true);
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const selectWelcome = () => {
+    setSelectedPhase(null);
+    setIsPlayingMain(true);
+  };
 
   const userName = user?.displayName
     ? user.displayName.split(' ')[0]
@@ -62,19 +88,39 @@ export default function BienvenidoPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch w-full min-w-0">
         {/* Main Video Box */}
         <div className="lg:col-span-8 bg-[#101426] rounded-3xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden shadow-xl min-h-[360px] sm:min-h-[440px]">
+          {isPlayingMain && (
+            <video
+              key={activeVideoUrl}
+              src={activeVideoUrl}
+              controls
+              autoPlay
+              playsInline
+              controlsList="nodownload"
+              className="absolute inset-0 w-full h-full object-contain bg-black z-20"
+            />
+          )}
+
           {/* Tag */}
-          <div className="relative z-10">
+          <div className="relative z-10 flex items-center gap-2 flex-wrap">
             <span className="inline-block bg-[#8b5cf6] text-white text-[10px] sm:text-xs font-semibold uppercase tracking-wider px-3.5 py-1.5 rounded-full shadow-sm">
-              VIDEO DE BIENVENIDA
+              {activePhase ? `FASE ${activePhase.phase}` : 'VIDEO DE BIENVENIDA'}
             </span>
+            {activePhase && (
+              <button
+                onClick={selectWelcome}
+                className="text-[10px] sm:text-xs font-medium text-slate-300 hover:text-white underline underline-offset-2 cursor-pointer"
+              >
+                Ver video de bienvenida
+              </button>
+            )}
           </div>
 
           {/* Central Play Button */}
           <div className="absolute inset-0 flex items-center justify-center z-10">
             <button
-              onClick={() => setIsPlayingMain(!isPlayingMain)}
+              onClick={() => setIsPlayingMain(true)}
               className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white text-slate-900 flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 group cursor-pointer"
-              aria-label="Reproducir video de bienvenida"
+              aria-label="Reproducir video"
             >
               <Play className="w-6 h-6 sm:w-8 sm:h-8 fill-slate-900 text-slate-900 ml-1 group-hover:scale-105 transition-transform" />
             </button>
@@ -87,10 +133,10 @@ export default function BienvenidoPage() {
           {/* Bottom Title */}
           <div className="relative z-10 pt-20">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-white tracking-tight">
-              ¿Qué es Udreamms y cómo te acompaña?
+              {activePhase ? activePhase.title : '¿Qué es Udreamms y cómo te acompaña?'}
             </h2>
             <p className="text-slate-400 text-xs sm:text-sm mt-1 font-normal">
-              Con Valentina · [duración]
+              {activePhase ? activePhase.subtitle : 'Con Valentina'}
             </p>
           </div>
         </div>
@@ -172,7 +218,7 @@ export default function BienvenidoPage() {
               <motion.div
                 key={item.phase}
                 whileHover={{ y: -3 }}
-                onClick={() => setSelectedPhase(item.phase)}
+                onClick={() => selectPhase(item.phase)}
                 className={`rounded-3xl border transition-all duration-200 cursor-pointer overflow-hidden flex flex-col justify-between p-5 sm:p-6 bg-white min-w-0 ${
                   isSelected
                     ? 'border-blue-500 ring-2 ring-blue-500/20 shadow-md'
