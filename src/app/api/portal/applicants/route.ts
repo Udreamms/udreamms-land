@@ -26,15 +26,22 @@ export async function GET(req: NextRequest) {
       hiddenSnap.forEach((hDoc) => hiddenIds.add(hDoc.id));
     } catch (hErr) {}
 
-    const snap = await db.collection('solicitudes_visas').get();
+    // Indexed lookup by email, fetching only the two fields we need (no base64 documents).
+    // Legacy docs that only carry formData.email_contacto are matched by the second query.
+    const emailVariants = Array.from(new Set([email.trim(), emailLower]));
+    const [byEmail, byContact]= await Promise.all([
+      db.collection('solicitudes_visas').where('email', 'in', emailVariants).select('applicantId', 'visaType').get(),
+      db.collection('solicitudes_visas').where('formData.email_contacto', 'in', emailVariants).select('applicantId', 'visaType').get(),
+    ]);
+    const seen = new Set<string>();
+    const docs = [...byEmail.docs, ...byContact.docs].filter((d) => !seen.has(d.id) && seen.add(d.id));
 
     const applicantIds: string[] = [];
-    snap.forEach((doc) => {
+    docs.forEach((doc) => {
       if (hiddenIds.has(doc.id)) return;
       const data = doc.data();
-      const docEmail = (data.email || data.formData?.email_contacto || '').toLowerCase().trim();
       const docVisaType = data.visaType === 'B-2' ? 'B-2' : 'F-1';
-      if (docEmail === emailLower && docVisaType === visaType) {
+      if (docVisaType === visaType) {
         const aId = data.applicantId || '1';
         if (!applicantIds.includes(aId)) {
           applicantIds.push(aId);

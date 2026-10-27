@@ -18,6 +18,7 @@ import { StaffDossierModal } from './components/StaffDossierModal';
 import { StaffChatDrawer } from './components/StaffChatDrawer';
 import { StaffResources } from './components/StaffResources';
 import { StaffReferrals } from './components/StaffReferrals';
+import { useVisiblePolling } from '@/hooks/useVisiblePolling';
 
 export default function StaffPortalPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -256,15 +257,8 @@ export default function StaffPortalPage() {
     }
   };
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchCases();
-      const interval = setInterval(() => {
-        fetchCases();
-      }, 3500);
-      return () => clearInterval(interval);
-    }
-  }, [isAuthenticated]);
+  // Visible-tab polling only; staff has no Firebase Auth so onSnapshot is not an option here.
+  useVisiblePolling(fetchCases, 30000, isAuthenticated);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -409,13 +403,7 @@ export default function StaffPortalPage() {
     } catch (e) {}
   };
 
-  useEffect(() => {
-    if (activeChatStudent) {
-      fetchStaffChat();
-      const interval = setInterval(fetchStaffChat, 2500);
-      return () => clearInterval(interval);
-    }
-  }, [activeChatStudent]);
+  useVisiblePolling(fetchStaffChat, 8000, !!activeChatStudent);
 
   const handleSendStaffChat = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();

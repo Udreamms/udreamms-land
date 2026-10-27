@@ -15,6 +15,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { useVisiblePolling } from '@/hooks/useVisiblePolling';
 
 export interface ChatMessage {
   id: string;
@@ -78,22 +81,42 @@ export default function PortalLiveChat({
     }
   };
 
-  // Poll for messages: faster when open (3.5s), normal when closed (8s)
+  // Realtime listener: Firestore pushes changes, so no /api polling (and no Vercel
+  // invocations) while it works. Falls back to visible-tab polling if the listener fails
+  // (e.g. firestore.rules not deployed yet).
+  const [realtimeFailed, setRealtimeFailed] = useState(false);
+  const isOpenRef = useRef(isOpen);
+  isOpenRef.current = isOpen;
+
   useEffect(() => {
-    if (!userEmail) return;
+    if (!userEmail || realtimeFailed) return;
+    const docId = `chat_${userEmail.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_')}`;
+    const unsubscribe = onSnapshot(
+      doc(db, 'portal_chats', docId),
+      (snap) => {
+        setIsLoading(false);
+        if (!snap.exists()) return;
+        const data = snap.data();
+        if (Array.isArray(data.messages)) setMessages(data.messages as ChatMessage[]);
+        const unread = typeof data.unreadByClient === 'number' ? data.unreadByClient : 0;
+        setUnreadCount(isOpenRef.current ? 0 : unread);
+        // Chat is open and new staff messages arrived: mark them read server-side.
+        if (isOpenRef.current && unread > 0) void fetchMessages();
+      },
+      (err) => {
+        console.warn('PortalLiveChat realtime unavailable, falling back to polling:', err?.message || err);
+        setRealtimeFailed(true);
+      }
+    );
+    return unsubscribe;
+  }, [userEmail, realtimeFailed]);
 
-    const controller = new AbortController();
-    fetchMessages(controller.signal);
-
-    const interval = setInterval(() => {
-      fetchMessages(controller.signal);
-    }, isOpen ? 3500 : 8000);
-
-    return () => {
-      controller.abort();
-      clearInterval(interval);
-    };
+  // Opening the chat marks existing messages as read.
+  useEffect(() => {
+    if (isOpen && userEmail) void fetchMessages();
   }, [isOpen, userEmail]);
+
+  useVisiblePolling(() => fetchMessages(), isOpen ? 5000 : 20000, !!userEmail && realtimeFailed);
 
   useEffect(() => {
     if (isOpen) {

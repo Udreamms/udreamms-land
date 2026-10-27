@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageCircle, Send, ChevronDown, CheckCheck, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useVisiblePolling } from '@/hooks/useVisiblePolling';
 
 interface ChatMessage {
   id: string;
@@ -76,11 +77,7 @@ export const DossierChatFooter: React.FC<DossierChatFooterProps> = ({
     }
   };
 
-  useEffect(() => {
-    fetchChat();
-    const interval = setInterval(fetchChat, 2500);
-    return () => clearInterval(interval);
-  }, [clientEmail]);
+  useVisiblePolling(fetchChat, 8000, !!clientEmail);
 
   useEffect(() => {
     if (isExpanded) {

@@ -179,7 +179,19 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ case: null });
     }
 
-    return NextResponse.json({ case: doc.data() });
+    // Skip the base64 copy of documents that already live in Storage (`url`).
+    const caseData: any = doc.data();
+    for (const key of [
+      'passportDoc', 'bankStatementDoc', 'sevisDoc', 'i20Doc',
+      'ds160Doc', 'acceptanceLetterDoc', 'affidavitDoc', 'embassyAppointmentDoc',
+    ]) {
+      const d = caseData?.[key];
+      if (d?.dataUrl && typeof d.url === 'string' && d.url && !d.url.startsWith('data:')) {
+        const { dataUrl, ...rest } = d;
+        caseData[key] = rest;
+      }
+    }
+    return NextResponse.json({ case: caseData });
   } catch (error: any) {
     console.error('Error fetching submission:', error);
     return NextResponse.json({ error: error?.message || 'Error al obtener postulación' }, { status: 500 });

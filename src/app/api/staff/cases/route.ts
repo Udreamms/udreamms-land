@@ -66,6 +66,17 @@ function parseTimestampMs(val: any): number {
   return 0;
 }
 
+// Drops the heavy base64 copy when the file already lives in Storage (`url`); documents
+// that only exist as a dataUrl keep it so Staff can still open them.
+function slimDoc(doc: any): any {
+  if (!doc) return null;
+  if (doc.url && typeof doc.url === 'string' && !doc.url.startsWith('data:') && doc.dataUrl) {
+    const { dataUrl, ...rest } = doc;
+    return rest;
+  }
+  return doc;
+}
+
 export async function GET(req: NextRequest) {
   try {
     if (!db) {
@@ -147,14 +158,14 @@ export async function GET(req: NextRequest) {
           submittedAt: parseDateSafe(data.submittedAt || data.createdAt),
           updatedAt: parseDateTimeSafe(data.updatedAt || data.createdAt),
           photoUrl: cleanPhotoUrl,
-          passportDoc: data.passportDoc || null,
-          bankStatementDoc: data.bankStatementDoc || null,
-          sevisDoc: data.sevisDoc || null,
-          i20Doc: data.i20Doc || null,
-          ds160Doc: data.ds160Doc || null,
-          acceptanceLetterDoc: data.acceptanceLetterDoc || null,
-          affidavitDoc: data.affidavitDoc || null,
-          embassyAppointmentDoc: data.embassyAppointmentDoc || null,
+          passportDoc: slimDoc(data.passportDoc),
+          bankStatementDoc: slimDoc(data.bankStatementDoc),
+          sevisDoc: slimDoc(data.sevisDoc),
+          i20Doc: slimDoc(data.i20Doc),
+          ds160Doc: slimDoc(data.ds160Doc),
+          acceptanceLetterDoc: slimDoc(data.acceptanceLetterDoc),
+          affidavitDoc: slimDoc(data.affidavitDoc),
+          embassyAppointmentDoc: slimDoc(data.embassyAppointmentDoc),
           formData: formData,
           notes: data.notes || '',
           unreadCount: chatInfo.unreadByStaff || 0,
@@ -428,7 +439,10 @@ export async function GET(req: NextRequest) {
       return timeB - timeA;
     });
 
-    return NextResponse.json({ cases: realCases });
+    return NextResponse.json(
+      { cases: realCases },
+      { headers: { 'Cache-Control': 'private, no-cache' } }
+    );
   } catch (error: any) {
     console.error('Error fetching staff cases:', error);
     return NextResponse.json({ cases: [], error: error?.message });

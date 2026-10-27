@@ -17,7 +17,7 @@ async function fetchJupiterPriceV3(mints: string[]): Promise<Record<string, Pric
     const apiKey = process.env.JUPITER_API_KEY;
     const response = await fetch(`https://api.jup.ag/price/v3?ids=${mints.join(',')}`, {
       headers: apiKey ? { 'x-api-key': apiKey } : undefined,
-      cache: 'no-store',
+      next: { revalidate: 30 },
     });
 
     if (!response.ok) {
@@ -113,5 +113,8 @@ export async function GET(request: NextRequest) {
     })
   );
 
-  return NextResponse.json({ prices, sources });
+  return NextResponse.json(
+    { prices, sources },
+    { headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60' } }
+  );
 }

@@ -30,6 +30,15 @@ service cloud.firestore {
       allow read, write: if request.auth != null;
     }
 
+    // Portal chat: a signed-in client may read (never write) only their own thread.
+    // Writes go through /api/portal/chat (Admin SDK).
+    match /portal_chats/{chatId} {
+      allow read: if request.auth != null
+        && request.auth.token.email != null
+        && resource.data.clientEmail.lower() == request.auth.token.email.lower();
+      allow write: if false;
+    }
+
     // Visa crypto QR payments — written only by Firebase Admin (API routes).
     // Clients must not read/write payment sessions or comprobantes directly.
     match /visaCryptoSessions/{sessionId} {

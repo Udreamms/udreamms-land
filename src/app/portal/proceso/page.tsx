@@ -535,13 +535,13 @@ export default function ProcesoPage() {
       await hydrateFromCloud('B-2');
     })();
 
-    // Poll every 12 seconds to reflect staff status changes in real-time
+    // Poll every 60 seconds (visible tab only) to reflect staff status changes.
+    // syncApplicantList already hydrates every card it discovers.
     const interval = setInterval(() => {
+      if (document.hidden) return;
       void syncApplicantList('F-1');
       void syncApplicantList('B-2');
-      void hydrateFromCloud('F-1');
-      void hydrateFromCloud('B-2');
-    }, 12000);
+    }, 60000);
 
     return () => clearInterval(interval);
   }, [user?.email, refreshApplicantsData]);

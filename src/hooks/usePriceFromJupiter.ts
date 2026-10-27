@@ -113,11 +113,9 @@ export function usePriceFromJupiter(
       }
     }, 1000);
 
-    const fetchInterval = setInterval(fetchPrices, cacheDurationMs);
-
+    // The 1s timer above already refetches once the cache window expires.
     return () => {
       clearInterval(timerInterval);
-      clearInterval(fetchInterval);
     };
   }, [tokenAddresses.join(','), cacheDurationMs, JSON.stringify(fallbackUsdPrices)]);
 
